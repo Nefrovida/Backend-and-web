@@ -1,21 +1,13 @@
-import React from "react";
-import "./App.css";
-import { useEffect } from "react";
+import { Outlet } from "react-router";
+import Navbar from "./components/organism/Navbar";
 
 function App() {
-  useEffect(() => {
-    fetch("/api")
-      .then((res) => res.json())
-      .then((data) => console.log(data))
-      .catch((e) => console.log(`Error: ${e}`));
-  }, []);
-
   return (
-    <div className="App">
-      <header className="App-header">
-        <p>Inicio de la aplicación: App()</p>
-      </header>
-    </div>
+    <main className="bg-gray-200">
+      <Navbar>
+        <Outlet />
+      </Navbar>
+    </main>
   );
 }
 
