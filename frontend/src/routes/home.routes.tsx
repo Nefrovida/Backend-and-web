@@ -1,14 +1,27 @@
+import App from "../App";
+import { createBrowserRouter } from "react-router";
+import NotFoundPage from "../components/page/NotFoundPage";
+import Login from "../components/page/Login";
+import analisisRoutes from "./analisis.routes";
 import Home from "../components/page/Home";
-import { RouterType } from "./types";
 
-// Routing component:
-// @path: String, La ruta en la que se carga el componente principal
-// @component: ReactNode, Componente que se va a cargar
-// @childRoutes: RouterType[], para componentes anidados que cambian su
-// estructura dependiendo la ruta
-export const homeRoute: RouterType[] = [
+const router = createBrowserRouter([
   {
     path: "/",
-    component: <Home />,
+    element: <App />,
+    errorElement: <NotFoundPage />,
+    children: [
+      {
+        path: "/",
+        element: <Home />,
+      },
+      ...analisisRoutes,
+    ],
   },
-];
+  {
+    path: "/login",
+    element: <Login />,
+  },
+]);
+
+export default router;
