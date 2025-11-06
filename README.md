@@ -41,6 +41,17 @@ cd frontend
 npm start
 ```
 
+## Crear base de datos
+```bash
+# Iniciar servidor
+cd backend
+npx prisma db push
+
+# Si hacen cambios
+npx prisma db migrate
+npx prisma db push
+```
+
 ## Estándares de Commits
 
 Este proyecto sigue [Conventional Commits](https://www.conventionalcommits.org/).
