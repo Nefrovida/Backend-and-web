@@ -4,7 +4,7 @@ import { FiAlertTriangle } from "react-icons/fi";
 
 function LabResultComponent() {
   return (
-    <div className="rounded-lg drop-shadow-md shadow-md border-2 border-light-blue flex bg-white items-center justify-between py-2 px-4">
+    <div className="rounded-lg drop-shadow-md shadow-md border-2 border-light-blue flex bg-white items-center justify-between py-2 px-4 hover:shadow-xl bg-6" >
       <div className="flex items-center">
         <BsPerson className="text-3xl mr-5" />
         <div>
