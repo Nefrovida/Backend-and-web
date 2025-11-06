@@ -7,3 +7,277 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+model roles {
+  role_id      Int @id @default(autoincrement())
+  rol_name  String
+
+  users users[]
+  rolePrivileges role_privilege[]
+}
+
+model privileges {
+  privilege_id      Int @id @default(autoincrement())
+  description       String
+
+  rolePrivileges role_privilege[]
+}
+
+model role_privilege {
+  role_id       Int
+  privilege_id  Int
+
+  @@id([role_id, privilege_id])
+
+  role      roles @relation(fields: [role_id], references: [role_id], onDelete: Cascade)
+  privilege privileges @relation(fields: [privilege_id], references: [privilege_id], onDelete: Cascade)
+}
+
+// ############ ACTORES ################
+model users {
+  user_id             String @id @default(uuid()) @db.Uuid
+  name                String
+  parent_last_name    String
+  maternal_last_name  String?
+  active              Boolean @default(true)
+  phone_number        String
+  user                String
+  password            String
+  birthday            DateTime
+  gender              Gender
+  registration_date   DateTime @default(now())
+  role_id             Int @default(1)
+  
+  role                roles @relation(fields: [role_id], references: [role_id], onDelete: SetDefault)
+
+  patients patients[]
+  familiars familiars[]
+  laboratorists laboratorists[]
+  doctors doctors[]
+  forums forums[]
+  usersForums users_forums[]
+  messages messages[]
+
+  likes likes[]
+}
+
+// Valores que parten de usuario no deberían tener su propio ID, lo hereda de 
+// user_id
+model patients {
+  patient_id String @id @default(uuid()) @db.Uuid
+  user_id    String @db.Uuid
+  curp       String @unique
+
+  user       users @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+
+  familiars familiars[]
+
+  patientAppointments patient_appointment[]
+
+  patientAnalyses patient_analysis[]
+
+  patientHistories patient_history[]
+}
+
+model familiars {
+  familiar_id   String @id @default(uuid()) @db.Uuid
+  user_id       String @unique @db.Uuid
+  patient_id    String @db.Uuid
+
+  user          users @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  patient       patients @relation(fields: [patient_id], references: [patient_id], onDelete: Cascade)
+}
+
+// No podría ser solo un rol?? no añade información
+model laboratorists { 
+  laboratorists_id String @id @default(uuid()) @db.Uuid
+  user_id         String @unique @db.Uuid
+
+  user            users @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+
+  patientAnalyses patient_analysis[]
+}
+
+model doctors {
+  doctor_id     String @id @default(uuid()) @db.Uuid
+  user_id       String @unique @db.Uuid
+  speciality    String @db.Char(100)
+  license       String @unique @db.Char(20)
+
+  user          users @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+
+  appointments appointments[]
+}
+
+// ########## FORUMS ##################
+model forums {
+  forum_id      Int @id @default(autoincrement())
+  name          String @unique @db.Char(100)
+  description   String @db.Char(255)
+  public        Boolean
+  created_by    String @db.Uuid
+  active        Boolean @default(true)
+
+  user          users @relation(fields: [created_by], references: [user_id])
+
+  usersForums users_forums[]
+  messages messages[]
+}
+
+model users_forums {
+  user_id       String @db.Uuid
+  forum_id      Int
+  rol_forum     String
+
+  @@id([user_id, forum_id])
+
+  user          users @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  forum         forums @relation(fields: [forum_id], references: [forum_id], onDelete: Cascade)
+}
+
+model messages {
+  message_id        Int @id @default(autoincrement())
+  forum_id          Int
+  user_id           String @db.Uuid
+  content           String
+  timestamp_publish DateTime @default(now())
+  parent_message_id Int?
+  active            Boolean @default(true)
+
+  forum             forums @relation(fields: [forum_id], references: [forum_id], onDelete: Cascade)
+  user              users @relation(fields: [user_id], references: [user_id], onDelete: Cascade)  
+  replies           messages? @relation("Replies", fields: [parent_message_id], references: [message_id], onDelete: Cascade)
+
+  messages messages[] @relation("Replies")
+  likes likes[]
+}
+
+// Es necesario???
+model likes {
+  like_id Int @id @default(autoincrement())
+  message_id  Int
+  user_id     String @db.Uuid
+  date        DateTime @default(now())
+
+  user        users @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  message     messages @relation(fields: [message_id], references: [message_id], onDelete: Cascade)
+}
+
+// ########## APPOINTMENTS ###############
+model appointments {
+  appointment_id  Int @id @default(autoincrement())
+  doctor_id       String @db.Uuid
+  name            String @db.Char(50)
+  general_cost    String @db.Char(10) // No debería ser Int???
+  community_cost  String @db.Char(10)
+
+  doctor          doctors @relation(fields: [doctor_id], references: [doctor_id], onDelete: Cascade)
+
+  patientAppointments patient_appointment[]
+}
+
+enum Status {
+  MISSED
+  CANCELED
+  FINISHED
+  PROGRAMMED
+}
+
+enum Type {
+  PRECENCIAL
+  VIRTUAL
+}
+
+model patient_appointment {
+  patient_appointment_id  Int @id @default(autoincrement())
+  patient_id              String @db.Uuid
+  appointment_id          Int @unique
+  date_hour               DateTime
+  duration                Int // minutes
+  type                    Type
+  link                    String?
+  place                   String?
+  status                  Status
+
+  patient                 patients @relation(fields: [patient_id], references: [patient_id], onDelete: Cascade)
+  appointment             appointments @relation(fields: [appointment_id], references: [appointment_id], onDelete: Cascade)
+
+  notes notes[]
+}
+
+model notes {
+  note_id                 Int @id @default(autoincrement())
+  patient_appointment_id  Int? @unique
+  title                   String @db.Char(50)
+  content                 String
+  visibility              Boolean @default(true)
+  creation_date           DateTime @default(now())
+
+  patient_appointment   patient_appointment? @relation(fields: [patient_appointment_id], references: [patient_appointment_id], onDelete: Cascade)
+}
+
+// ########## ANALYSIS #########3
+
+model analysis {
+  analysis_id           Int @id @default(autoincrement())
+  name                  String @db.Char(50)
+  description           String @db.Char(500)
+  previous_requirements String
+  general_cost          String
+  community_cost        String
+
+
+  patientAnalyses patient_analysis[]
+}
+
+model patient_analysis {
+  patient_analysis_id     Int @id @default(autoincrement())
+  laboratorist_id         String @db.Uuid
+  analysis_id             Int
+  patient_id              String @db.Uuid
+  analysis_date           DateTime
+  results_date            DateTime
+  place                   String
+
+  laboratorist            laboratorists @relation(fields: [laboratorist_id], references: [laboratorists_id], onDelete: Cascade)
+  analysis                analysis @relation(fields: [analysis_id], references: [analysis_id], onDelete: Cascade)
+  patient                 patients @relation(fields: [patient_id], references: [patient_id], onDelete: Cascade)
+
+  results results[]
+}
+
+model results {
+  result_id           Int @id @default(autoincrement())
+  patient_analysis_id Int @unique
+  date                DateTime
+  route               String @db.Char(255)
+
+  patient_analysis    patient_analysis @relation(fields: [patient_analysis_id], references: [patient_analysis_id], onDelete: Cascade)
+}
+
+// ########## History ############
+
+model questions_history {
+  question_id Int @id @default(autoincrement())
+  description String
+  type        String
+
+  patientHistories patient_history[]
+}
+
+model patient_history {
+  question_id Int
+  patient_id  String @db.Uuid
+  answer      String
+
+  @@id([question_id, patient_id])
+
+  question      questions_history @relation(fields: [question_id], references: [question_id], onDelete: Cascade)
+  patient       patients @relation(fields: [patient_id], references: [patient_id], onDelete: Cascade)
+}
