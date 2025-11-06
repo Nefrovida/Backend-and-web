@@ -19,14 +19,14 @@ model roles {
   rol_name  String
 
   users users[]
-  rolePrivileges role_privilege[]
+  role_privileges role_privilege[]
 }
 
 model privileges {
   privilege_id      Int @id @default(autoincrement())
   description       String
 
-  rolePrivileges role_privilege[]
+  role_privileges role_privilege[]
 }
 
 model role_privilege {
@@ -78,11 +78,11 @@ model patients {
 
   familiars familiars[]
 
-  patientAppointments patient_appointment[]
+  patient_appointments patient_appointment[]
 
-  patientAnalyses patient_analysis[]
+  patient_analyses patient_analysis[]
 
-  patientHistories patient_history[]
+  patient_histories patient_history[]
 }
 
 model familiars {
@@ -101,7 +101,7 @@ model laboratorists {
 
   user            users @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
 
-  patientAnalyses patient_analysis[]
+  patient_analyses patient_analysis[]
 }
 
 model doctors {
@@ -126,7 +126,7 @@ model forums {
 
   user          users @relation(fields: [created_by], references: [user_id])
 
-  usersForums users_forums[]
+  users_forums users_forums[]
   messages messages[]
 }
 
@@ -179,7 +179,7 @@ model appointments {
 
   doctor          doctors @relation(fields: [doctor_id], references: [doctor_id], onDelete: Cascade)
 
-  patientAppointments patient_appointment[]
+  patient_appointments patient_appointment[]
 }
 
 enum Status {
@@ -222,7 +222,7 @@ model notes {
   patient_appointment   patient_appointment? @relation(fields: [patient_appointment_id], references: [patient_appointment_id], onDelete: Cascade)
 }
 
-// ########## ANALYSIS #########3
+// ########## ANALYSIS #########
 
 model analysis {
   analysis_id           Int @id @default(autoincrement())
@@ -233,7 +233,7 @@ model analysis {
   community_cost        String
 
 
-  patientAnalyses patient_analysis[]
+  patient_analyses patient_analysis[]
 }
 
 model patient_analysis {
@@ -268,7 +268,7 @@ model questions_history {
   description String
   type        String
 
-  patientHistories patient_history[]
+  patient_histories patient_history[]
 }
 
 model patient_history {
