@@ -12,9 +12,9 @@ function ListaResultados() {
         <Filter />
         <Search />
       </div>
-      <ul className="flex flex-col gap-2 h-full overflow-auto pb-10 pr-2">
+      <ul className="flex flex-col gap-2 h-[90%] overflow-auto pb-10 mb-20 pr-2">
         {Array.from({ length: 10 }).map((idx) => (
-          <LabResultComponent />
+          <LabResultComponent status="lab"/>
         ))}
       </ul>
     </div>
