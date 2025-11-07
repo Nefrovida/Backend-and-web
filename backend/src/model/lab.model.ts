@@ -1,5 +1,5 @@
-import { patient_analysis } from './../../prisma/database/prisma/client';
-import {PrismaClient} from "@prisma/client";
+import { PrismaClient } from "@client";
+
 const prisma = new PrismaClient;
 
 export default class Laboratory {
@@ -8,11 +8,7 @@ export default class Laboratory {
     }
 
     static async getLabResults() {
-        const patientResults = await prisma.patient_analysis.findMany({
-            includes: {
-                patients: true,
-            }
-        });
+        const patientResults = await prisma.patient_analysis.findMany({});
         return patientResults;
     }
 }

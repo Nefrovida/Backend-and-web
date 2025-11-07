@@ -1,8 +1,8 @@
-import { Request, Response } from "express";
-import Laboratory from "../../model/lab.model";
+import { type Request, type Response } from "express";
+import Laboratory from "../../model/lab.model.js";
 
-function getLabResults(req: Request, res: Response) {
-    const patientLabResults = Laboratory.getLabResults();
+async function getLabResults(req: Request, res: Response) {
+    const patientLabResults = await Laboratory.getLabResults();
 
     console.log(patientLabResults);
 

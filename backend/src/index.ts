@@ -1,5 +1,5 @@
 // Dependencies
-import express, { Request, Response } from "express";
+import express, { type Request, type Response } from "express";
 import dotenv from "dotenv"
 import session from "express-session"
 
@@ -16,7 +16,7 @@ app.use(session({
 
 const port = process.env.SERVER_PORT || 3000;
 
-import router from "./routes/routes";
+import router from "./routes/routes.ts";
 
 // Routes
 app.use("/api", router);
