@@ -54,6 +54,9 @@ npx prisma db push
 
 # Actualizar typescript con los tipos de la base de datos
 npx prisma generate
+
+# Por si la regaron y tienen que volver a constrir la db
+npx prisma migrate reset
 ```
 
 ## Estándares de Commits
@@ -141,3 +144,9 @@ Utils (src/util/)
 
 Pure helper functions (JWT, password hashing, date formatting)
 No business logic, no database access
+
+## Types
+
+Para saber si tienen errores de types
+
+npx tsc --noEmit

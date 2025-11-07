@@ -39,7 +39,7 @@ export const login = async (loginData: LoginRequest): Promise<AuthResponse> => {
 
   // Extract privileges
   const privileges = existingUser.role.role_privilege.map(
-    (rp) => rp.privilege.description
+    (rp: { privilege: { description: string } }) => rp.privilege.description
   );
 
   // Create JWT payload
@@ -106,7 +106,7 @@ export const register = async (registerData: RegisterRequest): Promise<AuthRespo
 
   // Extract privileges
   const privileges = newUser.role.role_privilege.map(
-    (rp) => rp.privilege.description
+    (rp: { privilege: { description: string } }) => rp.privilege.description
   );
 
   // Create JWT payload
@@ -158,7 +158,7 @@ export const refreshAccessToken = async (userId: string): Promise<string> => {
 
   // Extract privileges
   const privileges = user.role.role_privilege.map(
-    (rp) => rp.privilege.description
+    (rp: { privilege: { description: string } }) => rp.privilege.description
   );
 
   // Create JWT payload
