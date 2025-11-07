@@ -45,6 +45,7 @@ npm start
 ```bash
 # Iniciar servidor
 cd backend
+npx prisma generate
 npx prisma db push
 
 # Si hacen cambios
