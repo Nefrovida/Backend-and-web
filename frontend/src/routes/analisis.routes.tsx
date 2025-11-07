@@ -1,10 +1,17 @@
 import { RouteObject } from "react-router";
-import LabResults from "../components/page/LabResults";
+import LabPage from "../components/page/LabPage";
+import LabResults from "../components/organism/lab/LabResults";
 
 const analisisRoutes: RouteObject[] = [
   {
     path: "/laboratorio",
-    element: <LabResults />,
+    element: <LabPage />,
+    children: [
+      {
+        path: ":resultadoId",
+        element: <LabResults />,
+      },
+    ],
   },
 ];
 
