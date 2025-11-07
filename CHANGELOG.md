@@ -30,9 +30,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.0] - 2025-11-06
 
+### Added
+
 - Database schema
 
+## [0.1.0] - 2025-11-07
+
 ### Added
+
+- Database-Seed
+
+
+### Fixed
+
+- Database had reserved words as some column-parameters
 
 ### Types of changes
 

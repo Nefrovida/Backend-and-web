@@ -14,6 +14,18 @@ enum Gender {
   OTHER
 }
 
+enum Status {
+  MISSED
+  CANCELED
+  FINISHED
+  PROGRAMMED
+}
+
+enum Type {
+  PRESENCIAL
+  VIRTUAL
+}
+
 model roles {
   role_id      Int @id @default(autoincrement())
   rol_name  String
@@ -47,7 +59,7 @@ model users {
   maternal_last_name  String?
   active              Boolean @default(true)
   phone_number        String
-  user                String
+  username            String
   password            String
   birthday            DateTime
   gender              Gender
@@ -87,7 +99,7 @@ model patients {
 
 model familiars {
   familiar_id   String @id @default(uuid()) @db.Uuid
-  user_id       String @unique @db.Uuid
+  user_id       String @db.Uuid
   patient_id    String @db.Uuid
 
   user          users @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
@@ -120,7 +132,7 @@ model forums {
   forum_id      Int @id @default(autoincrement())
   name          String @unique @db.Char(100)
   description   String @db.Char(255)
-  public        Boolean
+  public_status        Boolean
   created_by    String @db.Uuid
   active        Boolean @default(true)
 
@@ -182,28 +194,16 @@ model appointments {
   patient_appointments patient_appointment[]
 }
 
-enum Status {
-  MISSED
-  CANCELED
-  FINISHED
-  PROGRAMMED
-}
-
-enum Type {
-  PRECENCIAL
-  VIRTUAL
-}
-
 model patient_appointment {
   patient_appointment_id  Int @id @default(autoincrement())
   patient_id              String @db.Uuid
   appointment_id          Int @unique
   date_hour               DateTime
   duration                Int // minutes
-  type                    Type
+  appointment_type        Type
   link                    String?
   place                   String?
-  status                  Status
+  appointment_status      Status
 
   patient                 patients @relation(fields: [patient_id], references: [patient_id], onDelete: Cascade)
   appointment             appointments @relation(fields: [appointment_id], references: [appointment_id], onDelete: Cascade)

@@ -50,6 +50,9 @@ npx prisma db push
 # Si hacen cambios
 npx prisma db migrate
 npx prisma db push
+
+# Actualizar typescript con los tipos de la base de datos
+npx prisma generate
 ```
 
 ## Estándares de Commits
