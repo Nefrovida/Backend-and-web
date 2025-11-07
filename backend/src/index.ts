@@ -1,11 +1,18 @@
 // Dependencies
 import express, { Request, Response } from "express";
 import dotenv from "dotenv"
-dotenv.config({path: "../.env"})
+import session from "express-session"
 
+dotenv.config({path: "../.env"})
 
 // Initialize server
 const app = express();
+app.use(session({
+  secret: process.env.SECRET ?? "tacocat",
+  resave: false,
+  saveUninitialized: true,
+  cookie: {secure: true}
+}))
 
 const port = process.env.SERVER_PORT || 3000;
 
