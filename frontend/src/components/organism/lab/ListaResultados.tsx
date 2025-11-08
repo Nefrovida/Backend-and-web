@@ -1,8 +1,8 @@
 import React from "react";
 import Title from "../../atoms/Title";
-import LabResultComponent from "../../atoms/labs/LabResultComponent";
 import Filter from "../../atoms/Filter";
 import Search from "../../atoms/Search";
+import LabResultsList from "../../molecules/lab/LabResultsList";
 
 function ListaResultados() {
   return (
@@ -12,11 +12,7 @@ function ListaResultados() {
         <Filter />
         <Search />
       </div>
-      <ul className="flex flex-col gap-2 h-[90%] overflow-auto pb-10 mb-20 pr-2">
-        {Array.from({ length: 10 }).map((idx) => (
-          <LabResultComponent status="lab"/>
-        ))}
-      </ul>
+      <LabResultsList />
     </div>
   );
 }

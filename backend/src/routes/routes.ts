@@ -8,6 +8,6 @@ router.get("/", (_req: Request, res: Response) => {
   console.log("API hit");
   res.json({ message: "Welcome to the Express + TypeScript Server!" });
 });
-router.use("/laboratorio", labRoutes);
+router.use("/laboratory", labRoutes);
 
 export default router;

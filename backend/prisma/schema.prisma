@@ -21,6 +21,12 @@ enum Status {
   PROGRAMMED
 }
 
+enum ANALYSIS_STATUS {
+  LAB
+  PENDING
+  SENT
+}
+
 enum Type {
   PRESENCIAL
   VIRTUAL
@@ -92,7 +98,7 @@ model patients {
 
   patient_appointments patient_appointment[]
 
-  patient_analyses patient_analysis[]
+  patient_analysis patient_analysis[]
 
   patient_histories patient_history[]
 }
@@ -113,7 +119,7 @@ model laboratorists {
 
   user            users @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
 
-  patient_analyses patient_analysis[]
+  patient_analysis patient_analysis[]
 }
 
 model doctors {
@@ -233,7 +239,7 @@ model analysis {
   community_cost        String
 
 
-  patient_analyses patient_analysis[]
+  patient_analysis patient_analysis[]
 }
 
 model patient_analysis {
@@ -244,6 +250,7 @@ model patient_analysis {
   analysis_date           DateTime
   results_date            DateTime
   place                   String
+  analysis_status         ANALYSIS_STATUS @default(LAB)
 
   laboratorist            laboratorists @relation(fields: [laboratorist_id], references: [laboratorists_id], onDelete: Cascade)
   analysis                analysis @relation(fields: [analysis_id], references: [analysis_id], onDelete: Cascade)

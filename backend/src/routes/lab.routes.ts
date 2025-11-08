@@ -1,9 +1,9 @@
 import express from "express"
 const router = express.Router()
 
-import getLabResults from "../controller/lab/getLabResults.controller";
-import getPermission from "../util/getPermission";
+import getLabResults from "../controller/lab/getLabResults.controller.ts";
+import getPermission from "../util/getPermission.ts";
 
-router.get("/resultados", getPermission("labResults"), getLabResults);
+router.get("/results", getPermission("labResults"), getLabResults);
 
 export default router;
