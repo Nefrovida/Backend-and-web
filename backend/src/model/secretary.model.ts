@@ -1,12 +1,11 @@
-import { patient_appointment } from './../../prisma/database/prisma/client'; // Aquí va la tabla?
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "../../prisma/database/prisma/client";
 const prisma = new PrismaClient;
 
-export default class Secretary{ // Aquí va el rol?
-    Secretary() {
+export default class Secretary{ 
+    constructor() {
 
     }
-    static async getAppointmentsPerDay () {
+    static async getAppointmentsPerDay (targetDate: string | Date) {
         const date = new Date(targetDate); //Ocupo Date Object
         date.setHours(0,0,0,0); // El día comienza a las 00:00
 
