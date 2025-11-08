@@ -10,9 +10,11 @@ const app = express();
 const port = process.env.SERVER_PORT || 3000;
 
 import router from "./routes/routes";
+import reportRouter from "./routes/report.routes";
 
 // Routes
 app.use("/api", router);
+app.use("/api/report", reportRouter);
 
 // Start server
 app.listen(port, () => {
