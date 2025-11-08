@@ -17,7 +17,7 @@ export const login = async (loginData: LoginRequest): Promise<AuthResponse> => {
     include: {
       role: {
         include: {
-          role_privilege: {
+          role_privileges: {
             include: {
               privilege: true,
             },
@@ -38,7 +38,7 @@ export const login = async (loginData: LoginRequest): Promise<AuthResponse> => {
   }
 
   // Extract privileges
-  const privileges = existingUser.role.role_privilege.map(
+  const privileges = existingUser.role.role_privileges.map(
     (rp: { privilege: { description: string } }) => rp.privilege.description
   );
 
@@ -94,10 +94,14 @@ export const register = async (registerData: RegisterRequest): Promise<AuthRespo
   // Hash password
   const hashedPassword = await hashPassword(password);
 
+  // Convert birthday to Date if it's a string
+  const birthdayDate = userData.birthday ? new Date(userData.birthday) : new Date();
+
   // Create user with default role (patient) if not specified
   const newUser = await prisma.users.create({
     data: {
       ...userData,
+      birthday: birthdayDate,
       username,
       password: hashedPassword,
       role_id: actualRoleId,
@@ -105,7 +109,7 @@ export const register = async (registerData: RegisterRequest): Promise<AuthRespo
     include: {
       role: {
         include: {
-          role_privilege: {
+          role_privileges: {
             include: {
               privilege: true,
             },
@@ -154,7 +158,7 @@ export const register = async (registerData: RegisterRequest): Promise<AuthRespo
   }
 
   // Extract privileges
-  const privileges = newUser.role.role_privilege.map(
+  const privileges = newUser.role.role_privileges.map(
     (rp: { privilege: { description: string } }) => rp.privilege.description
   );
 
@@ -191,7 +195,7 @@ export const refreshAccessToken = async (userId: string): Promise<string> => {
     include: {
       role: {
         include: {
-          role_privilege: {
+          role_privileges: {
             include: {
               privilege: true,
             },
@@ -206,7 +210,7 @@ export const refreshAccessToken = async (userId: string): Promise<string> => {
   }
 
   // Extract privileges
-  const privileges = user.role.role_privilege.map(
+  const privileges = user.role.role_privileges.map(
     (rp: { privilege: { description: string } }) => rp.privilege.description
   );
 
