@@ -1,7 +1,6 @@
 import { prisma } from '../util/prisma';
-import { hashPassword } from '../util/password.util';
 import { UserWithRoleAndPrivileges, UpdateUserRequest } from '../types/user.types';
-import { NotFoundError, ConflictError } from '../util/errors.util';
+import { NotFoundError } from '../util/errors.util';
 
 /**
  * Get all users with their roles and privileges
@@ -107,7 +106,7 @@ export const deleteUser = async (userId: string): Promise<void> => {
  */
 export const getUserByUsername = async (username: string): Promise<UserWithRoleAndPrivileges | null> => {
   return await prisma.users.findFirst({
-    where: { user: username },
+    where: { username: username },
     include: {
       role: {
         include: {

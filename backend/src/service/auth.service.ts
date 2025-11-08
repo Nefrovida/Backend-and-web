@@ -2,18 +2,18 @@ import { prisma } from '../util/prisma';
 import { hashPassword, comparePassword } from '../util/password.util';
 import { generateAccessToken, generateRefreshToken } from '../util/jwt.util';
 import { LoginRequest, RegisterRequest, AuthResponse, JwtPayload } from '../types/auth.types';
-import { UnauthorizedError, BadRequestError, ConflictError } from '../util/errors.util';
+import { UnauthorizedError, ConflictError } from '../util/errors.util';
 import { DEFAULT_ROLES } from '../config/constants';
 
 /**
  * Login user and generate tokens
  */
 export const login = async (loginData: LoginRequest): Promise<AuthResponse> => {
-  const { user, password } = loginData;
+  const { username, password } = loginData;
 
   // Find user with role and privileges
   const existingUser = await prisma.users.findFirst({
-    where: { user, active: true },
+    where: { username, active: true },
     include: {
       role: {
         include: {
@@ -59,7 +59,7 @@ export const login = async (loginData: LoginRequest): Promise<AuthResponse> => {
     user: {
       user_id: existingUser.user_id,
       name: existingUser.name,
-      user: existingUser.user,
+      username: existingUser.username,
       role_id: existingUser.role_id,
     },
   };
@@ -69,15 +69,26 @@ export const login = async (loginData: LoginRequest): Promise<AuthResponse> => {
  * Register a new user
  */
 export const register = async (registerData: RegisterRequest): Promise<AuthResponse> => {
-  const { user, password, role_id, ...userData } = registerData;
+  const { username, password, role_id, curp, speciality, license, patient_id, ...userData } = registerData;
 
   // Check if user already exists
   const existingUser = await prisma.users.findFirst({
-    where: { user },
+    where: { username },
   });
 
   if (existingUser) {
     throw new ConflictError('User already exists');
+  }
+
+  // Determine the actual role (default to PATIENT if not specified)
+  const actualRoleId = role_id || DEFAULT_ROLES.PATIENT;
+
+  // Validate required fields based on role
+  if (actualRoleId === DEFAULT_ROLES.PATIENT && !curp) {
+    throw new ConflictError('CURP is required for patient registration');
+  }
+  if (actualRoleId === DEFAULT_ROLES.DOCTOR && (!speciality || !license)) {
+    throw new ConflictError('Speciality and license are required for doctor registration');
   }
 
   // Hash password
@@ -87,9 +98,9 @@ export const register = async (registerData: RegisterRequest): Promise<AuthRespo
   const newUser = await prisma.users.create({
     data: {
       ...userData,
-      user,
+      username,
       password: hashedPassword,
-      role_id: role_id || DEFAULT_ROLES.PATIENT,
+      role_id: actualRoleId,
     },
     include: {
       role: {
@@ -103,6 +114,44 @@ export const register = async (registerData: RegisterRequest): Promise<AuthRespo
       },
     },
   });
+
+  // Create role-specific entry
+  switch (actualRoleId) {
+    case DEFAULT_ROLES.PATIENT:
+      await prisma.patients.create({
+        data: {
+          user_id: newUser.user_id,
+          curp: curp!,
+        },
+      });
+      break;
+
+    case DEFAULT_ROLES.DOCTOR:
+      await prisma.doctors.create({
+        data: {
+          user_id: newUser.user_id,
+          speciality: speciality!,
+          license: license!,
+        },
+      });
+      break;
+
+    case DEFAULT_ROLES.LABORATORIST:
+      await prisma.laboratorists.create({
+        data: {
+          user_id: newUser.user_id,
+        },
+      });
+      break;
+
+    // ADMIN role doesn't need a separate table entry
+    case DEFAULT_ROLES.ADMIN:
+      break;
+
+    default:
+      // If an unknown role is provided, we still allow it but don't create additional entries
+      break;
+  }
 
   // Extract privileges
   const privileges = newUser.role.role_privilege.map(
@@ -126,7 +175,7 @@ export const register = async (registerData: RegisterRequest): Promise<AuthRespo
     user: {
       user_id: newUser.user_id,
       name: newUser.name,
-      user: newUser.user,
+      username: newUser.username,
       role_id: newUser.role_id,
     },
   };

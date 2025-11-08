@@ -13,7 +13,7 @@ export interface JwtPayload {
  * Login request DTO
  */
 export interface LoginRequest {
-  user: string;
+  username: string;
   password: string;
 }
 
@@ -25,11 +25,21 @@ export interface RegisterRequest {
   parent_last_name: string;
   maternal_last_name?: string;
   phone_number: string;
-  user: string;
+  username: string;
   password: string;
   birthday: Date;
   gender: Gender;
   role_id?: number;
+  
+  // Patient-specific fields
+  curp?: string;
+  
+  // Doctor-specific fields
+  speciality?: string;
+  license?: string;
+  
+  // Familiar-specific fields (Note: familiars are not a role, but users with patient associations)
+  patient_id?: string;
 }
 
 /**
@@ -41,7 +51,7 @@ export interface AuthResponse {
   user: {
     user_id: string;
     name: string;
-    user: string;
+    username: string;
     role_id: number;
   };
 }
