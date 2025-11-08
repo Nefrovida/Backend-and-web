@@ -3,7 +3,7 @@ to avoid duplicate connections
 and ensure efficient database access across the application.
 Singleton pattern*/
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../../prisma/database/prisma/client.js';
 
 // Extend globalThis to store the PrismaClient instance in development
 const globalForPrisma = globalThis as unknown as {
