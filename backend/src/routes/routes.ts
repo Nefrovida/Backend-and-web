@@ -1,7 +1,7 @@
 import express, {type Request, type Response } from "express";
 const router = express.Router();
 
-import secretaryRoutes from "./secretary.routes.ts"
+import secretaryRoutes from "./secretary.routes"
 
 
 // Use this file to append router modules:

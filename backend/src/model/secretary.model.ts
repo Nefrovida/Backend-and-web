@@ -5,22 +5,29 @@ export default class Secretary{
     constructor() {
 
     }
-    static async getAppointmentsPerDay (targetDate: string | Date) {
-        const date = new Date(targetDate); //Ocupo Date Object
-        date.setHours(0,0,0,0); // El día comienza a las 00:00
+static async getAppointmentsPerDay(targetDate: string) {
+  // Convierte a hora de Mexico
+  const [year, month, day] = targetDate.split('-').map(Number);
+  const start = new Date(year, month - 1, day, 0, 0, 0);  
+  const end = new Date(year, month - 1, day + 1, 0, 0, 0); 
 
-        const appointments = await prisma.patient_appointment.findMany({
-            where: {
-                date_hour: {
-                    gte: date,
-                    lt: new Date(date.getTime() + 24 * 60 * 60 * 1000)
-                },
-            },
-        });
+  /*console.log("Searching between (LOCAL FIX):");
+  console.log("gte:", start);
+  console.log("lt:", end);*/
 
-        console.log(appointments);
-        return appointments;
+  const appointments = await prisma.patient_appointment.findMany({
+    where: {
+      date_hour: {
+        gte: start,
+        lt: end,
+      },
+    },
+  });
 
-    }
+  console.log("Results:", appointments);
+  return appointments;
+}
+
+
 
 }
