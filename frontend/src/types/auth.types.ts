@@ -22,6 +22,9 @@ export interface RegisterData {
   // Doctor-specific fields
   speciality?: string;
   license?: string;
+
+  // Familiar-specific fields
+  patient_curp?: string;
 }
 
 export interface AuthResponse {
@@ -45,6 +48,7 @@ export const ROLE_IDS = {
   DOCTOR: 2,
   LABORATORIST: 3,
   ADMIN: 4,
+  FAMILIAR: 5,
 } as const;
 
 export const ROLE_NAMES = {
@@ -52,4 +56,5 @@ export const ROLE_NAMES = {
   [ROLE_IDS.DOCTOR]: "Doctor",
   [ROLE_IDS.LABORATORIST]: "Laboratorista",
   [ROLE_IDS.ADMIN]: "Administrador",
+  [ROLE_IDS.FAMILIAR]: "Familiar",
 } as const;

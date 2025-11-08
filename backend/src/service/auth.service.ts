@@ -69,7 +69,7 @@ export const login = async (loginData: LoginRequest): Promise<AuthResponse> => {
  * Register a new user
  */
 export const register = async (registerData: RegisterRequest): Promise<AuthResponse> => {
-  const { username, password, role_id, curp, speciality, license, patient_id, ...userData } = registerData;
+  const { username, password, role_id, curp, speciality, license, patient_curp, ...userData } = registerData;
 
   // Check if user already exists
   const existingUser = await prisma.users.findFirst({
@@ -89,6 +89,9 @@ export const register = async (registerData: RegisterRequest): Promise<AuthRespo
   }
   if (actualRoleId === DEFAULT_ROLES.DOCTOR && (!speciality || !license)) {
     throw new ConflictError('Speciality and license are required for doctor registration');
+  }
+  if (actualRoleId === DEFAULT_ROLES.FAMILIAR && !patient_curp) {
+    throw new ConflictError('Patient CURP is required for familiar registration');
   }
 
   // Hash password
@@ -144,6 +147,24 @@ export const register = async (registerData: RegisterRequest): Promise<AuthRespo
       await prisma.laboratorists.create({
         data: {
           user_id: newUser.user_id,
+        },
+      });
+      break;
+
+    case DEFAULT_ROLES.FAMILIAR:
+      // Look up patient by CURP
+      const patient = await prisma.patients.findUnique({
+        where: { curp: patient_curp! },
+      });
+      
+      if (!patient) {
+        throw new ConflictError('Patient with provided CURP not found');
+      }
+      
+      await prisma.familiars.create({
+        data: {
+          user_id: newUser.user_id,
+          patient_id: patient.patient_id,
         },
       });
       break;

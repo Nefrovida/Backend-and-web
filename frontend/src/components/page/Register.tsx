@@ -56,6 +56,12 @@ function Register() {
         return;
       }
 
+      if (formData.role_id === ROLE_IDS.FAMILIAR && !formData.patient_curp) {
+        setError("El CURP del paciente es requerido para familiares");
+        setLoading(false);
+        return;
+      }
+
       const response = await authService.register(formData as RegisterData);
       
       // Store tokens
@@ -196,7 +202,7 @@ function Register() {
       <p className="text-center text-gray-600 mb-6">¿Qué tipo de usuario eres?</p>
 
       <div className="space-y-3">
-        {[ROLE_IDS.PATIENT, ROLE_IDS.DOCTOR, ROLE_IDS.LABORATORIST].map((roleId) => (
+        {[ROLE_IDS.PATIENT, ROLE_IDS.DOCTOR, ROLE_IDS.LABORATORIST, ROLE_IDS.FAMILIAR].map((roleId) => (
           <button
             key={roleId}
             onClick={() => handleStep2Submit(roleId)}
@@ -207,6 +213,7 @@ function Register() {
               {roleId === ROLE_IDS.PATIENT && "Registrarme como paciente"}
               {roleId === ROLE_IDS.DOCTOR && "Soy un profesional de la salud"}
               {roleId === ROLE_IDS.LABORATORIST && "Trabajo en laboratorio"}
+              {roleId === ROLE_IDS.FAMILIAR && "Soy familiar de un paciente"}
             </p>
           </button>
         ))}
@@ -279,6 +286,24 @@ function Register() {
           <p className="text-sm text-gray-700">
             Como laboratorista, no necesitas información adicional.
             Presiona "Completar Registro" para finalizar.
+          </p>
+        </div>
+      )}
+
+      {formData.role_id === ROLE_IDS.FAMILIAR && (
+        <div>
+          <label className="block text-sm text-gray-600 mb-2 ml-1">CURP del Paciente *</label>
+          <input
+            type="text"
+            value={formData.patient_curp || ""}
+            onChange={(e) => updateFormData({ patient_curp: e.target.value.toUpperCase() })}
+            className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-900 transition-colors uppercase"
+            placeholder="ABCD123456HDFXYZ01"
+            maxLength={18}
+            required
+          />
+          <p className="text-xs text-gray-500 mt-2 ml-1">
+            Ingrese el CURP del paciente al que está asociado como familiar
           </p>
         </div>
       )}

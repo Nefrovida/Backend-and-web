@@ -39,7 +39,7 @@ export interface RegisterRequest {
   license?: string;
   
   // Familiar-specific fields (Note: familiars are not a role, but users with patient associations)
-  patient_id?: string;
+  patient_curp?: string;
 }
 
 /**

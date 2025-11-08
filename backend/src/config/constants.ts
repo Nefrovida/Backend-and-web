@@ -11,6 +11,7 @@ export const DEFAULT_ROLES = {
   DOCTOR: 2,
   LABORATORIST: 3,
   ADMIN: 4,
+  FAMILIAR: 5,
 } as const;
 
 /**
