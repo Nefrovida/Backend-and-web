@@ -73,69 +73,67 @@ function Register() {
   };
 
   const renderStep1 = () => (
-    <form onSubmit={handleStep1Submit} className="space-y-4">
-      <h2 className="text-2xl font-bold text-center mb-6">Información Básica</h2>
-
+    <form onSubmit={handleStep1Submit} className="space-y-5">
       <div>
-        <label className="block text-sm font-medium mb-1">Nombre *</label>
+        <label className="block text-sm text-gray-600 mb-2 ml-1">Nombre *</label>
         <input
           type="text"
           value={formData.name || ""}
           onChange={(e) => updateFormData({ name: e.target.value })}
-          className="w-full px-3 py-2 border rounded-md"
+          className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-900 transition-colors"
           required
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Apellido Paterno *</label>
+        <label className="block text-sm text-gray-600 mb-2 ml-1">Apellido Paterno *</label>
         <input
           type="text"
           value={formData.parent_last_name || ""}
           onChange={(e) => updateFormData({ parent_last_name: e.target.value })}
-          className="w-full px-3 py-2 border rounded-md"
+          className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-900 transition-colors"
           required
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Apellido Materno</label>
+        <label className="block text-sm text-gray-600 mb-2 ml-1">Apellido Materno</label>
         <input
           type="text"
           value={formData.maternal_last_name || ""}
           onChange={(e) => updateFormData({ maternal_last_name: e.target.value })}
-          className="w-full px-3 py-2 border rounded-md"
+          className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-900 transition-colors"
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Teléfono *</label>
+        <label className="block text-sm text-gray-600 mb-2 ml-1">Teléfono *</label>
         <input
           type="tel"
           value={formData.phone_number || ""}
           onChange={(e) => updateFormData({ phone_number: e.target.value })}
-          className="w-full px-3 py-2 border rounded-md"
+          className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-900 transition-colors"
           required
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Fecha de Nacimiento *</label>
+        <label className="block text-sm text-gray-600 mb-2 ml-1">Fecha de Nacimiento *</label>
         <input
           type="date"
           value={formData.birthday || ""}
           onChange={(e) => updateFormData({ birthday: e.target.value })}
-          className="w-full px-3 py-2 border rounded-md"
+          className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-900 transition-colors"
           required
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Género *</label>
+        <label className="block text-sm text-gray-600 mb-2 ml-1">Género *</label>
         <select
           value={formData.gender}
           onChange={(e) => updateFormData({ gender: e.target.value as Gender })}
-          className="w-full px-3 py-2 border rounded-md"
+          className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-900 transition-colors"
           required
         >
           <option value={Gender.MALE}>Masculino</option>
@@ -145,42 +143,46 @@ function Register() {
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Usuario *</label>
+        <label className="block text-sm text-gray-600 mb-2 ml-1">Usuario *</label>
         <input
           type="text"
           value={formData.username || ""}
           onChange={(e) => updateFormData({ username: e.target.value })}
-          className="w-full px-3 py-2 border rounded-md"
+          className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-900 transition-colors"
           required
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Contraseña *</label>
+        <label className="block text-sm text-gray-600 mb-2 ml-1">Contraseña *</label>
         <input
           type="password"
           value={formData.password || ""}
           onChange={(e) => updateFormData({ password: e.target.value })}
-          className="w-full px-3 py-2 border rounded-md"
+          className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-900 transition-colors"
           required
         />
       </div>
 
-      {error && <p className="text-red-600 text-sm">{error}</p>}
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+          {error}
+        </div>
+      )}
 
       <button
         type="submit"
-        className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700"
+        className="w-full bg-blue-900 text-white py-3 rounded-full font-semibold hover:bg-blue-800 transition-colors shadow-lg"
       >
         Siguiente
       </button>
 
-      <p className="text-center text-sm">
+      <p className="text-center text-sm text-gray-600">
         ¿Ya tienes cuenta?{" "}
         <button
           type="button"
           onClick={() => navigate("/login")}
-          className="text-blue-600 hover:underline"
+          className="text-blue-600 hover:text-blue-700 font-semibold hover:underline"
         >
           Inicia sesión
         </button>
@@ -189,8 +191,8 @@ function Register() {
   );
 
   const renderStep2 = () => (
-    <div className="space-y-4">
-      <h2 className="text-2xl font-bold text-center mb-6">Tipo de Usuario</h2>
+    <div className="space-y-6">
+      <h2 className="text-2xl font-semibold text-center mb-2 text-gray-800">Tipo de Usuario</h2>
       <p className="text-center text-gray-600 mb-6">¿Qué tipo de usuario eres?</p>
 
       <div className="space-y-3">
@@ -198,10 +200,10 @@ function Register() {
           <button
             key={roleId}
             onClick={() => handleStep2Submit(roleId)}
-            className="w-full p-4 border-2 rounded-lg hover:border-blue-600 hover:bg-blue-50 transition text-left"
+            className="w-full p-5 border-2 border-gray-300 rounded-xl hover:border-blue-900 hover:bg-blue-50 transition-all text-left shadow-sm hover:shadow-md"
           >
-            <h3 className="font-semibold text-lg">{ROLE_NAMES[roleId as keyof typeof ROLE_NAMES]}</h3>
-            <p className="text-sm text-gray-600">
+            <h3 className="font-semibold text-lg text-gray-800">{ROLE_NAMES[roleId as keyof typeof ROLE_NAMES]}</h3>
+            <p className="text-sm text-gray-600 mt-1">
               {roleId === ROLE_IDS.PATIENT && "Registrarme como paciente"}
               {roleId === ROLE_IDS.DOCTOR && "Soy un profesional de la salud"}
               {roleId === ROLE_IDS.LABORATORIST && "Trabajo en laboratorio"}
@@ -212,7 +214,7 @@ function Register() {
 
       <button
         onClick={() => setStep(1)}
-        className="w-full py-2 text-gray-600 hover:text-gray-800"
+        className="w-full py-3 text-gray-600 hover:text-gray-800 font-medium"
       >
         ← Volver
       </button>
@@ -220,24 +222,24 @@ function Register() {
   );
 
   const renderStep3 = () => (
-    <form onSubmit={handleFinalSubmit} className="space-y-4">
-      <h2 className="text-2xl font-bold text-center mb-6">
+    <form onSubmit={handleFinalSubmit} className="space-y-5">
+      <h2 className="text-2xl font-semibold text-center mb-6 text-gray-800">
         Información de {ROLE_NAMES[formData.role_id as keyof typeof ROLE_NAMES]}
       </h2>
 
       {formData.role_id === ROLE_IDS.PATIENT && (
         <div>
-          <label className="block text-sm font-medium mb-1">CURP *</label>
+          <label className="block text-sm text-gray-600 mb-2 ml-1">CURP *</label>
           <input
             type="text"
             value={formData.curp || ""}
             onChange={(e) => updateFormData({ curp: e.target.value.toUpperCase() })}
-            className="w-full px-3 py-2 border rounded-md uppercase"
+            className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-900 transition-colors uppercase"
             placeholder="ABCD123456HDFXYZ01"
             maxLength={18}
             required
           />
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-gray-500 mt-2 ml-1">
             Clave Única de Registro de Población (18 caracteres)
           </p>
         </div>
@@ -246,24 +248,24 @@ function Register() {
       {formData.role_id === ROLE_IDS.DOCTOR && (
         <>
           <div>
-            <label className="block text-sm font-medium mb-1">Especialidad *</label>
+            <label className="block text-sm text-gray-600 mb-2 ml-1">Especialidad *</label>
             <input
               type="text"
               value={formData.speciality || ""}
               onChange={(e) => updateFormData({ speciality: e.target.value })}
-              className="w-full px-3 py-2 border rounded-md"
+              className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-900 transition-colors"
               placeholder="Ej: Nefrología, Medicina General, etc."
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Cédula Profesional *</label>
+            <label className="block text-sm text-gray-600 mb-2 ml-1">Cédula Profesional *</label>
             <input
               type="text"
               value={formData.license || ""}
               onChange={(e) => updateFormData({ license: e.target.value })}
-              className="w-full px-3 py-2 border rounded-md"
+              className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-900 transition-colors"
               placeholder="Número de cédula"
               maxLength={20}
               required
@@ -273,7 +275,7 @@ function Register() {
       )}
 
       {formData.role_id === ROLE_IDS.LABORATORIST && (
-        <div className="p-4 bg-blue-50 rounded-md">
+        <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl">
           <p className="text-sm text-gray-700">
             Como laboratorista, no necesitas información adicional.
             Presiona "Completar Registro" para finalizar.
@@ -281,12 +283,16 @@ function Register() {
         </div>
       )}
 
-      {error && <p className="text-red-600 text-sm">{error}</p>}
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+          {error}
+        </div>
+      )}
 
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 disabled:bg-gray-400"
+        className="w-full bg-green-600 text-white py-3 rounded-full font-semibold hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors shadow-lg"
       >
         {loading ? "Registrando..." : "Completar Registro"}
       </button>
@@ -294,7 +300,7 @@ function Register() {
       <button
         type="button"
         onClick={() => setStep(2)}
-        className="w-full py-2 text-gray-600 hover:text-gray-800"
+        className="w-full py-3 text-gray-600 hover:text-gray-800 font-medium"
         disabled={loading}
       >
         ← Volver
@@ -303,21 +309,45 @@ function Register() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
+    <div 
+      className="min-h-screen flex items-center justify-center p-4" 
+      style={{
+        background: "linear-gradient(180deg, #A8C5DD 0%, #1E3A8A 100%)"
+      }}
+    >
+      <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-8 w-full max-w-md">
+        {/* Logo */}
+        <div className="flex justify-center mb-4">
+          <div className="text-center">
+            <h1 className="text-3xl font-bold">
+              <span style={{ color: "#1E3A8A" }}>NEFR</span>
+              <span style={{ color: "#DC2626" }}>O</span>
+              <span style={{ color: "#84CC16" }}>Vida</span>
+            </h1>
+            <p className="text-xs text-gray-600 mt-1">Asociación Civil</p>
+          </div>
+        </div>
+
+        {/* Welcome message - only on step 1 */}
+        {step === 1 && (
+          <h2 className="text-2xl font-semibold text-center mb-6 text-gray-800">
+            ¡Bienvenid@!
+          </h2>
+        )}
+
         {/* Progress indicator */}
         <div className="flex justify-center mb-6">
           <div className="flex items-center space-x-2">
             {[1, 2, 3].map((s) => (
               <React.Fragment key={s}>
                 <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                    step >= s ? "bg-blue-600 text-white" : "bg-gray-300 text-gray-600"
+                  className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold transition-colors ${
+                    step >= s ? "bg-blue-900 text-white" : "bg-gray-300 text-gray-600"
                   }`}
                 >
                   {s}
                 </div>
-                {s < 3 && <div className="w-8 h-1 bg-gray-300" />}
+                {s < 3 && <div className={`w-8 h-1 transition-colors ${step > s ? "bg-blue-900" : "bg-gray-300"}`} />}
               </React.Fragment>
             ))}
           </div>
