@@ -1,7 +1,9 @@
 import { type Request, type Response } from "express";
-import Report from "../../model/report.model.js";
+import * as getResultsService from "../../service/analysis/getResult.service"
 
-async function getResult(req: Request, res: Response) {
+
+
+/*async function getResult(req: Request, res: Response) {
     const patient_analysis_id = Number(req.params.patient_analysis_id);
     
     const info = await Report.getResult(patient_analysis_id);
@@ -11,6 +13,18 @@ async function getResult(req: Request, res: Response) {
     }
     
     res.status(200).json(info);
+}*/
+
+async function getResult (req: Request, res: Response) {
+    try {
+        
+        const results = await getResultsService.getResultById(req, res);
+
+        res.status(200).json(results);
+
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 export default getResult;
