@@ -1,5 +1,9 @@
-import React, { useState } from 'react'
+import React, { FC, useState } from 'react'
 import { BsSearch } from 'react-icons/bs'
+
+interface Props {
+  onChange: (name: string) => void
+}
 
 function Idle() {
   return (
@@ -10,24 +14,32 @@ function Idle() {
   )
 }
 
-function SearchTool() {
+const SearchTool: FC<Props> = ({onChange}) => {
   return (
     <div className='flex items-center'>
-      <input type="text" placeholder='Buscar...' className='w-32 bg-transparent'/>
+      <input type="text" placeholder='Buscar...' className='w-32 bg-transparent' 
+        onChange={(e) => onChange(e.target.value)}/>
       <BsSearch />
     </div>
   )
 }
 
-function Search() {
-  const [hover, setHover] = useState(false)
+const Search: FC<Props> = ({onChange})  => {
+  const [active, setActive] = useState(false)
 
   return (
-    <div className='w-24 hover:w-40 hover:bg-gray-100 rounded-full bg-white flex justify-between items-center px-2 group overflow-clip' 
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}>
+    <div className={`w-24 rounded-full bg-white flex justify-between items-center px-2 group overflow-clip ${active && 'w-40 bg-gray-100'}` }
+      onMouseEnter={() => setActive(true)}
+      onMouseLeave={() => {
+        if (!document.activeElement || document.activeElement.tagName !== "INPUT")
+          setActive(false);
+      }}>
       
-      {hover ?  <SearchTool/> : <Idle />}
+      {active ?  
+        <div onFocus={() => setActive(true)} onBlur={() => setActive(false)}>
+          <SearchTool onChange={onChange} />
+        </div>
+        : <Idle />}
     </div>
   )
 }

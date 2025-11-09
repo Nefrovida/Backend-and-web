@@ -1,7 +1,6 @@
 import App from "../App";
 import { createBrowserRouter } from "react-router";
 import NotFoundPage from "../components/page/NotFoundPage";
-import Login from "../components/page/Login";
 import analisisRoutes from "./analisis.routes";
 import Home from "../components/page/Home";
 
@@ -17,10 +16,6 @@ const router = createBrowserRouter([
       },
       ...analisisRoutes,
     ],
-  },
-  {
-    path: "/login",
-    element: <Login />,
   },
 ]);
 
