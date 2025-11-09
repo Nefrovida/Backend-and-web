@@ -10,7 +10,7 @@ export const getAllUsers = async (): Promise<UserWithRoleAndPrivileges[]> => {
     include: {
       role: {
         include: {
-          role_privilege: {
+          role_privileges: {
             include: {
               privilege: true,
             },
@@ -30,7 +30,7 @@ export const getUserById = async (userId: string): Promise<UserWithRoleAndPrivil
     include: {
       role: {
         include: {
-          role_privilege: {
+          role_privileges: {
             include: {
               privilege: true,
             },
@@ -70,7 +70,7 @@ export const updateUser = async (
     include: {
       role: {
         include: {
-          role_privilege: {
+          role_privileges: {
             include: {
               privilege: true,
             },
@@ -110,7 +110,7 @@ export const getUserByUsername = async (username: string): Promise<UserWithRoleA
     include: {
       role: {
         include: {
-          role_privilege: {
+          role_privileges: {
             include: {
               privilege: true,
             },

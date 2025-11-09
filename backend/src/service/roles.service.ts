@@ -7,7 +7,7 @@ import { NotFoundError, ConflictError, BadRequestError } from '../util/errors.ut
 export const getAllRoles = async () => {
   return await prisma.roles.findMany({
     include: {
-      role_privilege: {
+      role_privileges: {
         include: {
           privilege: true,
         },
@@ -23,7 +23,7 @@ export const getRoleById = async (roleId: number) => {
   const role = await prisma.roles.findUnique({
     where: { role_id: roleId },
     include: {
-      role_privilege: {
+      role_privileges: {
         include: {
           privilege: true,
         },

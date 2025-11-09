@@ -9,7 +9,8 @@ export interface UserWithRoleAndPrivileges {
   parent_last_name: string;
   maternal_last_name: string | null;
   phone_number: string;
-  user: string;
+  username: string;
+  password: string;
   birthday: Date;
   gender: Gender;
   active: boolean;
@@ -18,7 +19,7 @@ export interface UserWithRoleAndPrivileges {
   role: {
     role_id: number;
     rol_name: string;
-    role_privilege: {
+    role_privileges: {
       privilege: {
         privilege_id: number;
         description: string;
