@@ -64,9 +64,7 @@ function Register() {
 
       const response = await authService.register(formData as RegisterData);
       
-      // Store tokens
-      localStorage.setItem("accessToken", response.accessToken);
-      localStorage.setItem("refreshToken", response.refreshToken);
+      // Store only user data (tokens are in httpOnly cookies)
       localStorage.setItem("user", JSON.stringify(response.user));
 
       // Redirect to home

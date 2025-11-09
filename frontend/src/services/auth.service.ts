@@ -9,6 +9,7 @@ export const authService = {
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include", // Include cookies in request
       body: JSON.stringify(data),
     });
 
@@ -26,6 +27,7 @@ export const authService = {
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include", // Include cookies in request
       body: JSON.stringify(data),
     });
 
@@ -35,5 +37,21 @@ export const authService = {
     }
 
     return response.json();
+  },
+
+  async logout(): Promise<void> {
+    const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+      method: "POST",
+      credentials: "include", // Include cookies in request
+    });
+
+    if (!response.ok) {
+      throw new Error("Logout failed");
+    }
+  },
+
+  getCurrentUser() {
+    const userStr = localStorage.getItem("user");
+    return userStr ? JSON.parse(userStr) : null;
   },
 };

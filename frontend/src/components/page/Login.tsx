@@ -18,9 +18,7 @@ function Login() {
     try {
       const response = await authService.login({ username, password });
 
-      // Store tokens
-      localStorage.setItem("accessToken", response.accessToken);
-      localStorage.setItem("refreshToken", response.refreshToken);
+      // Store only user data (tokens are in httpOnly cookies)
       localStorage.setItem("user", JSON.stringify(response.user));
 
       // Redirect to home
