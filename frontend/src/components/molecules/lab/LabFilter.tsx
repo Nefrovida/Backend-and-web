@@ -46,7 +46,7 @@ const LabFilter: FC<Props> = ({onChange}) => {
   }
   
   useEffect(() => {
-    fetch("/api/laboratory/analysis")
+    fetch("/laboratory/analysis")
       .then(res => res.json())
       .then(data => setAnalysis(data))
       .catch(err => console.error(err))

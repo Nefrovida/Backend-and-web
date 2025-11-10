@@ -1,5 +1,7 @@
 // Dependencies
 import express, { type Request, type Response } from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
 import dotenv from "dotenv"
 import session from "express-session"
 
@@ -16,10 +18,22 @@ app.use(session({
 
 const port = process.env.SERVER_PORT || 3000;
 
-import router from "./routes/routes.ts";
+// CORS configuration
+app.use(cors({
+  origin: process.env.FRONTEND_URL || "http://localhost:3000",
+  credentials: true
+}));
+
+// Middleware to parse JSON
+app.use(express.json());
+
+// Middleware to parse cookies
+app.use(cookieParser());
+
+import router from "./routes/routes";
 
 // Routes
-app.use("/api", router);
+app.use("/", router);
 
 // Start server
 app.listen(port, () => {

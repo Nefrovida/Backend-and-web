@@ -45,6 +45,7 @@ npm start
 ```bash
 # Iniciar servidor
 cd backend
+npx prisma generate
 npx prisma db push
 
 # Si hacen cambios
@@ -53,6 +54,9 @@ npx prisma db push
 
 # Actualizar typescript con los tipos de la base de datos
 npx prisma generate
+
+# Por si la regaron y tienen que volver a constrir la db
+npx prisma migrate reset
 ```
 
 ## Estándares de Commits
@@ -108,3 +112,41 @@ git push origin feature/my-feature
 ## Changelog
 
 Ver [CHANGELOG.md](CHANGELOG.md) para la lista completa de cambios por versión.
+
+
+## arquitectura
+
+(esta es mi interpretación de MVC + clean architecture, cámbienla como lo vean necesario)
+Controllers (src/controller/)
+
+Handle HTTP requests/responses
+Validate input (or delegate to middleware)
+Call services
+Return appropriate HTTP status codes
+No business logic, no database access
+
+Services (src/service/)
+
+All business logic lives here
+Orchestrate Prisma operations
+Handle transactions
+Enforce business rules (e.g., "can't delete role if users have it")
+Reusable across different controllers
+This is where Prisma client gets used
+
+Middleware (src/middleware/)
+
+Authentication, authorization
+Request validation
+Error handling
+
+Utils (src/util/)
+
+Pure helper functions (JWT, password hashing, date formatting)
+No business logic, no database access
+
+## Types
+
+Para saber si tienen errores de types
+
+npx tsc --noEmit
