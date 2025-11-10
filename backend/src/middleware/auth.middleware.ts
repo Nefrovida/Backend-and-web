@@ -7,14 +7,19 @@ import { UnauthorizedError } from '../util/errors.util';
  */
 export const authenticate = (req: Request, res: Response, next: NextFunction): void => {
   try {
-    // Get token from Authorization header
-    const authHeader = req.headers.authorization;
+    // Get token from cookies or Authorization header
+    let token = req.cookies?.accessToken;
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      throw new UnauthorizedError('No token provided');
+    if (!token) {
+      // Fallback to Authorization header
+      const authHeader = req.headers.authorization;
+      
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        throw new UnauthorizedError('No token provided');
+      }
+      
+      token = authHeader.substring(7); // Remove 'Bearer ' prefix
     }
-
-    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
 
     // Verify token and attach user to request
     const decoded = verifyToken(token);

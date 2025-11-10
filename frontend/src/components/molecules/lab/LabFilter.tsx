@@ -46,7 +46,9 @@ const LabFilter: FC<Props> = ({onChange}) => {
   }
   
   useEffect(() => {
-    fetch("/laboratory/analysis")
+    fetch("/laboratory/analysis", {
+      credentials: "include" // Include cookies in request
+    })
       .then(res => res.json())
       .then(data => setAnalysis(data))
       .catch(err => console.error(err))
