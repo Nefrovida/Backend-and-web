@@ -1,5 +1,5 @@
 import { type Request, type Response } from "express";
-import Laboratory from "../../model/lab.model.js";
+import Laboratory from "../../model/lab.model";
 import type { ANALYSIS_STATUS } from "@client";
 
 async function getLabResults(req: Request, res: Response) {
