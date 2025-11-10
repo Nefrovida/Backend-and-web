@@ -7,7 +7,14 @@ export default class Laboratory {
 
   }
 
-  static async getLabResults(pagination: number = 0, filter: {name: string | null, status?: ANALYSIS_STATUS}) {
+  static async getLabResults(pagination: number = 0, 
+    filter: {
+      name?: string | null, 
+      start?: string | null, 
+      end?: string | null,  
+      analysisType?: number[],
+      status?: ANALYSIS_STATUS
+    }) {
     const paginationSkip = 10;
     
     const patientResults = await prisma.patient_analysis.findMany({
@@ -24,6 +31,17 @@ export default class Laboratory {
                 },
               }
             : {}),
+        ...(filter.start || filter.end
+        ? {
+            analysis_date: {
+              ...(filter.start ? { gte: filter.start } : {}),
+              ...(filter.end ? { lte: filter.end } : {}),
+            },
+          }
+        : {}),
+        ...(filter.analysisType && filter.analysisType.length > 0
+        ? { analysis_id: { in: filter.analysisType } }
+        : {}),
         ...(filter?.status ? {analysis_status: filter?.status} : {})
       },
       orderBy: [
@@ -35,7 +53,6 @@ export default class Laboratory {
         analysis_date: true,
         results_date: true,
         analysis_status: true,
-        
         patient: {
           select: {
             user: {
@@ -52,5 +69,15 @@ export default class Laboratory {
       skip: pagination * paginationSkip
     });
     return patientResults;
+  }
+
+  static async getAnalysis() {
+    const analysis = await prisma.analysis.findMany({
+      select: {
+        analysis_id: true,
+        name: true
+      }
+    });
+    return analysis
   }
 }

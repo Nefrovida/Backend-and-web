@@ -3,12 +3,16 @@ import patientLabResults from "../types/patientsLabResults";
 
 async function fetchLabResults(
   page: number, 
-  filter: {name: string | null, date: string | null}
+  filter: {name: string | null, start: Date | null, end: Date|null, analysis: number[]}
 ) {
   const params = new URLSearchParams({ page: page.toString() });
 
   if (filter?.name) params.append("name", filter.name);
-  if (filter?.date) params.append("date", filter.date);
+  if (filter?.start) params.append("start", filter.start.toISOString());
+  if (filter?.end) params.append("end", filter.end.toISOString());
+  if (filter?.analysis) params.append("analysis", "["+filter.analysis.join(",")+"]")
+
+    console.log(params);
 
   const res = await fetch(`/api/laboratory/results?${params.toString()}`);  
   if (!res.ok) throw new Error("Failed to fetch lab results");
@@ -22,6 +26,8 @@ export default function useLabResults() {
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [name, setName] = useState<string|null>(null)
+  const [date, setDate] = useState<{start: Date|null, end: Date|null}>({start: null, end: null})
+  const [analysisType, setAnalysisType] = useState<number[]>([])
   
   const scrollRef = useRef<HTMLUListElement>(null);
 
@@ -30,7 +36,7 @@ export default function useLabResults() {
     if (loading || !hasMore) return;
 
     setLoading(true);
-    fetchLabResults(currentPage, {name, date: null})
+    fetchLabResults(currentPage, {name, start: date.start, end: date.end, analysis: analysisType})
       .then((data) => {
         setLabResults((prev) => [...prev, ...data]);
         setHasMore(data.length > 0);
@@ -44,7 +50,7 @@ export default function useLabResults() {
       .finally(() => {
         setLoading(false);
       });
-  }, [loading, hasMore, currentPage, name]);
+  }, [loading, hasMore, currentPage, name, date, analysisType]);
 
   // Fetches new results when getting to the bottom of the list
   const handleScroll = useCallback(() => {
@@ -63,6 +69,14 @@ export default function useLabResults() {
     setHasMore(true);
   }, []);
 
+  const handleFilter = useCallback((startDate: Date|null, endDate: Date|null, analysis: number[]) => {
+    setDate({start: startDate, end: endDate})
+    setAnalysisType(analysis)
+    setCurrentPage(0);
+    setLabResults([])
+    setHasMore(true)
+  }, [])
+
   // First page load
   useEffect(() => {
     loadMoreResults();
@@ -78,10 +92,10 @@ export default function useLabResults() {
 
   // Fetch results with name
   useEffect(() => {
-    if (name !== null) {
+    if (name !== null || date !== null || analysisType !== null) {
       loadMoreResults();
     }
-  }, [name]);
+  }, [name, date, analysisType]);
 
   return {
     labResults,
@@ -90,6 +104,7 @@ export default function useLabResults() {
     error,
     scrollRef,
     handleSearch,
+    handleFilter
   };
 }
 
