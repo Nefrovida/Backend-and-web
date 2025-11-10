@@ -8,30 +8,19 @@ export default class Report {
 
   }
 
-  static async getResult(patient_analysis_id: number) {
+  static async getResult(patientAnalysisId: number) {
     
-  const reportInfo = await prisma.results.findFirst({
-    where: {
-      patient_analysis_id
-    },
-    include: {
-      patient_analysis: true
-    }
-  });
-
-  if (!reportInfo) {
-    return null;
-  }
-
-  if (reportInfo.route) {
-    reportInfo.route = reportInfo.route.trim();
-  }
-
-
-
-  console.log(reportInfo?.route);
-
-
-    return reportInfo;
+  return prisma.results.findFirst({
+      where: {
+        patient_analysis_id: patientAnalysisId
+      },
+      include: {
+        patient_analysis: {
+          include: {
+              analysis: true,
+          }
+        }
+      }
+      });
   }
 }

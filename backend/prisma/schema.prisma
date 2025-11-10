@@ -257,6 +257,7 @@ model results {
   patient_analysis_id Int @unique
   date                DateTime
   route               String @db.Char(255)
+  interpretation      String @default("")
 
   patient_analysis    patient_analysis @relation(fields: [patient_analysis_id], references: [patient_analysis_id], onDelete: Cascade)
 }
