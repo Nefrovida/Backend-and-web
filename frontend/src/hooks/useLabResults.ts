@@ -3,16 +3,27 @@ import patientLabResults from "../types/patientsLabResults";
 
 async function fetchLabResults(
   page: number, 
-  filter: {name: string | null, start: Date | null, end: Date|null, analysis: number[]}
+  filter: {
+    name: string | null, 
+    start: Date | null, 
+    end: Date|null, 
+    analysis: number[],
+    status: {
+      sent: boolean,
+      pending: boolean,
+      lab: boolean
+    }
+  }
 ) {
   const params = new URLSearchParams({ page: page.toString() });
-
   if (filter?.name) params.append("name", filter.name);
   if (filter?.start) params.append("start", filter.start.toISOString());
   if (filter?.end) params.append("end", filter.end.toISOString());
-  if (filter?.analysis) params.append("analysis", "["+filter.analysis.join(",")+"]")
+  if (filter?.analysis) params.append("analysis", JSON.stringify(filter.analysis));
 
-    console.log(params);
+  const selectedStatus = Object.entries(filter.status).filter(([k, v]) => v).map(([key, v]) => key)
+
+  if (selectedStatus) params.append("status", JSON.stringify(selectedStatus))
 
   const res = await fetch(`/api/laboratory/results?${params.toString()}`);  
   if (!res.ok) throw new Error("Failed to fetch lab results");
@@ -28,6 +39,13 @@ export default function useLabResults() {
   const [name, setName] = useState<string|null>(null)
   const [date, setDate] = useState<{start: Date|null, end: Date|null}>({start: null, end: null})
   const [analysisType, setAnalysisType] = useState<number[]>([])
+  const [status, setStatus] = useState<{sent: boolean, pending: boolean, lab: boolean}>(
+    {
+      sent: false,
+      pending: false,
+      lab: false
+    }
+  )
   
   const scrollRef = useRef<HTMLUListElement>(null);
 
@@ -36,7 +54,7 @@ export default function useLabResults() {
     if (loading || !hasMore) return;
 
     setLoading(true);
-    fetchLabResults(currentPage, {name, start: date.start, end: date.end, analysis: analysisType})
+    fetchLabResults(currentPage, {name, start: date.start, end: date.end, analysis: analysisType, status})
       .then((data) => {
         setLabResults((prev) => [...prev, ...data]);
         setHasMore(data.length > 0);
@@ -50,7 +68,7 @@ export default function useLabResults() {
       .finally(() => {
         setLoading(false);
       });
-  }, [loading, hasMore, currentPage, name, date, analysisType]);
+  }, [loading, hasMore, currentPage, name, date, analysisType, status]);
 
   // Fetches new results when getting to the bottom of the list
   const handleScroll = useCallback(() => {
@@ -69,18 +87,28 @@ export default function useLabResults() {
     setHasMore(true);
   }, []);
 
-  const handleFilter = useCallback((startDate: Date|null, endDate: Date|null, analysis: number[]) => {
+  const handleFilter = useCallback((
+    startDate: Date|null, 
+    endDate: Date|null, 
+    analysis: number[],
+    status: {
+      sent: boolean,
+      pending: boolean,
+      lab: boolean,
+    }
+  ) => {
     setDate({start: startDate, end: endDate})
     setAnalysisType(analysis)
+    setStatus(status)
     setCurrentPage(0);
     setLabResults([])
     setHasMore(true)
   }, [])
 
   // First page load
-  useEffect(() => {
-    loadMoreResults();
-  }, []); 
+  // useEffect(() => {
+  //   loadMoreResults();
+  // }, []); 
 
   // Fetch more results when scrolling to the bottom of the list
   useEffect(() => {
@@ -92,10 +120,10 @@ export default function useLabResults() {
 
   // Fetch results with name
   useEffect(() => {
-    if (name !== null || date !== null || analysisType !== null) {
+    if (name !== null || date !== null || analysisType !== null || status !== null) {
       loadMoreResults();
     }
-  }, [name, date, analysisType]);
+  }, [name, date, analysisType, status]);
 
   return {
     labResults,

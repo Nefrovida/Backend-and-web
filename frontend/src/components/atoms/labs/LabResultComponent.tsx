@@ -20,7 +20,7 @@ const Status: Record<ANALYSIS_STATUS, JSX.Element> = {
 const LabResultComponent: FC<Props> = ({patientResult}) => {
   const patient = patientResult.patient.user;
   const name = patient.name + " " + patient.parent_last_name + " " + patient.maternal_last_name;
-  const date = new Date(patientResult.results_date ?? patientResult.analysis_date);
+  const date = new Date(patientResult.analysis_date);
 
   const parsedDate = date.getDate() + "/" + (date.getMonth()+1) + "/" + date.getFullYear();
 

@@ -13,7 +13,7 @@ export default class Laboratory {
       start?: string | null, 
       end?: string | null,  
       analysisType?: number[],
-      status?: ANALYSIS_STATUS
+      status?: ANALYSIS_STATUS[] | null
     }) {
     const paginationSkip = 10;
     
@@ -42,7 +42,9 @@ export default class Laboratory {
         ...(filter.analysisType && filter.analysisType.length > 0
         ? { analysis_id: { in: filter.analysisType } }
         : {}),
-        ...(filter?.status ? {analysis_status: filter?.status} : {})
+        ...(filter?.status ? {analysis_status: {
+          in: filter?.status
+        }} : {})
       },
       orderBy: [
         {analysis_status: "desc"},
