@@ -7,7 +7,7 @@ dotenv.config({path: "../.env"})
 // Initialize server
 const app = express();
 
-const port = process.env.SERVER_PORT || 3000;
+const port = process.env.SERVER_PORT || 3001;
 
 import router from "./routes/routes";
 import doctorAppointmentRouter from "./routes/appointments.routes";

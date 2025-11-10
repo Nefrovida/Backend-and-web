@@ -1,4 +1,3 @@
-import { request } from "http";
 import { PrismaClient } from "../../prisma/database/prisma";
 
 const prisma = new PrismaClient();
