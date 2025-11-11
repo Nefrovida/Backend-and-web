@@ -20,7 +20,7 @@ export interface RegisterData {
   curp?: string;
 
   // Doctor-specific fields
-  speciality?: string;
+  specialty?: string;
   license?: string;
 
   // Familiar-specific fields

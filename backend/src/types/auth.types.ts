@@ -35,7 +35,7 @@ export interface RegisterRequest {
   curp?: string;
   
   // Doctor-specific fields
-  speciality?: string;
+  specialty?: string;
   license?: string;
   
   // Familiar-specific fields (Note: familiars are not a role, but users with patient associations)

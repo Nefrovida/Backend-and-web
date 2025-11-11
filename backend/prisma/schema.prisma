@@ -34,7 +34,7 @@ enum Type {
 
 model roles {
   role_id      Int @id @default(autoincrement())
-  rol_name  String
+  role_name  String
 
   users users[]
   role_privileges role_privilege[]
@@ -70,6 +70,7 @@ model users {
   birthday            DateTime
   gender              Gender
   registration_date   DateTime @default(now())
+  first_login         Boolean
   role_id             Int @default(1)
   
   role                roles @relation(fields: [role_id], references: [role_id], onDelete: SetDefault)
@@ -114,7 +115,7 @@ model familiars {
 
 // No podría ser solo un rol?? no añade información
 model laboratorists { 
-  laboratorists_id String @id @default(uuid()) @db.Uuid
+  laboratorist_id String @id @default(uuid()) @db.Uuid
   user_id         String @unique @db.Uuid
 
   user            users @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
@@ -125,7 +126,7 @@ model laboratorists {
 model doctors {
   doctor_id     String @id @default(uuid()) @db.Uuid
   user_id       String @unique @db.Uuid
-  speciality    String @db.Char(100)
+  specialty    String @db.Char(100)
   license       String @unique @db.Char(20)
 
   user          users @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
@@ -141,6 +142,7 @@ model forums {
   public_status        Boolean
   created_by    String @db.Uuid
   active        Boolean @default(true)
+  creation_date DateTime @default(now())
 
   user          users @relation(fields: [created_by], references: [user_id])
 
@@ -151,7 +153,7 @@ model forums {
 model users_forums {
   user_id       String @db.Uuid
   forum_id      Int
-  rol_forum     String
+  forum_role     String
 
   @@id([user_id, forum_id])
 
@@ -164,7 +166,7 @@ model messages {
   forum_id          Int
   user_id           String @db.Uuid
   content           String
-  timestamp_publish DateTime @default(now())
+  publication_timestamp DateTime @default(now())
   parent_message_id Int?
   active            Boolean @default(true)
 
@@ -194,6 +196,7 @@ model appointments {
   name            String @db.Char(50)
   general_cost    String @db.Char(10) // No debería ser Int???
   community_cost  String @db.Char(10)
+  image_url       String
 
   doctor          doctors @relation(fields: [doctor_id], references: [doctor_id], onDelete: Cascade)
 
@@ -250,9 +253,10 @@ model patient_analysis {
   analysis_date           DateTime
   results_date            DateTime
   place                   String
+  duration                Int
   analysis_status         ANALYSIS_STATUS @default(LAB)
 
-  laboratorist            laboratorists @relation(fields: [laboratorist_id], references: [laboratorists_id], onDelete: Cascade)
+  laboratorist            laboratorists @relation(fields: [laboratorist_id], references: [laboratorist_id], onDelete: Cascade)
   analysis                analysis @relation(fields: [analysis_id], references: [analysis_id], onDelete: Cascade)
   patient                 patients @relation(fields: [patient_id], references: [patient_id], onDelete: Cascade)
 
@@ -263,7 +267,7 @@ model results {
   result_id           Int @id @default(autoincrement())
   patient_analysis_id Int @unique
   date                DateTime
-  route               String @db.Char(255)
+  path               String @db.Char(255)
   interpretation      String @default("")
 
   patient_analysis    patient_analysis @relation(fields: [patient_analysis_id], references: [patient_analysis_id], onDelete: Cascade)
