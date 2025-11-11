@@ -68,14 +68,11 @@ JOIN patients p ON p.user_id <> f.user_id
 WHERE f.role_id = 5
 LIMIT 2;
 
--- ========================
--- 💬 FOROS
--- ========================
-INSERT INTO forums (name, description, public_status, created_by)
+INSERT INTO forums (title, description, visibility, created_by_id)
 SELECT 
   'Foro de salud ' || i,
   'Discusión general sobre temas médicos ' || i,
-  true,
+  'PUBLIC',
   u.user_id
 FROM generate_series(1, 3) i
 JOIN users u ON u.role_id = 2

@@ -26,6 +26,11 @@ enum Type {
   VIRTUAL
 }
 
+enum Visibility {
+  PUBLIC
+  PRIVATE
+}
+
 model roles {
   role_id      Int @id @default(autoincrement())
   rol_name  String
@@ -72,7 +77,7 @@ model users {
   familiars familiars[]
   laboratorists laboratorists[]
   doctors doctors[]
-  forums forums[]
+  forums Forum[] @relation("ForumCreatedBy")
   usersForums users_forums[]
   messages messages[]
 
@@ -128,41 +133,45 @@ model doctors {
 }
 
 // ########## FORUMS ##################
-model forums {
-  forum_id      Int @id @default(autoincrement())
-  name          String @unique @db.Char(100)
-  description   String @db.Char(255)
-  public_status        Boolean
-  created_by    String @db.Uuid
-  active        Boolean @default(true)
+model Forum {
+  id          String     @id @default(cuid()) @map("forum_id")
+  title       String
+  description String?
+  visibility  Visibility @default(PUBLIC)
+  createdById String     @map("created_by_id")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
 
-  user          users @relation(fields: [created_by], references: [user_id])
+  createdBy users @relation("ForumCreatedBy", fields: [createdById], references: [user_id], onDelete: Cascade)
+  members   users_forums[]
+  messages  messages[]
 
-  users_forums users_forums[]
-  messages messages[]
+  @@index([createdById])
+  @@index([visibility])
+  @@map("forums")
 }
 
 model users_forums {
   user_id       String @db.Uuid
-  forum_id      Int
+  forum_id      String
   rol_forum     String
 
   @@id([user_id, forum_id])
 
   user          users @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
-  forum         forums @relation(fields: [forum_id], references: [forum_id], onDelete: Cascade)
+  forum         Forum @relation(fields: [forum_id], references: [id], onDelete: Cascade)
 }
 
 model messages {
   message_id        Int @id @default(autoincrement())
-  forum_id          Int
+  forum_id          String
   user_id           String @db.Uuid
   content           String
   timestamp_publish DateTime @default(now())
   parent_message_id Int?
   active            Boolean @default(true)
 
-  forum             forums @relation(fields: [forum_id], references: [forum_id], onDelete: Cascade)
+  forum             Forum @relation(fields: [forum_id], references: [id], onDelete: Cascade)
   user              users @relation(fields: [user_id], references: [user_id], onDelete: Cascade)  
   replies           messages? @relation("Replies", fields: [parent_message_id], references: [message_id], onDelete: Cascade)
 
