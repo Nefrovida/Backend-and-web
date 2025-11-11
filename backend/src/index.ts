@@ -31,11 +31,9 @@ app.use(express.json());
 app.use(cookieParser());
 
 import router from "./routes/routes";
-import laboratoristRouter from "./routes/laboratorista.routes";
 
 // Routes
 app.use("/api", router);
-app.use("/api/laboratorist", laboratoristRouter),
 
 // Start server
 app.listen(port, () => {
