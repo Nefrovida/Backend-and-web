@@ -16,7 +16,7 @@ app.use(session({
   cookie: {secure: true}
 }))
 
-const port = process.env.SERVER_PORT || 3000;
+const port = process.env.SERVER_PORT || 3001;
 
 // CORS configuration
 app.use(cors({
@@ -31,9 +31,11 @@ app.use(express.json());
 app.use(cookieParser());
 
 import router from "./routes/routes";
+import doctorAppointmentRouter from "./routes/appointments.routes";
 
 // Routes
 app.use("/api", router);
+app.use("/api/doctor-appointments", doctorAppointmentRouter);
 
 // Start server
 app.listen(port, () => {
