@@ -1,4 +1,4 @@
-import { Gender } from '../../prisma/database/prisma/enums';
+import { Gender } from '../../prisma/database/prisma/index.js';
 
 /**
  * User with role and privileges
