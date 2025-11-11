@@ -8,12 +8,6 @@ import privilegesRoutes from "./privileges.routes";
 
 const router = express.Router();
 
-// Health check
-router.get("/", (_req: Request, res: Response) => {
-  console.log("API hit");
-  res.json({ message: "Welcome to the Express + TypeScript Server!" });
-});
-
 // ============================================
 // Authentication Routes (Public)
 // ============================================
@@ -38,5 +32,11 @@ router.use("/privileges", privilegesRoutes)
 // Laboratory Routes (Protected)
 // ============================================
 router.use("/laboratory", labRoutes);
+
+// Health check
+router.get("/", (_req: Request, res: Response) => {
+  console.log("API hit");
+  res.json({ message: "Welcome to the Express + TypeScript Server!" });
+});
 
 export default router;

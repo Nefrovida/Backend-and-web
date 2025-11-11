@@ -26,7 +26,10 @@ async function fetchLabResults(
   if (selectedStatus) params.append("status", JSON.stringify(selectedStatus))
 
   const res = await fetch(`/laboratory/results?${params.toString()}`);  
-  if (!res.ok) throw new Error("Failed to fetch lab results");
+  if (!res.ok) {
+    const response = await res.json();
+    throw response;
+  }
   return res.json();
 }
 

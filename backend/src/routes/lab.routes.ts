@@ -8,7 +8,7 @@ import { requirePrivileges } from "src/middleware/rbac.middleware";
 import { Privilege } from "src/types/rbac.types";
 
 router.get("/results", 
-  authenticate,
+  // authenticate,
   // requirePrivileges([Privilege.VIEW_ANALYSIS]),
   getLabResults);
 router.get("/analysis", getAnalysis)
