@@ -2,8 +2,11 @@ import express from "express";
 const router = express.Router()
 
 import getAppointmentsPerDay from "../controller/secretary/getAppointmentsPerDay.controller";
-//import getPermission from "../util/getPermission";
+import { authenticate } from "src/middleware/auth.middleware";
+import { requirePrivileges } from "src/middleware/rbac.middleware";
+import { Privilege } from "src/types/rbac.types";
 
-router.get("/appointments-per-day", /*getPermission("filterAppointments"),*/ getAppointmentsPerDay);
+
+router.get("/appointments-per-day", /*requirePrivileges([Privilege.VIEW_APPOINTMENTS]),*/ getAppointmentsPerDay);
 
 export default router;
