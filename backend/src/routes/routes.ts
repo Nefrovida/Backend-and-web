@@ -6,6 +6,8 @@ import usersRoutes from "./users.routes";
 import rolesRoutes from "./roles.routes"
 import privilegesRoutes from "./privileges.routes";
 
+import reportRouter from "./report.routes";
+
 const router = express.Router();
 
 // Health check
@@ -38,5 +40,7 @@ router.use("/privileges", privilegesRoutes)
 // Laboratory Routes (Protected)
 // ============================================
 router.use("/laboratory", labRoutes);
+
+router.use("/report", reportRouter);
 
 export default router;
