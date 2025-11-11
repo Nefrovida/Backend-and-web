@@ -72,6 +72,7 @@ model users {
   registration_date   DateTime @default(now())
   first_login         Boolean
   role_id             Int @default(1)
+  first_login         Boolean
   
   role                roles @relation(fields: [role_id], references: [role_id], onDelete: SetDefault)
 
@@ -116,6 +117,7 @@ model familiars {
 // No podría ser solo un rol?? no añade información
 model laboratorists { 
   laboratorist_id String @id @default(uuid()) @db.Uuid
+  laboratorist_id String @id @default(uuid()) @db.Uuid
   user_id         String @unique @db.Uuid
 
   user            users @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
@@ -154,6 +156,7 @@ model users_forums {
   user_id       String @db.Uuid
   forum_id      Int
   forum_role     String
+  forum_role     String
 
   @@id([user_id, forum_id])
 
@@ -166,6 +169,7 @@ model messages {
   forum_id          Int
   user_id           String @db.Uuid
   content           String
+  publication_timestamp DateTime @default(now())
   publication_timestamp DateTime @default(now())
   parent_message_id Int?
   active            Boolean @default(true)
@@ -240,6 +244,7 @@ model analysis {
   previous_requirements String
   general_cost          String
   community_cost        String
+  image_url             String
 
 
   patient_analysis patient_analysis[]
@@ -253,6 +258,7 @@ model patient_analysis {
   analysis_date           DateTime
   results_date            DateTime
   place                   String
+  duration                Int
   duration                Int
   analysis_status         ANALYSIS_STATUS @default(LAB)
 
@@ -292,4 +298,33 @@ model patient_history {
 
   question      questions_history @relation(fields: [question_id], references: [question_id], onDelete: Cascade)
   patient       patients @relation(fields: [patient_id], references: [patient_id], onDelete: Cascade)
+}
+
+// ########## Reports ############
+
+model user_reports {
+  report_id        Int @id @default(autoincrement())
+  user_id          String @db.Uuid
+  reported_message String @db.Uuid
+  cause            String
+  date             DateTime
+  status           Boolean
+
+  message messages @relation(fields: [reported_message], references: [message_id], onDelete: Cascade)
+  user    users @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+
+}
+
+// ########## Notifications ############
+
+model notifications {
+  report_id        Int @id @default(autoincrement())
+  user_id          String @db.Uuid
+  answer           String
+  date             DateTime
+  title            String
+  content          String
+  seen             Boolean @default(false)
+
+  user    users @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
 }
