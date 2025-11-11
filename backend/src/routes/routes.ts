@@ -7,6 +7,8 @@ import { authenticate } from "../middleware/auth.middleware";
 import { requirePrivileges } from "../middleware/rbac.middleware";
 import { Privilege } from "../types/rbac.types";
 
+import reportRouter from "./report.routes";
+
 const router = express.Router();
 
 // Health check
@@ -140,5 +142,7 @@ router.delete(
   requirePrivileges([Privilege.DELETE_PRIVILEGES]),
   privilegesController.deletePrivilege
 );
+
+router.use("/report", reportRouter);
 
 export default router;
