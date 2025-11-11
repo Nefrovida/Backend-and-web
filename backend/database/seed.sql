@@ -1,6 +1,14 @@
 -- ========================
 -- 🧩 ROLES
 -- ========================
+-- ========================
+-- 🧼 CLEAR EXISTING DATA
+-- ========================
+-- Truncate child tables first and restart sequences so IDs are consistent
+BEGIN;
+TRUNCATE TABLE role_privilege, patient_history, results, patient_analysis, patient_appointment, notes, appointments, forums, familiars, doctors, laboratorists, patients, users, privileges, roles, analysis, questions_history RESTART IDENTITY CASCADE;
+COMMIT;
+
 INSERT INTO roles (role_name) VALUES
 ('Admin'),
 ('Doctor'),
@@ -128,10 +136,10 @@ LIMIT 3;
 -- ========================
 -- 🔬 ANÁLISIS
 -- ========================
-INSERT INTO analysis (name, description, previous_requirements, general_cost, community_cost)
+INSERT INTO analysis (name, description, previous_requirements, general_cost, community_cost, image_url)
 VALUES
-('Biometría Hemática', 'Análisis general de sangre', 'Ayuno de 8 horas', '250', '150'),
-('Examen de orina', 'Análisis de orina general', 'Recolectar muestra matutina', '200', '120');
+('Biometría Hemática', 'Análisis general de sangre', 'Ayuno de 8 horas', '250', '150', '/images/default.png'),
+('Examen de orina', 'Análisis de orina general', 'Recolectar muestra matutina', '200', '120', '/images/default.png');
 
 -- ========================
 -- 📊 PACIENTE - ANÁLISIS

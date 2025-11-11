@@ -72,7 +72,6 @@ model users {
   registration_date   DateTime @default(now())
   first_login         Boolean
   role_id             Int @default(1)
-  first_login         Boolean
   
   role                roles @relation(fields: [role_id], references: [role_id], onDelete: SetDefault)
 
@@ -83,6 +82,8 @@ model users {
   forums forums[]
   usersForums users_forums[]
   messages messages[]
+  user_reports user_reports[]
+  notifications notifications[]
 
   likes likes[]
 }
@@ -116,7 +117,6 @@ model familiars {
 
 // No podría ser solo un rol?? no añade información
 model laboratorists { 
-  laboratorist_id String @id @default(uuid()) @db.Uuid
   laboratorist_id String @id @default(uuid()) @db.Uuid
   user_id         String @unique @db.Uuid
 
@@ -156,7 +156,6 @@ model users_forums {
   user_id       String @db.Uuid
   forum_id      Int
   forum_role     String
-  forum_role     String
 
   @@id([user_id, forum_id])
 
@@ -170,7 +169,6 @@ model messages {
   user_id           String @db.Uuid
   content           String
   publication_timestamp DateTime @default(now())
-  publication_timestamp DateTime @default(now())
   parent_message_id Int?
   active            Boolean @default(true)
 
@@ -180,6 +178,7 @@ model messages {
 
   messages messages[] @relation("Replies")
   likes likes[]
+  user_reports user_reports[]
 }
 
 // Es necesario???
@@ -259,7 +258,6 @@ model patient_analysis {
   results_date            DateTime
   place                   String
   duration                Int
-  duration                Int
   analysis_status         ANALYSIS_STATUS @default(LAB)
 
   laboratorist            laboratorists @relation(fields: [laboratorist_id], references: [laboratorist_id], onDelete: Cascade)
@@ -305,7 +303,7 @@ model patient_history {
 model user_reports {
   report_id        Int @id @default(autoincrement())
   user_id          String @db.Uuid
-  reported_message String @db.Uuid
+  reported_message Int
   cause            String
   date             DateTime
   status           Boolean
