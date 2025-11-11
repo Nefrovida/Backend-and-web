@@ -186,8 +186,8 @@ model appointments {
   appointment_id  Int @id @default(autoincrement())
   doctor_id       String @db.Uuid
   name            String @db.Char(50)
-  general_cost    String @db.Char(10) // No debería ser Int???
-  community_cost  String @db.Char(10)
+  general_cost    Float @db.DoublePrecision
+  community_cost  Float @db.DoublePrecision
 
   doctor          doctors @relation(fields: [doctor_id], references: [doctor_id], onDelete: Cascade)
 
@@ -226,12 +226,11 @@ model notes {
 
 model analysis {
   analysis_id           Int @id @default(autoincrement())
-  name                  String @db.Char(50)
+  name                  String @unique @db.Char(50)
   description           String @db.Char(500)
   previous_requirements String
-  general_cost          String
-  community_cost        String
-
+  general_cost          Float @db.DoublePrecision
+  community_cost        Float @db.DoublePrecision
 
   patient_analyses patient_analysis[]
 }

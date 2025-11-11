@@ -3,6 +3,7 @@ import * as authController from "../controller/auth.controller";
 import * as usersController from "../controller/users.controller";
 import * as rolesController from "../controller/roles.controller";
 import * as privilegesController from "../controller/privileges.controller";
+import * as analysisController from '../controller/analysis.controller';
 import { authenticate } from "../middleware/auth.middleware";
 import { requirePrivileges } from "../middleware/rbac.middleware";
 import { Privilege } from "../types/rbac.types";
@@ -139,6 +140,44 @@ router.delete(
   authenticate,
   requirePrivileges([Privilege.DELETE_PRIVILEGES]),
   privilegesController.deletePrivilege
+);
+
+// ============================================
+// Analysis Routes
+// ============================================
+router.post(
+  '/analysis',
+  authenticate,
+  requirePrivileges([Privilege.CREATE_ANALYSIS]),
+  analysisController.createAnalysis
+);
+
+router.get(
+  '/analysis',
+  authenticate,
+  requirePrivileges([Privilege.VIEW_ANALYSIS]),
+  analysisController.getAllAnalyses
+);
+
+router.get(
+  '/analysis/:id',
+  authenticate,
+  requirePrivileges([Privilege.VIEW_ANALYSIS]),
+  analysisController.getAnalysisById
+);
+
+router.put(
+  '/analysis/:id',
+  authenticate,
+  requirePrivileges([Privilege.UPDATE_ANALYSIS]),
+  analysisController.updateAnalysis
+);
+
+router.delete(
+  '/analysis/:id',
+  authenticate,
+  requirePrivileges([Privilege.DELETE_ANALYSIS]),
+  analysisController.deleteAnalysis
 );
 
 export default router;
