@@ -39,4 +39,11 @@ router.delete(
   usersController.deleteUser
 );
 
+router.get(
+  "/users/:id/appointments",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_USERS]),
+  usersController.getUserAppointments
+)
+
 export default router;

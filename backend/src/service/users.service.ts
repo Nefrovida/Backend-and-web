@@ -120,3 +120,15 @@ export const getUserByUsername = async (username: string): Promise<UserWithRoleA
     },
   });
 };
+
+export const getAllAppointmentsByUserId = async (userId: string) => {
+  const appointments = await prisma.patient_appointments.findMany({
+    where: { user_id: userId },
+  });
+
+  const analysis = await prisma.patient_analysis.findMany({
+    where: { user_id: userId },
+  });
+
+  return { appointments, analysis };
+};
