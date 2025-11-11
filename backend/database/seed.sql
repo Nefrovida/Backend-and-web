@@ -37,6 +37,8 @@ VALUES
 (gen_random_uuid(), 'Ana', 'García', 'Torres', true, '5554445555', 'anag', '12345', '1987-12-01', 'FEMALE', 5),
 (gen_random_uuid(), 'Lucía', 'Pérez', 'Núñez', true, '5555556666', 'luciap', '12345', '1995-07-19', 'FEMALE', 3);
 
+
+
 -- ========================
 -- 👩‍⚕️ DOCTORES
 -- ========================
@@ -141,8 +143,7 @@ SELECT
   NOW() - interval '5 days',
   NOW() - interval '1 days',
   'Laboratorio Central'
-FROM laboratorists l, analysis a, patients p
-LIMIT 4;
+FROM laboratorists l, analysis a, patients p;
 
 -- ========================
 -- 🧾 RESULTADOS
