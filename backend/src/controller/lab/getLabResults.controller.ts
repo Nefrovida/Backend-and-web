@@ -1,6 +1,6 @@
 import { type Request, type Response } from "express";
 import Laboratory from "../../model/lab.model";
-import type { ANALYSIS_STATUS } from "../../prisma/database/prisma";
+import type { ANALYSIS_STATUS } from "../../prisma/database/prisma/index.js";
 
 async function getLabResults(req: Request, res: Response) {
     const page = Number(req.query.page);

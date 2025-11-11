@@ -1,4 +1,4 @@
-import { prisma } from '../util/prisma';
+import { prisma } from '../util/prisma.js';
 import { NotFoundError, ConflictError, BadRequestError } from '../util/errors.util';
 
 /**
