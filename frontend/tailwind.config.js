@@ -6,6 +6,8 @@ module.exports = {
       colors: {
         primary: "#010C5E",
         "light-blue": "#9AE5FB",
+        "success": "#DEEECD",
+        "hover-success": "#CAF39E"
       },
     },
   },
