@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '../../prisma/database/prisma/client.js';
-const prisma = new PrismaClient();
+import { prisma } from '../util/prisma.js';
 
 export default class Analysis {
     Analysis() {
