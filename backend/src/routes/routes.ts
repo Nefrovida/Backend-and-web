@@ -5,6 +5,7 @@ import authRoutes from "./auth.routes";
 import usersRoutes from "./users.routes";
 import rolesRoutes from "./roles.routes"
 import privilegesRoutes from "./privileges.routes";
+import secretaryRoutes from "./secretary.routes"
 
 import reportRouter from "./report.routes";
 
@@ -42,5 +43,7 @@ router.use("/privileges", privilegesRoutes)
 router.use("/laboratory", labRoutes);
 
 router.use("/report", reportRouter);
+
+router.use("/secretary-agenda", secretaryRoutes);
 
 export default router;
