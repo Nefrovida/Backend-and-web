@@ -2,6 +2,7 @@ import React, { FC, JSX } from "react";
 import { BsPerson } from "react-icons/bs";
 import { FiAlertTriangle } from "react-icons/fi";
 import {GoVerified} from "react-icons/go";
+import { MdPendingActions } from "react-icons/md";
 import { PiFlaskLight } from "react-icons/pi";
 import patientLabResults from "../../../types/patientsLabResults";
 import { ANALYSIS_STATUS } from "../../../types/Analysis_status";
@@ -14,7 +15,8 @@ interface Props {
 const Status: Record<ANALYSIS_STATUS, JSX.Element> = {
   [ANALYSIS_STATUS.SENT]: <GoVerified className="text-green-600" />,
   [ANALYSIS_STATUS.LAB]: <PiFlaskLight className="text-red-600" />,
-  [ANALYSIS_STATUS.PENDING]: <FiAlertTriangle className="text-yellow-400" />
+  [ANALYSIS_STATUS.PENDING]: <FiAlertTriangle className="text-orange-400" />,
+  [ANALYSIS_STATUS.REQUESTED]: <MdPendingActions className="text-yellow-400"/>
 };
 
 const LabResultComponent: FC<Props> = ({patientResult}) => {
