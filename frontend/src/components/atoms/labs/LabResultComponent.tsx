@@ -5,7 +5,7 @@ import {GoVerified} from "react-icons/go";
 import { PiFlaskLight } from "react-icons/pi";
 import patientLabResults from "../../../types/patientsLabResults";
 import { ANALYSIS_STATUS } from "../../../types/Analysis_status";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 
 interface Props {
   patientResult: patientLabResults,
@@ -26,7 +26,7 @@ const LabResultComponent: FC<Props> = ({patientResult}) => {
 
   return (
     <Link 
-      className="rounded-lg drop-shadow-md shadow-md border-2 border-light-blue flex bg-white items-center justify-between py-2 px-4 hover:shadow-xl bg-6" 
+      className="rounded-lg drop-shadow-md shadow-md border-2 border-light-blue flex bg-white items-center justify-between py-2 px-4 hover:shadow-xl" 
       to={patientResult.patient_analysis_id.toString()} >
       <div className="flex items-center">
         <BsPerson className="text-3xl mr-5" />

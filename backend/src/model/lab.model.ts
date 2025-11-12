@@ -1,6 +1,5 @@
-import { PrismaClient, ANALYSIS_STATUS } from "../../prisma/database/prisma";
-
-const prisma = new PrismaClient();
+import { ANALYSIS_STATUS } from "../../prisma/database/prisma/index.js";
+import { prisma } from "../util/prisma.js";
 
 export default class Laboratory {
   Laboratory() {

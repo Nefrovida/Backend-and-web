@@ -1,7 +1,4 @@
-import { report } from "process";
-import { PrismaClient } from "../../prisma/database/prisma";
-
-const prisma = new PrismaClient;
+import { prisma } from "../util/prisma.js";
 
 export default class Report {
   Report() {

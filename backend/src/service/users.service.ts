@@ -1,4 +1,4 @@
-import { prisma } from '../util/prisma';
+import { prisma } from '../util/prisma.js';
 import { UserWithRoleAndPrivileges, UpdateUserRequest } from '../types/user.types';
 import { NotFoundError } from '../util/errors.util';
 import userModel from '../model/user.model';
