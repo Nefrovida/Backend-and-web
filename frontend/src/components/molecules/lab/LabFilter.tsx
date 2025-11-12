@@ -1,4 +1,4 @@
-import React, { FC, JSX, useEffect, useState } from 'react'
+import React, { FC, useEffect, useState } from 'react'
 import analysisInfo from '../../../types/analysisInfo'
 import { GoVerified } from 'react-icons/go';
 import { PiFlaskLight } from 'react-icons/pi';
@@ -46,7 +46,7 @@ const LabFilter: FC<Props> = ({onChange}) => {
   }
   
   useEffect(() => {
-    fetch("/laboratory/analysis", {
+    fetch("/api/laboratory/analysis", {
       credentials: "include" // Include cookies in request
     })
       .then(res => res.json())

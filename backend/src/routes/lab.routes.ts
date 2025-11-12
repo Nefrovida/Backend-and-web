@@ -10,8 +10,8 @@ import { Privilege } from "src/types/rbac.types";
 import getAnalysisByDay from "../controller/lab/laboratoristGetAnalysis.controller";
 
 router.get("/results", 
-  // authenticate,
-  // requirePrivileges([Privilege.VIEW_ANALYSIS]),
+  authenticate,
+  requirePrivileges([Privilege.VIEW_ANALYSIS]),
   getLabResults);
 router.get("/analysis", getAnalysis)
 
