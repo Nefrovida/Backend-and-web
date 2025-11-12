@@ -55,4 +55,11 @@ router.delete(
 
 router.get("/appointments/:id", usersController.getUserAppointments);
 
+router.post(
+  "/appointments/:id",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_USERS]),
+  usersController.getUserAppointments
+);
+
 export default router;
