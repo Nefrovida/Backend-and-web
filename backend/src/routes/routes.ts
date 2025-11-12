@@ -14,12 +14,6 @@ import { Privilege } from "../types/rbac.types";
 
 const router = express.Router();
 
-// Health check
-router.get("/", (_req: Request, res: Response) => {
-  console.log("API hit");
-  res.json({ message: "Welcome to the Express + TypeScript Server!" });
-});
-
 // ============================================
 // Authentication Routes (Public)
 // ============================================
