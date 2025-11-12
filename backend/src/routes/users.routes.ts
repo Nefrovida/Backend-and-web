@@ -58,8 +58,7 @@ router.get("/appointments/:id", usersController.getUserAppointments);
 router.post(
   "/appointments/:id",
   authenticate,
-  requirePrivileges([Privilege.VIEW_USERS]),
-  usersController.getUserAppointments
+  usersController.postUserRiskForms
 );
 
 export default router;
