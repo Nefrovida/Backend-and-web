@@ -47,9 +47,9 @@ export const createAnalysis = async (data: CreateAnalysisRequest) => {
 };
 
 /**
- * Get all analyses with pagination and search
+ * Get all analysis with pagination and search
  */
-export const getAllAnalyses = async (
+export const getAllAnalysis = async (
   page: number = 1,
   limit: number = 10,
   search?: string
@@ -60,10 +60,10 @@ export const getAllAnalyses = async (
   const total = await analysisModel.count(search);
 
   // Get paginated results
-  const analyses = await analysisModel.findAll(skip, limit, search);
+  const analysis = await analysisModel.findAll(skip, limit, search);
 
   return {
-    data: analyses.map(transformAnalysisToResponse),
+    data: analysis.map(transformAnalysisToResponse),
     pagination: {
       page,
       limit,
