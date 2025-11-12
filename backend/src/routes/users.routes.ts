@@ -53,6 +53,6 @@ router.delete(
   usersController.deleteUser
 );
 
-router.get("/appointments/:id", usersController.getUserAppointments);
+router.get("/appointments/:id",authenticate, usersController.getUserAppointments);
 
 export default router;
