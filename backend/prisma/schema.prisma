@@ -62,7 +62,7 @@ model users {
   user_id             String @id @default(uuid()) @db.Uuid
   name                String
   parent_last_name    String
-  maternal_last_name  String?
+  maternal_last_name  String
   active              Boolean @default(true)
   phone_number        String
   username            String
@@ -197,10 +197,10 @@ model appointments {
   appointment_id  Int @id @default(autoincrement())
   doctor_id       String @db.Uuid
   name            String @db.Char(50)
-  general_cost    String @db.Char(10) // No debería ser Int???
-  community_cost  String @db.Char(10)
-  image_url       String
-
+  general_cost    Float @db.DoublePrecision
+  community_cost  Float @db.DoublePrecision
+  image_url       String?
+  
   doctor          doctors @relation(fields: [doctor_id], references: [doctor_id], onDelete: Cascade)
 
   patient_appointments patient_appointment[]
@@ -238,13 +238,12 @@ model notes {
 
 model analysis {
   analysis_id           Int @id @default(autoincrement())
-  name                  String @db.Char(50)
+  name                  String @unique @db.Char(50)
   description           String @db.Char(500)
   previous_requirements String
-  general_cost          String
-  community_cost        String
-  image_url             String
-
+  general_cost          Float @db.DoublePrecision
+  community_cost        Float @db.DoublePrecision
+  image_url             String?
 
   patient_analysis patient_analysis[]
 }
