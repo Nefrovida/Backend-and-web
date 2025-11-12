@@ -33,7 +33,7 @@ app.use(cookieParser());
 import router from "./routes/routes";
 
 // Routes
-app.use("/", router);
+app.use("/api", router);
 
 // Start server
 app.listen(port, () => {

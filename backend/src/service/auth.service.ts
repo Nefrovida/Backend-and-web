@@ -1,4 +1,4 @@
-import { prisma } from '../util/prisma';
+import { prisma } from '../util/prisma.js';
 import { hashPassword, comparePassword } from '../util/password.util';
 import { generateAccessToken, generateRefreshToken } from '../util/jwt.util';
 import { LoginRequest, RegisterRequest, AuthResponse, JwtPayload } from '../types/auth.types';
@@ -39,7 +39,7 @@ export const login = async (loginData: LoginRequest): Promise<AuthResponse> => {
 
   // Extract privileges
   const privileges = existingUser.role.role_privileges.map(
-    (rp: { privilege: { description: string } }) => rp.privilege.description
+    (rp) => rp.privilege.description
   );
 
   // Create JWT payload
@@ -69,7 +69,7 @@ export const login = async (loginData: LoginRequest): Promise<AuthResponse> => {
  * Register a new user
  */
 export const register = async (registerData: RegisterRequest): Promise<AuthResponse> => {
-  const { username, password, role_id, curp, speciality, license, patient_curp, ...userData } = registerData;
+  const { username, password, role_id, curp, specialty, license, patient_curp, ...userData } = registerData;
 
   // Check if user already exists
   const existingUser = await prisma.users.findFirst({
@@ -87,8 +87,8 @@ export const register = async (registerData: RegisterRequest): Promise<AuthRespo
   if (actualRoleId === DEFAULT_ROLES.PATIENT && !curp) {
     throw new ConflictError('CURP is required for patient registration');
   }
-  if (actualRoleId === DEFAULT_ROLES.DOCTOR && (!speciality || !license)) {
-    throw new ConflictError('Speciality and license are required for doctor registration');
+  if (actualRoleId === DEFAULT_ROLES.DOCTOR && (!specialty || !license)) {
+    throw new ConflictError('specialty and license are required for doctor registration');
   }
   if (actualRoleId === DEFAULT_ROLES.FAMILIAR && !patient_curp) {
     throw new ConflictError('Patient CURP is required for familiar registration');
@@ -108,6 +108,7 @@ export const register = async (registerData: RegisterRequest): Promise<AuthRespo
       username,
       password: hashedPassword,
       role_id: actualRoleId,
+      first_login: true,
     },
     include: {
       role: {
@@ -137,7 +138,7 @@ export const register = async (registerData: RegisterRequest): Promise<AuthRespo
       await prisma.doctors.create({
         data: {
           user_id: newUser.user_id,
-          speciality: speciality!,
+          specialty: specialty!,
           license: license!,
         },
       });
@@ -180,7 +181,7 @@ export const register = async (registerData: RegisterRequest): Promise<AuthRespo
 
   // Extract privileges
   const privileges = newUser.role.role_privileges.map(
-    (rp: { privilege: { description: string } }) => rp.privilege.description
+    (rp) => rp.privilege.description
   );
 
   // Create JWT payload
@@ -232,7 +233,7 @@ export const refreshAccessToken = async (userId: string): Promise<string> => {
 
   // Extract privileges
   const privileges = user.role.role_privileges.map(
-    (rp: { privilege: { description: string } }) => rp.privilege.description
+    (rp) => rp.privilege.description
   );
 
   // Create JWT payload

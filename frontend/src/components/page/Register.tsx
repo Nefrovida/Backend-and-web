@@ -50,7 +50,7 @@ function Register() {
         return;
       }
 
-      if (formData.role_id === ROLE_IDS.DOCTOR && (!formData.speciality || !formData.license)) {
+      if (formData.role_id === ROLE_IDS.DOCTOR && (!formData.specialty || !formData.license)) {
         setError("La especialidad y cédula son requeridas para doctores");
         setLoading(false);
         return;
@@ -256,8 +256,8 @@ function Register() {
             <label className="block text-sm text-gray-600 mb-2 ml-1">Especialidad *</label>
             <input
               type="text"
-              value={formData.speciality || ""}
-              onChange={(e) => updateFormData({ speciality: e.target.value })}
+              value={formData.specialty || ""}
+              onChange={(e) => updateFormData({ specialty: e.target.value })}
               className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-900 transition-colors"
               placeholder="Ej: Nefrología, Medicina General, etc."
               required

@@ -31,8 +31,8 @@ export const getRoleById = async (req: Request, res: Response): Promise<void> =>
  */
 export const createRole = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { rol_name } = req.body;
-    const role = await rolesService.createRole(rol_name);
+    const { role_name } = req.body;
+    const role = await rolesService.createRole(role_name);
     res.status(201).json(role);
   } catch (error: any) {
     res.status(error.statusCode || 500).json({ error: error.message });
@@ -45,8 +45,8 @@ export const createRole = async (req: Request, res: Response): Promise<void> => 
 export const updateRole = async (req: Request, res: Response): Promise<void> => {
   try {
     const roleId = parseInt(req.params.id);
-    const { rol_name } = req.body;
-    const role = await rolesService.updateRole(roleId, rol_name);
+    const { role_name } = req.body;
+    const role = await rolesService.updateRole(roleId, role_name);
     res.status(200).json(role);
   } catch (error: any) {
     res.status(error.statusCode || 500).json({ error: error.message });

@@ -1,5 +1,5 @@
 import App from "../App";
-import { createBrowserRouter } from "react-router";
+import { createBrowserRouter } from "react-router-dom";
 import NotFoundPage from "../components/page/NotFoundPage";
 import Login from "../components/page/Login";
 import Register from "../components/page/Register";

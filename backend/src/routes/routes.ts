@@ -6,6 +6,8 @@ import usersRoutes from "./users.routes";
 import rolesRoutes from "./roles.routes"
 import privilegesRoutes from "./privileges.routes";
 
+import reportRouter from "./report.routes";
+
 const router = express.Router();
 
 // ============================================
@@ -33,10 +35,6 @@ router.use("/privileges", privilegesRoutes)
 // ============================================
 router.use("/laboratory", labRoutes);
 
-// Health check
-router.get("/", (_req: Request, res: Response) => {
-  console.log("API hit");
-  res.json({ message: "Welcome to the Express + TypeScript Server!" });
-});
+router.use("/report", reportRouter);
 
 export default router;

@@ -1,4 +1,4 @@
-import { Gender } from '../../prisma/database/prisma/enums';
+import { Gender } from '../../prisma/database/prisma/index.js';
 
 /**
  * User with role and privileges
@@ -15,10 +15,11 @@ export interface UserWithRoleAndPrivileges {
   gender: Gender;
   active: boolean;
   registration_date: Date;
+  first_login: boolean;
   role_id: number;
   role: {
     role_id: number;
-    rol_name: string;
+    role_name: string;
     role_privileges: {
       privilege: {
         privilege_id: number;

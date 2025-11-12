@@ -1,6 +1,6 @@
 import { type Request, type Response } from "express";
-import Laboratory from "../../model/lab.model.js";
-import type { ANALYSIS_STATUS } from "@client";
+import Laboratory from "../../model/lab.model";
+import { ANALYSIS_STATUS } from "@prisma/client";
 
 async function getLabResults(req: Request, res: Response) {
     // Parse parameters for query
@@ -16,8 +16,6 @@ async function getLabResults(req: Request, res: Response) {
 
     // Query 
     const patientLabResults = await Laboratory.getLabResults(page, {name, start, end, analysisType, status});
-
-    console.log(page)
 
     res.json(patientLabResults);
 }
