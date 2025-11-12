@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "./database/prisma"
 }
 
 datasource db {
@@ -25,6 +24,7 @@ enum ANALYSIS_STATUS {
   LAB
   PENDING
   SENT
+  REQUESTED
 }
 
 enum Type {
@@ -257,7 +257,7 @@ model patient_analysis {
   results_date            DateTime
   place                   String
   duration                Int
-  analysis_status         ANALYSIS_STATUS @default(LAB)
+  analysis_status         ANALYSIS_STATUS @default(REQUESTED)
 
   laboratorist            laboratorists @relation(fields: [laboratorist_id], references: [laboratorist_id], onDelete: Cascade)
   analysis                analysis @relation(fields: [analysis_id], references: [analysis_id], onDelete: Cascade)
