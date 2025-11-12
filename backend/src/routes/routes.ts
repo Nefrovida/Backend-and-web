@@ -20,6 +20,7 @@ router.get("/", (_req: Request, res: Response) => {
   res.json({ message: "Welcome to the Express + TypeScript Server!" });
 });
 
+
 // ============================================
 // Authentication Routes (Public)
 // ============================================
@@ -28,7 +29,7 @@ router.use("/auth", authRoutes)
 // ============================================
 // User Routes (Protected)
 // ============================================
-router.use("/users", usersRoutes)
+router.use("/users", usersRoutes);
 
 // ============================================
 // Role Routes (Protected)
