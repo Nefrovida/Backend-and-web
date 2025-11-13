@@ -85,8 +85,19 @@ export const postUserRiskForms = async (req: Request, res: Response): Promise<vo
   try {
     const { id } = req.params;
     const riskFormData = req.body;
-    const result = await usersService.getAllAppointmentsByUserId(id, );
+
+    if (req.params.userId !== id) {
+    res.status(401).json({error: 'You can only submit your own risk form.'});
+    }
+
+    if(!riskFormData){
+      res.status(400).json({ error: 'Risk form data is required' });
+      return;
+    }
+    
+    const result = await usersService.postUserRiskForms(id, riskFormData);
     res.status(200).json(result);
+    
   } catch (error: any) {
     res.status(error.statusCode || 500).json({ error: error.message });
   }
