@@ -81,4 +81,78 @@ export default class Laboratory {
     });
     return analysis
   }
+
+  static async getLabAppointmentsForUpload(page: number = 0, pageSize: number = 10) {
+    const rows = await prisma.patient_analysis.findMany({
+      where: {
+        analysis_status: "REQUESTED" as ANALYSIS_STATUS, // pendiente de resultado
+      },
+      orderBy: [
+        { analysis_date: "asc" },
+      ],
+      skip: page * pageSize,
+      take: pageSize,
+      select: {
+        patient_analysis_id: true,
+        analysis_date: true,
+        analysis_status: true,
+        analysis: {
+          select: {
+            name: true,
+          },
+        },
+        patient: {
+          select: {
+            user: {
+              select: {
+                name: true,
+                parent_last_name: true,
+                maternal_last_name: true,
+              },
+            },
+          },
+        },
+        results: {
+          select: {
+            path: true,
+          },
+        },
+      },
+    });
+
+    return rows.map((r: any) => ({
+      id: r.patient_analysis_id,
+      date: r.analysis_date,
+      status: r.analysis_status,
+      analysisName: r.analysis.name,
+      patientName: `${r.patient.user.name} ${r.patient.user.parent_last_name} ${r.patient.user.maternal_last_name}`.trim(),
+      resultURI: r.results?.path ?? null,
+    }));
+  }
+
+  static async confirmLabAppointmentResult(patientAnalysisId: number, fileUri: string) {
+    await prisma.$transaction([
+      prisma.results.upsert({
+        where: { patient_analysis_id: patientAnalysisId },
+        update: {
+          path: fileUri,
+          date: new Date(),
+        },
+        create: {
+          patient_analysis_id: patientAnalysisId,
+          path: fileUri,
+          date: new Date(),
+          interpretation: "",
+          recommendation: "",
+        },
+      }),
+      prisma.patient_analysis.update({
+        where: { patient_analysis_id: patientAnalysisId },
+        data: {
+          analysis_status: ANALYSIS_STATUS.SENT,
+          results_date: new Date(),
+        },
+      }),
+    ]);
+  }
 }
