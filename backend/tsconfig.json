@@ -4,7 +4,8 @@
     "module": "ES2020",
     "baseUrl": "./",
     "paths": {
-      "@client": ["./prisma/database/prisma/client.ts"]
+      "@client": ["./prisma/database/prisma/client.ts"],
+      "#/*": ["*"],
     },
     "moduleResolution": "node",
     "outDir": "./dist",
