@@ -10,7 +10,8 @@
     "start": "npx tsx --env-file=../.env src/index.ts",
     "build": "tsc",
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev"
+    "prisma:migrate": "prisma migrate dev",
+    "seed:sql": "tsx --env-file=../.env database/run-seed-sql.ts"
   },
   "keywords": [],
   "author": "",
