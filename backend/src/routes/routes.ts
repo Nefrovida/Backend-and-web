@@ -6,6 +6,7 @@ import usersRoutes from "./users.routes";
 import rolesRoutes from "./roles.routes"
 import privilegesRoutes from "./privileges.routes";
 import * as analysisController from '../controller/analysis/add.analysis.controller';
+import addPatientToForumRoutes from './add.patient.to.forum.routes';
 
 import reportRouter from "./report.routes";
 import { authenticate } from "../middleware/auth.middleware";
@@ -78,5 +79,10 @@ router.delete(
   requirePrivileges([Privilege.DELETE_ANALYSIS]),
   analysisController.deleteAnalysis
 );
+
+// ============================================
+// FORUM ROUTES
+// ============================================
+router.use(addPatientToForumRoutes);
 
 export default router;
