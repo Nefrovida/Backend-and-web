@@ -13,29 +13,40 @@ const __dirname = path.dirname(__filename);
 async function runSeedSQL() {
   // Resolve path relative to this file's location
   const sqlFilePath = path.resolve(__dirname, 'seed.sql');
-  const sql = fs.readFileSync(sqlFilePath, 'utf-8');
+  let sql = fs.readFileSync(sqlFilePath, 'utf-8');
 
   console.log('Running seed.sql...');
 
-  // Split SQL into statements (handles ; and multi-line)
-  // Filter out empty statements and comments
+  // Remove comment lines (lines starting with --)
+  sql = sql.split('\n')
+    .filter(line => !line.trim().startsWith('--'))
+    .join('\n');
+
+  // Split by semicolon and clean up statements
   const statements = sql
     .split(';')
     .map(s => s.trim())
-    .filter(s => s.length > 0 && !s.startsWith('--'));
+    .filter(s => s.length > 0);
 
-  for (const statement of statements) {
+  console.log(`Found ${statements.length} SQL statements to execute`);
+
+  for (let i = 0; i < statements.length; i++) {
+    const statement = statements[i];
     if (statement.trim()) {
       try {
+        // Execute the statement with semicolon
         await prisma.$executeRawUnsafe(statement + ';');
+        console.log(`✅ Executed statement ${i + 1}/${statements.length}`);
       } catch (error) {
-        console.error('Error executing statement:', statement.substring(0, 50) + '...');
+        console.error(`❌ Error executing statement ${i + 1}:`);
+        console.error('Statement:', statement.substring(0, 100) + '...');
+        console.error('Full error:', error);
         throw error;
       }
     }
   }
 
-  console.log('seed.sql executed successfully!');
+  console.log('✅ seed.sql executed successfully!');
 }
 
 runSeedSQL()

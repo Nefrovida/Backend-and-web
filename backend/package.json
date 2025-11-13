@@ -11,7 +11,8 @@
     "build": "tsc",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "seed:sql": "tsx --env-file=../.env database/run-seed-sql.ts"
+    "seed:sql": "tsx --env-file=../.env database/run-seed-sql.ts",
+    "verify:db": "tsx --env-file=../.env database/verify-db.ts"
   },
   "keywords": [],
   "author": "",
