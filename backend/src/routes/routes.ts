@@ -5,6 +5,7 @@ import authRoutes from "./auth.routes";
 import usersRoutes from "./users.routes";
 import rolesRoutes from "./roles.routes"
 import privilegesRoutes from "./privileges.routes";
+import notesRouter from "./notes.routes"
 import * as analysisController from '../controller/analysis/add.analysis.controller';
 
 import reportRouter from "./report.routes";
@@ -40,6 +41,8 @@ router.use("/privileges", privilegesRoutes)
 router.use("/laboratory", labRoutes);
 
 router.use("/report", reportRouter);
+
+router.use("/notes", notesRouter);
 
 // ============================================
 // Analysis Routes
