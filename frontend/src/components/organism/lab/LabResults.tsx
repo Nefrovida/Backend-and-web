@@ -24,7 +24,7 @@ function LabResults() {
     e.preventDefault(); // ← STOP PAGE RELOAD
     setIsSubmitting(true)
     try {
-      const response = await fetch("/api/lab/generate-report", {
+      const response = await fetch("/api/laboratory/generate-report", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

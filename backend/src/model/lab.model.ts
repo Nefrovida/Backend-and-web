@@ -15,7 +15,10 @@ export default class Laboratory {
       status?: ANALYSIS_STATUS[] | null
     }) {
     const paginationSkip = 10;
-    
+    console.log("filter: ", filter)
+    console.log("pagination: ", pagination)
+
+    console.log("about to query db for patientLab results")
     const patientResults = await prisma.patient_analysis.findMany({
       where: {
         ...(filter.name
@@ -79,6 +82,29 @@ export default class Laboratory {
         name: true
       }
     });
+    console.log("analysis found: ", analysis)
     return analysis
+  }
+
+  static async generateReport(
+    resultadoId: number = -1, 
+    interpretations: string, 
+    recommendations: string) {
+    try {
+      await prisma.results.create({
+        data: {
+          patient_analysis_id: 1,
+          result_id: resultadoId,
+          interpretation: interpretations,
+          recommendation: recommendations,
+          date: new Date(),
+          path: '/reports/placeholder.pdf',   // or generate real path
+        },
+      })
+      return { success: true }
+    } catch (error) {
+      console.error("Error creating lab report in db: ", error);
+      throw new Error(`Error creating lab report in db ${error}`);
+    }
   }
 }

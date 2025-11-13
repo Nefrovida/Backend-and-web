@@ -272,6 +272,7 @@ model results {
   date                DateTime
   path               String @db.Char(255)
   interpretation      String @default("")
+  recommendation      String @default("")
 
   patient_analysis    patient_analysis @relation(fields: [patient_analysis_id], references: [patient_analysis_id], onDelete: Cascade)
 }
