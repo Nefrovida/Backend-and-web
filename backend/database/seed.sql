@@ -72,7 +72,7 @@ INSERT INTO forums (title, description, visibility, created_by_id)
 SELECT 
   'Foro de salud ' || i,
   'Discusión general sobre temas médicos ' || i,
-  'PUBLIC',
+  'PUBLIC'::"Visibility",
   u.user_id
 FROM generate_series(1, 3) i
 JOIN users u ON u.role_id = 2
