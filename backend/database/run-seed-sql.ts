@@ -36,9 +36,9 @@ async function runSeedSQL() {
       try {
         // Execute the statement with semicolon
         await prisma.$executeRawUnsafe(statement + ';');
-        console.log(`✅ Executed statement ${i + 1}/${statements.length}`);
+        console.log(`Executed statement ${i + 1}/${statements.length}`);
       } catch (error) {
-        console.error(`❌ Error executing statement ${i + 1}:`);
+        console.error(`Error executing statement ${i + 1}:`);
         console.error('Statement:', statement.substring(0, 100) + '...');
         console.error('Full error:', error);
         throw error;
@@ -46,7 +46,7 @@ async function runSeedSQL() {
     }
   }
 
-  console.log('✅ seed.sql executed successfully!');
+  console.log('seed.sql executed successfully!');
 }
 
 runSeedSQL()
