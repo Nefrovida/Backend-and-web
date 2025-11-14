@@ -21,7 +21,7 @@ async function fetchLabResults(
   if (filter?.end) params.append("end", filter.end.toISOString());
   if (filter?.analysis) params.append("analysis", JSON.stringify(filter.analysis));
 
-  const selectedStatus = Object.entries(filter.status).filter(([k, v]) => v).map(([key, v]) => key)
+  const selectedStatus = Object.entries(filter.status).filter(([,v]) => v).map(([key,]) => key)
 
   if (selectedStatus) params.append("status", JSON.stringify(selectedStatus))
 

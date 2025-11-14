@@ -1,4 +1,4 @@
-import React, { FC, JSX, useEffect, useState } from 'react'
+import React, { FC, useEffect, useState } from 'react'
 import analysisInfo from '../../../types/analysisInfo'
 import { GoVerified } from 'react-icons/go';
 import { PiFlaskLight } from 'react-icons/pi';
@@ -20,7 +20,7 @@ interface Props {
 const LabFilter: FC<Props> = ({onChange}) => {
   const [analysis, 
     setAnalysis] = useState<analysisInfo[]>([])
-  const [inputs, setInputs] = useState({})
+  const [inputs, setInputs] = useState({}) // Inputs
   const [date, setDate] = useState<{start: Date|null, end: Date|null}>({start: null, end: null})
   const [status, setStatus] = useState<{sent: boolean, pending: boolean, lab: boolean}>({sent: false, pending: false, lab: false})
   
@@ -29,6 +29,10 @@ const LabFilter: FC<Props> = ({onChange}) => {
       .filter((v) => v.selected)
       .map((v) => (v.value))
     onChange(date.start, date.end, selected, status)
+  }
+
+  function deleteFilter() {
+    onChange(null, null, [], {sent: false, pending: false, lab: false})
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,7 +50,7 @@ const LabFilter: FC<Props> = ({onChange}) => {
   }
   
   useEffect(() => {
-    fetch("/laboratory/analysis", {
+    fetch("/api/laboratory/analysis", {
       credentials: "include" // Include cookies in request
     })
       .then(res => res.json())
@@ -111,9 +115,14 @@ const LabFilter: FC<Props> = ({onChange}) => {
           </label>
         ))}
       </div>
-      <button className='bg-success hover:bg-hover-success rounded-md w-full py-1' onClick={handleFilter}>
-        Buscar
-      </button>
+      <div className='flex gap-2'>
+        <button className='bg-gray-300 hover:bg-gray-200 rounded-md w-1/2 py-1' onClick={deleteFilter}>
+          Borrar
+        </button>
+        <button className='bg-success hover:bg-hover-success rounded-md w-1/2 py-1' onClick={handleFilter}>
+          Buscar
+        </button>
+      </div>
     </div>
   )
 }

@@ -11,7 +11,7 @@ import getAnalysisByDay from "../controller/lab/laboratoristGetAnalysis.controll
 
 router.get("/results", 
   authenticate,
-  // requirePrivileges([Privilege.VIEW_ANALYSIS]),
+  requirePrivileges([Privilege.VIEW_ANALYSIS]),
   getLabResults);
 router.get("/analysis", getAnalysis)
 
