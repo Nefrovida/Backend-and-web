@@ -5,12 +5,14 @@ import authRoutes from "./auth.routes";
 import usersRoutes from "./users.routes";
 import rolesRoutes from "./roles.routes"
 import privilegesRoutes from "./privileges.routes";
+import appointmentsRoutes from "./appointments.routes";
 import * as analysisController from '../controller/analysis/add.analysis.controller';
 
 import reportRouter from "./report.routes";
 import { authenticate } from "../middleware/auth.middleware";
 import { requirePrivileges } from "../middleware/rbac.middleware";
 import { Privilege } from "../types/rbac.types";
+import appointments from "src/model/appointment.model";
 
 const router = express.Router();
 
@@ -23,6 +25,11 @@ router.use("/auth", authRoutes)
 // User Routes (Protected)
 // ============================================
 router.use("/users", usersRoutes);
+
+// ============================================
+// Appointments Routes (Protected)
+// ============================================
+router.use("/appointment", appointmentsRoutes);
 
 // ============================================
 // Role Routes (Protected)

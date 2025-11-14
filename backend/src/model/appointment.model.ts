@@ -2,8 +2,8 @@ import { Request, Response } from 'express';
 import { PrismaClient } from '../../prisma/database/prisma/client.js';
 const prisma = new PrismaClient();
 
-export default class User {
-    User() {
+export default class appointments {
+    appointments() {
 
     }
 
