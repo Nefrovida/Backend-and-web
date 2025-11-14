@@ -8,7 +8,7 @@ import privilegesRoutes from "./privileges.routes";
 import * as analysisController from '../controller/analysis/add.analysis.controller';
 
 import reportRouter from "./report.routes";
-import secretaryRoutes from "./secretary.routes"
+import agendaRoutes from "./agenda.routes"
 
 
 import { authenticate } from "../middleware/auth.middleware";
@@ -44,7 +44,10 @@ router.use("/laboratory", labRoutes);
 
 router.use("/report", reportRouter);
 
-router.use("/secretary-agenda", secretaryRoutes);
+// ============================================
+// Agenda Routes 
+// ============================================
+router.use("/agenda", agendaRoutes);
 
 
 // ============================================

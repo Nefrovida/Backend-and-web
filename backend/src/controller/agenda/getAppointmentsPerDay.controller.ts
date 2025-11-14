@@ -1,5 +1,5 @@
 import {Request, Response} from "express";
-import Secretary from "../../model/secretary.model";
+import Agenda from "../../model/agenda.model";
 
 
 async function getAppointmentsPerDay(req: Request, res: Response) {
@@ -8,7 +8,7 @@ async function getAppointmentsPerDay(req: Request, res: Response) {
         if (!targetDate) {
             return res.status(400).json({ error: "Date parameter is required (e.g., ?date=2023-10-05)" });
         }
-        const appointmentsPerDay = await Secretary.getAppointmentsPerDay(targetDate);
+        const appointmentsPerDay = await Agenda.getAppointmentsPerDay(targetDate);
         
         console.log(appointmentsPerDay);
 
