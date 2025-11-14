@@ -90,8 +90,8 @@ router.delete(
 );
 
 // ============================================
-// FORUM ROUTES
+// FORUM ENDPOINT
 // ============================================
-router.use(addPatientToForumRoutes);
+router.use("/forum", addPatientToForumRoutes);
 
 export default router;
