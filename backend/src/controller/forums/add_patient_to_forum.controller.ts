@@ -1,9 +1,9 @@
 import type { Request, Response, NextFunction } from 'express';
-import { addPatientToForumService } from '../../service/forums/add.patient.to.forum.service';
+import { addPatientToForumService } from '../../service/forums/add_patient_to_forum.service';
 import {
   addPatientToForumBodySchema,
   addPatientToForumParamsSchema
-} from '../../validators/forums/add.patient.to.forum.validator';
+} from '../../validators/forums/add_patient_to_forum.validator';
 import { BadRequestError } from '../../util/errors.util.js';
 
 /**

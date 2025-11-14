@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { authenticate } from '../middleware/auth.middleware';
-import { requirePrivileges } from '../middleware/rbac.middleware';
-import { Privilege } from '../types/rbac.types';
-import * as addPatientToForumController from '../controller/forums/add.patient.to.forum.controller';
+import { authenticate } from '../../middleware/auth.middleware';
+import { requirePrivileges } from '../../middleware/rbac.middleware';
+import { Privilege } from '../../types/rbac.types';
+import * as addPatientToForumController from '../../controller/forums/add_patient_to_forum.controller';
 
 const router = Router();
 

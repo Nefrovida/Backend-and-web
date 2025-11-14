@@ -1,5 +1,5 @@
 import { prisma } from '../../util/prisma.js';
-import type { ForumData, PatientData, UserForumData } from '../../types/forums/add.patient.to.forum.types';
+import type { ForumData, PatientData, UserForumData } from '../../types/forums/add_patient_to_forum.types.js';
 
 /**
  * Verifica si un foro existe

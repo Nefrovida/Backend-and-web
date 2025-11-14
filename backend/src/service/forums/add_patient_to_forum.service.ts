@@ -3,13 +3,13 @@ import {
   findPatientByUserId,
   findUserInForum,
   addUserToForum
-} from '../../model/forums/add.patient.to.forum.model';
+} from '../../model/forums/add_patient_to_forum.model';
 import {
   NotFoundError,
   BadRequestError,
   ConflictError
 } from '../../util/errors.util.js';
-import type { AddPatientToForumResponse } from '../../types/forums/add.patient.to.forum.types';
+import type { AddPatientToForumResponse } from '../../types/forums/add_patient_to_forum.types';
 
 /**
  * Servicio para añadir un paciente a un foro privado

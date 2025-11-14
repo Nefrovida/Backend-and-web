@@ -6,7 +6,7 @@ import usersRoutes from "./users.routes";
 import rolesRoutes from "./roles.routes"
 import privilegesRoutes from "./privileges.routes";
 import * as analysisController from '../controller/analysis/add.analysis.controller';
-import addPatientToForumRoutes from './add.patient.to.forum.routes';
+import addPatientToForumRoutes from './forums/add_patient_to_forum.routes';
 
 import reportRouter from "./report.routes";
 import { authenticate } from "../middleware/auth.middleware";
