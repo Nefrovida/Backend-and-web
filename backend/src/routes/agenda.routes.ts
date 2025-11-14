@@ -8,8 +8,8 @@ import { Privilege } from "src/types/rbac.types";
 
 
 router.get("/appointments-per-day", 
-    /*authenticate,
-    requirePrivileges([Privilege.VIEW_APPOINTMENTS]),*/
+    authenticate,
+    requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
      getAppointmentsPerDay);
 
 export default router;
