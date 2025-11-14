@@ -7,7 +7,7 @@ import {
 import { BadRequestError } from '../../util/errors.util.js';
 
 /**
- * Controller para añadir un paciente a un foro
+ * Controller add patient to forum
  */
 export async function addPatientToForum(
   req: Request,
@@ -15,7 +15,7 @@ export async function addPatientToForum(
   next: NextFunction
 ): Promise<void> {
   try {
-    // Validar params
+    // Verify params
     const paramsValidation = addPatientToForumParamsSchema.safeParse(req.params);
     if (!paramsValidation.success) {
       const errors = paramsValidation.error.errors.map(err => ({
@@ -25,7 +25,7 @@ export async function addPatientToForum(
       return next(new BadRequestError(`Invalid request parameters: ${JSON.stringify(errors)}`));
     }
 
-    // Validar body
+    // Verify body
     const bodyValidation = addPatientToForumBodySchema.safeParse(req.body);
     if (!bodyValidation.success) {
       const errors = bodyValidation.error.errors.map(err => ({
@@ -38,10 +38,10 @@ export async function addPatientToForum(
     const { forumId } = paramsValidation.data;
     const { userId, forumRole } = bodyValidation.data;
 
-    // Llamar al servicio
+    // Call service
     const result = await addPatientToForumService(forumId, userId, forumRole);
 
-    // Responder
+    // Added successfully
     res.status(201).json({
       success: true,
       message: 'Patient added to forum successfully',

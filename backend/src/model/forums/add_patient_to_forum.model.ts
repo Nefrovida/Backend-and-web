@@ -2,7 +2,7 @@ import { prisma } from '../../util/prisma.js';
 import type { ForumData, PatientData, UserForumData } from '../../types/forums/add_patient_to_forum.types.js';
 
 /**
- * Verifica si un foro existe
+ * Verify if forum exists
  */
 export async function findForumById(forumId: number): Promise<ForumData | null> {
   return await prisma.forums.findUnique({
@@ -13,7 +13,7 @@ export async function findForumById(forumId: number): Promise<ForumData | null> 
 }
 
 /**
- * Verifica si un usuario es paciente
+ * Verify if patient exists
  */
 export async function findPatientByUserId(userId: string): Promise<PatientData | null> {
   return await prisma.patients.findFirst({
@@ -24,7 +24,7 @@ export async function findPatientByUserId(userId: string): Promise<PatientData |
 }
 
 /**
- * Verifica si un usuario ya está en el foro
+ * Verify if user is already in forum
  */
 export async function findUserInForum(userId: string, forumId: number): Promise<UserForumData | null> {
   return await prisma.users_forums.findUnique({
@@ -38,7 +38,7 @@ export async function findUserInForum(userId: string, forumId: number): Promise<
 }
 
 /**
- * Añade un usuario a un foro
+ * Add user to forum
  */
 export async function addUserToForum(
   userId: string,
