@@ -7,6 +7,7 @@ import rolesRoutes from "./roles.routes"
 import privilegesRoutes from "./privileges.routes";
 import notesRouter from "./notes.routes"
 import * as analysisController from '../controller/analysis/add.analysis.controller';
+import patientRoutes from "./patients.routes";
 
 import reportRouter from "./report.routes";
 import { authenticate } from "../middleware/auth.middleware";
@@ -43,6 +44,8 @@ router.use("/laboratory", labRoutes);
 router.use("/report", reportRouter);
 
 router.use("/notes", notesRouter);
+
+router.use("/patients", patientRoutes)
 
 // ============================================
 // Analysis Routes

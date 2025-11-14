@@ -10,7 +10,7 @@ interface Props {
 const Pill: FC<Props> = ({text, icon, className, onClick}) =>  {
   return (
     <div 
-      className={`rounded-full bg-white flex justify-between items-center px-2 cursor-pointer gap-2 h-10 text-center ${className}`}
+      className={`rounded-full flex justify-between items-center px-2 cursor-pointer gap-2 h-10 text-center ${className ?? 'bg-white'}`}
       onClick={onClick}
     >
       <span className='mb-1'>{text}</span>
