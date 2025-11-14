@@ -40,3 +40,49 @@ export const create = async (req: Request, res: Response): Promise<void> => {
     res.status(error.statusCode || 400).json({ error: error.message });
   }
 };
+
+/**
+ * Get all forums
+ * 
+ * User Story: "User: View Forums List"
+ * 
+ * Flow:
+ * 1. Extract query parameters (page, limit, search, isPublic)
+ * 2. Call service to retrieve forums with filters
+ * 3. Return array of forums with 200 status
+ * 
+ * Prerequisites (handled by middlewares):
+ * - authenticate: Ensures req.user exists and is valid
+ * - requirePrivileges(['VIEW_FORUMS']): Ensures user has permission
+ * 
+ * Query Parameters:
+ * - page: number (default: 1)
+ * - limit: number (default: 20)
+ * - search: string (optional)
+ * - isPublic: boolean (optional)
+ * 
+ * @param req - Express request with query params
+ * @param res - Express response
+ */
+export const getAll = async (req: Request, res: Response): Promise<void> => {
+  try {
+    // Extract and parse query parameters
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 20;
+    const search = req.query.search as string | undefined;
+    const isPublic = req.query.isPublic === 'true' ? true : 
+                     req.query.isPublic === 'false' ? false : 
+                     undefined;
+
+    // Call service to get forums
+    const forums = await forumsService.getAllForums(page, limit, {
+      search,
+      isPublic,
+    });
+
+    // Respond with forums array
+    res.status(200).json(forums);
+  } catch (error: any) {
+    res.status(error.statusCode || 500).json({ error: error.message });
+  }
+};

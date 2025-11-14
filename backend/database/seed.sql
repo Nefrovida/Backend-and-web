@@ -45,6 +45,10 @@ VALUES
 (gen_random_uuid(), 'Ana', 'García', 'Torres', true, '5554445555', 'anag', '12345', '1987-12-01', 'FEMALE', false, 5),
 (gen_random_uuid(), 'Lucía', 'Pérez', 'Núñez', true, '5555556666', 'luciap', '12345', '1995-07-19', 'FEMALE', false, 3);
 
+-- Admin explicit user (added)
+INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
+VALUES (gen_random_uuid(), 'Administrador', 'Sistema', 'Admin', true, '5550000000', 'admin', '$2b$10$/aYCozNwvUh8qt41J1diPOwDqeW50wg8nWf76NvAQ9plWjngrj4yS', '1980-01-01', 'MALE', false, 1);
+
 
 
 -- ========================

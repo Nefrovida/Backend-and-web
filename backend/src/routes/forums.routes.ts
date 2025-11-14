@@ -11,6 +11,44 @@ const router = express.Router();
 // ============================================
 
 /**
+ * Get all forums
+ * 
+ * GET /api/forums
+ * 
+ * User Story: "User: View Forums List"
+ * 
+ * Middlewares:
+ * 1. authenticate - Verifies JWT and injects req.user
+ * 2. requirePrivileges - Checks if user has VIEW_FORUMS privilege
+ * 3. forumsController.getAll - Handles the request
+ * 
+ * Query Parameters:
+ * - page: number (default: 1)
+ * - limit: number (default: 20)
+ * - search: string (optional)
+ * - isPublic: boolean (optional)
+ * 
+ * Response: 200 OK
+ * [
+ *   {
+ *     "forum_id": 1,
+ *     "name": "Forum Name",
+ *     "description": "Forum description",
+ *     "public_status": true,
+ *     "created_by": "user-uuid",
+ *     "active": true,
+ *     "creation_date": "2025-11-13T..."
+ *   }
+ * ]
+ */
+router.get(
+  "/",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_FORUMS]),
+  forumsController.getAll
+);
+
+/**
  * Create a new forum
  * 
  * POST /api/forums

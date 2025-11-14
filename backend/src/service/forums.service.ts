@@ -41,3 +41,35 @@ export const createForum = async (
 
   return newForum;
 };
+
+/**
+ * Get all forums
+ * 
+ * Business logic:
+ * 1. Retrieve all active forums from the database
+ * 2. Apply pagination (default: page 1, limit 20)
+ * 3. Apply filters if provided (search, public status)
+ * 
+ * @param page - Page number (1-indexed)
+ * @param limit - Number of items per page
+ * @param filters - Optional filters (search term, public status)
+ * @returns Array of forum entities
+ */
+export const getAllForums = async (
+  page: number = 1,
+  limit: number = 20,
+  filters?: {
+    search?: string;
+    isPublic?: boolean;
+  }
+): Promise<ForumEntity[]> => {
+  const skip = (page - 1) * limit;
+
+  const forums = await forumModel.findAll(skip, limit, {
+    search: filters?.search,
+    isPublic: filters?.isPublic,
+    active: true, // Only return active forums
+  });
+
+  return forums;
+};
