@@ -18,10 +18,6 @@ async function getAppointmentsPerDay(req: Request, res: Response) {
         console.error("Error fetching appointments:", error);
         res.status(500).json({error: "Failed to fetch appointments"});
     }
-
-
-
-
 }
 
 export default getAppointmentsPerDay;
