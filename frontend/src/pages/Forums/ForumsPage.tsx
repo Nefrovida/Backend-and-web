@@ -154,9 +154,9 @@ export const ForumsPage = () => {
 
         {/* Forums List */}
         {!isLoading && !error && (
-          <div className="space-y-0">
+          <div>
             {filteredForums.length === 0 ? (
-              <div className="text-center py-12 bg-white rounded-lg shadow-sm">
+              <div className="text-center py-12 bg-white rounded-xl shadow-sm border border-gray-100">
                 <p className="text-gray-600">
                   {searchTerm ? 'No se encontraron foros' : 'No hay foros disponibles'}
                 </p>

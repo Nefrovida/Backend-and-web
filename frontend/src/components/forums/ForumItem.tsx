@@ -12,7 +12,9 @@ interface ForumItemProps {
  * Displays a single forum card with:
  * - Forum name
  * - Creation date
- * - Settings icon (placeholder)
+ * - Settings icon
+ * 
+ * Based on Figma design with proper symmetry and spacing
  */
 export const ForumItem: React.FC<ForumItemProps> = ({ forum, onSettingsClick }) => {
   const formatDate = (dateString: string) => {
@@ -25,20 +27,27 @@ export const ForumItem: React.FC<ForumItemProps> = ({ forum, onSettingsClick }) 
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-4 mb-3 flex items-center justify-between">
-      <div className="flex-1">
-        <h3 className="text-lg font-semibold text-gray-800">{forum.name}</h3>
-        <p className="text-sm text-gray-500">{formatDate(forum.creation_date)}</p>
+    <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 p-5 mb-4 flex items-center justify-between border border-gray-100">
+      <div className="flex-1 min-w-0 pr-4">
+        <h3 className="text-lg font-semibold text-gray-900 mb-1 truncate">
+          {forum.name}
+        </h3>
+        <p className="text-sm text-gray-500">
+          {formatDate(forum.creation_date)}
+        </p>
       </div>
       
       <button
-        onClick={() => onSettingsClick?.(forum)}
-        className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+        onClick={(e) => {
+          e.stopPropagation();
+          onSettingsClick?.(forum);
+        }}
+        className="flex-shrink-0 p-2 hover:bg-gray-100 rounded-full transition-colors"
         aria-label="Configuración del foro"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6 text-gray-600"
+          className="h-5 w-5 text-gray-600"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
