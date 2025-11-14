@@ -227,7 +227,9 @@ model notes {
   note_id                 Int @id @default(autoincrement())
   patient_appointment_id  Int? @unique
   title                   String @db.Char(50)
-  content                 String
+  general                 String?
+  illness                 String?
+  receipe                 String?
   visibility              Boolean @default(true)
   creation_date           DateTime @default(now())
 
