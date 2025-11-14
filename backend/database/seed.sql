@@ -25,7 +25,10 @@ INSERT INTO privileges (description) VALUES
 ('Eliminar usuario'),
 ('Ver reportes'),
 ('Administrar foros'),
-('Asignar citas');
+('Asignar citas'),
+('ADD_USER_TO_FORUM'),
+('REMOVE_USER_FROM_FORUM'),
+('VIEW_FORUM_USERS');
 
 -- ========================
 -- 🧩 ROLES - PRIVILEGIOS
