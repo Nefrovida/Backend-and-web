@@ -4,13 +4,13 @@ export interface AppointmentData {
   schedule: string;
   reason: string;
   consulting_room: number;
-  patient: PacienteInfo;
+  patient: PatientInfo;
 }
 
-export interface PacienteInfo {
+export interface PatientInfo {
   name: string;
   age: number;
-  sex: string;
+  genre: string;
   diagnostic: string;
   LastAnalisisUrl: string; 
 }
