@@ -8,6 +8,7 @@ import privilegesRoutes from "./privileges.routes";
 import * as analysisController from '../controller/analysis/add.analysis.controller';
 
 import reportRouter from "./report.routes";
+import historyRoutes from "./history.routes";
 import { authenticate } from "../middleware/auth.middleware";
 import { requirePrivileges } from "../middleware/rbac.middleware";
 import { Privilege } from "../types/rbac.types";
@@ -40,6 +41,11 @@ router.use("/privileges", privilegesRoutes)
 router.use("/laboratory", labRoutes);
 
 router.use("/report", reportRouter);
+
+// ============================================
+// Patient History Questions Templates
+// ============================================
+router.use('/history', historyRoutes);
 
 // ============================================
 // Analysis Routes
