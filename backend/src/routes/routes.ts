@@ -9,6 +9,7 @@ import * as analysisController from '../controller/analysis/add.analysis.control
 
 import reportRouter from "./report.routes";
 import agendaRoutes from "./agenda.routes"
+import historialRoutes from "./historial.routes"
 
 
 import { authenticate } from "../middleware/auth.middleware";
@@ -45,10 +46,14 @@ router.use("/laboratory", labRoutes);
 router.use("/report", reportRouter);
 
 // ============================================
-// Agenda Routes 
+// Agenda Routes
 // ============================================
 router.use("/agenda", agendaRoutes);
 
+// ============================================
+// Historial Routes (Patient Analysis History)
+// ============================================
+router.use("/historial", historialRoutes);
 
 // ============================================
 // Analysis Routes
