@@ -4,13 +4,26 @@ import Title from '../atoms/Title'
 import NewNoteModal from '../molecules/notes/NewNoteModal'
 import CancelNoteButton from '../atoms/notes/CancelNoteButton'
 import SaveNoteButton from '../atoms/notes/SaveNoteButton'
+import Note from '@/types/note'
 
 function Notas() {
   
   const [showModal, setShowModal] = useState(false)
+  const [noteInfo, setNoteInfo] = useState<Note>({
+    general: null,
+    illness: null,
+    recepie: null
+  })
 
   function save() {
-    
+    if (noteInfo) {
+      fetch("/api/notes", {
+        method: "POST",
+        body: JSON.stringify(noteInfo),
+        credentials: "include"
+      })
+      setShowModal(false)
+    }
   }
 
   return (
@@ -27,7 +40,7 @@ function Notas() {
         }
         
       </div>
-      {showModal && <NewNoteModal />}
+      {showModal && <NewNoteModal modalState={setNoteInfo}/>}
     </div>
   )
 }
