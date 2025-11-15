@@ -1,6 +1,7 @@
 import React, { FC, useEffect, useState } from 'react'
 import analysisInfo from '../../../types/analysisInfo'
 import CreateAnalysisModal from '../../organism/lab/CreateAnalysisModal'
+import { authService } from '@/services/auth.service'
 import { CreateAnalysisData } from '../../../types/add.analysis.types'
 import { analysisService } from '../../../services/analysis.service'
 import { FiTrash2 } from 'react-icons/fi'
@@ -66,10 +67,12 @@ const LabFilter: FC<Props> = ({onChange}) => {
   return (
     <>
     <div className='absolute top-[4.3rem] -translate-x-28 bg-white rounded-md h-96 w-80 z-10 drop-shadow-xl shadow-lg p-2'>
-      <div className='flex justify-between items-center mb-2'>
+        <div className='flex justify-between items-center mb-2'>
         <h1 className='text-lg font-semibold'>Filtro</h1>
         <div className='flex gap-2'>
-          <button onClick={() => setIsModalOpen(true)} className='bg-blue-500 text-white px-3 py-1 rounded-md'>Crear</button>
+          {authService.getCurrentUser() && (
+            <button onClick={() => setIsModalOpen(true)} className='bg-blue-500 text-white px-3 py-1 rounded-md'>Crear</button>
+          )}
         </div>
       </div>
       <h2 className='text-lg'>Rango de fechas</h2>
@@ -131,6 +134,10 @@ const LabFilter: FC<Props> = ({onChange}) => {
               if (!confirm(`¿Eliminar examen ${a.name}?`)) return;
 
               try {
+                if(!authService.getCurrentUser()) {
+                  alert('Debes iniciar sesión para eliminar exámenes');
+                  return;
+                }
                 await analysisService.deleteAnalysis(a.analysis_id);
                 // Refetch analysis list
                 const res = await fetch("/api/laboratory/analysis", {credentials: 'include'});

@@ -43,18 +43,22 @@ export interface LoginData {
   password: string;
 }
 
+// NOTE: these IDs should match the IDs in the database `roles` table (see seed.sql)
+// Keep values in sync with backend.DEFAULT_ROLES / roles table.
 export const ROLE_IDS = {
-  PATIENT: 1,
-  DOCTOR: 2,
-  LABORATORIST: 3,
-  ADMIN: 4,
-  FAMILIAR: 5,
+  ADMIN: 1,
+  SECRETARIA: 2,
+  DOCTOR: 3,
+  PATIENT: 4,
+  LABORATORIST: 5,
+  FAMILIAR: 6,
 } as const;
 
 export const ROLE_NAMES = {
-  [ROLE_IDS.PATIENT]: "Paciente",
-  [ROLE_IDS.DOCTOR]: "Doctor",
-  [ROLE_IDS.LABORATORIST]: "Laboratorista",
   [ROLE_IDS.ADMIN]: "Administrador",
+  [ROLE_IDS.SECRETARIA]: "Secretaria",
+  [ROLE_IDS.DOCTOR]: "Doctor",
+  [ROLE_IDS.PATIENT]: "Paciente",
+  [ROLE_IDS.LABORATORIST]: "Laboratorista",
   [ROLE_IDS.FAMILIAR]: "Familiar",
 } as const;

@@ -1,12 +1,11 @@
 -- ========================
+--  CLEAR EXISTING DATA
+-- ========================
+TRUNCATE TABLE role_privilege, patient_history, results, patient_analysis, patient_appointment, notes, appointments, forums, familiars, doctors, laboratorists, patients, users, privileges, roles, analysis, questions_history RESTART IDENTITY CASCADE;
+
+-- ========================
 -- 🧩 ROLES
 -- ========================
--- ========================
--- 🧼 CLEAR EXISTING DATA
--- ========================
-BEGIN;
-TRUNCATE TABLE role_privilege, patient_history, results, patient_analysis, patient_appointment, notes, appointments, forums, familiars, doctors, laboratorists, patients, users, privileges, roles, analysis, questions_history RESTART IDENTITY CASCADE;
-COMMIT;
 
 INSERT INTO roles (role_name) VALUES
 ('Admin'),
@@ -14,8 +13,7 @@ INSERT INTO roles (role_name) VALUES
 ('Doctor'),
 ('Paciente'),
 ('Laboratorista'),
-('Familiar'),
-('Secretaria');
+('Familiar');
 
 -- ========================
 -- 🧩 PRIVILEGIOS
@@ -147,8 +145,7 @@ SELECT
   true,
   u.user_id
 FROM generate_series(1, 3) i
-JOIN users u ON u.role_id = 3
-LIMIT 3;
+CROSS JOIN (SELECT user_id FROM users WHERE role_id = 3 LIMIT 1) u;
 
 -- ========================
 -- 📅 CITAS MÉDICAS

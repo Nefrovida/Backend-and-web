@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import CreateAnalysisModal from "../organism/lab/CreateAnalysisModal";
+import { authService } from "@/services/auth.service";
 import { analysisService } from "@/services/analysis.service";
 import { CreateAnalysisData } from "@/types/add.analysis.types";
 
@@ -27,7 +28,9 @@ const AnalysisManager = () => {
       <div className="max-w-4xl mx-auto bg-white rounded-lg p-6 shadow">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-xl font-bold">Administrar Exámenes</h1>
-          <button className="bg-blue-500 text-white px-3 py-1 rounded" onClick={() => setIsOpen(true)}>Crear examen</button>
+          {authService.getCurrentUser() && (
+            <button className="bg-blue-500 text-white px-3 py-1 rounded" onClick={() => setIsOpen(true)}>Crear examen</button>
+          )}
         </div>
 
         <div className="grid grid-cols-1 gap-3">
@@ -40,12 +43,17 @@ const AnalysisManager = () => {
                   <div className="font-semibold">{a.name}</div>
                   <div className="text-xs text-gray-500">{a.description}</div>
                 </div>
-                <div className="flex gap-2">
+                  <div className="flex gap-2">
                   <button
                     className="border px-3 py-1 rounded text-red-600"
                     onClick={async () => {
                       if (!confirm(`Eliminar ${a.name}?`)) return;
                       try {
+                        if (!authService.getCurrentUser()) {
+                          alert('Debes iniciar sesión para eliminar exámenes');
+                          return;
+                        }
+
                         await analysisService.deleteAnalysis(a.analysis_id);
                         await load();
                         alert('Examen eliminado');
