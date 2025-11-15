@@ -49,7 +49,7 @@ export const createAnalysis = async (data: CreateAnalysisRequest) => {
 /**
  * Get all analysis with pagination and search
  */
-export const getAllAnalysis = async (
+export const getAllAnalyses = async (
   page: number = 1,
   limit: number = 10,
   search?: string
@@ -134,6 +134,12 @@ export const deleteAnalysis = async (analysisId: number) => {
 
   if (!analysis) {
     throw new NotFoundError('Analysis not found');
+  }
+
+  // Do not allow deletion if analysis is referenced by any patient_analysis
+  const references = await analysisModel.countPatientAnalysisReferences(analysisId);
+  if (references > 0) {
+    throw new ConflictError('Cannot delete analysis that has patient requests');
   }
 
   await analysisModel.deleteById(analysisId);
