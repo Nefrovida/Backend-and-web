@@ -4,6 +4,7 @@ import NotFoundPage from "../components/page/NotFoundPage";
 import Login from "../components/page/Login";
 import Register from "../components/page/Register";
 import analisisRoutes from "./analisis.routes";
+import forumsRoutes from "./forums.routes";
 import Home from "../components/page/Home";
 import notesRoutes from "./notes.routes";
 
@@ -18,7 +19,11 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       ...analisisRoutes,
+<<<<<<< HEAD
       ...notesRoutes,
+=======
+      ...forumsRoutes,
+>>>>>>> origin/develop
     ],
   },
   {

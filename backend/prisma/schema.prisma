@@ -32,6 +32,13 @@ enum Type {
   VIRTUAL
 }
 
+enum ForumRole {
+  OWNER
+  MODERATOR
+  MEMBER
+  VIEWER
+}
+
 model roles {
   role_id      Int @id @default(autoincrement())
   role_name  String
@@ -155,7 +162,7 @@ model forums {
 model users_forums {
   user_id       String @db.Uuid
   forum_id      Int
-  forum_role     String
+  forum_role    ForumRole
 
   @@id([user_id, forum_id])
 
