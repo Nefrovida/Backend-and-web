@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import Secretary from "../../model/secretary.model";
+import Agenda from "../../model/agenda.model";
 
 async function scheduleAppointment(req: Request, res: Response) {
   try {
@@ -31,7 +31,7 @@ async function scheduleAppointment(req: Request, res: Response) {
       return res.status(400).json({ error: "dateHour (ISO string) is required" });
     }
 
-    const updated = await Secretary.scheduleAppointment(
+    const updated = await Agenda.scheduleAppointment(
       patientAppointmentId,
       doctorId,
       dateHour,
@@ -55,6 +55,9 @@ async function scheduleAppointment(req: Request, res: Response) {
       }
       if (error.message === "Invalid dateHourISO") {
         return res.status(400).json({ error: "Invalid date format" });
+      }
+      if (error.message === "Appointment is not in REQUESTED status") {
+        return res.status(400).json({ error: "Appointment is not in REQUESTED status" });
       }
     }
     res.status(500).json({ error: "Failed to schedule appointment" });

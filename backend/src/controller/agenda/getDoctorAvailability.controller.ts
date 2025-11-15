@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import Secretary from "../../model/secretary.model";
+import Agenda from "../../model/agenda.model";
 
 async function getDoctorAvailability(req: Request, res: Response) {
   try {
@@ -20,7 +20,7 @@ async function getDoctorAvailability(req: Request, res: Response) {
       return res.status(400).json({ error: "Invalid date format. Use YYYY-MM-DD" });
     }
 
-    const availability = await Secretary.getDoctorAvailability(doctorId, date);
+    const availability = await Agenda.getDoctorAvailability(doctorId, date);
     res.json(availability);
   } catch (error) {
     console.error("Error fetching doctor availability:", error);
