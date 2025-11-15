@@ -169,15 +169,31 @@ INSERT INTO patient_appointment (patient_id, appointment_id, date_hour, duration
 SELECT 
   p.patient_id,
   a.appointment_id,
-  NOW() + (random() * (interval '30 days')),
+  NULL, -- No date for requested
   45,
   'PRESENCIAL',
-  'PROGRAMMED'
+  'REQUESTED'
 FROM (
   SELECT patient_id, ROW_NUMBER() OVER () AS rn FROM patients
 ) p
 JOIN (
   SELECT appointment_id, ROW_NUMBER() OVER () AS rn FROM appointments
+) a ON p.rn = a.rn
+LIMIT 3;
+
+INSERT INTO patient_appointment (patient_id, appointment_id, date_hour, duration, appointment_type, appointment_status)
+SELECT 
+  p.patient_id,
+  a.appointment_id,
+  NOW() + (random() * (interval '30 days')),
+  45,
+  'PRESENCIAL',
+  'PROGRAMMED'
+FROM (
+  SELECT patient_id, ROW_NUMBER() OVER () AS rn FROM patients OFFSET 3
+) p
+JOIN (
+  SELECT appointment_id, ROW_NUMBER() OVER () AS rn FROM appointments OFFSET 3
 ) a ON p.rn = a.rn
 LIMIT 5;
 

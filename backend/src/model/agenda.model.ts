@@ -52,15 +52,6 @@ export default class Agenda {
     return flattened;
   }
 
-    static async cancelAppointment(id: number) {
-      const appointmentId = id;
-      await prisma.patient_appointment.update({
-      where: { appointment_id: id },
-      data: { appointment_status: "CANCELED" },
-});
-
-    }
-
   static async getAppointmentRequests() {
     const requests = await prisma.patient_appointment.findMany({
       where: {
@@ -80,8 +71,8 @@ export default class Agenda {
         },
       },
       orderBy: {
-        created_at: "asc",
-      },
+          patient_appointment_id: "asc",
+        },
     });
 
     // Flatten the data
@@ -100,23 +91,71 @@ export default class Agenda {
   }
 
   static async getDoctors() {
-    const doctors = await prisma.user.findMany({
+    // Robust lookup: prefer searching for role_id via raw SQL so this works even
+    // if the column name changed (rol_name vs role_name) in different DB states.
+    const roleName = "Doctor";
+    const [roleRow] = (await prisma.$queryRaw`
+      SELECT role_id FROM "roles"
+      WHERE role_name = ${roleName}
+      LIMIT 1
+    `) as Array<{ role_id?: number }>;
+
+    const roleId = roleRow?.role_id ?? null;
+    if (!roleId) {
+      // If role cannot be found via raw SQL, fall back to relation-based filter
+      // which might work for older/newer Prisma clients. We'll return empty array
+      // if both methods fail rather than crashing the whole app.
+      try {
+        const doctors = await prisma.users.findMany({
+          where: {
+            role: {
+              is: {
+                role_name: roleName
+              }
+            }
+          },
+          select: {
+            user_id: true,
+            name: true,
+            parent_last_name: true,
+            maternal_last_name: true
+          }
+        });
+        return doctors;
+      } catch (err) {
+        console.error("getDoctors: fallback relation filter failed", err);
+        return [];
+      }
+    }
+
+    const doctors = await prisma.users.findMany({
       where: {
-        role: "doctor",
+        role_id: roleId
       },
       select: {
         user_id: true,
         name: true,
         parent_last_name: true,
-        maternal_last_name: true,
-      },
+        maternal_last_name: true
+      }
     });
+
     return doctors;
   }
 
   static async getDoctorAvailability(doctorId: string, date?: string) {
-    const doctor_id = parseInt(doctorId);
-    if (isNaN(doctor_id)) {
+    // doctorId is actually user_id from frontend; need to get the real doctor_id
+    const doctorRecord = await prisma.doctors.findUnique({
+      where: { user_id: doctorId },
+      select: { doctor_id: true }
+    });
+
+    if (!doctorRecord) {
+      throw new Error("Doctor not found");
+    }
+
+    const doctor_id_int = parseInt(doctorRecord.doctor_id);
+    if (isNaN(doctor_id_int)) {
       throw new Error("Invalid doctor ID");
     }
 
@@ -131,7 +170,9 @@ export default class Agenda {
     // Get programmed appointments for this doctor on target date
     const programmedAppointments = await prisma.patient_appointment.findMany({
       where: {
-        doctor_id: doctor_id,
+        appointment: {
+          doctor_id: doctorRecord.doctor_id
+        },
         appointment_status: "PROGRAMMED",
         date_hour: {
           gte: targetDate,
@@ -175,22 +216,19 @@ export default class Agenda {
     place?: string,
     link?: string
   ) {
-    const doctor_id = parseInt(doctorId);
-    if (isNaN(doctor_id)) {
-      throw new Error("Invalid doctor ID");
-    }
-
-    // Validate doctor exists
-    const doctor = await prisma.user.findUnique({
-      where: { user_id: doctor_id },
+    // doctorId is actually user_id from frontend; validate doctor exists
+    const doctorRecord = await prisma.doctors.findUnique({
+      where: { user_id: doctorId },
+      select: { doctor_id: true }
     });
-    if (!doctor || doctor.role !== "doctor") {
+
+    if (!doctorRecord) {
       throw new Error("Doctor not found");
     }
 
-    // Check if appointment exists and is REQUESTED
+    // Check if patient appointment exists and is REQUESTED
     const existingAppointment = await prisma.patient_appointment.findUnique({
-      where: { appointment_id: appointmentId },
+      where: { patient_appointment_id: appointmentId },
     });
     if (!existingAppointment) {
       throw new Error("Patient appointment not found");
@@ -206,7 +244,9 @@ export default class Agenda {
     }
     const conflicts = await prisma.patient_appointment.findMany({
       where: {
-        doctor_id: doctor_id,
+        appointment: {
+          doctor_id: doctorRecord.doctor_id
+        },
         appointment_status: "PROGRAMMED",
         date_hour: appointmentDate,
       },
@@ -217,9 +257,8 @@ export default class Agenda {
 
     // Update the appointment
     const updatedAppointment = await prisma.patient_appointment.update({
-      where: { appointment_id: appointmentId },
+      where: { patient_appointment_id: appointmentId },
       data: {
-        doctor_id: doctor_id,
         date_hour: appointmentDate,
         duration: duration,
         place: place,

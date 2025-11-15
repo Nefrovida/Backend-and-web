@@ -38,6 +38,23 @@ app.use(cors({
   credentials: true
 }));
 
+// Development-only: log incoming proxy request headers to debug proxy issues
+if (process.env.NODE_ENV !== "production") {
+  app.use((req, _res, next) => {
+    // Only log for /api paths used by frontend
+    if (req.path.startsWith('/api')) {
+      console.log('[proxy-debug] incoming request headers:', {
+        host: req.get('host'),
+        origin: req.get('origin'),
+        referer: req.get('referer'),
+        'x-forwarded-host': req.get('x-forwarded-host'),
+        'x-forwarded-for': req.get('x-forwarded-for'),
+      });
+    }
+    next();
+  });
+}
+
 // Middleware to parse JSON
 app.use(express.json());
 

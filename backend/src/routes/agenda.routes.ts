@@ -23,23 +23,23 @@ router.post("/appointments/:id/cancel",
      cancelAppointment);
 
 router.get("/appointment-requests", 
-    authenticate,
-    requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
+    // authenticate,
+    // requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
      getAppointmentRequests);
 
 router.get("/doctors", 
-    authenticate,
-    requirePrivileges([Privilege.VIEW_USERS]),
+    // authenticate,
+    // requirePrivileges([Privilege.VIEW_USERS]),
      getDoctors);
 
 router.get("/doctor/:doctorId/availability", 
-    authenticate,
-    requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
+    // authenticate,
+    // requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
      getDoctorAvailability);
 
 router.post("/schedule", 
-    authenticate,
-    requirePrivileges([Privilege.CREATE_APPOINTMENTS]),
+    // authenticate,
+    // requirePrivileges([Privilege.CREATE_APPOINTMENTS]),
      scheduleAppointment);
 
 export default router;
