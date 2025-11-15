@@ -23,6 +23,7 @@ export const ForumsPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [modalError, setModalError] = useState<string>('');
 
   // Fetch forums on component mount
   useEffect(() => {
@@ -53,6 +54,8 @@ export const ForumsPage = () => {
 
   const handleCreateForum = async (data: CreateForumData) => {
     try {
+      setModalError(''); // Clear previous modal errors
+      
       const response = await fetch('/api/forums', {
         method: 'POST',
         credentials: 'include',
@@ -64,15 +67,26 @@ export const ForumsPage = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Error al crear el foro');
+        
+        // Handle validation errors from Zod
+        if (errorData.errors && Array.isArray(errorData.errors)) {
+          const firstError = errorData.errors[0];
+          setModalError(firstError.message);
+          return; // Don't close modal, show error
+        }
+        
+        // Handle other errors
+        setModalError(errorData.error || 'Error al crear el foro');
+        return; // Don't close modal, show error
       }
 
       const newForum = await response.json();
       setForums([newForum, ...forums]);
       setIsModalOpen(false);
+      setModalError(''); // Clear error on success
       alert('Foro creado exitosamente');
     } catch (err: any) {
-      alert(err.message);
+      setModalError(err.message || 'Error al crear el foro');
       console.error('Error creating forum:', err);
     }
   };
@@ -177,8 +191,12 @@ export const ForumsPage = () => {
       {/* Create Forum Modal */}
       <CreateForumModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => {
+          setIsModalOpen(false);
+          setModalError(''); // Clear error when closing
+        }}
         onConfirm={handleCreateForum}
+        externalError={modalError}
       />
     </div>
   );

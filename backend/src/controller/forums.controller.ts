@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { ZodError } from 'zod';
 import { createForumSchema } from '../validators/forum.validator';
 import * as forumsService from '../service/forums.service';
 
@@ -35,8 +36,30 @@ export const create = async (req: Request, res: Response): Promise<void> => {
     // Respond with created forum
     res.status(201).json(newForum);
   } catch (error: any) {
-    // Delegate error handling to Express
-    // Custom errors (ConflictError, etc.) have statusCode property
+    // Handle Zod validation errors with friendly, field-specific messages
+    if (error instanceof ZodError) {
+      const formatted = error.errors.map((e) => {
+        const field = e.path && e.path.length ? String(e.path[0]) : undefined;
+        // Provide friendly messages for common validation failures
+        let message = e.message;
+
+        if (field === 'name') {
+          if ((e as any).code === 'too_big') message = 'El nombre no puede exceder 100 caracteres';
+          if ((e as any).code === 'too_small') message = 'El nombre debe tener al menos 3 caracteres';
+        }
+
+        if (field === 'description') {
+          if ((e as any).code === 'too_big') message = 'La descripción no puede exceder 255 caracteres';
+        }
+
+        return { field, message };
+      });
+
+  res.status(400).json({ errors: formatted });
+  return;
+    }
+
+    // Delegate other errors to Express-style response
     res.status(error.statusCode || 400).json({ error: error.message });
   }
 };

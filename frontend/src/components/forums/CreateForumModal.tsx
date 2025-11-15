@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CreateForumData } from '../../types/forum.types';
 
 interface CreateForumModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: (data: CreateForumData) => void;
+  externalError?: string; // Error from parent component
 }
 
 /**
@@ -24,16 +25,35 @@ export const CreateForumModal: React.FC<CreateForumModalProps> = ({
   isOpen,
   onClose,
   onConfirm,
+  externalError,
 }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [publicStatus, setPublicStatus] = useState(true);
+  const [error, setError] = useState<string>('');
+
+  const MAX_NAME_LENGTH = 100;
+  const MAX_DESCRIPTION_LENGTH = 255;
+
+  // Update local error when external error changes
+  useEffect(() => {
+    if (externalError) {
+      setError(externalError);
+    }
+  }, [externalError]);
 
   if (!isOpen) return null;
 
   const handleConfirm = () => {
+    setError(''); // Clear previous errors
+
     if (!name.trim()) {
-      alert('Por favor ingresa un nombre para el foro');
+      setError('Por favor ingresa un nombre para el foro');
+      return;
+    }
+
+    if (name.length < 3) {
+      setError('El nombre debe tener al menos 3 caracteres');
       return;
     }
 
@@ -47,12 +67,14 @@ export const CreateForumModal: React.FC<CreateForumModalProps> = ({
     setName('');
     setDescription('');
     setPublicStatus(true);
+    setError('');
   };
 
   const handleCancel = () => {
     setName('');
     setDescription('');
     setPublicStatus(true);
+    setError('');
     onClose();
   };
 
@@ -66,6 +88,13 @@ export const CreateForumModal: React.FC<CreateForumModalProps> = ({
           Crear Nuevo Foro
         </h2>
 
+        {/* Error Message */}
+        {error && (
+          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
+            {error}
+          </div>
+        )}
+
         {/* Forum Name Input */}
         <div className="mb-4">
           <label htmlFor="forumName" className="block text-sm font-medium text-gray-700 mb-2">
@@ -75,10 +104,20 @@ export const CreateForumModal: React.FC<CreateForumModalProps> = ({
             id="forumName"
             type="text"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value.length <= MAX_NAME_LENGTH) {
+                setName(value);
+                setError(''); // Clear error on input
+              }
+            }}
+            maxLength={MAX_NAME_LENGTH}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent"
             placeholder="Ej: Foro de Nutrición"
           />
+          <div className="text-xs text-gray-500 mt-1 text-right">
+            {name.length}/{MAX_NAME_LENGTH} caracteres
+          </div>
         </div>
 
         {/* Forum Description Input */}
@@ -89,11 +128,21 @@ export const CreateForumModal: React.FC<CreateForumModalProps> = ({
           <textarea
             id="forumDescription"
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value.length <= MAX_DESCRIPTION_LENGTH) {
+                setDescription(value);
+                setError(''); // Clear error on input
+              }
+            }}
+            maxLength={MAX_DESCRIPTION_LENGTH}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent resize-none"
             placeholder="Breve descripción del foro"
             rows={3}
           />
+          <div className="text-xs text-gray-500 mt-1 text-right">
+            {description.length}/{MAX_DESCRIPTION_LENGTH} caracteres
+          </div>
         </div>
 
         {/* Visibility Section */}
