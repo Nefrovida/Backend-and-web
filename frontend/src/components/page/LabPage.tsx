@@ -1,10 +1,10 @@
 import { Outlet } from "react-router";
-import ListaResultados from "../organism/lab/ListaResultados";
+import ListResults from "../organism/lab/ListResults";
 
 function LabPage() {
   return (
     <section className="flex w-full">
-      <ListaResultados />
+      <ListResults />
       <Outlet />
     </section>
   );
