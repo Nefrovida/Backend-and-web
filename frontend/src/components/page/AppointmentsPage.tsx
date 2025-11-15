@@ -1,5 +1,3 @@
-// components/pages/AppointmentsPage.tsx
-
 import React, { useState, useEffect } from 'react';
 import PageHeader from '../molecules/PageHeader';
 import Search from '../atoms/Search';
@@ -16,7 +14,6 @@ const AppointmentsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Cargar citas al montar el componente
   useEffect(() => {
     loadAppointments();
   }, []);
@@ -49,7 +46,6 @@ const AppointmentsPage: React.FC = () => {
     try {
       const updated = await appointmentController.rescheduleAppointment(id, data);
       
-      // Actualizar estado local
       setAppointments((prev) =>
         prev.map((apt) => (apt.id === updated.id ? updated : apt))
       );
@@ -77,7 +73,6 @@ const AppointmentsPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <PageHeader />
           <div className="flex items-center space-x-3 relative">
@@ -94,7 +89,6 @@ const AppointmentsPage: React.FC = () => {
           onRetry={loadAppointments}
         />
 
-        {/* Settings Icon */}
         <div className="fixed bottom-8 left-8">
           <button className="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors">
             <svg
@@ -120,7 +114,6 @@ const AppointmentsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Reschedule Modal */}
       {selectedAppointment && (
         <RescheduleModal
           appointment={selectedAppointment}

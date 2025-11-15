@@ -10,6 +10,6 @@ export interface Appointment {
 }
 
 export interface RescheduleData {
-  date_hour: string; // ISO string
+  date_hour: string;
   reason: string;
 }

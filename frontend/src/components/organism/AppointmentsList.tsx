@@ -1,5 +1,3 @@
-// components/organisms/AppointmentsList.tsx
-
 import React from 'react';
 import AppointmentCard from '../molecules/AppointmentCard';
 import Button from '../atoms/Button';

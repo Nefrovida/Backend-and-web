@@ -1,17 +1,35 @@
-
 // routes/appointment.routes.ts
 
-import { Router } from 'express';
+import express from 'express';
 import AppointmentController from '../controller/appointment.controller';
-// import { authMiddleware } from '../middleware/auth'; // tu middleware de auth
+// import { authenticate } from '../middleware/auth.middleware';
+// import { requirePrivileges } from '../middleware/rbac.middleware';
+// import { Privilege } from '../types/rbac.types';
 
-const router = Router();
+const router = express.Router();
 
-// Aplicar middleware de autenticación si lo necesitas
-// router.use(authMiddleware);
+// GET /api/appointments
+router.get(
+  '/',
+  // authenticate,
+  // requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
+  AppointmentController.getAllAppointments
+);
 
-router.get('/appointments', AppointmentController.getAllAppointments);
-router.get('/appointments/day/:date', AppointmentController.getAppointmentsByDay);
-router.put('/appointments/:id/reschedule', AppointmentController.rescheduleAppointment);
+// GET /api/appointments/day/:date
+router.get(
+  '/day/:date',
+  // authenticate,
+  // requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
+  AppointmentController.getAppointmentsByDay
+);
+
+// PUT /api/appointments/:id/reschedule
+router.put(
+  '/:id/reschedule',
+  // authenticate,
+  // requirePrivileges([Privilege.UPDATE_APPOINTMENTS]),
+  AppointmentController.rescheduleAppointment
+);
 
 export default router;

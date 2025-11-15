@@ -1,5 +1,3 @@
-// components/molecules/AppointmentCard.tsx
-
 import React from 'react';
 import { BsPersonCircle } from 'react-icons/bs';
 import Button from '../atoms/Button';

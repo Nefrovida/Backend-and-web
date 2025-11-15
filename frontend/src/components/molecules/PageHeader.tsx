@@ -1,5 +1,3 @@
-// components/molecules/PageHeader.tsx
-
 import React from 'react';
 
 interface PageHeaderProps {

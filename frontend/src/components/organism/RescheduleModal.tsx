@@ -1,5 +1,3 @@
-// components/organisms/RescheduleModal.tsx
-
 import React, { useState } from 'react';
 import Button from '../atoms/Button';
 import TimeSlotGrid from '../molecules/TimeSlotGrid';
@@ -30,7 +28,6 @@ const RescheduleModal: React.FC<RescheduleModalProps> = ({
 
     setLoading(true);
     
-    // Combinar fecha y hora en formato ISO
     const dateTimeString = `${date}T${time}:00.000Z`;
 
     const rescheduleData: RescheduleData = {
@@ -58,7 +55,6 @@ const RescheduleModal: React.FC<RescheduleModalProps> = ({
         </h2>
 
         <div className="space-y-5">
-          {/* Purpose */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Motivo de la cita:
@@ -72,7 +68,6 @@ const RescheduleModal: React.FC<RescheduleModalProps> = ({
             />
           </div>
 
-          {/* Date Selection */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Seleccione la fecha para la cita:
@@ -86,7 +81,6 @@ const RescheduleModal: React.FC<RescheduleModalProps> = ({
             />
           </div>
 
-          {/* Time Selection */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Seleccione el horario para la cita:
@@ -98,7 +92,6 @@ const RescheduleModal: React.FC<RescheduleModalProps> = ({
           </div>
         </div>
 
-        {/* Action Buttons */}
         <div className="flex space-x-3 mt-6">
           <Button
             variant="warning"

@@ -1,14 +1,9 @@
-// controllers/AppointmentController.ts
-
 import { Appointment, RescheduleData } from '../types/appointment';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+const API_URL = import.meta.env.VITE_APP_API_URL || 'http://localhost:3001';
 
 class AppointmentController {
 
-  /**
-   * Cargar todas las citas
-   */
   async loadAppointments(): Promise<Appointment[]> {
     try {
       const response = await fetch(`${API_URL}/api/appointments`, {
@@ -29,9 +24,6 @@ class AppointmentController {
     }
   }
 
-  /**
-   * Cargar citas de un día específico
-   */
   async loadAppointmentsByDay(date: string): Promise<Appointment[]> {
     try {
       const response = await fetch(`${API_URL}/api/appointments/day/${date}`, {
@@ -52,12 +44,8 @@ class AppointmentController {
     }
   }
 
-  /**
-   * Reagendar cita
-   */
   async rescheduleAppointment(id: number, data: RescheduleData): Promise<Appointment> {
     try {
-      // Validaciones básicas del frontend
       if (!data.date_hour) throw new Error('Debe seleccionar fecha y hora');
       if (!data.reason) throw new Error('Debe especificar el motivo');
 
@@ -87,9 +75,6 @@ class AppointmentController {
     }
   }
 
-  /**
-   * Buscar citas por término
-   */
   searchAppointments(appointments: Appointment[], searchTerm: string): Appointment[] {
     if (!searchTerm?.trim()) return appointments;
 
@@ -100,9 +85,6 @@ class AppointmentController {
     );
   }
 
-  /**
-   * Formatear nombre completo del paciente
-   */
   getFullPatientName(appointment: Appointment): string {
     const parts = [
       appointment.patient_name,
@@ -113,9 +95,6 @@ class AppointmentController {
     return parts.join(' ');
   }
 
-  /**
-   * Formatear fecha para display (DD/MM/YYYY)
-   */
   formatDate(date: Date | string): string {
     const d = new Date(date);
     return d.toLocaleDateString('es-MX', {
@@ -125,9 +104,6 @@ class AppointmentController {
     });
   }
 
-  /**
-   * Formatear hora (HH:MM)
-   */
   formatTime(date: Date | string): string {
     const d = new Date(date);
     return d.toLocaleTimeString('es-MX', {
@@ -136,9 +112,6 @@ class AppointmentController {
     });
   }
 
-  /**
-   * Ordenar citas por fecha
-   */
   sortByDate(appointments: Appointment[]): Appointment[] {
     return [...appointments].sort((a, b) => {
       const dateA = new Date(a.date_hour);
