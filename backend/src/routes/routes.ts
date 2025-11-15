@@ -11,6 +11,7 @@ import reportRouter from "./report.routes";
 
 import historyRoutes from "./history.routes";
 import agendaRoutes from "./agenda.routes"
+import appointmentRoutes from "./appointment.routes";
 
 import { authenticate } from "../middleware/auth.middleware";
 import { requirePrivileges } from "../middleware/rbac.middleware";
@@ -53,6 +54,11 @@ router.use('/history', historyRoutes);
 // Agenda Routes 
 // ============================================
 router.use("/agenda", agendaRoutes);
+
+// ============================================
+// Appointments Routes (Protected)
+// ============================================
+router.use("/appointments", appointmentRoutes); 
 
 // ============================================
 // Analysis Routes

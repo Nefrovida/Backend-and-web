@@ -4,6 +4,7 @@ import NotFoundPage from "../components/page/NotFoundPage";
 import Login from "../components/page/Login";
 import Register from "../components/page/Register";
 import analisisRoutes from "./analisis.routes";
+import appointmentsRoutes from "./appointments.routes";
 import Home from "../components/page/Home";
 
 const router = createBrowserRouter([
@@ -17,6 +18,7 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       ...analisisRoutes,
+      ...appointmentsRoutes,
     ],
   },
   {

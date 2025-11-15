@@ -1,0 +1,162 @@
+// models/appointment.model.ts
+
+import { prisma } from '../util/prisma';
+
+export default class AppointmentModel {
+  
+  /**
+   * Obtener todas las citas
+   */
+  static async getAllAppointments() {
+    const appointments = await prisma.patient_appointment.findMany({
+      include: {
+        patient: {
+          include: {
+            user: {
+              select: {
+                name: true,
+                parent_last_name: true,
+                maternal_last_name: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        date_hour: 'asc',
+      },
+    });
+
+    return this.flattenAppointments(appointments);
+  }
+
+  /**
+   * Obtener citas de un día específico
+   */
+  static async getAppointmentsByDay(targetDate: string) {
+    const [year, month, day] = targetDate.split('-').map(Number);
+    const start = new Date(year, month - 1, day, 0, 0, 0);
+    const end = new Date(year, month - 1, day + 1, 0, 0, 0);
+
+    const appointments = await prisma.patient_appointment.findMany({
+      where: {
+        date_hour: {
+          gte: start,
+          lt: end,
+        },
+      },
+      include: {
+        patient: {
+          include: {
+            user: {
+              select: {
+                name: true,
+                parent_last_name: true,
+                maternal_last_name: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        date_hour: 'asc',
+      },
+    });
+
+    return this.flattenAppointments(appointments);
+  }
+
+  /**
+   * Obtener cita por ID
+   */
+  static async getAppointmentById(id: number) {
+    const appointment = await prisma.patient_appointment.findUnique({
+      where: { id },
+      include: {
+        patient: {
+          include: {
+            user: {
+              select: {
+                name: true,
+                parent_last_name: true,
+                maternal_last_name: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!appointment) return null;
+
+    const [flattened] = this.flattenAppointments([appointment]);
+    return flattened;
+  }
+
+  /**
+   * Reagendar una cita (actualizar fecha y motivo)
+   */
+  static async rescheduleAppointment(
+    id: number,
+    date_hour: Date,
+    reason: string
+  ) {
+    const updated = await prisma.patient_appointment.update({
+      where: { id },
+      data: {
+        date_hour,
+        reason,
+        status: 'rescheduled',
+      },
+      include: {
+        patient: {
+          include: {
+            user: {
+              select: {
+                name: true,
+                parent_last_name: true,
+                maternal_last_name: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const [flattened] = this.flattenAppointments([updated]);
+    return flattened;
+  }
+
+  /**
+   * Verificar disponibilidad de horario
+   */
+  static async isTimeSlotAvailable(date_hour: Date): Promise<boolean> {
+    const existing = await prisma.patient_appointment.findFirst({
+      where: {
+        date_hour,
+        status: {
+          not: 'cancelled',
+        },
+      },
+    });
+
+    return !existing;
+  }
+
+  /**
+   * Desanidar joins (helper method)
+   */
+  private static flattenAppointments(appointments: any[]) {
+    return appointments.map((a) => {
+      const user = a.patient?.user;
+      const { patient, ...rest } = a;
+
+      return {
+        ...rest,
+        patient_name: user?.name ?? null,
+        patient_parent_last_name: user?.parent_last_name ?? null,
+        patient_maternal_last_name: user?.maternal_last_name ?? null,
+      };
+    });
+  }
+}
