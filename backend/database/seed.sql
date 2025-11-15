@@ -19,13 +19,36 @@ INSERT INTO roles (role_name) VALUES
 -- ========================
 -- 🧩 PRIVILEGIOS
 -- ========================
-INSERT INTO privileges (description) VALUES
-('Crear usuario'),
-('Editar usuario'),
-('Eliminar usuario'),
-('Ver reportes'),
-('Administrar foros'),
-('Asignar citas');
+INSERT INTO privileges (description) 
+VALUES
+('VIEW_USERS'),
+('CREATE_USERS'),
+('UPDATE_USERS'),
+('DELETE_USERS'),
+('VIEW_ROLES'),
+('CREATE_ROLES'),
+('UPDATE_ROLES'),
+('DELETE_ROLES'),
+('VIEW_PATIENTS'),
+('CREATE_PATIENTS'),
+('UPDATE_PATIENTS'),
+('DELETE_PATIENTS'),
+('VIEW_APPOINTMENTS'),
+('CREATE_APPOINTMENTS'),
+('UPDATE_APPOINTMENTS'),
+('DELETE_APPOINTMENTS'),
+('VIEW_ANALYSIS'),
+('CREATE_ANALYSIS'),
+('UPDATE_ANALYSIS'),
+('DELETE_ANALYSIS'),
+('VIEW_FORUMS'),
+('CREATE_FORUMS'),
+('UPDATE_FORUMS'),
+('DELETE_FORUMS'),
+('VIEW_HISTORY_QUESTIONS'),
+('CREATE_HISTORY_QUESTIONS'),
+('UPDATE_HISTORY_QUESTIONS'),
+('DELETE_HISTORY_QUESTIONS');
 
 -- ========================
 -- 🧩 ROLES - PRIVILEGIOS
@@ -33,6 +56,11 @@ INSERT INTO privileges (description) VALUES
 -- ========================
 INSERT INTO role_privilege (role_id, privilege_id)
 SELECT 1, privilege_id FROM privileges;
+
+-- Laboratorista: puede ver y crear análisis
+INSERT INTO role_privilege (role_id, privilege_id)
+SELECT 4, privilege_id FROM privileges
+WHERE description IN ('VIEW_ANALYSIS', 'CREATE_ANALYSIS');
 
 -- ========================
 -- 👥 USERS
