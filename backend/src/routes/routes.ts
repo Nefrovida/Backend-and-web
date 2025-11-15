@@ -5,11 +5,8 @@ import authRoutes from "./auth.routes";
 import usersRoutes from "./users.routes";
 import rolesRoutes from "./roles.routes"
 import privilegesRoutes from "./privileges.routes";
-<<<<<<< HEAD
 import notesRouter from "./notes.routes"
-=======
 import forumsRoutes from "./forums.routes";
->>>>>>> origin/develop
 import * as analysisController from '../controller/analysis/add.analysis.controller';
 import patientRoutes from "./patients.routes";
 

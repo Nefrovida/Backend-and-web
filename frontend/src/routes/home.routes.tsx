@@ -19,11 +19,8 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       ...analisisRoutes,
-<<<<<<< HEAD
       ...notesRoutes,
-=======
       ...forumsRoutes,
->>>>>>> origin/develop
     ],
   },
   {
