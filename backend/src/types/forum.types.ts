@@ -1,4 +1,4 @@
-import { ForumRole } from '.prisma/client';
+import { ForumRole } from '@prisma/client';
 
 /**
  * Forum visibility type
