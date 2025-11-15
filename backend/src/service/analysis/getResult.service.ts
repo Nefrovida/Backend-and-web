@@ -13,3 +13,7 @@ export const getRiskQuestions = (req: Request, res: Response) => {
 export const getRiskOptions = (req: Request, res: Response) => {
     return Report.getRiskOptions();
 }
+
+export const submitRiskForm = async (id:string, answers:any) => {
+  return Report.postRiskFormAnswers(id, answers);
+};
