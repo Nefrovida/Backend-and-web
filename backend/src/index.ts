@@ -48,22 +48,21 @@ import path from "path";
 import fs from "fs/promises";
 import { raw } from "express";
 
-// Directorio donde se guardarán los PDFs
+// Dir for PDF storage
 const uploadDir = path.join(process.cwd(), "uploads");
 
-// Asegurarse que exista
 fs.mkdir(uploadDir, { recursive: true }).catch(console.error);
 
-// Servir los archivos estáticos (para poder descargarlos/verlos luego)
+// Serve static files
 app.use("/uploads", express.static(uploadDir));
 
-// Endpoint para recibir el archivo binario (PUT a la URL "presignada")
+// Endpoint to receibe new binary (presigned URL PUT)
 app.put(
   "/uploads/:fileName",
   raw({
     type: [
       "application/pdf",
-      "application/octet-stream" // por si el cliente no pone bien el mime
+      "application/octet-stream"
     ],
     limit: "20mb",
   }),
@@ -71,7 +70,6 @@ app.put(
     try {
       const fileName = req.params.fileName;
 
-      // En esta US solo aceptamos PDF
       const contentType = req.headers["content-type"];
       if (contentType !== "application/pdf" && contentType !== "application/octet-stream") {
         return res
