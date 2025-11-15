@@ -5,12 +5,14 @@ import authRoutes from "./auth.routes";
 import usersRoutes from "./users.routes";
 import rolesRoutes from "./roles.routes"
 import privilegesRoutes from "./privileges.routes";
+import forumsRoutes from "./forums.routes";
 import * as analysisController from '../controller/analysis/add.analysis.controller';
 import addPatientToForumRoutes from './forums/add_patient_to_forum.routes';
 
 import reportRouter from "./report.routes";
-import agendaRoutes from "./agenda.routes"
 
+import historyRoutes from "./history.routes";
+import agendaRoutes from "./agenda.routes"
 
 import { authenticate } from "../middleware/auth.middleware";
 import { requirePrivileges } from "../middleware/rbac.middleware";
@@ -39,6 +41,11 @@ router.use("/roles", rolesRoutes)
 router.use("/privileges", privilegesRoutes)
 
 // ============================================
+// Forum Routes (Protected)
+// ============================================
+router.use("/forums", forumsRoutes);
+
+// ============================================
 // Laboratory Routes (Protected)
 // ============================================
 router.use("/laboratory", labRoutes);
@@ -46,10 +53,13 @@ router.use("/laboratory", labRoutes);
 router.use("/report", reportRouter);
 
 // ============================================
+// Patient History Questions Templates
+// ============================================
+router.use('/history', historyRoutes);
+
 // Agenda Routes 
 // ============================================
 router.use("/agenda", agendaRoutes);
-
 
 // ============================================
 // Analysis Routes
