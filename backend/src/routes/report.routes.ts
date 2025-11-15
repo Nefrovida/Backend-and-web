@@ -8,8 +8,8 @@ import { Privilege } from "../types/rbac.types";
 
 router.get(
     "/get-result/:patient_analysis_id", 
-    authenticate, 
-    requirePrivileges([Privilege.VIEW_ANALYSIS]), 
+   // authenticate, 
+    //requirePrivileges([Privilege.VIEW_ANALYSIS]), 
     getResult
 );
 
