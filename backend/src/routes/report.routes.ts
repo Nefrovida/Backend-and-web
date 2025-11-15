@@ -15,17 +15,16 @@ router.get(
 );
 
 router.get("/risk-questions",
-    //authenticate,
+    authenticate,
     reportController.getRiskQuestions
 );
 
 router.get("/risk-options",
-    //authenticate,
+    authenticate,
     reportController.getRiskOptions
 )
 
 router.post("/risk-form/submit/:id",
-    //authenticate,
-    //validateRiskForm,
+    authenticate,
     reportController.submitRiskForm);
 export default router;
