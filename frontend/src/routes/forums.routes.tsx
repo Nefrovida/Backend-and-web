@@ -1,5 +1,5 @@
+import ForumsPage from "@/components/page/ForumsPage";
 import { RouteObject } from "react-router-dom";
-import ForumsPage from "../pages/Forums/ForumsPage";
 
 const forumsRoutes: RouteObject[] = [
   {
