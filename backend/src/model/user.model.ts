@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
-import { prisma } from '../util/prisma.js';
+import { PrismaClient } from '@prisma/client'; 
+const prisma = new PrismaClient();
 
 export default class User {
     User() {
