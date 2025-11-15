@@ -4,7 +4,9 @@ import NotFoundPage from "../components/page/NotFoundPage";
 import Login from "../components/page/Login";
 import Register from "../components/page/Register";
 import analisisRoutes from "./analisis.routes";
+import agendaRoutes from "./agenda.routes";
 import Home from "../components/page/Home";
+import Scheduler from "../components/organism/agenda/Scheduler"
 
 const router = createBrowserRouter([
   {
@@ -17,6 +19,7 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       ...analisisRoutes,
+      ...agendaRoutes,
     ],
   },
   {
@@ -26,6 +29,10 @@ const router = createBrowserRouter([
   {
     path: "/register",
     element: <Register />,
+  },
+  {
+    path: "/prueba",
+    element: <Scheduler />,
   },
 ]);
 
