@@ -1,6 +1,7 @@
 import { RouteObject } from "react-router-dom";
 import LabPage from "../components/page/LabPage";
 import LabResults from "../components/organism/lab/LabResults";
+import LaboratoristAnalysisCalendar from "../components/page/LaboratoristAnalysisCalendar";
 
 const analisisRoutes: RouteObject[] = [
   {
@@ -12,6 +13,10 @@ const analisisRoutes: RouteObject[] = [
         element: <LabResults />,
       },
     ],
+  },
+  {
+    path: "/analisis-dia/:date",
+    element: <LaboratoristAnalysisCalendar />,
   },
 ];
 
