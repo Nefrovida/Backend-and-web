@@ -30,6 +30,63 @@ app.use(express.json());
 // Middleware to parse cookies
 app.use(cookieParser());
 
+import path from "path";
+import fs from "fs/promises";
+import { raw } from "express";
+
+// Directorio donde se guardarán los PDFs
+const uploadDir = path.join(process.cwd(), "uploads");
+
+// Asegurarse que exista
+fs.mkdir(uploadDir, { recursive: true }).catch(console.error);
+
+// Servir los archivos estáticos (para poder descargarlos/verlos luego)
+app.use("/uploads", express.static(uploadDir));
+
+// Endpoint para recibir el archivo binario (PUT a la URL "presignada")
+app.put(
+  "/uploads/:fileName",
+  raw({
+    type: [
+      "application/pdf",
+      "application/octet-stream" // por si el cliente no pone bien el mime
+    ],
+    limit: "20mb",
+  }),
+  async (req: Request, res: Response) => {
+    try {
+      const fileName = req.params.fileName;
+
+      // En esta US solo aceptamos PDF
+      const contentType = req.headers["content-type"];
+      if (contentType !== "application/pdf" && contentType !== "application/octet-stream") {
+        return res
+          .status(400)
+          .json({ success: false, message: "Only PDF uploads are allowed" });
+      }
+
+      if (!req.body || !(req.body instanceof Buffer) && !Buffer.isBuffer(req.body)) {
+        return res
+          .status(400)
+          .json({ success: false, message: "File body is required" });
+      }
+
+      const buffer = Buffer.isBuffer(req.body) ? req.body : Buffer.from(req.body);
+
+      const filePath = path.join(uploadDir, fileName);
+
+      await fs.writeFile(filePath, buffer);
+
+      return res.status(200).json({ success: true, path: `/uploads/${fileName}` });
+    } catch (error: any) {
+      console.error("Error saving uploaded file:", error);
+      return res
+        .status(500)
+        .json({ success: false, message: "Error saving uploaded file" });
+    }
+  }
+);
+
 import router from "./routes/routes";
 
 // Routes

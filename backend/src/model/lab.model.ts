@@ -131,8 +131,8 @@ export default class Laboratory {
   }
 
   static async confirmLabAppointmentResult(patientAnalysisId: number, fileUri: string) {
-    await prisma.$transaction([
-      prisma.results.upsert({
+    await prisma.$transaction(async (tx: any) => {
+      await tx.results.upsert({
         where: { patient_analysis_id: patientAnalysisId },
         update: {
           path: fileUri,
@@ -143,16 +143,16 @@ export default class Laboratory {
           path: fileUri,
           date: new Date(),
           interpretation: "",
-          recommendation: "",
         },
-      }),
-      prisma.patient_analysis.update({
+      });
+
+      await tx.patient_analysis.update({
         where: { patient_analysis_id: patientAnalysisId },
         data: {
-          analysis_status: ANALYSIS_STATUS.SENT,
+          analysis_status: "SENT",
           results_date: new Date(),
         },
-      }),
-    ]);
+      });
+    });
   }
 }
