@@ -55,10 +55,4 @@ router.delete(
 
 router.get("/appointments/:id", usersController.getUserAppointments);
 
-router.post(
-  "/appointments/:id",
-  authenticate,
-  usersController.postUserRiskForms
-);
-
 export default router;
