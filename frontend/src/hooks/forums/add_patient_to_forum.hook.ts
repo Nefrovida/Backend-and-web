@@ -16,6 +16,12 @@ export default function useAddPatientToForum() {
       try {
         const response = await addPatientToForumService.addPatientToForum(forumId, data);
         setSuccess(true);
+        
+        // Reset success after 3 seconds
+        setTimeout(() => {
+          setSuccess(false);
+        }, 3000);
+        
         return response;
       } catch (err: any) {
         const errorMessage = getErrorMessage(err.message);
@@ -44,14 +50,14 @@ export default function useAddPatientToForum() {
 }
 
 /**
- * Convierte mensajes de error técnicos a mensajes amigables en español
+ * Converts backend error messages to user-friendly Spanish messages
  */
 function getErrorMessage(message: string): string {
   if (message.includes("Forum not found")) {
     return "El foro no existe";
   }
   if (message.includes("Only private forums")) {
-    return "Solo se pueden agregar usuarios a foros privados";
+    return "Solo se pueden agregar usuarios manualmente a foros privados";
   }
   if (message.includes("Forum is not active")) {
     return "El foro no está activo";
@@ -70,6 +76,12 @@ function getErrorMessage(message: string): string {
   }
   if (message.includes("Invalid request")) {
     return "Los datos ingresados no son válidos";
+  }
+  if (message.includes("userId must be a valid UUID")) {
+    return "El formato del ID de usuario no es válido";
+  }
+  if (message.includes("forumRole must be one of")) {
+    return "El rol seleccionado no es válido";
   }
   return message || "Error al agregar paciente al foro";
 }

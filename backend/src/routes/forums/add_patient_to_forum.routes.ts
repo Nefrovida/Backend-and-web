@@ -12,7 +12,7 @@ const router = Router();
  * @access  Private (requires ADD_USER_TO_FORUM privilege)
  */
 router.post(
-  '/forums/:forumId/users',
+  '/:forumId/users',
   authenticate,
   requirePrivileges([Privilege.ADD_USER_TO_FORUM]),
   addPatientToForumController.addPatientToForum

@@ -1,6 +1,6 @@
 export interface AddPatientToForumRequest {
   userId: string;
-  forumRole: string;
+  forumRole: ForumRole;
 }
 
 export interface AddPatientToForumResponse {
@@ -9,7 +9,7 @@ export interface AddPatientToForumResponse {
   data: {
     userId: string;
     forumId: number;
-    forumRole: string;
+    forumRole: ForumRole;
   };
 }
 
@@ -34,15 +34,32 @@ export interface Patient {
   patient_id: string;
   user_id: string;
   curp: string;
-  name: string;
-  parent_last_name: string;
+  name?: string;
+  parent_last_name?: string;
   maternal_last_name?: string;
 }
 
+// Estos valores deben coincidir exactamente con el enum de Prisma
+export enum ForumRole {
+  OWNER = "OWNER",
+  MODERATOR = "MODERATOR",
+  MEMBER = "MEMBER",
+  VIEWER = "VIEWER",
+}
+
 export const FORUM_ROLES = {
-  MEMBER: "miembro",
-  PARTICIPANT: "participante",
-  MODERATOR: "moderador",
+  OWNER: ForumRole.OWNER,
+  MODERATOR: ForumRole.MODERATOR,
+  MEMBER: ForumRole.MEMBER,
+  VIEWER: ForumRole.VIEWER,
 } as const;
 
-export type ForumRole = typeof FORUM_ROLES[keyof typeof FORUM_ROLES];
+export type ForumRoleType = typeof FORUM_ROLES[keyof typeof FORUM_ROLES];
+
+// Mapeo para mostrar nombres en español
+export const FORUM_ROLE_LABELS: Record<ForumRole, string> = {
+  [ForumRole.OWNER]: "Propietario",
+  [ForumRole.MODERATOR]: "Moderador",
+  [ForumRole.MEMBER]: "Miembro",
+  [ForumRole.VIEWER]: "Observador",
+};

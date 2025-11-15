@@ -9,7 +9,10 @@ import {
   BadRequestError,
   ConflictError
 } from '../../util/errors.util.js';
-import type { AddPatientToForumResponse } from '../../types/forums/add_patient_to_forum.types';
+import type { 
+  AddPatientToForumResponse,
+  ForumRole 
+} from '../../types/forums/add_patient_to_forum.types';
 
 /**
  * Service to add patient to forum
@@ -17,7 +20,7 @@ import type { AddPatientToForumResponse } from '../../types/forums/add_patient_t
 export async function addPatientToForumService(
   forumId: number,
   userId: string,
-  forumRole: string
+  forumRole: ForumRole
 ): Promise<AddPatientToForumResponse> {
   
   // 1. Verify that forum exists
@@ -53,8 +56,12 @@ export async function addPatientToForumService(
 
   // 7. Return success response
   return {
-    userId: userForum.user_id,
-    forumId: userForum.forum_id,
-    forumRole: userForum.forum_role
+    success: true,
+    message: 'Patient added to forum successfully',
+    data: {
+      userId: userForum.user_id,
+      forumId: userForum.forum_id,
+      forumRole: userForum.forum_role
+    }
   };
 }

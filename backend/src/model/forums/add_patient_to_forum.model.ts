@@ -1,5 +1,10 @@
 import { prisma } from '../../util/prisma.js';
-import type { ForumData, PatientData, UserForumData } from '../../types/forums/add_patient_to_forum.types.js';
+import type { 
+  Patient, 
+  UserForumData,
+  ForumData,
+  ForumRole 
+} from '../../types/forums/add_patient_to_forum.types.js';
 
 /**
  * Verify if forum exists
@@ -15,7 +20,7 @@ export async function findForumById(forumId: number): Promise<ForumData | null> 
 /**
  * Verify if patient exists
  */
-export async function findPatientByUserId(userId: string): Promise<PatientData | null> {
+export async function findPatientByUserId(userId: string): Promise<Patient | null> {
   return await prisma.patients.findFirst({
     where: {
       user_id: userId
@@ -43,7 +48,7 @@ export async function findUserInForum(userId: string, forumId: number): Promise<
 export async function addUserToForum(
   userId: string,
   forumId: number,
-  forumRole: string
+  forumRole: ForumRole
 ): Promise<UserForumData> {
   return await prisma.users_forums.create({
     data: {

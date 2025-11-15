@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import useAddPatientToForum from "../../../hooks/forums/add_patient_to_forum.hook";
-import { FORUM_ROLES } from "../../../types/forums/add_patient_to_forum.types";
+import { 
+  FORUM_ROLES, 
+  ForumRole, 
+  FORUM_ROLE_LABELS 
+} from "../../../types/forums/add_patient_to_forum.types";
 
 interface AddPatientToForumProps {
   forumId: number;
@@ -18,7 +22,7 @@ function AddPatientToForum({
   const { addPatient, loading, error, success } = useAddPatientToForum();
   
   const [userId, setUserId] = useState("");
-  const [forumRole, setForumRole] = useState<string>(FORUM_ROLES.MEMBER);
+  const [forumRole, setForumRole] = useState<ForumRole>(FORUM_ROLES.MEMBER);
   const [localError, setLocalError] = useState("");
 
   const validateUUID = (uuid: string): boolean => {
@@ -30,7 +34,7 @@ function AddPatientToForum({
     e.preventDefault();
     setLocalError("");
 
-    // Validaciones del cliente
+    // Validations
     if (!userId.trim()) {
       setLocalError("El ID del usuario es requerido");
       return;
@@ -41,27 +45,24 @@ function AddPatientToForum({
       return;
     }
 
-    if (!forumRole.trim()) {
-      setLocalError("El rol en el foro es requerido");
-      return;
-    }
-
     try {
       await addPatient(forumId, {
         userId: userId.trim(),
-        forumRole: forumRole.trim(),
+        forumRole: forumRole,
       });
       
-      // Limpiar formulario después del éxito
+      // Clear form
       setUserId("");
       setForumRole(FORUM_ROLES.MEMBER);
       
-      // Llamar callback de éxito si existe
+      // Call onSuccess callback if provided
       if (onSuccess) {
-        onSuccess();
+        setTimeout(() => {
+          onSuccess();
+        }, 2000);
       }
     } catch (err) {
-      // El error ya está manejado por el hook
+      // Error is handled in the hook
       console.error("Error adding patient to forum:", err);
     }
   };
@@ -157,17 +158,18 @@ function AddPatientToForum({
           </label>
           <select
             value={forumRole}
-            onChange={(e) => setForumRole(e.target.value)}
+            onChange={(e) => setForumRole(e.target.value as ForumRole)}
             className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-900 transition-colors"
             disabled={loading}
             required
           >
-            <option value={FORUM_ROLES.MEMBER}>Miembro</option>
-            <option value={FORUM_ROLES.PARTICIPANT}>Participante</option>
-            <option value={FORUM_ROLES.MODERATOR}>Moderador</option>
+            <option value={FORUM_ROLES.MEMBER}>{FORUM_ROLE_LABELS[FORUM_ROLES.MEMBER]}</option>
+            <option value={FORUM_ROLES.VIEWER}>{FORUM_ROLE_LABELS[FORUM_ROLES.VIEWER]}</option>
+            <option value={FORUM_ROLES.MODERATOR}>{FORUM_ROLE_LABELS[FORUM_ROLES.MODERATOR]}</option>
+            <option value={FORUM_ROLES.OWNER}>{FORUM_ROLE_LABELS[FORUM_ROLES.OWNER]}</option>
           </select>
           <p className="text-xs text-gray-500 mt-1 ml-1">
-            Miembro: Usuario del foro | Participante: Responde mensajes | Moderador: Administra el foro
+            Miembro: Participa activamente | Observador: Solo lectura | Moderador: Gestiona contenido | Propietario: Control total
           </p>
         </div>
 

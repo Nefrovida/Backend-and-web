@@ -102,6 +102,6 @@ router.delete(
 // ============================================
 // FORUM ENDPOINT
 // ============================================
-router.use("/forum", addPatientToForumRoutes);
+router.use("/forums", addPatientToForumRoutes);
 
 export default router;

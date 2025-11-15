@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ForumRole } from '@prisma/client';
 
 export const addPatientToForumBodySchema = z.object({
   userId: z
@@ -9,12 +10,10 @@ export const addPatientToForumBodySchema = z.object({
     .uuid('userId must be a valid UUID'),
   
   forumRole: z
-    .string({
+    .nativeEnum(ForumRole, {
       required_error: 'forumRole is required',
-      invalid_type_error: 'forumRole must be a string'
+      invalid_type_error: 'forumRole must be one of: OWNER, MODERATOR, MEMBER, VIEWER'
     })
-    .min(1, 'forumRole cannot be empty')
-    .max(50, 'forumRole must be at most 50 characters')
 });
 
 export const addPatientToForumParamsSchema = z.object({

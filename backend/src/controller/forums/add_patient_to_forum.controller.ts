@@ -41,12 +41,8 @@ export async function addPatientToForum(
     // Call service
     const result = await addPatientToForumService(forumId, userId, forumRole);
 
-    // Added successfully
-    res.status(201).json({
-      success: true,
-      message: 'Patient added to forum successfully',
-      data: result
-    });
+    // Added successfully - result already contains the full response structure
+    res.status(201).json(result);
   } catch (error) {
     next(error);
   }

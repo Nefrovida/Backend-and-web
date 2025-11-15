@@ -5,11 +5,11 @@ import {
   Patient 
 } from "../../types/forums/add_patient_to_forum.types";
 
-const API_BASE_URL = import.meta.env.VITE_APP_API_URL || "http://localhost:3001/api";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3001/api";
 
 export const addPatientToForumService = {
   /**
-   * Añade un paciente a un foro privado
+   * Add a patient to a forum
    */
   async addPatientToForum(
     forumId: number,
@@ -20,20 +20,21 @@ export const addPatientToForumService = {
       headers: {
         "Content-Type": "application/json",
       },
-      credentials: "include", // Include cookies (JWT in httpOnly)
+      credentials: "include",
       body: JSON.stringify(data),
     });
 
+    const result = await response.json();
+
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error?.message || "Failed to add patient to forum");
+      throw new Error(result.error?.message || result.message || "Failed to add patient to forum");
     }
 
-    return response.json();
+    return result;
   },
 
   /**
-   * Obtiene la lista de foros (opcional, para selector)
+   * Gets the list of forums (optional, for selector)
    */
   async getForums(): Promise<Forum[]> {
     const response = await fetch(`${API_BASE_URL}/forums`, {
@@ -49,7 +50,7 @@ export const addPatientToForumService = {
   },
 
   /**
-   * Obtiene la lista de pacientes (opcional, para selector)
+   * Gets the list of forums (optional, for selector)
    */
   async getPatients(): Promise<Patient[]> {
     const response = await fetch(`${API_BASE_URL}/patients`, {
