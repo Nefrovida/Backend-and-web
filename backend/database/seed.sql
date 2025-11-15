@@ -6,7 +6,7 @@
 -- ========================
 -- Truncate child tables first and restart sequences so IDs are consistent
 BEGIN;
-TRUNCATE TABLE role_privilege, patient_history, results, patient_analysis, patient_appointment, notes, appointments, forums, familiars, doctors, laboratorists, patients, users, privileges, roles, analysis, questions_history RESTART IDENTITY CASCADE;
+TRUNCATE TABLE role_privilege, patient_history, results, patient_analysis, patient_appointment, notes, appointments, forums, familiars, doctors, laboratorists, patients, users, privileges, roles, analysis, questions_history, users_forums, messages, likes, user_reports, notifications RESTART IDENTITY CASCADE;
 COMMIT;
 
 INSERT INTO roles (role_name) VALUES
@@ -103,7 +103,7 @@ VALUES -- passwd: 1234567890
 
 -- Admin explicit user (added)
 INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
-VALUES (gen_random_uuid(), 'Administrador', 'Sistema', 'Admin', true, '5550000000', 'admin', '$2b$10$/aYCozNwvUh8qt41J1diPOwDqeW50wg8nWf76NvAQ9plWjngrj4yS', '1980-01-01', 'MALE', false, 1);
+VALUES (gen_random_uuid(), 'Administrador', 'Sistema', 'Admin', true, '5550000000', 'admin', '$2b$10$/aYCozNwvUh8qt41J1diPOwDqeW50wg8nWf76NvAQ9plWjngrj4yS', '1980-01-01', 'MALE', false, 2);
 
 
 
@@ -143,7 +143,7 @@ LIMIT 2;
 -- ========================
 INSERT INTO forums (name, description, public_status, created_by)
 SELECT 
-  'Foro de salud ' || i,
+  'Foro de salud ' || i || ' - ' || gen_random_uuid(),
   'Discusión general sobre temas médicos ' || i,
   true,
   u.user_id
@@ -235,6 +235,219 @@ INSERT INTO patient_history (question_id, patient_id, answer)
 SELECT q.question_id, p.patient_id, 'Sí'
 FROM questions_history q, patients p
 LIMIT 3;
+
+
+
+
+
+INSERT INTO privileges (description) 
+VALUES
+('VIEW_USERS'),
+('VIEW_ANALYSIS'),
+('CREATE_USERS'),
+('UPDATE_USERS'),
+('DELETE_USERS'),
+('VIEW_ROLES'),
+('VIEW_PATIENTS'),
+('VIEW_APPOINTMENTS'),
+('VIEW_FORUMS'),
+('CREATE_ROLES'),
+('CREATE_PATIENTS'),
+('CREATE_APPOINTMENTS'),
+('CREATE_FORUMS'),
+('UPDATE_ROLES'),
+('UPDATE_PATIENTS'),
+('UPDATE_APPOINTMENTS'),
+('UPDATE_FORUMS'),
+('DELETE_ROLES'),
+('DELETE_PATIENTS'),
+('DELETE_APPOINTMENTS'),
+('DELETE_FORUMS'),
+('VIEW_HISTORY_QUESTIONS'),
+('CREATE_HISTORY_QUESTIONS'),
+('UPDATE_HISTORY_QUESTIONS'),
+('DELETE_HISTORY_QUESTIONS'),
+('VIEW_REPORTS'),
+('CREATE_NOTES'),
+('VIEW_NOTES'),
+('UPDATE_NOTES'),
+('DELETE_NOTES');
+
+
+INSERT INTO role_privilege (role_id, privilege_id)
+SELECT 2, generate_series(1, 20);
+
+
+INSERT INTO role_privilege (role_id, privilege_id)
+SELECT 1, privilege_id 
+FROM privileges 
+WHERE NOT EXISTS (
+  SELECT 1 FROM role_privilege 
+  WHERE role_id = 1 AND role_privilege.privilege_id = privileges.privilege_id
+);
+-- Ensure privilege 27 is assigned to role 2 (Doctor) only if not already present
+INSERT INTO role_privilege (role_id, privilege_id)
+SELECT 2, p.privilege_id
+FROM privileges p
+WHERE p.privilege_id = 27
+  AND NOT EXISTS (
+    SELECT 1 FROM role_privilege rp WHERE rp.role_id = 2 AND rp.privilege_id = p.privilege_id
+  );
+
+-- Assign notes privileges to Doctor role (idempotent)
+INSERT INTO role_privilege (role_id, privilege_id)
+SELECT 2, p.privilege_id
+FROM privileges p
+WHERE p.description IN ('CREATE_NOTES', 'VIEW_NOTES', 'UPDATE_NOTES', 'DELETE_NOTES')
+  AND NOT EXISTS (
+    SELECT 1 FROM role_privilege rp WHERE rp.role_id = 2 AND rp.privilege_id = p.privilege_id
+  );
+
+
+INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
+VALUES
+(gen_random_uuid(), 'Carlos', 'López', 'Martínez', true, '5551112222', 'carlosl', '12345', '1990-03-15', 'MALE', false, 3),
+(gen_random_uuid(), 'María', 'Fernández', 'Ruiz', true, '5553334444', 'mariaf', '12345', '1985-07-22', 'FEMALE', false, 4),
+(gen_random_uuid(), 'Javier', 'Hernández', 'Gómez', true, '5556667777', 'javierh', '12345', '1992-11-09', 'MALE', false, 2),
+(gen_random_uuid(), 'Lucía', 'Ramírez', 'Santos', true, '5558889999', 'luciar', '12345', '1998-05-30', 'FEMALE', false, 5),
+(gen_random_uuid(), 'Andrés', 'Pérez', 'Torres', true, '5552223333', 'andresp', '12345', '1989-01-12', 'MALE', false, 1),
+(gen_random_uuid(), 'Sofía', 'González', 'Morales', true, '5559998888', 'sofiag', '12345', '1995-09-17', 'FEMALE', false, 3),
+(gen_random_uuid(), 'Diego', 'Castro', 'Navarro', true, '5554446666', 'diegoc', '12345', '1993-06-05', 'MALE', false, 2),
+(gen_random_uuid(), 'Valeria', 'Domínguez', 'Flores', true, '5557771111', 'valeriad', '12345', '1997-10-25', 'FEMALE', false, 4),
+(gen_random_uuid(), 'Ricardo', 'Sánchez', 'Vega', true, '5553339999', 'ricardos', '12345', '1988-02-08', 'MALE', false, 5),
+(gen_random_uuid(), 'Elena', 'Mendoza', 'Cortés', true, '5556662222', 'elenam', '12345', '1991-04-14', 'FEMALE', false, 1),
+(gen_random_uuid(), 'Mateo', 'Ortega', 'Silva', true, '5551010101', 'mateoo', '12345', '1994-08-19', 'MALE', false, 5),
+(gen_random_uuid(), 'Camila', 'Rojas', 'Herrera', true, '5552020202', 'camilar', '12345', '1996-12-04', 'FEMALE', false, 5),
+(gen_random_uuid(), 'Sebastián', 'Luna', 'Reyes', true, '5553030303', 'sebastianl', '12345', '1990-02-21', 'MALE', false, 5),
+(gen_random_uuid(), 'Natalia', 'Cano', 'Ibáñez', true, '5554040404', 'nataliac', '12345', '1999-07-13', 'FEMALE', false, 5),
+(gen_random_uuid(), 'Alejandro', 'Suárez', 'Campos', true, '5555050505', 'alejandros', '12345', '1987-03-27', 'MALE', false, 5),
+(gen_random_uuid(), 'Paula', 'Mora', 'Galindo', true, '5556060606', 'paulam', '12345', '1993-05-09', 'FEMALE', false, 5),
+(gen_random_uuid(), 'Tomás', 'Vargas', 'Peña', true, '5557070707', 'tomasv', '12345', '1992-09-18', 'MALE', false, 5),
+(gen_random_uuid(), 'Fernanda', 'León', 'Rivas', true, '5558080808', 'fernandal', '12345', '1995-11-02', 'FEMALE', false, 5),
+(gen_random_uuid(), 'Rodrigo', 'Aguilar', 'Rosales', true, '5559090909', 'rodrigoa', '12345', '1989-06-22', 'MALE', false, 5),
+(gen_random_uuid(), 'Isabella', 'Castillo', 'Benítez', true, '5551212121', 'isabellac', '12345', '1997-10-01', 'FEMALE', false, 5),
+(gen_random_uuid(), 'Gabriel', 'Muñoz', 'Salas', true, '5552323232', 'gabrielm', '12345', '1991-01-30', 'MALE', false, 5),
+(gen_random_uuid(), 'Renata', 'Paredes', 'Quiroz', true, '5553434343', 'renatap', '12345', '1994-03-11', 'FEMALE', false, 5),
+(gen_random_uuid(), 'Emilio', 'Cabrera', 'Delgado', true, '5554545454', 'emilioc', '12345', '1988-08-07', 'MALE', false, 5),
+(gen_random_uuid(), 'Carolina', 'Villalobos', 'Esquivel', true, '5555656565', 'carolinav', '12345', '1996-04-28', 'FEMALE', false, 5),
+(gen_random_uuid(), 'Santiago', 'Núñez', 'Valdez', true, '5556767676', 'santiagon', '12345', '1990-12-16', 'MALE', false, 5);
+
+
+INSERT INTO patient_analysis (
+  laboratorist_id,
+  analysis_id,
+  patient_id,
+  analysis_date,
+  results_date,
+  place,
+  duration,
+  analysis_status
+)
+SELECT 
+  (SELECT laboratorist_id FROM laboratorists ORDER BY RANDOM() LIMIT 1),
+  (SELECT analysis_id FROM analysis ORDER BY RANDOM() LIMIT 1),
+  p.patient_id,
+  NOW() - (INTERVAL '5 days' * RANDOM()),
+  NOW() - (INTERVAL '1 days' * RANDOM()),
+  'Laboratorio Central',
+  FLOOR(RANDOM() * 60 + 30),
+  CASE FLOOR(RANDOM() * 4)
+      WHEN 0 THEN 'LAB'::"ANALYSIS_STATUS"
+      WHEN 1 THEN 'PENDING'::"ANALYSIS_STATUS"
+      WHEN 2 THEN 'REQUESTED'::"ANALYSIS_STATUS"
+      ELSE 'SENT'::"ANALYSIS_STATUS"
+  END
+FROM (
+  SELECT patient_id FROM patients ORDER BY RANDOM() LIMIT 10
+) p, generate_series(1, 2);
+
+-- ========================
+-- 🧪 DATOS DUMMY PARA NOTAS CLÍNICAS
+-- ========================
+
+-- Usuario + Doctor de prueba
+INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
+VALUES (gen_random_uuid(), 'Dr. Demo', 'Ejemplo', 'Ejemplar', true, '5559999999', 'drdemo', '$2b$10$/aYCozNwvUh8qt41J1diPOwDqeW50wg8nWf76NvAQ9plWjngrj4yS', '1975-05-15', 'MALE', false, 2);
+
+INSERT INTO doctors (doctor_id, user_id, specialty, license)
+SELECT gen_random_uuid(), u.user_id, 'Medicina General', 'LIC-9999'
+FROM users u WHERE u.username = 'drdemo';
+
+-- Pacientes de prueba
+INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
+VALUES 
+(gen_random_uuid(), 'Juan', 'Pérez', 'García', true, '5551234567', 'juanp', '12345', '1985-03-20', 'MALE', false, 3),
+(gen_random_uuid(), 'Ana', 'López', 'Martínez', true, '5559876543', 'anal', '12345', '1990-07-15', 'FEMALE', false, 3);
+
+INSERT INTO patients (patient_id, user_id, curp)
+SELECT gen_random_uuid(), u.user_id, 'CURP' || u.phone_number
+FROM users u WHERE u.username IN ('juanp', 'anal');
+
+-- Citas del doctor de prueba
+INSERT INTO appointments (doctor_id, name, general_cost, community_cost, image_url)
+SELECT 
+  d.doctor_id, 
+  'Consulta de prueba ' || generate_series(1, 2),
+  500,
+  300,
+  '/images/default.png'
+FROM doctors d
+JOIN users u ON d.user_id = u.user_id
+WHERE u.username = 'drdemo';
+
+-- Relación paciente-cita para pacientes de prueba
+INSERT INTO patient_appointment (patient_id, appointment_id, date_hour, duration, appointment_type, appointment_status)
+SELECT 
+  p.patient_id,
+  a.appointment_id,
+  '2025-01-10 10:00:00'::timestamp + (ROW_NUMBER() OVER () - 1) * interval '1 hour',
+  30,
+  'PRESENCIAL',
+  'PROGRAMMED'
+FROM patients p
+CROSS JOIN LATERAL (
+  SELECT a.appointment_id
+  FROM appointments a
+  JOIN doctors d ON a.doctor_id = d.doctor_id
+  JOIN users u ON d.user_id = u.user_id
+  WHERE u.username = 'drdemo'
+  LIMIT 1
+) a
+WHERE p.user_id IN (SELECT user_id FROM users WHERE username IN ('juanp', 'anal'))
+ORDER BY p.patient_id;
+
+-- Notas clínicas de prueba
+INSERT INTO notes (patient_id, patient_appointment_id, title, content, general_notes, ailments, prescription, visibility, creation_date)
+SELECT 
+  pa.patient_id,
+  pa.patient_appointment_id,
+  'Consulta ' || ROW_NUMBER() OVER (ORDER BY pa.patient_appointment_id),
+  '',
+  CASE 
+    WHEN ROW_NUMBER() OVER (ORDER BY pa.patient_appointment_id) = 1 
+    THEN 'El paciente presenta signos vitales estables. Presión arterial 120/80 mmHg. Temperatura 36.5°C. Frecuencia cardíaca 72 lpm. No se observan signos de alarma.'
+    ELSE 'Paciente acude a consulta de seguimiento. Refiere mejoría en sintomatología respiratoria. Auscultación pulmonar sin estertores. Saturación de oxígeno 98%.'
+  END,
+  CASE 
+    WHEN ROW_NUMBER() OVER (ORDER BY pa.patient_appointment_id) = 1 
+    THEN 'Diabetes tipo 2 controlada, hipertensión leve en tratamiento. Paciente refiere dolor leve en rodilla derecha al caminar.'
+    ELSE 'Asma bronquial en control. Rinitis alérgica estacional. Paciente con antecedentes de alergia a penicilina.'
+  END,
+  CASE 
+    WHEN ROW_NUMBER() OVER (ORDER BY pa.patient_appointment_id) = 1 
+    THEN 'Paracetamol 500mg cada 8 horas por 5 días. Metformina 850mg cada 12 horas. Enalapril 10mg cada 24 horas. Continuar con dieta baja en sodio y control de glucosa.'
+    ELSE 'Salbutamol inhalador 2 puff cada 12 horas por 10 días. Loratadina 10mg cada 24 horas por 15 días. Evitar exposición a alérgenos conocidos.'
+  END,
+  true,
+  pa.date_hour + interval '30 minutes'
+FROM patient_appointment pa
+WHERE pa.appointment_id IN (
+  SELECT a.appointment_id 
+  FROM appointments a
+  JOIN doctors d ON a.doctor_id = d.doctor_id
+  JOIN users u ON d.user_id = u.user_id
+  WHERE u.username = 'drdemo'
+);
 
 -- ========================
 -- ✅ FIN DEL SEED

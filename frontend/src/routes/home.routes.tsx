@@ -7,6 +7,7 @@ import analisisRoutes from "./analisis.routes";
 import forumsRoutes from "./forums.routes";
 import Home from "../components/page/Home";
 import AddPatientToForumPage from "../components/page/add_patient_to_forum_page";
+import notesRoutes from "./notes.routes";
 
 const router = createBrowserRouter([
   {
@@ -19,6 +20,7 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       ...analisisRoutes,
+      ...notesRoutes,
       ...forumsRoutes,
     ],
   },
