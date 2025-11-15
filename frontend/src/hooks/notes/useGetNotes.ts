@@ -4,10 +4,9 @@ import { Note } from "@/types/note";
 interface UseGetNotesParams {
   patientId?: string;
   refreshKey?: number;
-  title?: string;
 }
 
-function useGetNotes({ patientId, refreshKey, title }: UseGetNotesParams) {
+function useGetNotes({ patientId, refreshKey }: UseGetNotesParams) {
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +25,6 @@ function useGetNotes({ patientId, refreshKey, title }: UseGetNotesParams) {
       try {
         const params = new URLSearchParams();
         params.append("patientId", patientId);
-        if (title) params.append("title", title);
 
         const response = await fetch(`/api/notes?${params.toString()}`, {
           credentials: "include",
@@ -49,7 +47,7 @@ function useGetNotes({ patientId, refreshKey, title }: UseGetNotesParams) {
     };
 
     fetchNotes();
-  }, [patientId, refreshKey, title]);
+  }, [patientId, refreshKey]);
 
   return {
     notes,

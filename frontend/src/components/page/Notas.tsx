@@ -27,7 +27,6 @@ const Notas = ({ className }: { className: string }) => {
   const [selectedPatientId, setSelectedPatientIdState] = useState<string>("");
   const [notesKey, setNotesKey] = useState(0);
   const [validationError, setValidationError] = useState<string | null>(null);
-  const [title, setTitle] = useState<string>("");
 
   const {
     notes,
@@ -36,7 +35,6 @@ const Notas = ({ className }: { className: string }) => {
   } = useGetNotes({
     patientId: selectedPatientId || undefined,
     refreshKey: notesKey,
-    title,
   });
 
   useEffect(() => {
