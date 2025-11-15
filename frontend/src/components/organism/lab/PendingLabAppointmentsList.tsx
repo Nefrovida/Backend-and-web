@@ -21,10 +21,10 @@ function PendingLabAppointmentsList() {
 
     return (
         <div className="w-1/3 p-2 h-screen overflow-hidden border-r border-slate-200">
-            <Title>Estudios pendientes</Title>
+            <Title>Resultados de estudios pendientes</Title>
 
             <div className="w-full flex items-end justify-end gap-5 pb-2">
-                {/* Reutilizamos Search como en la otra lista */}
+                {}
                 <Search onChange={setQuery} />
             </div>
 

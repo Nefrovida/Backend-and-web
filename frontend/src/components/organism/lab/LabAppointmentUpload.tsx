@@ -4,11 +4,11 @@ import { useParams } from "react-router";
 import { LabAppointment } from "../../../types/labAppointment";
 
 interface PresignResponse {
-    url: string;
+    uploadUrl: string;
 }
 
 function LabAppointmentUpload() {
-    const params = useParams<{ resultadoId: string }>(); // usamos el mismo nombre pattern
+    const params = useParams<{ resultadoId: string }>();
     const [appointment, setAppointment] = useState<LabAppointment | null>(null);
     const [file, setFile] = useState<File | null>(null);
     const [uploading, setUploading] = useState(false);
@@ -17,7 +17,6 @@ function LabAppointmentUpload() {
 
     const id = params.resultadoId ? Number(params.resultadoId) : null;
 
-    // Cargamos la cita buscándola en la lista de pendientes
     useEffect(() => {
         async function load() {
             try {
@@ -31,6 +30,10 @@ function LabAppointmentUpload() {
                 setAppointment(found);
                 if (!found) {
                     setError("No se encontró la cita seleccionada");
+                } else {
+                    setError(null);
+                    setSuccess(false);
+                    setFile(null);
                 }
             } catch (err: any) {
                 setError(err.message ?? "Error al cargar la cita");
@@ -48,11 +51,17 @@ function LabAppointmentUpload() {
             return;
         }
         setError(null);
+        setSuccess(false);
         setFile(f);
     }
 
     async function handleUpload() {
         if (!appointment || !file || !id) return;
+
+        if (appointment.status !== "REQUESTED") {
+            setError("Esta cita ya tiene resultados registrados.");
+            return;
+        }
 
         try {
             setUploading(true);
@@ -80,7 +89,7 @@ function LabAppointmentUpload() {
             }
 
             const presignData: PresignResponse = await presignRes.json();
-            const uploadUrl = presignData.url;
+            const uploadUrl = presignData.uploadUrl;
 
             // 2) subir archivo al servidor de uploads
             const putRes = await fetch(uploadUrl, {
@@ -115,7 +124,6 @@ function LabAppointmentUpload() {
             }
 
             setSuccess(true);
-            setFile(null);
         } catch (err: any) {
             setError(err.message ?? "Error al subir resultados");
         } finally {
@@ -126,10 +134,14 @@ function LabAppointmentUpload() {
     if (!appointment && !error) {
         return (
             <div className="flex-1 flex items-center justify-center">
-                <p className="text-sm text-slate-500">Selecciona una cita de la lista.</p>
+                <p className="text-sm text-slate-500">
+                    Selecciona una cita de la lista.
+                </p>
             </div>
         );
     }
+
+    const isRequested = appointment?.status === "REQUESTED";
 
     return (
         <div className="flex-1 p-6 flex flex-col gap-4">
@@ -143,39 +155,48 @@ function LabAppointmentUpload() {
                 </div>
             )}
 
-            <div className="rounded-2xl bg-white p-4 shadow-sm flex flex-col gap-3 max-w-md">
-                <p className="text-sm font-medium">Subir resultados (PDF)</p>
+            {isRequested ? (
+                <div className="rounded-2xl bg-white p-4 shadow-sm flex flex-col gap-3 max-w-md">
+                    <p className="text-sm font-medium">Subir resultados (PDF)</p>
 
-                <input
-                    type="file"
-                    accept="application/pdf"
-                    onChange={handleFileChange}
-                    className="text-xs"
-                />
+                    <input
+                        type="file"
+                        accept="application/pdf"
+                        onChange={handleFileChange}
+                        className="text-xs"
+                    />
 
-                {file && (
-                    <p className="text-xs text-slate-600">
-                        Archivo seleccionado:{" "}
-                        <span className="font-mono">{file.name}</span>
+                    {file && (
+                        <p className="text-xs text-slate-600">
+                            Archivo seleccionado:{" "}
+                            <span className="font-mono">{file.name}</span>
+                        </p>
+                    )}
+
+                    <button
+                        type="button"
+                        disabled={!file || uploading || success}
+                        onClick={handleUpload}
+                        className="mt-2 w-full rounded-full bg-blue-600 py-2 text-sm font-semibold text-white disabled:opacity-50"
+                    >
+                        {uploading ? "Subiendo…" : success ? "Subida completada" : "Subir resultados"}
+                    </button>
+
+                    {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
+                    {success && (
+                        <p className="mt-2 text-xs text-green-600">
+                            Resultados subidos y cita actualizada.
+                        </p>
+                    )}
+                </div>
+            ) : (
+                <div className="rounded-2xl bg-white p-4 shadow-sm max-w-md">
+                    <p className="text-sm font-medium">Resultados ya enviados</p>
+                    <p className="text-xs text-slate-600 mt-1">
+                        Este estudio ya cuenta con un archivo de resultados registrado.
                     </p>
-                )}
-
-                <button
-                    type="button"
-                    disabled={!file || uploading || success}
-                    onClick={handleUpload}
-                    className="mt-2 w-full rounded-full bg-blue-600 py-2 text-sm font-semibold text-white disabled:opacity-50"
-                >
-                    {uploading ? "Subiendo…" : "Subir resultados"}
-                </button>
-
-                {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
-                {success && (
-                    <p className="mt-2 text-xs text-green-600">
-                        Resultados subidos y cita actualizada.
-                    </p>
-                )}
-            </div>
+                </div>
+            )}
         </div>
     );
 }
