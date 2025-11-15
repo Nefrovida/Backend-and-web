@@ -15,10 +15,6 @@ export async function getLabAppointments(req: Request, res: Response) {
   }
 }
 
-/**
- * Por ahora, presign devuelve una URL dummy.
- * Más adelante se puede integrar S3/MinIO sin cambiar la firma.
- */
 export async function requestPresign(req: Request, res: Response) {
   try {
     const id = Number(req.params.id);

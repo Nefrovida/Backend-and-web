@@ -11,11 +11,11 @@ COMMIT;
 
 INSERT INTO roles (role_name) VALUES
 ('Admin'),
-('Secretaria'),
 ('Doctor'),
 ('Paciente'),
 ('Laboratorista'),
-('Familiar');
+('Familiar'),
+('Secretaria');
 
 -- ========================
 -- 🧩 PRIVILEGIOS
@@ -81,7 +81,7 @@ VALUES (2, 27);
 
 -- Secretaria
 INSERT INTO role_privilege (role_id, privilege_id)
-SELECT 2, privilege_id FROM privileges 
+SELECT 6, privilege_id FROM privileges 
 WHERE description IN (
     'VIEW_ANALYSIS', 
     'CREATE_ANALYSIS', 

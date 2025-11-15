@@ -68,7 +68,7 @@ function LabAppointmentUpload() {
             setError(null);
             setSuccess(false);
 
-            // 1) pedir presign
+            // 1) ask for presign
             const presignRes = await fetch(
                 `/api/laboratory/lab-appointments/${id}/presign`,
                 {
@@ -91,7 +91,7 @@ function LabAppointmentUpload() {
             const presignData: PresignResponse = await presignRes.json();
             const uploadUrl = presignData.uploadUrl;
 
-            // 2) subir archivo al servidor de uploads
+            // 2) upload file to upload server
             const putRes = await fetch(uploadUrl, {
                 method: "PUT",
                 body: file,
@@ -104,7 +104,7 @@ function LabAppointmentUpload() {
                 throw new Error("Error al subir el archivo");
             }
 
-            // 3) confirmar subida
+            // 3) confirm upload
             const confirmRes = await fetch(
                 `/api/laboratory/lab-appointments/${id}/result`,
                 {

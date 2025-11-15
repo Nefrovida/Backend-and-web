@@ -23,7 +23,7 @@ router.get("/analysis/by-date/:date",
   requirePrivileges([Privilege.VIEW_ANALYSIS]),
   getAnalysisByDay);
 
-// Listar citas de laboratorio pendientes de resultado
+// Listar pending lab appointments
 router.get(
   "/lab-appointments",
   authenticate,
@@ -31,7 +31,7 @@ router.get(
   labAppointmentsController.getLabAppointments
 );
 
-// Solicitar URL (dummy) para subir archivo de resultado
+// Request URL for file upload
 router.post(
   "/lab-appointments/:id/presign",
   authenticate,
@@ -39,7 +39,7 @@ router.post(
   labAppointmentsController.requestPresign
 );
 
-// Confirmar que el archivo ya está subido y guardar en DB
+// Confirm file has been uploaded and is in DB
 router.post(
   "/lab-appointments/:id/result",
   authenticate,
