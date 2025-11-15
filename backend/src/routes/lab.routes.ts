@@ -15,7 +15,12 @@ router.get("/results",
   authenticate,
   requirePrivileges([Privilege.VIEW_ANALYSIS]),
   getLabResults);
-router.get("/analysis", getAnalysis)
+router.get(
+  "/analysis",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_ANALYSIS]),
+  getAnalysis
+)
 
 // Date format: dd-mm-yyyy
 router.get("/analysis/by-date/:date", 

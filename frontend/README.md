@@ -43,6 +43,17 @@ export default defineConfig([
 ])
 ```
 
+## Analysis management (new)
+
+This repository adds a basic UI to create and delete laboratory analysis types from the frontend. The lab filter under the Laboratory page now contains a "Crear" button that opens a modal for creating a new analysis (name, description, requirements and costs). Each analysis entry has a delete icon which deletes the analysis and refreshes the list.
+
+Server endpoints used:
+
+- POST /api/analysis — create (requires privileges)
+- DELETE /api/analysis/:id — delete (requires privileges)
+
+The UI calls `src/services/analysis.service.ts` and uses `src/components/organism/lab/CreateAnalysisModal.tsx` to create new entries.
+
 You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
 ```js

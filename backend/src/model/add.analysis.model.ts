@@ -112,6 +112,15 @@ export const deleteById = async (analysisId: number) => {
 };
 
 /**
+ * Count patient_analysis entries referencing this analysis
+ */
+export const countPatientAnalysisReferences = async (analysisId: number) => {
+  return await prisma.patient_analysis.count({
+    where: { analysis_id: analysisId },
+  });
+};
+
+/**
  * Find duplicate analysis by name (excluding current ID)
  */
 export const findDuplicateName = async (name: string, excludeId: number) => {

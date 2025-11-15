@@ -1,21 +1,19 @@
 -- ========================
+--  CLEAR EXISTING DATA
+-- ========================
+TRUNCATE TABLE role_privilege, patient_history, results, patient_analysis, patient_appointment, notes, appointments, forums, familiars, doctors, laboratorists, patients, users, privileges, roles, analysis, questions_history RESTART IDENTITY CASCADE;
+
+-- ========================
 -- 🧩 ROLES
 -- ========================
--- ========================
--- 🧼 CLEAR EXISTING DATA
--- ========================
--- Truncate child tables first and restart sequences so IDs are consistent
-BEGIN;
-TRUNCATE TABLE role_privilege, patient_history, results, patient_analysis, patient_appointment, notes, appointments, forums, familiars, doctors, laboratorists, patients, users, privileges, roles, analysis, questions_history RESTART IDENTITY CASCADE;
-COMMIT;
 
 INSERT INTO roles (role_name) VALUES
 ('Admin'),
+('Secretaria'),
 ('Doctor'),
 ('Paciente'),
 ('Laboratorista'),
-('Familiar'),
-('Secretaria');
+('Familiar');
 
 -- ========================
 -- 🧩 PRIVILEGIOS
@@ -56,11 +54,11 @@ VALUES
 -- 🧩 ROLES - PRIVILEGIOS
 -- ========================
 
--- Doctor
+-- Doctor (role_id = 3)
 INSERT INTO role_privilege (role_id, privilege_id)
-SELECT 2, generate_series(1, 20);
+SELECT 3, generate_series(1, 20);
 
--- Admin
+-- Admin (role_id = 1): full privileges
 INSERT INTO role_privilege (role_id, privilege_id)
 SELECT 1, privilege_id 
 FROM privileges 
@@ -69,19 +67,21 @@ WHERE NOT EXISTS (
   WHERE role_id = 1 AND role_privilege.privilege_id = privileges.privilege_id
 );
 
--- Laboratorista
+-- Laboratorista (role_id = 5)
 INSERT INTO role_privilege (role_id, privilege_id)
-SELECT 4, privilege_id
+SELECT 5, privilege_id
 FROM privileges
 WHERE description IN ('VIEW_ANALYSIS', 'CREATE_ANALYSIS');
 
--- Doctor
+-- Doctor also gets VIEW_REPORTS
 INSERT INTO role_privilege (role_id, privilege_id)
-VALUES (2, 27);
+SELECT 3, p.privilege_id
+FROM privileges p
+WHERE p.description = 'VIEW_REPORTS';
 
--- Secretaria
+-- Secretaria (role_id = 2)
 INSERT INTO role_privilege (role_id, privilege_id)
-SELECT 6, privilege_id FROM privileges 
+SELECT 2, privilege_id FROM privileges 
 WHERE description IN (
     'VIEW_ANALYSIS', 
     'CREATE_ANALYSIS', 
@@ -90,7 +90,7 @@ WHERE description IN (
 );
 
 -- ========================
--- 👥 USERS
+-- 👥 USERS (DEVELOP VERSION — hashed passwords)
 -- ========================
 INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
 VALUES -- passwd: 1234567890
@@ -100,32 +100,30 @@ VALUES -- passwd: 1234567890
 (gen_random_uuid(), 'Ana', 'García', 'Torres', true, '5554445555', 'anag', '$2b$10$78gwUI8tNJDco7uqgAzAlulip8F.J3PmP5OSj72gaIhbjIO9pZOcS', '1987-12-01', 'FEMALE', false, 5),
 (gen_random_uuid(), 'Lucía', 'Pérez', 'Núñez', true, '5555556666', 'luciap', '$2b$10$78gwUI8tNJDco7uqgAzAlulip8F.J3PmP5OSj72gaIhbjIO9pZOcS', '1995-07-19', 'FEMALE', false, 3);
 
--- Admin explicit user (added)
+-- Admin user
 INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
 VALUES (gen_random_uuid(), 'Administrador', 'Sistema', 'Admin', true, '5550000000', 'admin', '$2b$10$/aYCozNwvUh8qt41J1diPOwDqeW50wg8nWf76NvAQ9plWjngrj4yS', '1980-01-01', 'MALE', false, 1);
 
-
-
 -- ========================
--- 👩‍⚕️ DOCTORES
+-- 👨‍⚕️ DOCTORS
 -- ========================
 INSERT INTO doctors (doctor_id, user_id, specialty, license)
 SELECT gen_random_uuid(), u.user_id, 'Cardiología', 'LIC-' || floor(random()*10000)::text
-FROM users u WHERE u.role_id = 2;
+FROM users u WHERE u.role_id = 3;
 
 -- ========================
 -- 🧪 LABORATORISTAS
 -- ========================
 INSERT INTO laboratorists (laboratorist_id, user_id)
 SELECT gen_random_uuid(), u.user_id
-FROM users u WHERE u.role_id = 4;
+FROM users u WHERE u.role_id = 5;
 
 -- ========================
 -- 🧍 PACIENTES
 -- ========================
 INSERT INTO patients (patient_id, user_id, curp)
 SELECT gen_random_uuid(), u.user_id, 'CURP' || floor(random()*1000000)::text
-FROM users u WHERE u.role_id = 3;
+FROM users u WHERE u.role_id = 4;
 
 -- ========================
 -- 👪 FAMILIARES
@@ -134,7 +132,7 @@ INSERT INTO familiars (familiar_id, user_id, patient_id)
 SELECT gen_random_uuid(), f.user_id, p.patient_id
 FROM users f
 JOIN patients p ON p.user_id <> f.user_id
-WHERE f.role_id = 5
+WHERE f.role_id = 6
 LIMIT 2;
 
 -- ========================
@@ -147,8 +145,7 @@ SELECT
   true,
   u.user_id
 FROM generate_series(1, 3) i
-JOIN users u ON u.role_id = 2
-LIMIT 3;
+CROSS JOIN (SELECT user_id FROM users WHERE role_id = 3 LIMIT 1) u;
 
 -- ========================
 -- 📅 CITAS MÉDICAS
