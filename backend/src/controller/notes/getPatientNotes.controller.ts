@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import * as notesService from '../../service/notes.service';
+import * as notesService from "../../service/notes.service";
 
 async function getPatientNotes(req: Request, res: Response) {
   try {
@@ -11,14 +11,15 @@ async function getPatientNotes(req: Request, res: Response) {
 
     if (!patientId) {
       return res.status(400).json({
-        error: "patientId query parameter is required"
+        error: "patientId query parameter is required",
       });
     }
 
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
     if (!uuidRegex.test(patientId as string)) {
       return res.status(400).json({
-        error: "patientId must be a valid UUID"
+        error: "patientId must be a valid UUID",
       });
     }
 
@@ -28,7 +29,7 @@ async function getPatientNotes(req: Request, res: Response) {
   } catch (error) {
     console.error("Error fetching notes:", error);
     return res.status(500).json({
-      error: "Error fetching notes"
+      error: "Error fetching notes",
     });
   }
 }

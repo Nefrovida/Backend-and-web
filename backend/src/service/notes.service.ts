@@ -1,4 +1,4 @@
-import Notes from '../model/notes.model';
+import Notes from "../model/notes.model";
 
 /**
  * Create a new clinical note

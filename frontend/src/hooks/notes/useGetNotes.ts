@@ -1,12 +1,13 @@
-import { useState, useEffect } from 'react';
-import { Note } from '@/types/note';
+import { useState, useEffect } from "react";
+import { Note } from "@/types/note";
 
 interface UseGetNotesParams {
   patientId?: string;
   refreshKey?: number;
+  title?: string;
 }
 
-function useGetNotes({ patientId, refreshKey }: UseGetNotesParams) {
+function useGetNotes({ patientId, refreshKey, title }: UseGetNotesParams) {
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,21 +25,23 @@ function useGetNotes({ patientId, refreshKey }: UseGetNotesParams) {
 
       try {
         const params = new URLSearchParams();
-        params.append('patientId', patientId);
+        params.append("patientId", patientId);
+        if (title) params.append("title", title);
 
         const response = await fetch(`/api/notes?${params.toString()}`, {
-          credentials: 'include',
+          credentials: "include",
         });
 
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.error || 'Error al obtener las notas');
+          throw new Error(errorData.error || "Error al obtener las notas");
         }
 
         const data = await response.json();
         setNotes(data);
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
+        const errorMessage =
+          err instanceof Error ? err.message : "Error desconocido";
         setError(errorMessage);
       } finally {
         setLoading(false);
@@ -46,7 +49,7 @@ function useGetNotes({ patientId, refreshKey }: UseGetNotesParams) {
     };
 
     fetchNotes();
-  }, [patientId, refreshKey]);
+  }, [patientId, refreshKey, title]);
 
   return {
     notes,

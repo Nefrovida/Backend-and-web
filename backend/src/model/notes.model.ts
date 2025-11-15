@@ -1,9 +1,7 @@
 import { prisma } from "src/util/prisma";
 
 export default class Notes {
-  Notes() {
-
-  }
+  Notes() {}
 
   static async createNote(data: {
     patient_id: string;
@@ -23,18 +21,18 @@ export default class Notes {
         ailments: data.ailments,
         prescription: data.prescription,
         visibility: data.visibility ?? true,
-      }
+      },
     });
   }
 
   static async getNotesByPatient(patientId: string) {
     return await prisma.notes.findMany({
       where: {
-        patient_id: patientId
+        patient_id: patientId,
       },
       orderBy: {
-        creation_date: 'desc'
-      }
+        creation_date: "desc",
+      },
     });
   }
 }
