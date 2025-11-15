@@ -27,10 +27,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction): v
 
     next();
   } catch (error) {
-    if (error instanceof UnauthorizedError) {
-      res.status(error.statusCode).json({ error: error.message });
-    } else {
-      res.status(401).json({ error: 'Invalid or expired token' });
-    }
+    // Pasar el error al error handler global
+    next(error instanceof UnauthorizedError ? error : new UnauthorizedError('Invalid or expired token'));
   }
 };
