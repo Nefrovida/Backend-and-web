@@ -4,7 +4,6 @@
 -- ========================
 -- 🧼 CLEAR EXISTING DATA
 -- ========================
--- Truncate child tables first and restart sequences so IDs are consistent
 BEGIN;
 TRUNCATE TABLE role_privilege, patient_history, results, patient_analysis, patient_appointment, notes, appointments, forums, familiars, doctors, laboratorists, patients, users, privileges, roles, analysis, questions_history RESTART IDENTITY CASCADE;
 COMMIT;
@@ -15,34 +14,101 @@ INSERT INTO roles (role_name) VALUES
 ('Doctor'),
 ('Paciente'),
 ('Laboratorista'),
-('Familiar');
+('Familiar'),
+('Secretaria');
 
-
+-- ========================
+-- 🧩 PRIVILEGIOS
+-- ========================
+INSERT INTO privileges (description) 
+VALUES
+('VIEW_USERS'),
+('CREATE_USERS'),
+('UPDATE_USERS'),
+('DELETE_USERS'),
+('VIEW_ROLES'),
+('CREATE_ROLES'),
+('UPDATE_ROLES'),
+('DELETE_ROLES'),
+('VIEW_PATIENTS'),
+('CREATE_PATIENTS'),
+('UPDATE_PATIENTS'),
+('DELETE_PATIENTS'),
+('VIEW_APPOINTMENTS'),
+('CREATE_APPOINTMENTS'),
+('UPDATE_APPOINTMENTS'),
+('DELETE_APPOINTMENTS'),
+('VIEW_ANALYSIS'),
+('CREATE_ANALYSIS'),
+('UPDATE_ANALYSIS'),
+('DELETE_ANALYSIS'),
+('VIEW_FORUMS'),
+('CREATE_FORUMS'),
+('UPDATE_FORUMS'),
+('DELETE_FORUMS'),
+('VIEW_HISTORY_QUESTIONS'),
+('CREATE_HISTORY_QUESTIONS'),
+('UPDATE_HISTORY_QUESTIONS'),
+('DELETE_HISTORY_QUESTIONS'),
+('VIEW_REPORTS');
 
 -- ========================
 -- 🧩 ROLES - PRIVILEGIOS
--- (todos los privilegios para el admin)
 -- ========================
+
+-- Doctor (role_id = 3)
 INSERT INTO role_privilege (role_id, privilege_id)
-SELECT 1, privilege_id FROM privileges;
+SELECT 3, generate_series(1, 20);
+
+-- Admin (role_id = 1): full privileges
+INSERT INTO role_privilege (role_id, privilege_id)
+SELECT 1, privilege_id 
+FROM privileges 
+WHERE NOT EXISTS (
+  SELECT 1 FROM role_privilege 
+  WHERE role_id = 1 AND role_privilege.privilege_id = privileges.privilege_id
+);
+
+-- Laboratorista (role_id = 5)
+INSERT INTO role_privilege (role_id, privilege_id)
+SELECT 5, privilege_id
+FROM privileges
+WHERE description IN ('VIEW_ANALYSIS', 'CREATE_ANALYSIS');
+
+-- Doctor also gets VIEW_REPORTS
+INSERT INTO role_privilege (role_id, privilege_id)
+SELECT 3, p.privilege_id
+FROM privileges p
+WHERE p.description = 'VIEW_REPORTS';
+
+-- Secretaria (role_id = 2)
+INSERT INTO role_privilege (role_id, privilege_id)
+SELECT 2, privilege_id FROM privileges 
+WHERE description IN (
+    'VIEW_ANALYSIS', 
+    'CREATE_ANALYSIS', 
+    'UPDATE_ANALYSIS', 
+    'DELETE_ANALYSIS'
+);
 
 -- ========================
--- 👥 USERS
+-- 👥 USERS (DEVELOP VERSION — hashed passwords)
 -- ========================
 INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
-VALUES
-(gen_random_uuid(), 'Carlos', 'Ramírez', 'López', true, '5551112222', 'carlosr', '12345', '1980-05-12', 'MALE', false, 3),
-(gen_random_uuid(), 'María', 'Hernández', 'Gómez', true, '5552223333', 'mariah', '12345', '1992-08-22', 'FEMALE', false, 4),
-(gen_random_uuid(), 'José', 'Martínez', 'Soto', true, '5553334444', 'josem', '12345', '1990-03-10', 'MALE', false, 5),
-(gen_random_uuid(), 'Ana', 'García', 'Torres', true, '5554445555', 'anag', '12345', '1987-12-01', 'FEMALE', false, 6),
-(gen_random_uuid(), 'Lucía', 'Pérez', 'Núñez', true, '5555556666', 'luciap', '12345', '1995-07-19', 'FEMALE', false, 4);
+VALUES -- passwd: 1234567890
+(gen_random_uuid(), 'Carlos', 'Ramírez', 'López', true, '5551112222', 'carlosr', '$2b$10$78gwUI8tNJDco7uqgAzAlulip8F.J3PmP5OSj72gaIhbjIO9pZOcS', '1980-05-12', 'MALE', false, 2),
+(gen_random_uuid(), 'María', 'Hernández', 'Gómez', true, '5552223333', 'mariah', '$2b$10$78gwUI8tNJDco7uqgAzAlulip8F.J3PmP5OSj72gaIhbjIO9pZOcS', '1992-08-22', 'FEMALE', false, 3),
+(gen_random_uuid(), 'José', 'Martínez', 'Soto', true, '5553334444', 'josem', '$2b$10$78gwUI8tNJDco7uqgAzAlulip8F.J3PmP5OSj72gaIhbjIO9pZOcS', '1990-03-10', 'MALE', false, 4),
+(gen_random_uuid(), 'Ana', 'García', 'Torres', true, '5554445555', 'anag', '$2b$10$78gwUI8tNJDco7uqgAzAlulip8F.J3PmP5OSj72gaIhbjIO9pZOcS', '1987-12-01', 'FEMALE', false, 5),
+(gen_random_uuid(), 'Lucía', 'Pérez', 'Núñez', true, '5555556666', 'luciap', '$2b$10$78gwUI8tNJDco7uqgAzAlulip8F.J3PmP5OSj72gaIhbjIO9pZOcS', '1995-07-19', 'FEMALE', false, 3);
 
--- Admin explicit user (added)
+-- Admin user
 INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
 VALUES (gen_random_uuid(), 'Administrador', 'Sistema', 'Admin', true, '5550000000', 'admin', '$2b$10$/aYCozNwvUh8qt41J1diPOwDqeW50wg8nWf76NvAQ9plWjngrj4yS', '1980-01-01', 'MALE', false, 1);
 
-
-
+-- ========================
+-- 👨‍⚕️ DOCTORS
+-- ========================
 INSERT INTO doctors (doctor_id, user_id, specialty, license)
 SELECT gen_random_uuid(), u.user_id, 'Cardiología', 'LIC-' || floor(random()*10000)::text
 FROM users u WHERE u.role_id = 3;
@@ -168,114 +234,6 @@ INSERT INTO patient_history (question_id, patient_id, answer)
 SELECT q.question_id, p.patient_id, 'Sí'
 FROM questions_history q, patients p
 LIMIT 3;
-
-
-
-
-
-INSERT INTO privileges (description) 
-VALUES
-('VIEW_USERS'),
-('VIEW_ANALYSIS'),
-('CREATE_USERS'),
-('UPDATE_USERS'),
-('DELETE_USERS'),
-('VIEW_ROLES'),
-('VIEW_PATIENTS'),
-('VIEW_APPOINTMENTS'),
-('VIEW_FORUMS'),
-('CREATE_ROLES'),
-('CREATE_PATIENTS'),
-('CREATE_APPOINTMENTS'),
-('CREATE_FORUMS'),
-('UPDATE_ROLES'),
-('UPDATE_PATIENTS'),
-('UPDATE_APPOINTMENTS'),
-('UPDATE_FORUMS'),
-('DELETE_ROLES'),
-('DELETE_PATIENTS'),
-('DELETE_APPOINTMENTS'),
-('DELETE_FORUMS'),
-('VIEW_HISTORY_QUESTIONS'),
-('CREATE_HISTORY_QUESTIONS'),
-('UPDATE_HISTORY_QUESTIONS'),
-('DELETE_HISTORY_QUESTIONS'),
-('VIEW_REPORTS');
-
-
-INSERT INTO role_privilege (role_id, privilege_id)
--- Give the Doctor role (now role_id = 3) the first set of privileges
-SELECT 3, generate_series(1, 20);
-
-
-INSERT INTO role_privilege (role_id, privilege_id)
-SELECT 1, privilege_id 
-FROM privileges 
-WHERE NOT EXISTS (
-  SELECT 1 FROM role_privilege 
-  WHERE role_id = 1 AND role_privilege.privilege_id = privileges.privilege_id
-);
--- Give role 3 (Doctor) the VIEW_REPORTS privilege if present
-INSERT INTO role_privilege (role_id, privilege_id)
-SELECT 3, p.privilege_id FROM privileges p WHERE p.description = 'VIEW_REPORTS'
-ON CONFLICT DO NOTHING;
-
-
-INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
-VALUES
-(gen_random_uuid(), 'Carlos', 'López', 'Martínez', true, '5551112222', 'carlosl', '12345', '1990-03-15', 'MALE', false, 4),
-(gen_random_uuid(), 'María', 'Fernández', 'Ruiz', true, '5553334444', 'mariaf', '12345', '1985-07-22', 'FEMALE', false, 5),
-(gen_random_uuid(), 'Javier', 'Hernández', 'Gómez', true, '5556667777', 'javierh', '12345', '1992-11-09', 'MALE', false, 3),
-(gen_random_uuid(), 'Lucía', 'Ramírez', 'Santos', true, '5558889999', 'luciar', '12345', '1998-05-30', 'FEMALE', false, 6),
-(gen_random_uuid(), 'Andrés', 'Pérez', 'Torres', true, '5552223333', 'andresp', '12345', '1989-01-12', 'MALE', false, 1),
-(gen_random_uuid(), 'Sofía', 'González', 'Morales', true, '5559998888', 'sofiag', '12345', '1995-09-17', 'FEMALE', false, 4),
-(gen_random_uuid(), 'Diego', 'Castro', 'Navarro', true, '5554446666', 'diegoc', '12345', '1993-06-05', 'MALE', false, 3),
-(gen_random_uuid(), 'Valeria', 'Domínguez', 'Flores', true, '5557771111', 'valeriad', '12345', '1997-10-25', 'FEMALE', false, 5),
-(gen_random_uuid(), 'Ricardo', 'Sánchez', 'Vega', true, '5553339999', 'ricardos', '12345', '1988-02-08', 'MALE', false, 6),
-(gen_random_uuid(), 'Elena', 'Mendoza', 'Cortés', true, '5556662222', 'elenam', '12345', '1991-04-14', 'FEMALE', false, 1),
-(gen_random_uuid(), 'Mateo', 'Ortega', 'Silva', true, '5551010101', 'mateoo', '12345', '1994-08-19', 'MALE', false, 6),
-(gen_random_uuid(), 'Camila', 'Rojas', 'Herrera', true, '5552020202', 'camilar', '12345', '1996-12-04', 'FEMALE', false, 6),
-(gen_random_uuid(), 'Sebastián', 'Luna', 'Reyes', true, '5553030303', 'sebastianl', '12345', '1990-02-21', 'MALE', false, 6),
-(gen_random_uuid(), 'Natalia', 'Cano', 'Ibáñez', true, '5554040404', 'nataliac', '12345', '1999-07-13', 'FEMALE', false, 6),
-(gen_random_uuid(), 'Alejandro', 'Suárez', 'Campos', true, '5555050505', 'alejandros', '12345', '1987-03-27', 'MALE', false, 6),
-(gen_random_uuid(), 'Paula', 'Mora', 'Galindo', true, '5556060606', 'paulam', '12345', '1993-05-09', 'FEMALE', false, 6),
-(gen_random_uuid(), 'Tomás', 'Vargas', 'Peña', true, '5557070707', 'tomasv', '12345', '1992-09-18', 'MALE', false, 6),
-(gen_random_uuid(), 'Fernanda', 'León', 'Rivas', true, '5558080808', 'fernandal', '12345', '1995-11-02', 'FEMALE', false, 6),
-(gen_random_uuid(), 'Rodrigo', 'Aguilar', 'Rosales', true, '5559090909', 'rodrigoa', '12345', '1989-06-22', 'MALE', false, 6),
-(gen_random_uuid(), 'Isabella', 'Castillo', 'Benítez', true, '5551212121', 'isabellac', '12345', '1997-10-01', 'FEMALE', false, 6),
-(gen_random_uuid(), 'Gabriel', 'Muñoz', 'Salas', true, '5552323232', 'gabrielm', '12345', '1991-01-30', 'MALE', false, 6),
-(gen_random_uuid(), 'Renata', 'Paredes', 'Quiroz', true, '5553434343', 'renatap', '12345', '1994-03-11', 'FEMALE', false, 6),
-(gen_random_uuid(), 'Emilio', 'Cabrera', 'Delgado', true, '5554545454', 'emilioc', '12345', '1988-08-07', 'MALE', false, 6),
-(gen_random_uuid(), 'Carolina', 'Villalobos', 'Esquivel', true, '5555656565', 'carolinav', '12345', '1996-04-28', 'FEMALE', false, 6),
-(gen_random_uuid(), 'Santiago', 'Núñez', 'Valdez', true, '5556767676', 'santiagon', '12345', '1990-12-16', 'MALE', false, 6);
-
-
-INSERT INTO patient_analysis (
-  laboratorist_id,
-  analysis_id,
-  patient_id,
-  analysis_date,
-  results_date,
-  place,
-  duration,
-  analysis_status
-)
-SELECT 
-  (SELECT laboratorist_id FROM laboratorists ORDER BY RANDOM() LIMIT 1),
-  (SELECT analysis_id FROM analysis ORDER BY RANDOM() LIMIT 1),
-  p.patient_id,
-  NOW() - (INTERVAL '5 days' * RANDOM()),
-  NOW() - (INTERVAL '1 days' * RANDOM()),
-  'Laboratorio Central',
-  FLOOR(RANDOM() * 60 + 30),
-  CASE FLOOR(RANDOM() * 3)
-    WHEN 0 THEN 'LAB'::"ANALYSIS_STATUS"
-    WHEN 1 THEN 'PENDING'::"ANALYSIS_STATUS"
-    ELSE 'SENT'::"ANALYSIS_STATUS"
-  END
-FROM (
-  SELECT patient_id FROM patients ORDER BY RANDOM() LIMIT 10
-) p, generate_series(1, 2);
 
 -- ========================
 -- ✅ FIN DEL SEED
