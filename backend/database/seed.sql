@@ -203,6 +203,7 @@ VALUES
 ('UPDATE_HISTORY_QUESTIONS'),
 ('DELETE_HISTORY_QUESTIONS'),
 ('VIEW_REPORTS');
+('DELETE_HISTORY_QUESTIONS');
 
 
 INSERT INTO role_privilege (role_id, privilege_id)
@@ -216,6 +217,9 @@ WHERE NOT EXISTS (
   SELECT 1 FROM role_privilege 
   WHERE role_id = 1 AND role_privilege.privilege_id = privileges.privilege_id
 );
+INSERT INTO role_privilege (role_id, privilege_id)
+VALUES (2, 27);
+
 
 INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
 VALUES
