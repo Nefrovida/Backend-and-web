@@ -6,6 +6,7 @@ import Register from "../components/page/Register";
 import analisisRoutes from "./analisis.routes";
 import forumsRoutes from "./forums.routes";
 import Home from "../components/page/Home";
+import forumRoutes from "./forum.routes";
 
 const router = createBrowserRouter([
   {
@@ -18,7 +19,8 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       ...analisisRoutes,
-      ...forumsRoutes,
+      ...forumsRoutes, // administrador
+      ...forumRoutes, // chat
     ],
   },
   {

@@ -1,5 +1,23 @@
-import { prisma } from '../util/prisma';
-import { ForumRole } from '.prisma/client';
+import { prisma } from "../util/prisma";
+import { ForumRole } from ".prisma/client";
+
+export default class Forum {
+  Forum() {}
+
+  static async postNewMessage(
+    userId: string,
+    forumId: number,
+    content: string
+  ) {
+    await prisma.messages.create({
+      data: {
+        forum_id: forumId,
+        user_id: userId,
+        content: content,
+      },
+    });
+  }
+}
 
 /**
  * Find forum by name (case-insensitive)
@@ -9,7 +27,7 @@ export const findByName = async (name: string) => {
     where: {
       name: {
         equals: name,
-        mode: 'insensitive',
+        mode: "insensitive",
       },
     },
   });
@@ -77,7 +95,7 @@ export const findAll = async (
   if (filters?.search) {
     whereClause.name = {
       contains: filters.search,
-      mode: 'insensitive' as const,
+      mode: "insensitive" as const,
     };
   }
 
@@ -110,7 +128,7 @@ export const findAll = async (
       },
     },
     orderBy: {
-      creation_date: 'desc',
+      creation_date: "desc",
     },
     skip,
     take,
@@ -131,7 +149,7 @@ export const count = async (filters?: {
   if (filters?.search) {
     whereClause.name = {
       contains: filters.search,
-      mode: 'insensitive' as const,
+      mode: "insensitive" as const,
     };
   }
 
@@ -197,7 +215,7 @@ export const findDuplicateName = async (name: string, excludeId: number) => {
     where: {
       name: {
         equals: name,
-        mode: 'insensitive',
+        mode: "insensitive",
       },
       NOT: {
         forum_id: excludeId,
@@ -225,7 +243,7 @@ export const findPublicForums = async (skip: number, take: number) => {
       },
     },
     orderBy: {
-      creation_date: 'desc',
+      creation_date: "desc",
     },
     skip,
     take,
@@ -265,10 +283,7 @@ export const addUserToForum = async (
 /**
  * Remove user from forum
  */
-export const removeUserFromForum = async (
-  forumId: number,
-  userId: string
-) => {
+export const removeUserFromForum = async (forumId: number, userId: string) => {
   return await prisma.users_forums.delete({
     where: {
       user_id_forum_id: {
@@ -357,7 +372,7 @@ export const getForumMembers = async (
       },
     },
     orderBy: {
-      forum_role: 'asc', // OWNER first, then MODERATOR, MEMBER, VIEWER
+      forum_role: "asc", // OWNER first, then MODERATOR, MEMBER, VIEWER
     },
     skip,
     take,
@@ -398,9 +413,8 @@ export const getUserForums = async (userId: string) => {
     },
     orderBy: {
       forum: {
-        creation_date: 'desc',
+        creation_date: "desc",
       },
     },
   });
 };
-
