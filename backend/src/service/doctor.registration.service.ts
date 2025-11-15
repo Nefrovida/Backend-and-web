@@ -10,11 +10,14 @@ type RegisterDoctorInput = {
   phone_number?: string;
   birthday?: string;
   gender?: "MALE" | "FEMALE" | "OTHER";
-  speciality: string;
+  specialty: string;
   license: string;
 };
 
-export const registerDoctor = async (adminAccount: { role_id: number }, data: RegisterDoctorInput) => {
+export const registerDoctor = async (
+  adminAccount: { role_id: number },
+  data: RegisterDoctorInput
+) => {
   if (!adminAccount || adminAccount.role_id !== 1) {
     const err = new Error("Solo administradores pueden crear doctores");
     (err as any).statusCode = 403;
@@ -22,36 +25,31 @@ export const registerDoctor = async (adminAccount: { role_id: number }, data: Re
   }
 
   const hashedPassword = await bcrypt.hash(data.password, 10);
-  const birthdayDate = data.birthday ? new Date(data.birthday) : null;
 
-  const [newAccount, newDoctor] = await prisma.$transaction([
-    prisma.users.create({
-      data: {
-        name: data.name,
-        parent_last_name: data.parent_last_name,
-        maternal_last_name: data.maternal_last_name ?? null,
-        username: data.username,
-        password: hashedPassword,
-        phone_number: data.phone_number ?? null,
-        birthday: birthdayDate,
-        gender: data.gender ?? null,
-        role_id: 2, // Doctor
-      },
-    }),
-    prisma.doctors.create({
-      data: {
-        // el user_id se obtiene del primer create
-        user_id: undefined as any, // se reemplaza abajo
-        speciality: data.speciality,
-        license: data.license,
-      },
-    }),
-  ]);
+  const birthdayDate = data.birthday ? new Date(data.birthday) : new Date();
 
-  // Ajustar el doctor con el user_id recién creado
-  const doctor = await prisma.doctors.update({
-    where: { doctor_id: newDoctor.doctor_id },
-    data: { user_id: newAccount.user_id },
+  const newAccount = await prisma.users.create({
+    data: {
+      name: data.name,
+      parent_last_name: data.parent_last_name,
+      maternal_last_name: data.maternal_last_name ?? "",
+      username: data.username,
+      password: hashedPassword,
+      phone_number: data.phone_number ?? "", 
+      birthday: birthdayDate,
+      gender: data.gender ?? "OTHER",
+      first_login: true,
+      role_id: 2, // Doctor
+    },
+  });
+
+
+  const doctor = await prisma.doctors.create({
+    data: {
+      user_id: newAccount.user_id,
+      specialty: data.specialty,
+      license: data.license,
+    },
   });
 
   const { password, ...safeAccount } = newAccount;
