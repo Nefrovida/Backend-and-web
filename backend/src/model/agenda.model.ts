@@ -44,7 +44,7 @@ export default class Agenda {
       return {
         ...rest,
         patient_name: user?.name ?? null,
-        patient_parent_last_name: user?.parent_last_name ?? null,
+        patient_last_name: user?.parent_last_name ?? null,
         patient_maternal_last_name: user?.maternal_last_name ?? null,
       };
     });
