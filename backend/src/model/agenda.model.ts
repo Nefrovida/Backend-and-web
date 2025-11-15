@@ -50,5 +50,12 @@ export default class Agenda {
 
     return flattened;
   }
-}
 
+  static async cancelAppointment(id: number) {
+    const appointmentId = id;
+    await prisma.patient_appointment.update({
+      where: { appointment_id: id },
+      data: { appointment_status: "CANCELED" },
+    });
+  }
+}
