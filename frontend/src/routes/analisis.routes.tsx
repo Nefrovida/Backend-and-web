@@ -1,6 +1,7 @@
 import { RouteObject } from "react-router-dom";
 import LabPage from "../components/page/LabPage";
 import LabResults from "../components/organism/lab/LabResults";
+import AnalysisManager from "../components/page/AnalysisManager";
 
 const analisisRoutes: RouteObject[] = [
   {
@@ -12,6 +13,11 @@ const analisisRoutes: RouteObject[] = [
         element: <LabResults />,
       },
     ],
+  },
+  {
+    // Analysis manager must not be a child of /laboratorio
+    path: "/analisis",
+    element: <AnalysisManager />,
   },
 ];
 

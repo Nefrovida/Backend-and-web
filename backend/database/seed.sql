@@ -11,6 +11,7 @@ COMMIT;
 
 INSERT INTO roles (role_name) VALUES
 ('Admin'),
+('Secretaria'),
 ('Doctor'),
 ('Paciente'),
 ('Laboratorista'),
@@ -30,11 +31,11 @@ SELECT 1, privilege_id FROM privileges;
 -- ========================
 INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
 VALUES
-(gen_random_uuid(), 'Carlos', 'Ramírez', 'López', true, '5551112222', 'carlosr', '12345', '1980-05-12', 'MALE', false, 2),
-(gen_random_uuid(), 'María', 'Hernández', 'Gómez', true, '5552223333', 'mariah', '12345', '1992-08-22', 'FEMALE', false, 3),
-(gen_random_uuid(), 'José', 'Martínez', 'Soto', true, '5553334444', 'josem', '12345', '1990-03-10', 'MALE', false, 4),
-(gen_random_uuid(), 'Ana', 'García', 'Torres', true, '5554445555', 'anag', '12345', '1987-12-01', 'FEMALE', false, 5),
-(gen_random_uuid(), 'Lucía', 'Pérez', 'Núñez', true, '5555556666', 'luciap', '12345', '1995-07-19', 'FEMALE', false, 3);
+(gen_random_uuid(), 'Carlos', 'Ramírez', 'López', true, '5551112222', 'carlosr', '12345', '1980-05-12', 'MALE', false, 3),
+(gen_random_uuid(), 'María', 'Hernández', 'Gómez', true, '5552223333', 'mariah', '12345', '1992-08-22', 'FEMALE', false, 4),
+(gen_random_uuid(), 'José', 'Martínez', 'Soto', true, '5553334444', 'josem', '12345', '1990-03-10', 'MALE', false, 5),
+(gen_random_uuid(), 'Ana', 'García', 'Torres', true, '5554445555', 'anag', '12345', '1987-12-01', 'FEMALE', false, 6),
+(gen_random_uuid(), 'Lucía', 'Pérez', 'Núñez', true, '5555556666', 'luciap', '12345', '1995-07-19', 'FEMALE', false, 4);
 
 -- Admin explicit user (added)
 INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
@@ -42,26 +43,23 @@ VALUES (gen_random_uuid(), 'Administrador', 'Sistema', 'Admin', true, '555000000
 
 
 
--- ========================
--- 👩‍⚕️ DOCTORES
--- ========================
 INSERT INTO doctors (doctor_id, user_id, specialty, license)
 SELECT gen_random_uuid(), u.user_id, 'Cardiología', 'LIC-' || floor(random()*10000)::text
-FROM users u WHERE u.role_id = 2;
+FROM users u WHERE u.role_id = 3;
 
 -- ========================
 -- 🧪 LABORATORISTAS
 -- ========================
 INSERT INTO laboratorists (laboratorist_id, user_id)
 SELECT gen_random_uuid(), u.user_id
-FROM users u WHERE u.role_id = 4;
+FROM users u WHERE u.role_id = 5;
 
 -- ========================
 -- 🧍 PACIENTES
 -- ========================
 INSERT INTO patients (patient_id, user_id, curp)
 SELECT gen_random_uuid(), u.user_id, 'CURP' || floor(random()*1000000)::text
-FROM users u WHERE u.role_id = 3;
+FROM users u WHERE u.role_id = 4;
 
 -- ========================
 -- 👪 FAMILIARES
@@ -70,7 +68,7 @@ INSERT INTO familiars (familiar_id, user_id, patient_id)
 SELECT gen_random_uuid(), f.user_id, p.patient_id
 FROM users f
 JOIN patients p ON p.user_id <> f.user_id
-WHERE f.role_id = 5
+WHERE f.role_id = 6
 LIMIT 2;
 
 -- ========================
@@ -83,7 +81,7 @@ SELECT
   true,
   u.user_id
 FROM generate_series(1, 3) i
-JOIN users u ON u.role_id = 2
+JOIN users u ON u.role_id = 3
 LIMIT 3;
 
 -- ========================
@@ -206,7 +204,8 @@ VALUES
 
 
 INSERT INTO role_privilege (role_id, privilege_id)
-SELECT 2, generate_series(1, 20);
+-- Give the Doctor role (now role_id = 3) the first set of privileges
+SELECT 3, generate_series(1, 20);
 
 
 INSERT INTO role_privilege (role_id, privilege_id)
@@ -216,39 +215,39 @@ WHERE NOT EXISTS (
   SELECT 1 FROM role_privilege 
   WHERE role_id = 1 AND role_privilege.privilege_id = privileges.privilege_id
 );
--- Give role 2 (Doctor) the VIEW_REPORTS privilege if present
+-- Give role 3 (Doctor) the VIEW_REPORTS privilege if present
 INSERT INTO role_privilege (role_id, privilege_id)
-SELECT 2, p.privilege_id FROM privileges p WHERE p.description = 'VIEW_REPORTS'
+SELECT 3, p.privilege_id FROM privileges p WHERE p.description = 'VIEW_REPORTS'
 ON CONFLICT DO NOTHING;
 
 
 INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
 VALUES
-(gen_random_uuid(), 'Carlos', 'López', 'Martínez', true, '5551112222', 'carlosl', '12345', '1990-03-15', 'MALE', false, 3),
-(gen_random_uuid(), 'María', 'Fernández', 'Ruiz', true, '5553334444', 'mariaf', '12345', '1985-07-22', 'FEMALE', false, 4),
-(gen_random_uuid(), 'Javier', 'Hernández', 'Gómez', true, '5556667777', 'javierh', '12345', '1992-11-09', 'MALE', false, 2),
-(gen_random_uuid(), 'Lucía', 'Ramírez', 'Santos', true, '5558889999', 'luciar', '12345', '1998-05-30', 'FEMALE', false, 5),
+(gen_random_uuid(), 'Carlos', 'López', 'Martínez', true, '5551112222', 'carlosl', '12345', '1990-03-15', 'MALE', false, 4),
+(gen_random_uuid(), 'María', 'Fernández', 'Ruiz', true, '5553334444', 'mariaf', '12345', '1985-07-22', 'FEMALE', false, 5),
+(gen_random_uuid(), 'Javier', 'Hernández', 'Gómez', true, '5556667777', 'javierh', '12345', '1992-11-09', 'MALE', false, 3),
+(gen_random_uuid(), 'Lucía', 'Ramírez', 'Santos', true, '5558889999', 'luciar', '12345', '1998-05-30', 'FEMALE', false, 6),
 (gen_random_uuid(), 'Andrés', 'Pérez', 'Torres', true, '5552223333', 'andresp', '12345', '1989-01-12', 'MALE', false, 1),
-(gen_random_uuid(), 'Sofía', 'González', 'Morales', true, '5559998888', 'sofiag', '12345', '1995-09-17', 'FEMALE', false, 3),
-(gen_random_uuid(), 'Diego', 'Castro', 'Navarro', true, '5554446666', 'diegoc', '12345', '1993-06-05', 'MALE', false, 2),
-(gen_random_uuid(), 'Valeria', 'Domínguez', 'Flores', true, '5557771111', 'valeriad', '12345', '1997-10-25', 'FEMALE', false, 4),
-(gen_random_uuid(), 'Ricardo', 'Sánchez', 'Vega', true, '5553339999', 'ricardos', '12345', '1988-02-08', 'MALE', false, 5),
+(gen_random_uuid(), 'Sofía', 'González', 'Morales', true, '5559998888', 'sofiag', '12345', '1995-09-17', 'FEMALE', false, 4),
+(gen_random_uuid(), 'Diego', 'Castro', 'Navarro', true, '5554446666', 'diegoc', '12345', '1993-06-05', 'MALE', false, 3),
+(gen_random_uuid(), 'Valeria', 'Domínguez', 'Flores', true, '5557771111', 'valeriad', '12345', '1997-10-25', 'FEMALE', false, 5),
+(gen_random_uuid(), 'Ricardo', 'Sánchez', 'Vega', true, '5553339999', 'ricardos', '12345', '1988-02-08', 'MALE', false, 6),
 (gen_random_uuid(), 'Elena', 'Mendoza', 'Cortés', true, '5556662222', 'elenam', '12345', '1991-04-14', 'FEMALE', false, 1),
-(gen_random_uuid(), 'Mateo', 'Ortega', 'Silva', true, '5551010101', 'mateoo', '12345', '1994-08-19', 'MALE', false, 5),
-(gen_random_uuid(), 'Camila', 'Rojas', 'Herrera', true, '5552020202', 'camilar', '12345', '1996-12-04', 'FEMALE', false, 5),
-(gen_random_uuid(), 'Sebastián', 'Luna', 'Reyes', true, '5553030303', 'sebastianl', '12345', '1990-02-21', 'MALE', false, 5),
-(gen_random_uuid(), 'Natalia', 'Cano', 'Ibáñez', true, '5554040404', 'nataliac', '12345', '1999-07-13', 'FEMALE', false, 5),
-(gen_random_uuid(), 'Alejandro', 'Suárez', 'Campos', true, '5555050505', 'alejandros', '12345', '1987-03-27', 'MALE', false, 5),
-(gen_random_uuid(), 'Paula', 'Mora', 'Galindo', true, '5556060606', 'paulam', '12345', '1993-05-09', 'FEMALE', false, 5),
-(gen_random_uuid(), 'Tomás', 'Vargas', 'Peña', true, '5557070707', 'tomasv', '12345', '1992-09-18', 'MALE', false, 5),
-(gen_random_uuid(), 'Fernanda', 'León', 'Rivas', true, '5558080808', 'fernandal', '12345', '1995-11-02', 'FEMALE', false, 5),
-(gen_random_uuid(), 'Rodrigo', 'Aguilar', 'Rosales', true, '5559090909', 'rodrigoa', '12345', '1989-06-22', 'MALE', false, 5),
-(gen_random_uuid(), 'Isabella', 'Castillo', 'Benítez', true, '5551212121', 'isabellac', '12345', '1997-10-01', 'FEMALE', false, 5),
-(gen_random_uuid(), 'Gabriel', 'Muñoz', 'Salas', true, '5552323232', 'gabrielm', '12345', '1991-01-30', 'MALE', false, 5),
-(gen_random_uuid(), 'Renata', 'Paredes', 'Quiroz', true, '5553434343', 'renatap', '12345', '1994-03-11', 'FEMALE', false, 5),
-(gen_random_uuid(), 'Emilio', 'Cabrera', 'Delgado', true, '5554545454', 'emilioc', '12345', '1988-08-07', 'MALE', false, 5),
-(gen_random_uuid(), 'Carolina', 'Villalobos', 'Esquivel', true, '5555656565', 'carolinav', '12345', '1996-04-28', 'FEMALE', false, 5),
-(gen_random_uuid(), 'Santiago', 'Núñez', 'Valdez', true, '5556767676', 'santiagon', '12345', '1990-12-16', 'MALE', false, 5);
+(gen_random_uuid(), 'Mateo', 'Ortega', 'Silva', true, '5551010101', 'mateoo', '12345', '1994-08-19', 'MALE', false, 6),
+(gen_random_uuid(), 'Camila', 'Rojas', 'Herrera', true, '5552020202', 'camilar', '12345', '1996-12-04', 'FEMALE', false, 6),
+(gen_random_uuid(), 'Sebastián', 'Luna', 'Reyes', true, '5553030303', 'sebastianl', '12345', '1990-02-21', 'MALE', false, 6),
+(gen_random_uuid(), 'Natalia', 'Cano', 'Ibáñez', true, '5554040404', 'nataliac', '12345', '1999-07-13', 'FEMALE', false, 6),
+(gen_random_uuid(), 'Alejandro', 'Suárez', 'Campos', true, '5555050505', 'alejandros', '12345', '1987-03-27', 'MALE', false, 6),
+(gen_random_uuid(), 'Paula', 'Mora', 'Galindo', true, '5556060606', 'paulam', '12345', '1993-05-09', 'FEMALE', false, 6),
+(gen_random_uuid(), 'Tomás', 'Vargas', 'Peña', true, '5557070707', 'tomasv', '12345', '1992-09-18', 'MALE', false, 6),
+(gen_random_uuid(), 'Fernanda', 'León', 'Rivas', true, '5558080808', 'fernandal', '12345', '1995-11-02', 'FEMALE', false, 6),
+(gen_random_uuid(), 'Rodrigo', 'Aguilar', 'Rosales', true, '5559090909', 'rodrigoa', '12345', '1989-06-22', 'MALE', false, 6),
+(gen_random_uuid(), 'Isabella', 'Castillo', 'Benítez', true, '5551212121', 'isabellac', '12345', '1997-10-01', 'FEMALE', false, 6),
+(gen_random_uuid(), 'Gabriel', 'Muñoz', 'Salas', true, '5552323232', 'gabrielm', '12345', '1991-01-30', 'MALE', false, 6),
+(gen_random_uuid(), 'Renata', 'Paredes', 'Quiroz', true, '5553434343', 'renatap', '12345', '1994-03-11', 'FEMALE', false, 6),
+(gen_random_uuid(), 'Emilio', 'Cabrera', 'Delgado', true, '5554545454', 'emilioc', '12345', '1988-08-07', 'MALE', false, 6),
+(gen_random_uuid(), 'Carolina', 'Villalobos', 'Esquivel', true, '5555656565', 'carolinav', '12345', '1996-04-28', 'FEMALE', false, 6),
+(gen_random_uuid(), 'Santiago', 'Núñez', 'Valdez', true, '5556767676', 'santiagon', '12345', '1990-12-16', 'MALE', false, 6);
 
 
 INSERT INTO patient_analysis (

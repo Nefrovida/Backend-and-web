@@ -1,5 +1,9 @@
 import React, { FC, useEffect, useState } from 'react'
 import analysisInfo from '../../../types/analysisInfo'
+import CreateAnalysisModal from '../../organism/lab/CreateAnalysisModal'
+import { CreateAnalysisData } from '../../../types/add.analysis.types'
+import { analysisService } from '../../../services/analysis.service'
+import { FiTrash2 } from 'react-icons/fi'
 import { GoVerified } from 'react-icons/go';
 import { PiFlaskLight } from 'react-icons/pi';
 import { FiAlertTriangle } from 'react-icons/fi';
@@ -20,6 +24,7 @@ interface Props {
 const LabFilter: FC<Props> = ({onChange}) => {
   const [analysis, 
     setAnalysis] = useState<analysisInfo[]>([])
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const [inputs, setInputs] = useState({}) // Inputs
   const [date, setDate] = useState<{start: Date|null, end: Date|null}>({start: null, end: null})
   const [status, setStatus] = useState<{sent: boolean, pending: boolean, lab: boolean}>({sent: false, pending: false, lab: false})
@@ -59,7 +64,14 @@ const LabFilter: FC<Props> = ({onChange}) => {
   }, [])
   
   return (
+    <>
     <div className='absolute top-[4.3rem] -translate-x-28 bg-white rounded-md h-96 w-80 z-10 drop-shadow-xl shadow-lg p-2'>
+      <div className='flex justify-between items-center mb-2'>
+        <h1 className='text-lg font-semibold'>Filtro</h1>
+        <div className='flex gap-2'>
+          <button onClick={() => setIsModalOpen(true)} className='bg-blue-500 text-white px-3 py-1 rounded-md'>Crear</button>
+        </div>
+      </div>
       <h2 className='text-lg'>Rango de fechas</h2>
       <div className='flex gap-2 w-fit flex-wrap my-1'>
         <span>De</span>
@@ -109,9 +121,28 @@ const LabFilter: FC<Props> = ({onChange}) => {
       <h2 className='mt-2 text-lg'>Tipo de examen</h2>
       <div className='flex flex-col overflow-scroll h-32'>
         {analysis.map((a, idx) => (
-          <label htmlFor={"analysis_"+a.analysis_id} className='flex gap-2 items-center' key={idx}>
-            <input type="checkbox" id={"analysis_"+a.analysis_id}  name={a.name} value={a.analysis_id} onChange={(e) => handleChange(e)}/>
-            {a.name}
+          <label htmlFor={"analysis_"+a.analysis_id} className='flex gap-2 items-center justify-between' key={idx}>
+            <div className='flex gap-2 items-center'>
+              <input type="checkbox" id={"analysis_"+a.analysis_id}  name={a.name} value={a.analysis_id} onChange={(e) => handleChange(e)}/>
+              {a.name}
+            </div>
+            <button title="Eliminar examen" className="text-red-500 hover:opacity-80" onClick={async (e) => {
+              e.preventDefault();
+              if (!confirm(`¿Eliminar examen ${a.name}?`)) return;
+
+              try {
+                await analysisService.deleteAnalysis(a.analysis_id);
+                // Refetch analysis list
+                const res = await fetch("/api/laboratory/analysis", {credentials: 'include'});
+                const data = await res.json();
+                setAnalysis(data);
+                alert('Examen eliminado');
+              } catch (err: any) {
+                alert(err?.message || 'Error al eliminar examen');
+              }
+            }}>
+              <FiTrash2 />
+            </button>
           </label>
         ))}
       </div>
@@ -123,7 +154,20 @@ const LabFilter: FC<Props> = ({onChange}) => {
           Buscar
         </button>
       </div>
-    </div>
+  </div>
+  <CreateAnalysisModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onConfirm={async (data: CreateAnalysisData) => {
+      try {
+        await analysisService.createAnalysis(data);
+        const res = await fetch("/api/laboratory/analysis", {credentials: 'include'});
+        const newData = await res.json();
+        setAnalysis(newData);
+        setIsModalOpen(false);
+        alert('Examen creado');
+      } catch (err: any) {
+        alert(err?.message || 'Error creando examen');
+      }
+    }} externalError={""} />
+    </>
   )
 }
 
