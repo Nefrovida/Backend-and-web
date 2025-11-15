@@ -5,6 +5,7 @@ import authRoutes from "./auth.routes";
 import usersRoutes from "./users.routes";
 import rolesRoutes from "./roles.routes"
 import privilegesRoutes from "./privileges.routes";
+import forumsRoutes from "./forums.routes";
 import * as analysisController from '../controller/analysis/add.analysis.controller';
 
 import reportRouter from "./report.routes";
@@ -37,6 +38,11 @@ router.use("/roles", rolesRoutes)
 // Privilege Routes (Protected)
 // ============================================
 router.use("/privileges", privilegesRoutes)
+
+// ============================================
+// Forum Routes (Protected)
+// ============================================
+router.use("/forums", forumsRoutes);
 
 // ============================================
 // Laboratory Routes (Protected)

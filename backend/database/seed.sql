@@ -16,16 +16,7 @@ INSERT INTO roles (role_name) VALUES
 ('Laboratorista'),
 ('Familiar');
 
--- ========================
--- 🧩 PRIVILEGIOS
--- ========================
-INSERT INTO privileges (description) VALUES
-('Crear usuario'),
-('Editar usuario'),
-('Eliminar usuario'),
-('Ver reportes'),
-('Administrar foros'),
-('Asignar citas');
+
 
 -- ========================
 -- 🧩 ROLES - PRIVILEGIOS
@@ -44,6 +35,10 @@ VALUES
 (gen_random_uuid(), 'José', 'Martínez', 'Soto', true, '5553334444', 'josem', '12345', '1990-03-10', 'MALE', false, 4),
 (gen_random_uuid(), 'Ana', 'García', 'Torres', true, '5554445555', 'anag', '12345', '1987-12-01', 'FEMALE', false, 5),
 (gen_random_uuid(), 'Lucía', 'Pérez', 'Núñez', true, '5555556666', 'luciap', '12345', '1995-07-19', 'FEMALE', false, 3);
+
+-- Admin explicit user (added)
+INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
+VALUES (gen_random_uuid(), 'Administrador', 'Sistema', 'Admin', true, '5550000000', 'admin', '$2b$10$/aYCozNwvUh8qt41J1diPOwDqeW50wg8nWf76NvAQ9plWjngrj4yS', '1980-01-01', 'MALE', false, 1);
 
 
 
@@ -206,12 +201,22 @@ VALUES
 ('VIEW_HISTORY_QUESTIONS'),
 ('CREATE_HISTORY_QUESTIONS'),
 ('UPDATE_HISTORY_QUESTIONS'),
+('DELETE_HISTORY_QUESTIONS'),
+('VIEW_REPORTS');
 ('DELETE_HISTORY_QUESTIONS');
 
 
 INSERT INTO role_privilege (role_id, privilege_id)
 SELECT 2, generate_series(1, 20);
 
+
+INSERT INTO role_privilege (role_id, privilege_id)
+SELECT 1, privilege_id 
+FROM privileges 
+WHERE NOT EXISTS (
+  SELECT 1 FROM role_privilege 
+  WHERE role_id = 1 AND role_privilege.privilege_id = privileges.privilege_id
+);
 INSERT INTO role_privilege (role_id, privilege_id)
 VALUES (2, 27);
 
