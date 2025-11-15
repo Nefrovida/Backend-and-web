@@ -11,6 +11,7 @@ COMMIT;
 
 INSERT INTO roles (role_name) VALUES
 ('Admin'),
+('Secretaria'),
 ('Doctor'),
 ('Paciente'),
 ('Laboratorista'),
@@ -78,16 +79,26 @@ WHERE description IN ('VIEW_ANALYSIS', 'CREATE_ANALYSIS');
 INSERT INTO role_privilege (role_id, privilege_id)
 VALUES (2, 27);
 
+-- Secretaria
+INSERT INTO role_privilege (role_id, privilege_id)
+SELECT 2, privilege_id FROM privileges 
+WHERE description IN (
+    'VIEW_ANALYSIS', 
+    'CREATE_ANALYSIS', 
+    'UPDATE_ANALYSIS', 
+    'DELETE_ANALYSIS'
+);
+
 -- ========================
 -- 👥 USERS
 -- ========================
 INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
-VALUES
-(gen_random_uuid(), 'Carlos', 'Ramírez', 'López', true, '5551112222', 'carlosr', '12345', '1980-05-12', 'MALE', false, 2),
-(gen_random_uuid(), 'María', 'Hernández', 'Gómez', true, '5552223333', 'mariah', '12345', '1992-08-22', 'FEMALE', false, 3),
-(gen_random_uuid(), 'José', 'Martínez', 'Soto', true, '5553334444', 'josem', '12345', '1990-03-10', 'MALE', false, 4),
-(gen_random_uuid(), 'Ana', 'García', 'Torres', true, '5554445555', 'anag', '12345', '1987-12-01', 'FEMALE', false, 5),
-(gen_random_uuid(), 'Lucía', 'Pérez', 'Núñez', true, '5555556666', 'luciap', '12345', '1995-07-19', 'FEMALE', false, 3);
+VALUES -- passwd: 1234567890
+(gen_random_uuid(), 'Carlos', 'Ramírez', 'López', true, '5551112222', 'carlosr', '$2b$10$78gwUI8tNJDco7uqgAzAlulip8F.J3PmP5OSj72gaIhbjIO9pZOcS', '1980-05-12', 'MALE', false, 2),
+(gen_random_uuid(), 'María', 'Hernández', 'Gómez', true, '5552223333', 'mariah', '$2b$10$78gwUI8tNJDco7uqgAzAlulip8F.J3PmP5OSj72gaIhbjIO9pZOcS', '1992-08-22', 'FEMALE', false, 3),
+(gen_random_uuid(), 'José', 'Martínez', 'Soto', true, '5553334444', 'josem', '$2b$10$78gwUI8tNJDco7uqgAzAlulip8F.J3PmP5OSj72gaIhbjIO9pZOcS', '1990-03-10', 'MALE', false, 4),
+(gen_random_uuid(), 'Ana', 'García', 'Torres', true, '5554445555', 'anag', '$2b$10$78gwUI8tNJDco7uqgAzAlulip8F.J3PmP5OSj72gaIhbjIO9pZOcS', '1987-12-01', 'FEMALE', false, 5),
+(gen_random_uuid(), 'Lucía', 'Pérez', 'Núñez', true, '5555556666', 'luciap', '$2b$10$78gwUI8tNJDco7uqgAzAlulip8F.J3PmP5OSj72gaIhbjIO9pZOcS', '1995-07-19', 'FEMALE', false, 3);
 
 -- Admin explicit user (added)
 INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
