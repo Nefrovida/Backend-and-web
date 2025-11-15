@@ -9,6 +9,9 @@ import forumsRoutes from "./forums.routes";
 import * as analysisController from '../controller/analysis/add.analysis.controller';
 
 import reportRouter from "./report.routes";
+import agendaRoutes from "./agenda.routes"
+
+
 import { authenticate } from "../middleware/auth.middleware";
 import { requirePrivileges } from "../middleware/rbac.middleware";
 import { Privilege } from "../types/rbac.types";
@@ -46,6 +49,12 @@ router.use("/forums", forumsRoutes);
 router.use("/laboratory", labRoutes);
 
 router.use("/report", reportRouter);
+
+// ============================================
+// Agenda Routes 
+// ============================================
+router.use("/agenda", agendaRoutes);
+
 
 // ============================================
 // Analysis Routes
