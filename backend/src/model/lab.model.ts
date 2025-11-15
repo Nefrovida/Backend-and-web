@@ -84,11 +84,8 @@ export default class Laboratory {
 
   static async getLabAppointmentsForUpload(page: number = 0, pageSize: number = 10) {
     const rows = await prisma.patient_analysis.findMany({
-      where: {
-        analysis_status: "REQUESTED" as ANALYSIS_STATUS, // pendiente de resultado
-      },
       orderBy: [
-        { analysis_date: "asc" },
+        { analysis_date: "desc" },
       ],
       skip: page * pageSize,
       take: pageSize,

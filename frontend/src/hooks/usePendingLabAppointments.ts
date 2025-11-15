@@ -8,7 +8,7 @@ async function fetchPendingAppointments(): Promise<LabAppointment[]> {
     });
 
     if (!res.ok) {
-        throw new Error("No se pudieron cargar las citas pendientes");
+        throw new Error("No se pudieron cargar las citas");
     }
 
     return res.json();
@@ -24,9 +24,25 @@ export default function usePendingLabAppointments() {
             setLoading(true);
             setError(null);
             const data = await fetchPendingAppointments();
-            setAppointments(data);
+
+            const sorted = [...data].sort((a, b) => {
+                const weight = (s: LabAppointment["status"]) =>
+                    s === "REQUESTED" ? 0 : 1;
+
+                const wA = weight(a.status);
+                const wB = weight(b.status);
+
+                if (wA !== wB) return wA - wB;
+
+                return (
+                    new Date(b.date).getTime() -
+                    new Date(a.date).getTime()
+                );
+            });
+
+            setAppointments(sorted);
         } catch (err: any) {
-            setError(err.message ?? "Error al cargar citas pendientes");
+            setError(err.message ?? "Error al cargar citas");
         } finally {
             setLoading(false);
         }
