@@ -121,6 +121,14 @@ export const getAnalysisById = async (req: Request, res: Response) => {
           message: error.message,
         },
       });
+    } else if (error instanceof ConflictError) {
+      res.status(409).json({
+        success: false,
+        error: {
+          code: 'ANALYSIS_IN_USE',
+          message: error.message,
+        },
+      });
     } else {
       res.status(500).json({
         success: false,

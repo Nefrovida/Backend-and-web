@@ -203,7 +203,6 @@ VALUES
 ('UPDATE_HISTORY_QUESTIONS'),
 ('DELETE_HISTORY_QUESTIONS'),
 ('VIEW_REPORTS');
-('DELETE_HISTORY_QUESTIONS');
 
 
 INSERT INTO role_privilege (role_id, privilege_id)
@@ -217,8 +216,10 @@ WHERE NOT EXISTS (
   SELECT 1 FROM role_privilege 
   WHERE role_id = 1 AND role_privilege.privilege_id = privileges.privilege_id
 );
+-- Give role 2 (Doctor) the VIEW_REPORTS privilege if present
 INSERT INTO role_privilege (role_id, privilege_id)
-VALUES (2, 27);
+SELECT 2, p.privilege_id FROM privileges p WHERE p.description = 'VIEW_REPORTS'
+ON CONFLICT DO NOTHING;
 
 
 INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
@@ -268,11 +269,10 @@ SELECT
   NOW() - (INTERVAL '1 days' * RANDOM()),
   'Laboratorio Central',
   FLOOR(RANDOM() * 60 + 30),
-  CASE FLOOR(RANDOM() * 4)
-      WHEN 0 THEN 'LAB'::"ANALYSIS_STATUS"
-      WHEN 1 THEN 'PENDING'::"ANALYSIS_STATUS"
-      WHEN 2 THEN 'REQUESTED'::"ANALYSIS_STATUS"
-      ELSE 'SENT'::"ANALYSIS_STATUS"
+  CASE FLOOR(RANDOM() * 3)
+    WHEN 0 THEN 'LAB'::"ANALYSIS_STATUS"
+    WHEN 1 THEN 'PENDING'::"ANALYSIS_STATUS"
+    ELSE 'SENT'::"ANALYSIS_STATUS"
   END
 FROM (
   SELECT patient_id FROM patients ORDER BY RANDOM() LIMIT 10
