@@ -15,7 +15,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 15 * 60 * 1000 // 15 minutes
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
     });
     
     res.cookie('refreshToken', result.refreshToken, {
@@ -45,7 +45,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
-      maxAge: 15 * 60 * 1000 // 15 minutes
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
     });
     
     res.cookie('refreshToken', result.refreshToken, {
@@ -67,14 +67,25 @@ export const register = async (req: Request, res: Response): Promise<void> => {
  */
 export const refreshToken = async (req: Request, res: Response): Promise<void> => {
   try {
-    // User should be attached by auth middleware
-    if (!req.user) {
-      res.status(401).json({ error: 'Unauthorized' });
+    // Get refresh token from cookie
+    const refreshTokenFromCookie = req.cookies?.refreshToken;
+    
+    if (!refreshTokenFromCookie) {
+      res.status(401).json({ error: 'No refresh token provided' });
       return;
     }
 
-    const newAccessToken = await authService.refreshAccessToken(req.user.userId);
-    res.status(200).json({ accessToken: newAccessToken });
+    const result = await authService.refreshAccessToken(refreshTokenFromCookie);
+    
+    // Update accessToken cookie
+    res.cookie('accessToken', result.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    });
+    
+    res.status(200).json({ user: result.user });
   } catch (error: any) {
     res.status(error.statusCode || 500).json({ error: error.message });
   }
