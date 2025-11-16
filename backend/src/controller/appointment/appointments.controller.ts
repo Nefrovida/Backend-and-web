@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import * as appointmentsService from '../service/appointments.service';
+import * as appointmentsService from '../../service/appointments.service';
 
 /**
  * Get all appointments for the authenticated doctor
@@ -17,6 +17,17 @@ export const getDoctorAppointments = async (
       doctorId
     );
 
+    res.status(200).json(appointments);
+  } catch (error: any) {
+    res.status(error.statusCode || 500).json({ error: error.message });
+  }
+};
+
+
+export const getUserAppointments = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const appointments = await appointmentsService.getAllAppointmentsByUserId(id);
     res.status(200).json(appointments);
   } catch (error: any) {
     res.status(error.statusCode || 500).json({ error: error.message });

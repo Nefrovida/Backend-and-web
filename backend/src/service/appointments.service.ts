@@ -23,3 +23,12 @@ export const getDoctorAppointments = async (userId: string) => {
 
   return appointments;
 };
+
+/**
+ * 
+ * @param userId 
+ * @returns List appointment
+ */
+export const getAllAppointmentsByUserId = async (userId: string) => {
+  return await appointmentsModel.getAppointmentByUserId(userId);
+};

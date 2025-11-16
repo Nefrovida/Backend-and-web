@@ -69,3 +69,15 @@ export const getDoctorAppointments = async (doctorId: string) => {
 
   return formattedAppointments;
 };
+
+  export const getAppointmentByUserId = async (UserId: string) =>{
+      const appointments = await prisma.patient_appointment.findMany({
+          where: { patient_id: UserId },
+      });
+
+      const analysis = await prisma.patient_analysis.findMany({
+          where: { patient_id: UserId },
+      });
+
+      return { appointments, analysis };
+}
