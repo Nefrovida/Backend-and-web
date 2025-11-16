@@ -33,6 +33,10 @@ export const submitRiskForm = async (req:Request, res:Response) => {
     const id = req.params.id;
     const { answers } = req.body;
 
+    if (!id) {
+      return res.status(400).json({ message: "ID parameter is required" });
+    }
+
     const result = await CHS.submitRiskForm(id, answers);
 
     res.status(200).json({
@@ -49,6 +53,10 @@ export const submitRiskForm = async (req:Request, res:Response) => {
 export const getRiskFormAnswersById = async (req:Request, res:Response) => {
   try {
     const id = req.params.id;
+
+    if (!id) {
+      return res.status(400).json({ message: "ID parameter is required" });
+    }
 
     const answers = await CHS.getRiskFormAnswersById(id);
 
