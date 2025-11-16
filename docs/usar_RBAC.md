@@ -74,10 +74,11 @@ users → roles → role_privilege ← privileges
 | ID | Rol            | Descripción                        |
 |----|----------------|------------------------------------|
 | 1  | Admin          | Acceso completo al sistema         |
-| 2  | Doctor         | Gestión de pacientes y consultas   |
-| 3  | Paciente       | Acceso a su información médica     |
-| 4  | Laboratorista  | Gestión de análisis de laboratorio |
-| 5  | Familiar       | Acceso limitado a info del paciente|
+| 2  | Familiar       | Acceso limitado a info del paciente|
+| 3  | Doctor         | Gestión de pacientes y consultas   |
+| 4  | Paciente       | Acceso a su información médica     |
+| 5  | Laboratorista  | Gestión de análisis de laboratorio |
+| 6  | Secretaria     | Gestión administrativa / secretaria|
 
 ### Privilegios Definidos
 

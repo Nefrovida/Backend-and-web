@@ -47,11 +47,11 @@ export interface LoginData {
 // Keep values in sync with backend.DEFAULT_ROLES / roles table.
 export const ROLE_IDS = {
   ADMIN: 1,
-  SECRETARIA: 2,
+  SECRETARIA: 6,
   DOCTOR: 3,
   PATIENT: 4,
   LABORATORIST: 5,
-  FAMILIAR: 6,
+  FAMILIAR: 2,
 } as const;
 
 export const ROLE_NAMES = {
