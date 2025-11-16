@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "actify": "^0.5.7",
+    "@fullcalendar/react": "^6.1.19",
+    "fullcalendar": "^6.1.19",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-icons": "^5.4.0",
