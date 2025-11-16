@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { ZodError } from 'zod';
-import { createForumSchema } from '../validators/forum.validator';
+import { createForumSchema, updateForumSchema } from '../validators/forum.validator';
 import * as forumsService from '../service/forums.service';
 
 /**
@@ -107,5 +107,53 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
     res.status(200).json(forums);
   } catch (error: any) {
     res.status(error.statusCode || 500).json({ error: error.message });
+  }
+};
+
+/**
+ * Update a forum (Admin only)
+ */
+export const update = async (req: Request, res: Response): Promise<void> => {
+  try {
+    // Validate request body with Zod
+    const validatedData = updateForumSchema.parse(req.body);
+
+    // Extract forumId from URL params
+    const forumId = parseInt(req.params.forumId);
+    if (isNaN(forumId)) {
+      res.status(400).json({ error: 'ID de foro inválido' });
+      return;
+    }
+
+    // Call service to execute business logic
+    const updatedForum = await forumsService.updateForum(forumId, validatedData);
+
+    // Respond with updated forum
+    res.status(200).json(updatedForum);
+  } catch (error: any) {
+    // Handle Zod validation errors with friendly, field-specific messages
+    if (error instanceof ZodError) {
+      const formatted = error.errors.map((e) => {
+        const field = e.path && e.path.length ? String(e.path[0]) : undefined;
+        let message = e.message;
+
+        if (field === 'name') {
+          if ((e as any).code === 'too_big') message = 'El nombre no puede exceder 100 caracteres';
+          if ((e as any).code === 'too_small') message = 'El nombre debe tener al menos 3 caracteres';
+        }
+
+        if (field === 'description') {
+          if ((e as any).code === 'too_big') message = 'La descripción no puede exceder 255 caracteres';
+        }
+
+        return { field, message };
+      });
+
+      res.status(400).json({ errors: formatted });
+      return;
+    }
+
+    // Delegate other errors to Express-style response
+    res.status(error.statusCode || 400).json({ error: error.message });
   }
 };

@@ -85,4 +85,15 @@ router.post(
   forumsController.create
 );
 
+/**
+ * Update a forum
+ * 
+ */
+router.put(
+  "/:forumId",
+  authenticate,
+  requirePrivileges([Privilege.UPDATE_FORUMS]),
+  forumsController.update
+);
+
 export default router;

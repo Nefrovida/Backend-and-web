@@ -1,6 +1,6 @@
-import { CreateForumInputValidated } from '../validators/forum.validator';
+import { CreateForumInputValidated, UpdateForumInputValidated } from '../validators/forum.validator';
 import { ForumEntity } from '../types/forum.types';
-import { ConflictError } from '../util/errors.util';
+import { ConflictError, NotFoundError } from '../util/errors.util';
 import * as forumModel from '../model/forum.model';
 
 /**
@@ -72,4 +72,32 @@ export const getAllForums = async (
   });
 
   return forums;
+};
+
+/**
+ * Update a forum
+ * 
+ 
+ */
+export const updateForum = async (
+  forumId: number,
+  data: UpdateForumInputValidated
+): Promise<ForumEntity> => {
+  // Check if forum exists
+  const existingForum = await forumModel.findById(forumId);
+  if (!existingForum) {
+    throw new NotFoundError('Foro no encontrado');
+  }
+
+  // Check for duplicate name if name is being updated
+  if (data.name && data.name !== existingForum.name) {
+    const duplicateForum = await forumModel.findByName(data.name);
+    if (duplicateForum) {
+      throw new ConflictError('Ya existe un foro con este nombre');
+    }
+  }
+
+  // Update the forum
+  const updatedForum = await forumModel.update(forumId, data);
+  return updatedForum;
 };
