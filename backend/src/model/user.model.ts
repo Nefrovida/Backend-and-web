@@ -17,7 +17,14 @@ export default class User {
     });
 
     return { appointments, analysis };
-        }
+    }
 
-    
+    static async postRiskFormByUserId(UserId: string, riskFormData: any) {
+    const newRiskForm = await prisma.patient_history.create({
+        data: {
+            patient_id: UserId,
+            ...riskFormData,
+        },
+    });
+    }
 }
