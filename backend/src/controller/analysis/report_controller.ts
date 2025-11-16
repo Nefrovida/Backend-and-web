@@ -26,5 +26,32 @@ async function getResult (req: Request, res: Response) {
         console.log(error);
     }
 }
+export const getRiskQuestions = async (req: Request, res: Response) => {
+    try {
+        
+        if(!req.user){
+            return  res.status(401).json("Unauthorized");
+        }
+        const questions = await getResultsService.getRiskQuestions(req, res);
+
+        res.status(200).json(questions);
+
+    }
+    catch (error) {
+        res.status(500).json("Internal Server Error");
+        console.log(error);
+    }
+}
+
+export const getRiskOptions = async (req: Request, res: Response) => {
+    try {
+        const options = await getResultsService.getRiskOptions(req, res);
+
+        res.status(200).json(options);
+    } catch (error) {
+        res.status(500).json("Internal Server Error");
+        console.log(error);
+    }
+}
 
 export default getResult;
