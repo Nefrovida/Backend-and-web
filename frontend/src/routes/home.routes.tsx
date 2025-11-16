@@ -4,9 +4,11 @@ import NotFoundPage from "../components/page/NotFoundPage";
 import Login from "../components/page/Login";
 import Register from "../components/page/Register";
 import analisisRoutes from "./analisis.routes";
+import forumsRoutes from "./forums.routes";
 import agendaRoutes from "./agenda.routes";
 import Home from "../components/page/Home";
-import Scheduler from "../components/organism/agenda/Scheduler"
+import AddPatientToForumPage from "../components/page/add_patient_to_forum_page";
+import notesRoutes from "./notes.routes";
 
 const router = createBrowserRouter([
   {
@@ -20,6 +22,8 @@ const router = createBrowserRouter([
       },
       ...analisisRoutes,
       ...agendaRoutes,
+      ...notesRoutes,
+      ...forumsRoutes,
     ],
   },
   {
@@ -31,8 +35,8 @@ const router = createBrowserRouter([
     element: <Register />,
   },
   {
-    path: "/prueba",
-    element: <Scheduler />,
+  path: "/forums/:forumId/add-patient",
+  element: <AddPatientToForumPage />
   },
 ]);
 

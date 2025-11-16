@@ -10,7 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+<<<<<<< HEAD
     "date-fns": "^4.1.0",
+=======
+    "@fullcalendar/react": "^6.1.19",
+    "fullcalendar": "^6.1.19",
+>>>>>>> 218b273c8a4c7699ea06a1a3d01aa432c9b6c6ce
     "react": "^19.2.0",
     "react-big-calendar": "^1.19.4",
     "react-dom": "^19.2.0",
