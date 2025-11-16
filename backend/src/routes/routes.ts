@@ -5,6 +5,8 @@ import authRoutes from "./auth.routes";
 import usersRoutes from "./users.routes";
 import rolesRoutes from "./roles.routes";
 import privilegesRoutes from "./privileges.routes";
+
+import appointmentsRoutes from "./appointments.routes";
 import notesRouter from "./notes.routes";
 import forumsRoutes from "./forums.routes";
 import * as analysisController from '../controller/analysis/add.analysis.controller';
@@ -16,7 +18,6 @@ import reportRouter from "./report.routes";
 
 import historyRoutes from "./history.routes";
 import agendaRoutes from "./agenda.routes";
-import appointmentsRoutes from "./appointments.routes";
 
 import { authenticate } from "../middleware/auth.middleware";
 import { requirePrivileges } from "../middleware/rbac.middleware";
