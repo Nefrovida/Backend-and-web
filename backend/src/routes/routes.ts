@@ -7,7 +7,8 @@ import rolesRoutes from "./roles.routes";
 import privilegesRoutes from "./privileges.routes";
 import notesRouter from "./notes.routes";
 import forumsRoutes from "./forums.routes";
-import * as analysisController from "../controller/analysis/add.analysis.controller";
+import * as analysisController from '../controller/analysis/add.analysis.controller';
+import addPatientToForumRoutes from './forums/add_patient_to_forum.routes';
 import patientRoutes from "./patients.routes";
 
 import reportRouter from "./report.routes";
@@ -118,5 +119,10 @@ router.delete(
   requirePrivileges([Privilege.DELETE_ANALYSIS]),
   analysisController.deleteAnalysis
 );
+
+// ============================================
+// FORUM ENDPOINT
+// ============================================
+router.use("/forums", addPatientToForumRoutes);
 
 export default router;

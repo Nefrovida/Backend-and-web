@@ -1,4 +1,4 @@
-import { prisma } from '../util/prisma';
+import { prisma } from '../../util/prisma';
 
 /**
  * Find analysis by name (case-insensitive)

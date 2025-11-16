@@ -39,11 +39,16 @@ export enum Privilege {
   DELETE_ANALYSIS = "DELETE_ANALYSIS",
 
   // Forum management
-  VIEW_FORUMS = "VIEW_FORUMS",
-  CREATE_FORUMS = "CREATE_FORUMS",
-  UPDATE_FORUMS = "UPDATE_FORUMS",
-  DELETE_FORUMS = "DELETE_FORUMS",
+  VIEW_FORUMS = 'VIEW_FORUMS',
+  CREATE_FORUMS = 'CREATE_FORUMS',
+  UPDATE_FORUMS = 'UPDATE_FORUMS',
+  DELETE_FORUMS = 'DELETE_FORUMS',
 
+  // Forum privileges
+  ADD_USER_TO_FORUM = "ADD_USER_TO_FORUM",
+  REMOVE_USER_FROM_FORUM = "REMOVE_USER_FROM_FORUM",
+  VIEW_FORUM_USERS = "VIEW_FORUM_USERS",
+  
   // Patient history questions templates
   VIEW_HISTORY_QUESTIONS = "VIEW_HISTORY_QUESTIONS",
   CREATE_HISTORY_QUESTIONS = "CREATE_HISTORY_QUESTIONS",
@@ -66,4 +71,9 @@ export interface AuthenticatedRequest {
     roleId: number;
     privileges: string[];
   };
+}
+
+export interface RolePrivilege {
+  roleId: number;
+  privileges: Privilege[];
 }

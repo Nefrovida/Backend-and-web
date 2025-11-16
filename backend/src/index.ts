@@ -4,6 +4,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv"
 import session from "express-session"
+import { errorHandler } from './middleware/error.middleware';
 
 dotenv.config({path: "../.env"})
 
@@ -103,6 +104,9 @@ import router from "./routes/routes";
 
 // Routes
 app.use("/api", router);
+
+// Global error handler middleware
+app.use(errorHandler);
 
 // Start server
 app.listen(port, () => {

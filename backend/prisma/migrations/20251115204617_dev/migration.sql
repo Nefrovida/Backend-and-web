@@ -5,12 +5,18 @@ CREATE TYPE "Gender" AS ENUM ('MALE', 'FEMALE', 'OTHER');
 CREATE TYPE "Status" AS ENUM ('MISSED', 'CANCELED', 'FINISHED', 'PROGRAMMED');
 
 -- CreateEnum
-CREATE TYPE "Type" AS ENUM ('PRECENCIAL', 'VIRTUAL');
+CREATE TYPE "ANALYSIS_STATUS" AS ENUM ('LAB', 'PENDING', 'SENT', 'REQUESTED');
+
+-- CreateEnum
+CREATE TYPE "Type" AS ENUM ('PRESENCIAL', 'VIRTUAL');
+
+-- CreateEnum
+CREATE TYPE "ForumRole" AS ENUM ('OWNER', 'MODERATOR', 'MEMBER', 'VIEWER');
 
 -- CreateTable
 CREATE TABLE "roles" (
     "role_id" SERIAL NOT NULL,
-    "rol_name" TEXT NOT NULL,
+    "role_name" TEXT NOT NULL,
 
     CONSTRAINT "roles_pkey" PRIMARY KEY ("role_id")
 );
@@ -36,14 +42,15 @@ CREATE TABLE "users" (
     "user_id" UUID NOT NULL,
     "name" TEXT NOT NULL,
     "parent_last_name" TEXT NOT NULL,
-    "maternal_last_name" TEXT,
+    "maternal_last_name" TEXT NOT NULL,
     "active" BOOLEAN NOT NULL DEFAULT true,
     "phone_number" TEXT NOT NULL,
-    "user" TEXT NOT NULL,
+    "username" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "birthday" TIMESTAMP(3) NOT NULL,
     "gender" "Gender" NOT NULL,
     "registration_date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "first_login" BOOLEAN NOT NULL,
     "role_id" INTEGER NOT NULL DEFAULT 1,
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("user_id")
@@ -69,17 +76,17 @@ CREATE TABLE "familiars" (
 
 -- CreateTable
 CREATE TABLE "laboratorists" (
-    "laboratorists_id" UUID NOT NULL,
+    "laboratorist_id" UUID NOT NULL,
     "user_id" UUID NOT NULL,
 
-    CONSTRAINT "laboratorists_pkey" PRIMARY KEY ("laboratorists_id")
+    CONSTRAINT "laboratorists_pkey" PRIMARY KEY ("laboratorist_id")
 );
 
 -- CreateTable
 CREATE TABLE "doctors" (
     "doctor_id" UUID NOT NULL,
     "user_id" UUID NOT NULL,
-    "speciality" CHAR(100) NOT NULL,
+    "specialty" CHAR(100) NOT NULL,
     "license" CHAR(20) NOT NULL,
 
     CONSTRAINT "doctors_pkey" PRIMARY KEY ("doctor_id")
@@ -90,9 +97,10 @@ CREATE TABLE "forums" (
     "forum_id" SERIAL NOT NULL,
     "name" CHAR(100) NOT NULL,
     "description" CHAR(255) NOT NULL,
-    "public" BOOLEAN NOT NULL,
+    "public_status" BOOLEAN NOT NULL,
     "created_by" UUID NOT NULL,
     "active" BOOLEAN NOT NULL DEFAULT true,
+    "creation_date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "forums_pkey" PRIMARY KEY ("forum_id")
 );
@@ -101,7 +109,7 @@ CREATE TABLE "forums" (
 CREATE TABLE "users_forums" (
     "user_id" UUID NOT NULL,
     "forum_id" INTEGER NOT NULL,
-    "rol_forum" TEXT NOT NULL,
+    "forum_role" "ForumRole" NOT NULL,
 
     CONSTRAINT "users_forums_pkey" PRIMARY KEY ("user_id","forum_id")
 );
@@ -112,7 +120,7 @@ CREATE TABLE "messages" (
     "forum_id" INTEGER NOT NULL,
     "user_id" UUID NOT NULL,
     "content" TEXT NOT NULL,
-    "timestamp_publish" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "publication_timestamp" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "parent_message_id" INTEGER,
     "active" BOOLEAN NOT NULL DEFAULT true,
 
@@ -134,8 +142,9 @@ CREATE TABLE "appointments" (
     "appointment_id" SERIAL NOT NULL,
     "doctor_id" UUID NOT NULL,
     "name" CHAR(50) NOT NULL,
-    "general_cost" CHAR(10) NOT NULL,
-    "community_cost" CHAR(10) NOT NULL,
+    "general_cost" DOUBLE PRECISION NOT NULL,
+    "community_cost" DOUBLE PRECISION NOT NULL,
+    "image_url" TEXT,
 
     CONSTRAINT "appointments_pkey" PRIMARY KEY ("appointment_id")
 );
@@ -147,10 +156,10 @@ CREATE TABLE "patient_appointment" (
     "appointment_id" INTEGER NOT NULL,
     "date_hour" TIMESTAMP(3) NOT NULL,
     "duration" INTEGER NOT NULL,
-    "type" "Type" NOT NULL,
+    "appointment_type" "Type" NOT NULL,
     "link" TEXT,
     "place" TEXT,
-    "status" "Status" NOT NULL,
+    "appointment_status" "Status" NOT NULL,
 
     CONSTRAINT "patient_appointment_pkey" PRIMARY KEY ("patient_appointment_id")
 );
@@ -173,8 +182,9 @@ CREATE TABLE "analysis" (
     "name" CHAR(50) NOT NULL,
     "description" CHAR(500) NOT NULL,
     "previous_requirements" TEXT NOT NULL,
-    "general_cost" TEXT NOT NULL,
-    "community_cost" TEXT NOT NULL,
+    "general_cost" DOUBLE PRECISION NOT NULL,
+    "community_cost" DOUBLE PRECISION NOT NULL,
+    "image_url" TEXT,
 
     CONSTRAINT "analysis_pkey" PRIMARY KEY ("analysis_id")
 );
@@ -188,6 +198,8 @@ CREATE TABLE "patient_analysis" (
     "analysis_date" TIMESTAMP(3) NOT NULL,
     "results_date" TIMESTAMP(3) NOT NULL,
     "place" TEXT NOT NULL,
+    "duration" INTEGER NOT NULL,
+    "analysis_status" "ANALYSIS_STATUS" NOT NULL DEFAULT 'REQUESTED',
 
     CONSTRAINT "patient_analysis_pkey" PRIMARY KEY ("patient_analysis_id")
 );
@@ -197,7 +209,8 @@ CREATE TABLE "results" (
     "result_id" SERIAL NOT NULL,
     "patient_analysis_id" INTEGER NOT NULL,
     "date" TIMESTAMP(3) NOT NULL,
-    "route" CHAR(255) NOT NULL,
+    "path" CHAR(255) NOT NULL,
+    "interpretation" TEXT NOT NULL DEFAULT '',
 
     CONSTRAINT "results_pkey" PRIMARY KEY ("result_id")
 );
@@ -220,11 +233,33 @@ CREATE TABLE "patient_history" (
     CONSTRAINT "patient_history_pkey" PRIMARY KEY ("question_id","patient_id")
 );
 
--- CreateIndex
-CREATE UNIQUE INDEX "patients_curp_key" ON "patients"("curp");
+-- CreateTable
+CREATE TABLE "user_reports" (
+    "report_id" SERIAL NOT NULL,
+    "user_id" UUID NOT NULL,
+    "reported_message" INTEGER NOT NULL,
+    "cause" TEXT NOT NULL,
+    "date" TIMESTAMP(3) NOT NULL,
+    "status" BOOLEAN NOT NULL,
+
+    CONSTRAINT "user_reports_pkey" PRIMARY KEY ("report_id")
+);
+
+-- CreateTable
+CREATE TABLE "notifications" (
+    "report_id" SERIAL NOT NULL,
+    "user_id" UUID NOT NULL,
+    "answer" TEXT NOT NULL,
+    "date" TIMESTAMP(3) NOT NULL,
+    "title" TEXT NOT NULL,
+    "content" TEXT NOT NULL,
+    "seen" BOOLEAN NOT NULL DEFAULT false,
+
+    CONSTRAINT "notifications_pkey" PRIMARY KEY ("report_id")
+);
 
 -- CreateIndex
-CREATE UNIQUE INDEX "familiars_user_id_key" ON "familiars"("user_id");
+CREATE UNIQUE INDEX "patients_curp_key" ON "patients"("curp");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "laboratorists_user_id_key" ON "laboratorists"("user_id");
@@ -243,6 +278,9 @@ CREATE UNIQUE INDEX "patient_appointment_appointment_id_key" ON "patient_appoint
 
 -- CreateIndex
 CREATE UNIQUE INDEX "notes_patient_appointment_id_key" ON "notes"("patient_appointment_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "analysis_name_key" ON "analysis"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "results_patient_analysis_id_key" ON "results"("patient_analysis_id");
@@ -308,7 +346,7 @@ ALTER TABLE "patient_appointment" ADD CONSTRAINT "patient_appointment_appointmen
 ALTER TABLE "notes" ADD CONSTRAINT "notes_patient_appointment_id_fkey" FOREIGN KEY ("patient_appointment_id") REFERENCES "patient_appointment"("patient_appointment_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "patient_analysis" ADD CONSTRAINT "patient_analysis_laboratorist_id_fkey" FOREIGN KEY ("laboratorist_id") REFERENCES "laboratorists"("laboratorists_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "patient_analysis" ADD CONSTRAINT "patient_analysis_laboratorist_id_fkey" FOREIGN KEY ("laboratorist_id") REFERENCES "laboratorists"("laboratorist_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "patient_analysis" ADD CONSTRAINT "patient_analysis_analysis_id_fkey" FOREIGN KEY ("analysis_id") REFERENCES "analysis"("analysis_id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -324,3 +362,12 @@ ALTER TABLE "patient_history" ADD CONSTRAINT "patient_history_question_id_fkey" 
 
 -- AddForeignKey
 ALTER TABLE "patient_history" ADD CONSTRAINT "patient_history_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "patients"("patient_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "user_reports" ADD CONSTRAINT "user_reports_reported_message_fkey" FOREIGN KEY ("reported_message") REFERENCES "messages"("message_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "user_reports" ADD CONSTRAINT "user_reports_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("user_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "notifications" ADD CONSTRAINT "notifications_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("user_id") ON DELETE CASCADE ON UPDATE CASCADE;
