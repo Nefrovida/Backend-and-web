@@ -9,7 +9,7 @@ export default class Analysis {
     static async getAnalysisByDate(dateString: string) {
 
         if (!/^\d{2}-\d{2}-\d{4}$/.test(dateString)) {
-        throw new Error("Format must be DD/MM/YYYY");
+        throw new Error("Format must be DD-MM-YYYY");
         }
 
         const [day, month, year] = dateString.split('-').map(Number);
