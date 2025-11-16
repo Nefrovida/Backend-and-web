@@ -6,7 +6,6 @@ import { authenticate } from "../middleware/auth.middleware";
 import { requirePrivileges } from "../middleware/rbac.middleware";
 import { Privilege } from "../types/rbac.types";
 
-
 router.get("/risk-questions",
     authenticate,
     CHC.getRiskQuestions
