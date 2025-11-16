@@ -1,5 +1,5 @@
-import * as analysisModel from '../../model/add.analysis.model';
-import { CreateAnalysisRequest, AnalysisResponse, UpdateAnalysisRequest } from '../../types/add.analysis.types';
+import * as analysisModel from '../../model/analysis/add.analysis.model';
+import { CreateAnalysisRequest, AnalysisResponse, UpdateAnalysisRequest } from '../../types/analysis/add.analysis.types';
 import { NotFoundError, ConflictError } from '../../util/errors.util';
 
 /**
@@ -49,7 +49,7 @@ export const createAnalysis = async (data: CreateAnalysisRequest) => {
 /**
  * Get all analysis with pagination and search
  */
-export const getAllAnalyses = async (
+export const getAllAnalysis = async (
   page: number = 1,
   limit: number = 10,
   search?: string

@@ -1,3 +1,4 @@
+// backend/src/routes/routes.ts
 import express from "express";
 
 import labRoutes from "./lab.routes";
@@ -5,7 +6,10 @@ import authRoutes from "./auth.routes";
 import usersRoutes from "./users.routes";
 import rolesRoutes from "./roles.routes";
 import privilegesRoutes from "./privileges.routes";
+import notesRouter from "./notes.routes";
 import forumsRoutes from "./forums.routes";
+import addPatientToForumRoutes from "./forums/add_patient_to_forum.routes";
+import patientRoutes from "./patients.routes";
 import reportRouter from "./report.routes";
 import historyRoutes from "./history.routes";
 import agendaRoutes from "./agenda.routes";
@@ -54,6 +58,16 @@ router.use("/laboratory", labRoutes);
 router.use("/report", reportRouter);
 
 // ============================================
+// Notes Routes (Protected)
+// ============================================
+router.use("/notes", notesRouter);
+
+// ============================================
+// Patients Routes (Protected)
+// ============================================
+router.use("/patients", patientRoutes);
+
+// ============================================
 // Patient History Questions Templates
 // ============================================
 router.use("/history", historyRoutes);
@@ -82,7 +96,7 @@ router.get(
   "/analysis",
   authenticate,
   requirePrivileges([Privilege.VIEW_ANALYSIS]),
-  analysisController.getAllAnalyses
+  analysisController.getAllAnalysis
 );
 
 router.get(
@@ -105,5 +119,10 @@ router.delete(
   requirePrivileges([Privilege.DELETE_ANALYSIS]),
   analysisController.deleteAnalysis
 );
+
+// ============================================
+// Forum extra routes (add patient to forum)
+// ============================================
+router.use("/forums", addPatientToForumRoutes);
 
 export default router;

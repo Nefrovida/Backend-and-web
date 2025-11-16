@@ -212,7 +212,7 @@ function Register() {
               {roleId === ROLE_IDS.DOCTOR && "Soy un profesional de la salud"}
               {roleId === ROLE_IDS.LABORATORIST && "Trabajo en laboratorio"}
               {roleId === ROLE_IDS.FAMILIAR && "Soy familiar de un paciente"}
-              {roleId === ROLE_IDS.SECRETARIA && "Trabajo en administración / secretaria"}
+              {roleId === ROLE_IDS.SECRETARIA && "Soy secretaria"}
             </p>
           </button>
         ))}

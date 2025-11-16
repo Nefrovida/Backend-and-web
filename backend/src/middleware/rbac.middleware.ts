@@ -27,11 +27,8 @@ export const requirePrivileges = (requiredPrivileges: string[]) => {
 
       next();
     } catch (error) {
-      if (error instanceof ForbiddenError) {
-        res.status(error.statusCode).json({ error: error.message });
-      } else {
-        res.status(403).json({ error: 'Access denied' });
-      }
+      // Pass error to the next middleware
+      next(error instanceof ForbiddenError ? error : new ForbiddenError('Access denied'));
     }
   };
 };
@@ -61,11 +58,8 @@ export const requireAnyPrivilege = (requiredPrivileges: string[]) => {
 
       next();
     } catch (error) {
-      if (error instanceof ForbiddenError) {
-        res.status(error.statusCode).json({ error: error.message });
-      } else {
-        res.status(403).json({ error: 'Access denied' });
-      }
+      // Pass error to the next middleware
+      next(error instanceof ForbiddenError ? error : new ForbiddenError('Access denied'));
     }
   };
 };

@@ -1,4 +1,6 @@
-import { prisma } from "../util/prisma";
+import { PrismaClient } from "@prisma/client";
+
+const prismaClient = new PrismaClient();
 
 export default class Agenda {
   constructor() {}
@@ -9,7 +11,7 @@ export default class Agenda {
     const start = new Date(year, month - 1, day, 0, 0, 0);
     const end = new Date(year, month - 1, day + 1, 0, 0, 0);
 
-    const appointments = await prisma.patient_appointment.findMany({
+    const appointments = await prismaClient.patient_appointment.findMany({
       where: {
         date_hour: {
           gte: start,
@@ -51,14 +53,11 @@ export default class Agenda {
     return flattened;
   }
 
-    static async cancelAppointment(id: number) {
-      const appointmentId = id;
-      await prisma.patient_appointment.update({
+  static async cancelAppointment(id: number) {
+    const appointmentId = id;
+    await prismaClient.patient_appointment.update({
       where: { appointment_id: id },
       data: { appointment_status: "CANCELED" },
-});
-
-    }
-
+    });
+  }
 }
-
