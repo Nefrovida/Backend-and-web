@@ -47,4 +47,20 @@ export const submitRiskForm = async (req:Request, res:Response) => {
     console.error(error);
     res.status(500).json("Internal Server Error");
   }
-};  
+};
+
+export const getRiskFormAnswersById = async (req:Request, res:Response) => {
+  try {
+    const id = req.params.id;
+
+    const answers = await CHS.getRiskFormAnswersById(id);
+
+    res.status(200).json({
+      data: answers
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json("Internal Server Error");
+  }
+};

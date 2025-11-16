@@ -31,4 +31,12 @@ export default class CH {
 
     return saved;
 }
+
+    static async getRiskFormAnswersById(id:string) {
+        return prisma.patient_history.findMany({
+            where: {
+                patient_id: id
+            }
+        });
+    }   
 }
