@@ -21,8 +21,8 @@ router.post("/risk-form/submit/:id",
     CHC.submitRiskForm);
 
 router.get("/risk-form/get/:id",
-    //authenticate,
-    //requirePrivileges([Privilege.VIEW_CLINICAL_HISTORY]),
+    authenticate,
+    requirePrivileges([Privilege.VIEW_CLINICAL_HISTORY]),
     CHC.getRiskFormAnswersById);
 
 export default router;
