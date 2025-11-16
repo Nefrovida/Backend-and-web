@@ -28,27 +28,27 @@ router.get("/analysis/by-date/:date",
   requirePrivileges([Privilege.VIEW_ANALYSIS]),
   getAnalysisByDay);
 
-// Listar pending lab appointments
+// List pending lab appointments (US5)
 router.get(
   "/lab-appointments",
   authenticate,
-  requirePrivileges([Privilege.VIEW_ANALYSIS]),
+  requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
   labAppointmentsController.getLabAppointments
 );
 
-// Request URL for file upload
+// Request URL for file upload (US5)
 router.post(
   "/lab-appointments/:id/presign",
   authenticate,
-  requirePrivileges([Privilege.CREATE_ANALYSIS]),
+  requirePrivileges([Privilege.UPDATE_APPOINTMENTS]),
   labAppointmentsController.requestPresign
 );
 
-// Confirm file has been uploaded and is in DB
+// Confirm file has been uploaded and is in DB (US5)
 router.post(
   "/lab-appointments/:id/result",
   authenticate,
-  requirePrivileges([Privilege.CREATE_ANALYSIS]),
+  requirePrivileges([Privilege.UPDATE_APPOINTMENTS]),
   labAppointmentsController.confirmUpload
 );
 

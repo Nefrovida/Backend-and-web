@@ -25,25 +25,15 @@ const analisisRoutes: RouteObject[] = [
     ],
   },
   {
-    // Secretary view to manage analysis types (US 28, 29, 30)
+    // Only Admin (1) and Secretaria (6) can access the analysis types manager
     path: "/analisis",
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute allowedRoles={[1, 6]}>
         <AnalysisManager />
       </ProtectedRoute>
     ),
   },
   {
-    // Routes added in develop for laboratorist calendar
-    path: "/test/:date",
-    element: <LaboratoristAnalysisCalendar />,
-  },
-  {
-    path: "/analisis-dia",
-    element: <LaboratoristAnalysisCalendarC />,
-  },
-  {
-    // Laboratorist view to upload PDF results (US5)
     path: "/laboratorio/subir",
     element: (
       <ProtectedRoute>

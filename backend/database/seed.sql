@@ -72,7 +72,11 @@ WHERE NOT EXISTS (
 INSERT INTO role_privilege (role_id, privilege_id)
 SELECT 4, privilege_id
 FROM privileges
-WHERE description IN ('VIEW_ANALYSIS', 'CREATE_ANALYSIS');
+WHERE description IN (
+  'VIEW_APPOINTMENTS',
+  'UPDATE_APPOINTMENTS',
+  'VIEW_ANALYSIS'  -- solo lectura de catálogo, si quieres que vea nombres y costos
+);
 
 -- Doctor also gets VIEW_REPORTS
 INSERT INTO role_privilege (role_id, privilege_id)
