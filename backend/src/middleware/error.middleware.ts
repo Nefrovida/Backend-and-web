@@ -9,7 +9,6 @@ import {
 
 /**
  * Global error handler middleware
- * DEBE ir AL FINAL de todas las rutas en app.ts
  */
 export function errorHandler(
   err: Error,
@@ -19,7 +18,7 @@ export function errorHandler(
 ): void {
   console.error('Error:', err);
 
-  // Manejo de errores personalizados
+  // Handle known error types
   if (
     err instanceof UnauthorizedError ||
     err instanceof ForbiddenError ||
@@ -36,7 +35,7 @@ export function errorHandler(
     return;
   }
 
-  // Error genérico no manejado
+  // Generic server error for unknown error types
   res.status(500).json({
     success: false,
     error: {

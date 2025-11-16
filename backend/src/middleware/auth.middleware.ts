@@ -18,7 +18,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction): v
         throw new UnauthorizedError('No token provided');
       }
       
-      token = authHeader.substring(7); // Remove 'Bearer ' prefix
+      token = authHeader.substring(7);
     }
 
     // Verify token and attach user to request
@@ -27,7 +27,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction): v
 
     next();
   } catch (error) {
-    // Pasar el error al error handler global
+    // Pass error to the next middleware
     next(error instanceof UnauthorizedError ? error : new UnauthorizedError('Invalid or expired token'));
   }
 };

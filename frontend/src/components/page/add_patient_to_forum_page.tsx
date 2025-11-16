@@ -7,14 +7,14 @@ function AddPatientToForumPage() {
   const { forumId } = useParams<{ forumId: string }>();
 
   const handleSuccess = () => {
-    // Redirigir a la página del foro después de agregar al paciente
+    // Redirect to the forum page after a short delay
     setTimeout(() => {
       navigate(`/forums/${forumId}`);
     }, 2000);
   };
 
   const handleCancel = () => {
-    // Volver a la página del foro
+    // Go back to the forum page
     navigate(`/forums/${forumId}`);
   };
 

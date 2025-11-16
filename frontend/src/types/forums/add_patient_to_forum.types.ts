@@ -39,7 +39,6 @@ export interface Patient {
   maternal_last_name?: string;
 }
 
-// Estos valores deben coincidir exactamente con el enum de Prisma
 export enum ForumRole {
   OWNER = "OWNER",
   MODERATOR = "MODERATOR",
@@ -56,7 +55,6 @@ export const FORUM_ROLES = {
 
 export type ForumRoleType = typeof FORUM_ROLES[keyof typeof FORUM_ROLES];
 
-// Mapeo para mostrar nombres en español
 export const FORUM_ROLE_LABELS: Record<ForumRole, string> = {
   [ForumRole.OWNER]: "Propietario",
   [ForumRole.MODERATOR]: "Moderador",
