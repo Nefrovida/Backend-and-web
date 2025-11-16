@@ -6,9 +6,6 @@ import * as CHS from "../../service/clinicalHistory/clinicalHistory.service"
 export const getRiskQuestions = async (req: Request, res: Response) => {
     try {
         
-       // if(!req.user){
-       //     return  res.status(401).json("Unauthorized");
-       // }
         const questions = await CHS.getRiskQuestions(req, res);
 
         res.status(200).json(questions);
