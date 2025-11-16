@@ -106,5 +106,74 @@ export default class Laboratory {
       console.error("Error creating lab report in db: ", error);
       throw new Error(`Error creating lab report in db ${error}`);
     }
+  static async getLabAppointmentsForUpload(page: number = 0, pageSize: number = 10) {
+    const rows = await prisma.patient_analysis.findMany({
+      orderBy: [
+        { analysis_date: "desc" },
+      ],
+      skip: page * pageSize,
+      take: pageSize,
+      select: {
+        patient_analysis_id: true,
+        analysis_date: true,
+        analysis_status: true,
+        analysis: {
+          select: {
+            name: true,
+          },
+        },
+        patient: {
+          select: {
+            user: {
+              select: {
+                name: true,
+                parent_last_name: true,
+                maternal_last_name: true,
+              },
+            },
+          },
+        },
+        results: {
+          select: {
+            path: true,
+          },
+        },
+      },
+    });
+
+    return rows.map((r: any) => ({
+      id: r.patient_analysis_id,
+      date: r.analysis_date,
+      status: r.analysis_status,
+      analysisName: r.analysis.name,
+      patientName: `${r.patient.user.name} ${r.patient.user.parent_last_name} ${r.patient.user.maternal_last_name}`.trim(),
+      resultURI: r.results?.path ?? null,
+    }));
+  }
+
+  static async confirmLabAppointmentResult(patientAnalysisId: number, fileUri: string) {
+    await prisma.$transaction(async (tx: any) => {
+      await tx.results.upsert({
+        where: { patient_analysis_id: patientAnalysisId },
+        update: {
+          path: fileUri,
+          date: new Date(),
+        },
+        create: {
+          patient_analysis_id: patientAnalysisId,
+          path: fileUri,
+          date: new Date(),
+          interpretation: "",
+        },
+      });
+
+      await tx.patient_analysis.update({
+        where: { patient_analysis_id: patientAnalysisId },
+        data: {
+          analysis_status: "SENT",
+          results_date: new Date(),
+        },
+      });
+    });
   }
 }

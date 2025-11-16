@@ -10,6 +10,8 @@ import { Privilege } from "src/types/rbac.types";
 import getAnalysisByDay from "../controller/lab/laboratoristGetAnalysis.controller";
 import generateLabReport from "../controller/lab/generateReport.controller";
 
+import * as labAppointmentsController from "../controller/lab/labAppointments.controller";
+
 router.get("/results", 
   //authenticate,
   //requirePrivileges([Privilege.VIEW_ANALYSIS]),
@@ -29,5 +31,28 @@ router.post("/generate-report",
   // requirePrivileges([Privilege.CREATE_REPORT]),
   generateLabReport
 )
+// Listar pending lab appointments
+router.get(
+  "/lab-appointments",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_ANALYSIS]),
+  labAppointmentsController.getLabAppointments
+);
+
+// Request URL for file upload
+router.post(
+  "/lab-appointments/:id/presign",
+  authenticate,
+  requirePrivileges([Privilege.CREATE_ANALYSIS]),
+  labAppointmentsController.requestPresign
+);
+
+// Confirm file has been uploaded and is in DB
+router.post(
+  "/lab-appointments/:id/result",
+  authenticate,
+  requirePrivileges([Privilege.CREATE_ANALYSIS]),
+  labAppointmentsController.confirmUpload
+);
 
 export default router;
