@@ -71,12 +71,4 @@ export const getProfile = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
-export const getUserAppointments = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { id } = req.params;
-    const appointments = await usersService.getAllAppointmentsByUserId(id);
-    res.status(200).json(appointments);
-  } catch (error: any) {
-    res.status(error.statusCode || 500).json({ error: error.message });
-  }
-};
+
