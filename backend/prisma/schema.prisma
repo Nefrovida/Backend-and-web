@@ -216,7 +216,7 @@ model appointments {
 model patient_appointment {
   patient_appointment_id  Int @id @default(autoincrement())
   patient_id              String @db.Uuid
-  appointment_id          Int @unique
+  appointment_id          Int
   date_hour               DateTime
   duration                Int // minutes
   appointment_type        Type

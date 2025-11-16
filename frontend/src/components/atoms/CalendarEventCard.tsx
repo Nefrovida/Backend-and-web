@@ -1,3 +1,5 @@
+import "../../styles/Calendar.css";
+
 export const CalendarEventCard = ({ title, type, description }) => (
   <div className="calendar-event-card">
     <div><b>Paciente:</b> {title}</div>
