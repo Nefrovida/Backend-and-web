@@ -130,3 +130,15 @@ export const getUserByUsername = async (username: string): Promise<UserWithRoleA
 export const getAllAppointmentsByUserId = async (userId: string) => {
   return await userModel.getAppointmentByUserId(userId);
 };
+
+export const postUserRiskForms = async (userId: string, riskFormData: any) => {
+  const user = await prisma.users.findUnique({ where: { user_id: userId } });
+  
+  if (!user) {
+  throw new NotFoundError(`User with ID ${userId} not found.`);
+}
+
+
+
+  return await userModel.postRiskFormByUserId(userId, riskFormData);
+};

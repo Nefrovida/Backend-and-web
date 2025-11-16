@@ -225,11 +225,77 @@ FROM patient_analysis pa;
 -- ========================
 -- 🧠 HISTORIAL DE PACIENTE
 -- ========================
-INSERT INTO questions_history (description, type)
-VALUES
-('¿Fuma con frecuencia?', 'boolean'),
-('¿Hace ejercicio?', 'boolean'),
-('¿Tiene antecedentes familiares de diabetes?', 'boolean');
+INSERT INTO questions_history (description, type) VALUES
+-- DATOS GENERALES
+('Nombre', 'text'),
+('Teléfono', 'text'),
+('Género', 'choice'),
+('Edad', 'number'),
+('Fecha de nacimiento', 'date'),
+('Estado de nacimiento', 'text'),
+
+-- PREGUNTAS CLÍNICAS DEL CUESTIONARIO
+('¿Sus padres o hermanos padecen enfermedades crónicas?', 'choice'),
+('¿Padece diabetes mellitus?', 'choice'),
+('¿Ha tenido cifras de glucosa mayores que 140 en ayunas?', 'choice'),
+('¿Está en tratamiento por presión alta?', 'choice'),
+('¿Cifras de presión arterial mayores que 130/80?', 'choice'),
+('¿Familiar con enfermedad renal crónica (ERC), es decir 
+con tratamientos de dialisis peritoneal o hemodiálisis?', 'choice'),
+('¿Regularmente se auto medica con analgésicos de venta libre como ibuprofeno, 
+naproxeno, aspirinas, etc?', 'choice'),
+('¿Ha padecido de litiasis renal (piedras en los riñones)?', 'choice'),
+('¿Tiene sobrepeso u obesidad?', 'choice'),
+('¿Consume refrescos?', 'choice'),
+('¿Cuántos refrescos por semana (600 ml)?', 'choice'),
+('¿Agrega sal a sus alimentos?', 'choice'),
+('¿Fuma o ha fumado más de 10 años?', 'choice'),
+('¿Ingiere bebidas alcohólicas con frecuencia?', 'choice'),
+('¿Ha tenido episodios de depresión?', 'choice');
+
+INSERT INTO options (question_id, description)
+SELECT q.question_id, v.description
+FROM questions_history q
+CROSS JOIN (
+    VALUES ('Masculino'), ('Femenino'), ('Otro')
+) v(description)
+WHERE q.description = 'Género';
+
+INSERT INTO options (question_id, description)
+SELECT q.question_id, opt.description
+FROM questions_history q
+CROSS JOIN (
+    VALUES ('Sí'), ('No'), ('Lo desconoce')
+) AS opt(description)
+WHERE q.description IN (
+    '¿Sus padres o hermanos padecen enfermedades crónicas?',
+    '¿Padece diabetes mellitus?',
+    '¿Ha tenido cifras de glucosa mayores que 140 en ayunas?',
+    '¿Está en tratamiento por presión alta?',
+    '¿Cifras de presión arterial mayores que 130/80?',
+    '¿Familiar con enfermedad renal crónica (ERC), es decir 
+con tratamientos de dialisis peritoneal o hemodiálisis?',
+    '¿Regularmente se auto medica con analgésicos de venta libre como ibuprofeno, 
+naproxeno, aspirinas, etc?',
+    '¿Ha padecido de litiasis renal (piedras en los riñones)?',
+    '¿Tiene sobrepeso u obesidad?',
+    '¿Consume refrescos?',
+    '¿Agrega sal a sus alimentos?',
+    '¿Fuma o ha fumado más de 10 años?',
+    '¿Ingiere bebidas alcohólicas con frecuencia?',
+    '¿Ha tenido episodios de depresión?'
+);
+
+INSERT INTO options (question_id, description)
+SELECT q.question_id, v.description
+FROM questions_history q
+CROSS JOIN (
+    VALUES 
+        ('1-2 por semana'),
+        ('3-5 por semana'),
+        ('Más de 5 por semana')
+) v(description)
+WHERE q.description = '¿Cuántos refrescos por semana (600 ml)?';
 
 INSERT INTO patient_history (question_id, patient_id, answer)
 SELECT q.question_id, p.patient_id, 'Sí'
