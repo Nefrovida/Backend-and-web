@@ -12,6 +12,7 @@ import forumsRoutes from "./forums.routes";
 import * as analysisController from '../controller/analysis/add.analysis.controller';
 import addPatientToForumRoutes from './forums/add_patient_to_forum.routes';
 import patientRoutes from "./patients.routes";
+import clinicalHistoryRoutes from "./clinicalHistory.routes";
 
 import reportRouter from "./report.routes";
 
@@ -35,9 +36,9 @@ router.use("/auth", authRoutes);
 router.use("/users", usersRoutes);
 
 // ============================================
-// Appointments Routes (Protected)
+// Clinical History Routes (Protected)
 // ============================================
-router.use("/appointment", appointmentsRoutes);
+router.use("/clinical-history", clinicalHistoryRoutes);
 
 // ============================================
 // Role Routes (Protected)
@@ -102,7 +103,7 @@ router.get(
   "/analysis",
   authenticate,
   requirePrivileges([Privilege.VIEW_ANALYSIS]),
-  analysisController.getAllAnalyses
+  analysisController.getAllAnalysis
 );
 
 router.get(
