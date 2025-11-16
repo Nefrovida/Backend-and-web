@@ -6,6 +6,7 @@ import Register from "../components/page/Register";
 import analisisRoutes from "./analisis.routes";
 import forumsRoutes from "./forums.routes";
 import Home from "../components/page/Home";
+import SecretaryPage from "../components/page/SecretaryPage";
 
 const router = createBrowserRouter([
   {
@@ -16,6 +17,10 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <Home />,
+      },
+      {
+        path: "/secretary",
+        element: <SecretaryPage />,
       },
       ...analisisRoutes,
       ...forumsRoutes,
