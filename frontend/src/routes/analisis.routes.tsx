@@ -20,7 +20,7 @@ const analisisRoutes: RouteObject[] = [
     element: <LaboratoristAnalysisCalendar />,
   },
   {
-    path: "/analisis-dia/:date",
+    path: "/analisis-dia",
     element: <LaboratoristAnalysisCalendarC />,
   },
 ];

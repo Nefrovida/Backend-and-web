@@ -7,8 +7,6 @@ export const LaboratoristAnalysisCalendarC = () => {
     const [events, setEvents] = useState<any[]>([]);
     const [currentDate, setCurrentDate] = useState(new Date());
 
-    console.log("EVENTS: ", events)
-
     // Llama al backend por fecha
     const fetchEvents = async (date: Date) => {
         const day = String(date.getDate()).padStart(2, "0");
