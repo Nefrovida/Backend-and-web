@@ -9,7 +9,7 @@ export default class Forum {
     forumId: number,
     content: string
   ) {
-    await prisma.messages.create({
+    return await prisma.messages.create({
       data: {
         forum_id: forumId,
         user_id: userId,

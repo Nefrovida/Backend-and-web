@@ -17,8 +17,14 @@ async function postNewMessage(req: Request, res: Response) {
       return;
     }
 
-    await Forum.postNewMessage(userId, Number(forumId), content);
+    const response = await Forum.postNewMessage(
+      userId,
+      Number(forumId),
+      content
+    );
+    res.status(200).json({ message: "Exitoso" });
   } catch (e) {
+    console.error(e);
     res.status(500).json({ message: "Error imprevisto" });
     return;
   }
