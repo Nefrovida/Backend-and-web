@@ -55,9 +55,9 @@ VALUES
 -- 🧩 ROLES - PRIVILEGIOS
 -- ========================
 
--- Doctor (role_id = 3)
+-- Doctor (role_id = 2)
 INSERT INTO role_privilege (role_id, privilege_id)
-SELECT 3, generate_series(1, 20);
+SELECT 2, generate_series(1, 20);
 
 -- Admin (role_id = 1): full privileges
 INSERT INTO role_privilege (role_id, privilege_id)
@@ -75,12 +75,12 @@ FROM privileges
 WHERE description IN (
   'VIEW_APPOINTMENTS',
   'UPDATE_APPOINTMENTS',
-  'VIEW_ANALYSIS'  -- solo lectura de catálogo, si quieres que vea nombres y costos
+  'VIEW_ANALYSIS'  -- solo lectura de catálogo
 );
 
 -- Doctor also gets VIEW_REPORTS
 INSERT INTO role_privilege (role_id, privilege_id)
-SELECT 3, p.privilege_id
+SELECT 2, p.privilege_id
 FROM privileges p
 WHERE p.description = 'VIEW_REPORTS';
 
@@ -100,7 +100,7 @@ WHERE description IN (
 INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
 VALUES -- passwd: 1234567890
 (gen_random_uuid(), 'Carlos', 'Ramírez', 'López', true, '5551112222', 'carlosr', '$2b$10$78gwUI8tNJDco7uqgAzAlulip8F.J3PmP5OSj72gaIhbjIO9pZOcS', '1980-05-12', 'MALE', false, 6),
-(gen_random_uuid(), 'María', 'Hernández', 'Gómez', true, '5552223333', 'mariah', '$2b$10$78gwUI8tNJDco7uqgAzAlulip8F.J3PmP5OSj72gaIhbjIO9pZOcS', '1992-08-22', 'FEMALE', false, 3),
+(gen_random_uuid(), 'María', 'Hernández', 'Gómez', true, '5552223333', 'mariah', '$2b$10$78gwUI8tNJDco7uqgAzAlulip8F.J3PmP5OSj72gaIhbjIO9pZOcS', '1992-08-22', 'FEMALE', false, 2),
 (gen_random_uuid(), 'José', 'Martínez', 'Soto', true, '5553334444', 'josem', '$2b$10$78gwUI8tNJDco7uqgAzAlulip8F.J3PmP5OSj72gaIhbjIO9pZOcS', '1990-03-10', 'MALE', false, 4),
 (gen_random_uuid(), 'Ana', 'García', 'Torres', true, '5554445555', 'anag', '$2b$10$78gwUI8tNJDco7uqgAzAlulip8F.J3PmP5OSj72gaIhbjIO9pZOcS', '1987-12-01', 'FEMALE', false, 5),
 (gen_random_uuid(), 'Lucía', 'Pérez', 'Núñez', true, '5555556666', 'luciap', '$2b$10$78gwUI8tNJDco7uqgAzAlulip8F.J3PmP5OSj72gaIhbjIO9pZOcS', '1995-07-19', 'FEMALE', false, 3);
@@ -114,21 +114,21 @@ VALUES (gen_random_uuid(), 'Administrador', 'Sistema', 'Admin', true, '555000000
 -- ========================
 INSERT INTO doctors (doctor_id, user_id, specialty, license)
 SELECT gen_random_uuid(), u.user_id, 'Cardiología', 'LIC-' || floor(random()*10000)::text
-FROM users u WHERE u.role_id = 3;
+FROM users u WHERE u.role_id = 2;  -- DOCTOR
 
 -- ========================
 -- 🧪 LABORATORISTAS
 -- ========================
 INSERT INTO laboratorists (laboratorist_id, user_id)
 SELECT gen_random_uuid(), u.user_id
-FROM users u WHERE u.role_id = 5;
+FROM users u WHERE u.role_id = 4;  -- LABORATORISTA
 
 -- ========================
 -- 🧍 PACIENTES
 -- ========================
 INSERT INTO patients (patient_id, user_id, curp)
 SELECT gen_random_uuid(), u.user_id, 'CURP' || floor(random()*1000000)::text
-FROM users u WHERE u.role_id = 4;
+FROM users u WHERE u.role_id = 3;  -- PACIENTE
 
 -- ========================
 -- 👪 FAMILIARES
@@ -137,7 +137,7 @@ INSERT INTO familiars (familiar_id, user_id, patient_id)
 SELECT gen_random_uuid(), f.user_id, p.patient_id
 FROM users f
 JOIN patients p ON p.user_id <> f.user_id
-WHERE f.role_id = 2
+WHERE f.role_id = 5  -- FAMILIAR
 LIMIT 2;
 
 -- ========================
