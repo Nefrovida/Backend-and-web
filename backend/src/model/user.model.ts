@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client'; 
+import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 export default class User {
@@ -17,7 +17,14 @@ export default class User {
     });
 
     return { appointments, analysis };
-        }
+    }
 
-    
+    static async postRiskFormByUserId(UserId: string, riskFormData: any) {
+    const newRiskForm = await prisma.patient_history.create({
+        data: {
+            patient_id: UserId,
+            ...riskFormData,
+        },
+    });
+    }
 }

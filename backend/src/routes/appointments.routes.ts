@@ -1,8 +1,10 @@
-import express from 'express';
-import { authenticate } from '../middleware/auth.middleware';
-import { requirePrivileges } from '../middleware/rbac.middleware';
-import { Privilege } from '../types/rbac.types';
-import * as appointmentsController from '../controller/appointments.controller';
+import express from "express"
+import * as appointmentController from "../controller/appointment/getUserAppointment";
+import { authenticate } from "../middleware/auth.middleware";
+import { requirePrivileges } from "../middleware/rbac.middleware";
+import { Privilege } from "../types/rbac.types";
+import { exit } from "process";
+import * as appointmentsController from '../controller/appointment/appointments.controller';
 
 const router = express.Router();
 
@@ -23,5 +25,10 @@ router.get(
 );
 
 router.get("/getAllAppointments", appointmentsController.getAllAppointments);
+
+router.get("/user/:id",
+  authenticate, 
+  appointmentController.getUserAppointments);
+
 
 export default router;
