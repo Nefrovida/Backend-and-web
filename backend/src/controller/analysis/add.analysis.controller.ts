@@ -3,7 +3,7 @@ import {
   createAnalysisSchema, 
   updateAnalysisSchema,
   getAnalysesQuerySchema 
-} from '../../validators/add.analysis.validator';
+} from '../../validators/analysis/add.analysis.validator';
 import * as analysisService from '../../service/analysis/add.analysis.service';
 import { NotFoundError, ConflictError } from '../../util/errors.util';
 import { ZodError } from 'zod';

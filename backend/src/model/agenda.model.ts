@@ -1,4 +1,4 @@
-import { PrismaClient } from "../../prisma/database/prisma/client";
+import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 export default class Agenda {
@@ -52,14 +52,11 @@ export default class Agenda {
     return flattened;
   }
 
-    static async cancelAppointment(id: number) {
-      const appointmentId = id;
-      await prisma.patient_appointment.update({
+  static async cancelAppointment(id: number) {
+    const appointmentId = id;
+    await prisma.patient_appointment.update({
       where: { appointment_id: id },
       data: { appointment_status: "CANCELED" },
-});
-
-    }
-
+    });
+  }
 }
-
