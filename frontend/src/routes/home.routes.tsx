@@ -7,6 +7,7 @@ import analisisRoutes from "./analisis.routes";
 import forumsRoutes from "./forums.routes";
 import Home from "../components/page/Home";
 import SecretaryPage from "../components/page/SecretaryPage";
+import PrivateRoute from "../components/PrivateRoute";
 
 const router = createBrowserRouter([
   {
@@ -19,8 +20,12 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: "/secretary",
-        element: <SecretaryPage />,
+        path: "/AgendarCita",
+        element: (
+          <PrivateRoute>
+            <SecretaryPage />
+          </PrivateRoute>
+        ),
       },
       ...analisisRoutes,
       ...forumsRoutes,
