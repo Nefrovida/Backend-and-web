@@ -8,6 +8,7 @@ import forumsRoutes from "./forums.routes";
 import Home from "../components/page/Home";
 import AddPatientToForumPage from "../components/page/add_patient_to_forum_page";
 import notesRoutes from "./notes.routes";
+import LandingPage from "../components/page/LandingPage";
 
 const router = createBrowserRouter([
   {
@@ -16,8 +17,12 @@ const router = createBrowserRouter([
     errorElement: <NotFoundPage />,
     children: [
       {
-        path: "/",
+        path: "/", // ruta raíz
         element: <Home />,
+      },
+      {
+        path: "landing", // 👈 aquí defines /landing
+        element: <LandingPage />,
       },
       ...analisisRoutes,
       ...notesRoutes,
@@ -33,8 +38,8 @@ const router = createBrowserRouter([
     element: <Register />,
   },
   {
-  path: "/forums/:forumId/add-patient",
-  element: <AddPatientToForumPage />
+    path: "/forums/:forumId/add-patient",
+    element: <AddPatientToForumPage />,
   },
 ]);
 
