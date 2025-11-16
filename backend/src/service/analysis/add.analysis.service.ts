@@ -1,5 +1,5 @@
-import * as analysisModel from '../../model/add.analysis.model';
-import { CreateAnalysisRequest, AnalysisResponse, UpdateAnalysisRequest } from '../../types/add.analysis.types';
+import * as analysisModel from '../../model/analysis/add.analysis.model';
+import { CreateAnalysisRequest, AnalysisResponse, UpdateAnalysisRequest } from '../../types/analysis/add.analysis.types';
 import { NotFoundError, ConflictError } from '../../util/errors.util';
 
 /**
