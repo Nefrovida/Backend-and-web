@@ -6,14 +6,15 @@ import authRoutes from "./auth.routes";
 import usersRoutes from "./users.routes";
 import rolesRoutes from "./roles.routes";
 import privilegesRoutes from "./privileges.routes";
+import appointmentsRoutes from "./appointments.routes";
 import notesRouter from "./notes.routes";
 import forumsRoutes from "./forums.routes";
 import addPatientToForumRoutes from "./forums/add_patient_to_forum.routes";
 import patientRoutes from "./patients.routes";
+import clinicalHistoryRoutes from "./clinicalHistory.routes";
 import reportRouter from "./report.routes";
 import historyRoutes from "./history.routes";
 import agendaRoutes from "./agenda.routes";
-import appointmentsRoutes from "./appointments.routes";
 
 import * as analysisController from "../controller/analysis/add.analysis.controller";
 import { authenticate } from "../middleware/auth.middleware";
@@ -31,6 +32,11 @@ router.use("/auth", authRoutes);
 // User Routes (Protected)
 // ============================================
 router.use("/users", usersRoutes);
+
+// ============================================
+// Clinical History Routes (Protected)
+// ============================================
+router.use("/clinical-history", clinicalHistoryRoutes);
 
 // ============================================
 // Role Routes (Protected)
@@ -83,7 +89,7 @@ router.use("/agenda", agendaRoutes);
 router.use("/appointments", appointmentsRoutes);
 
 // ============================================
-// Analysis Routes (Secretaria: crea / ve / actualiza / elimina tipo de análisis)
+// Analysis Routes (Secretary: creates / views / updates / deletes analysis types)
 // ============================================
 router.post(
   "/analysis",

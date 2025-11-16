@@ -1,10 +1,11 @@
-import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client'; 
+// backend/src/model/user.model.ts
+import { Request, Response } from "express";
+import { PrismaClient } from "@prisma/client";
+
 const prisma = new PrismaClient();
 
-
 export default class User {
-    constructor() {}
+    constructor() { }
 
     static async getAppointmentByUserId(UserId: string) {
         const appointments = await prisma.patient_appointment.findMany({
@@ -16,5 +17,16 @@ export default class User {
         });
 
         return { appointments, analysis };
+    }
+
+    static async postRiskFormByUserId(UserId: string, riskFormData: any) {
+        const newRiskForm = await prisma.patient_history.create({
+            data: {
+                patient_id: UserId,
+                ...riskFormData,
+            },
+        });
+
+        return newRiskForm;
     }
 }
