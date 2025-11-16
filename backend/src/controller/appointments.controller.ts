@@ -22,3 +22,15 @@ export const getDoctorAppointments = async (
     res.status(error.statusCode || 500).json({ error: error.message });
   }
 };
+
+export const getAllAppointments = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const appointments = await appointmentsService.getAllAppointments();
+    res.status(200).json(appointments);
+  } catch (error: any) {
+    res.status(error.statusCode || 500).json({ error: error.message });
+  }
+};

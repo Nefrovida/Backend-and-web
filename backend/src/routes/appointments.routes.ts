@@ -22,4 +22,6 @@ router.get(
   appointmentsController.getDoctorAppointments
 );
 
+router.get("/getAllAppointments", appointmentsController.getAllAppointments);
+
 export default router;
