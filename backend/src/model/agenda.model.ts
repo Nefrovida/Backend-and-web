@@ -291,5 +291,12 @@ export default class Agenda {
     };
   }
 
+  static async cancelAppointment(id: number) {
+    await prisma.patient_appointment.update({
+      where: { patient_appointment_id: id },
+      data: { appointment_status: "CANCELED" },
+    });
+  }
+
 }
 
