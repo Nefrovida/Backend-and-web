@@ -297,7 +297,17 @@ model questions_history {
   description String
   type        String
 
+  options options[]
   patient_histories patient_history[]
+}
+
+model options {
+  option_id Int @id @default(autoincrement())
+  question_id Int
+  description String
+
+  question          questions_history @relation(fields: [question_id], references: [question_id], onDelete: Cascade)
+
 }
 
 model patient_history {
