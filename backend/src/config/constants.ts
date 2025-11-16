@@ -9,11 +9,11 @@ import { Privilege } from '../types/rbac.types';
 // Role IDs should reflect the actual ordering in the database seed file.
 export const DEFAULT_ROLES = {
   ADMIN: 1,
+  DOCTOR: 2,
+  PATIENT: 3,
+  LABORATORIST: 4,
+  FAMILIAR: 5,
   SECRETARIA: 6,
-  DOCTOR: 3,
-  PATIENT: 4,
-  LABORATORIST: 5,
-  FAMILIAR: 2,
 } as const;
 
 /**
