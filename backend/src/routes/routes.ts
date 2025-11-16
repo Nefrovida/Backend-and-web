@@ -74,7 +74,7 @@ router.get(
   '/analysis',
   authenticate,
   requirePrivileges([Privilege.VIEW_ANALYSIS]),
-  analysisController.getAllAnalyses
+  analysisController.getAllAnalysis
 );
 
 router.get(

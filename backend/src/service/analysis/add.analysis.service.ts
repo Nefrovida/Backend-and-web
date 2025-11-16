@@ -49,7 +49,7 @@ export const createAnalysis = async (data: CreateAnalysisRequest) => {
 /**
  * Get all analysis with pagination and search
  */
-export const getAllAnalyses = async (
+export const getAllAnalysis = async (
   page: number = 1,
   limit: number = 10,
   search?: string

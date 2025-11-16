@@ -54,10 +54,10 @@ export const createAnalysis = async (req: Request, res: Response) => {
 /**
  * Get all analyses with pagination and search
  */
-export const getAllAnalyses = async (req: Request, res: Response) => {
+export const getAllAnalysis = async (req: Request, res: Response) => {
   try {
     const { page, limit, search } = getAnalysesQuerySchema.parse(req.query);
-    const result = await analysisService.getAllAnalyses(page, limit, search);
+  const result = await analysisService.getAllAnalysis(page, limit, search);
 
     res.status(200).json({
       success: true,
