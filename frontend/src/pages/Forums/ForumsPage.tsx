@@ -3,6 +3,10 @@ import { Forum, CreateForumData } from '../../types/forum.types';
 import { ForumItem } from '../../components/forums/ForumItem';
 import { CreateForumModal } from '../../components/forums/CreateForumModal';
 import { UpdateForumModal } from '../../components/forums/UpdateForumModal';
+import { ForumConfigModal } from '../../components/forums/ForumConfigModal';
+import { AdministratorsModal } from '../../components/forums/AdministratorsModal';
+import { MembersModal } from '../../components/forums/MembersModal';
+import { DeleteForumModal } from '../../components/forums/DeleteForumModal';
 
 /**
  * ForumsPage Component
@@ -13,10 +17,15 @@ import { UpdateForumModal } from '../../components/forums/UpdateForumModal';
  * - Displays list of forums
  * - Search and filter functionality
  * - Create new forum button
- * - Modal for creating forums with visibility selection
+ * - Comprehensive forum management through configuration modal:
+ *   - Visibility settings (public/private)
+ *   - Administrator management
+ *   - Member management (placeholder)
+ *   - Forum deletion with confirmation
+ * - Modal system for all forum operations
  * - Integrates with backend API at /api/forums
  * 
- * Based on Figma design with existing project patterns.
+ * Based on mobile interface design adapted for web with consistent styling.
  */
 export const ForumsPage = () => {
   const [forums, setForums] = useState<Forum[]>([]);
@@ -27,6 +36,10 @@ export const ForumsPage = () => {
   const [modalError, setModalError] = useState<string>('');
   const [selectedForum, setSelectedForum] = useState<Forum | null>(null);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
+  const [isAdministratorsModalOpen, setIsAdministratorsModalOpen] = useState(false);
+  const [isMembersModalOpen, setIsMembersModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   // Fetch forums on component mount
   useEffect(() => {
@@ -138,7 +151,72 @@ export const ForumsPage = () => {
 
   const handleSettingsClick = (forum: Forum) => {
     setSelectedForum(forum);
+    setIsConfigModalOpen(true);
+  };
+
+  const handleVisibilityClick = (forum: Forum) => {
+    setSelectedForum(forum);
     setIsUpdateModalOpen(true);
+  };
+
+  const handleMembersClick = (forum: Forum) => {
+    setSelectedForum(forum);
+    setIsMembersModalOpen(true);
+  };
+
+  const handleAdministratorsClick = (forum: Forum) => {
+    setSelectedForum(forum);
+    setIsAdministratorsModalOpen(true);
+  };
+
+  const handleDeleteForumClick = (forum: Forum) => {
+    setSelectedForum(forum);
+    setIsDeleteModalOpen(true);
+  };
+
+  // Functions to go back to config modal
+  const handleBackToConfig = () => {
+    setIsUpdateModalOpen(false);
+    setIsAdministratorsModalOpen(false);
+    setIsMembersModalOpen(false);
+    setIsDeleteModalOpen(false);
+    setIsConfigModalOpen(true);
+  };
+
+  const handleDeleteForum = async (forumId: number) => {
+    try {
+      setModalError(''); // Clear previous modal errors
+      
+      const response = await fetch(`/api/forums/${forumId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        
+        // Handle validation errors from Zod
+        if (errorData.errors && Array.isArray(errorData.errors)) {
+          const firstError = errorData.errors[0];
+          setModalError(firstError.message);
+          return; // Don't close modal, show error
+        }
+        
+        // Handle other errors
+        setModalError(errorData.error || 'Error al eliminar el foro');
+        return; // Don't close modal, show error
+      }
+
+      // Remove forum from list
+      setForums(forums.filter(forum => forum.forum_id !== forumId));
+      setIsDeleteModalOpen(false);
+      setSelectedForum(null);
+      setModalError(''); // Clear error on success
+      alert('Foro eliminado exitosamente');
+    } catch (err: any) {
+      setModalError(err.message || 'Error al eliminar el foro');
+      console.error('Error deleting forum:', err);
+    }
   };
 
   // Filter forums based on search term
@@ -252,7 +330,63 @@ export const ForumsPage = () => {
           setSelectedForum(null);
           setModalError(''); // Clear error when closing
         }}
+        onBack={handleBackToConfig}
         onConfirm={handleUpdateForum}
+        forum={selectedForum}
+        externalError={modalError}
+      />
+
+      {/* Forum Configuration Modal */}
+      <ForumConfigModal
+        isOpen={isConfigModalOpen}
+        onClose={() => {
+          setIsConfigModalOpen(false);
+          setSelectedForum(null);
+          setModalError(''); // Clear error when closing
+        }}
+        forum={selectedForum}
+        onVisibilityClick={handleVisibilityClick}
+        onMembersClick={handleMembersClick}
+        onAdministratorsClick={handleAdministratorsClick}
+        onDeleteClick={handleDeleteForumClick}
+      />
+
+      {/* Administrators Modal */}
+      <AdministratorsModal
+        isOpen={isAdministratorsModalOpen}
+        onClose={() => {
+          setIsAdministratorsModalOpen(false);
+          setSelectedForum(null);
+          setModalError(''); // Clear error when closing
+        }}
+        onBack={handleBackToConfig}
+        forum={selectedForum}
+        externalError={modalError}
+      />
+
+      {/* Members Modal */}
+      <MembersModal
+        isOpen={isMembersModalOpen}
+        onClose={() => {
+          setIsMembersModalOpen(false);
+          setSelectedForum(null);
+          setModalError(''); // Clear error when closing
+        }}
+        onBack={handleBackToConfig}
+        forum={selectedForum}
+        externalError={modalError}
+      />
+
+      {/* Delete Forum Modal */}
+      <DeleteForumModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setSelectedForum(null);
+          setModalError(''); // Clear error when closing
+        }}
+        onBack={handleBackToConfig}
+        onConfirm={handleDeleteForum}
         forum={selectedForum}
         externalError={modalError}
       />

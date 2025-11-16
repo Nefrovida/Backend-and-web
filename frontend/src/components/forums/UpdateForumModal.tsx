@@ -4,6 +4,7 @@ import { Forum } from '../../types/forum.types';
 interface UpdateForumModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onBack?: () => void; // Optional back button to return to config modal
   onConfirm: (forumId: number, publicStatus: boolean) => void;
   forum: Forum | null;
   externalError?: string; // Error from parent component
@@ -18,6 +19,7 @@ interface UpdateForumModalProps {
 export const UpdateForumModal: React.FC<UpdateForumModalProps> = ({
   isOpen,
   onClose,
+  onBack,
   onConfirm,
   forum,
   externalError,
@@ -58,14 +60,39 @@ export const UpdateForumModal: React.FC<UpdateForumModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]">
       <div
-        className="bg-[#CFE6ED] rounded-3xl shadow-2xl p-8 w-full max-w-md mx-4"
+        className="bg-[#CFE6ED] rounded-3xl shadow-2xl p-6 w-full max-w-md mx-4"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-xl font-semibold text-gray-800 mb-6 text-center">
-          Actualizar Visibilidad del Foro
-        </h2>
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          {onBack && (
+            <button
+              onClick={onBack}
+              className="p-1 hover:bg-gray-200 rounded-full transition-colors"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 text-gray-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+            </button>
+          )}
+          <h2 className="text-lg font-semibold text-gray-800">
+            Actualizar Visibilidad
+          </h2>
+          <div className="w-8"> {/* Spacer for centering */}</div>
+        </div>
 
         <p className="text-gray-600 mb-4 text-center">
           <strong>{forum.name}</strong>
