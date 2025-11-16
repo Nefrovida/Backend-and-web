@@ -14,4 +14,13 @@ router.get(
     getResult
 );
 
+router.get("/risk-questions",
+    authenticate,
+    reportController.getRiskQuestions
+);
+
+router.get("/risk-options",
+    //authenticate,
+    reportController.getRiskOptions
+)
 export default router;

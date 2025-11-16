@@ -21,4 +21,11 @@ export default class Report {
       });
   }
 
+  static async getRiskQuestions() {
+    return prisma.questions_history.findMany();
+  }
+
+  static async getRiskOptions() {
+    return prisma.options.findMany();
+  }
 }

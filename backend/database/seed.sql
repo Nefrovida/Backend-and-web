@@ -233,6 +233,7 @@ INSERT INTO questions_history (description, type) VALUES
 ('Edad', 'number'),
 ('Fecha de nacimiento', 'date'),
 ('Estado de nacimiento', 'text'),
+('Fecha del cuestionario', 'date'),
 
 -- PREGUNTAS CLÍNICAS DEL CUESTIONARIO
 ('¿Sus padres o hermanos padecen enfermedades crónicas?', 'choice'),
