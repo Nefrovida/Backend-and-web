@@ -9,10 +9,10 @@ TRUNCATE TABLE role_privilege, patient_history, results, patient_analysis, patie
 
 INSERT INTO roles (role_name) VALUES
 ('Admin'),
-('Familiar'),
 ('Doctor'),
 ('Paciente'),
 ('Laboratorista'),
+('Familiar'),
 ('Secretaria');
 
 -- ========================
@@ -68,9 +68,9 @@ WHERE NOT EXISTS (
   WHERE role_id = 1 AND role_privilege.privilege_id = privileges.privilege_id
 );
 
--- Laboratorista (role_id = 5)
+-- Laboratorista (role_id = 4)
 INSERT INTO role_privilege (role_id, privilege_id)
-SELECT 5, privilege_id
+SELECT 4, privilege_id
 FROM privileges
 WHERE description IN ('VIEW_ANALYSIS', 'CREATE_ANALYSIS');
 
@@ -193,10 +193,10 @@ LIMIT 3;
 -- ========================
 -- 🔬 ANÁLISIS
 -- ========================
-INSERT INTO analysis (name, description, previous_requirements, general_cost, community_cost, image_url)
+INSERT INTO analysis (name, description, previous_requirements, general_cost, community_cost)
 VALUES
-('Biometría Hemática', 'Análisis general de sangre', 'Ayuno de 8 horas', '250', '150', '/images/default.png'),
-('Examen de orina', 'Análisis de orina general', 'Recolectar muestra matutina', '200', '120', '/images/default.png');
+('Biometría Hemática', 'Análisis general de sangre', 'Ayuno de 8 horas', '250', '150'),
+('Examen de orina', 'Análisis de orina general', 'Recolectar muestra matutina', '200', '120');
 
 -- ========================
 -- 📊 PACIENTE - ANÁLISIS
