@@ -30,6 +30,11 @@ router.use("/auth", authRoutes)
 router.use("/users", usersRoutes);
 
 // ============================================
+// User Routes (Protected)
+// ============================================
+router.use("/clinical-history", usersRoutes);
+
+// ============================================
 // Role Routes (Protected)
 // ============================================
 router.use("/roles", rolesRoutes)
@@ -74,7 +79,7 @@ router.get(
   '/analysis',
   authenticate,
   requirePrivileges([Privilege.VIEW_ANALYSIS]),
-  analysisController.getAllAnalyses
+  analysisController.getAllAnalysis
 );
 
 router.get(
