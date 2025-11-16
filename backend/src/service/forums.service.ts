@@ -75,6 +75,21 @@ export const getAllForums = async (
 };
 
 /**
+ * Get forum by id
+ */
+export const getForumById = async (forumId: number): Promise<ForumEntity | null> => {
+  return await forumModel.findByIdWithCreator(forumId);
+};
+
+export const getForumsForUser = async (userId: string) => {
+  return await forumModel.getUserForums(userId);
+};
+
+export const isUserMemberOfForum = async (forumId: number, userId: string) => {
+  return await forumModel.isUserMember(forumId, userId);
+};
+
+/**
  * Update a forum
  * 
  

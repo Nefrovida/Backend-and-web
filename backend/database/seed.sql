@@ -76,6 +76,12 @@ SELECT 4, privilege_id
 FROM privileges
 WHERE description IN ('VIEW_ANALYSIS', 'CREATE_ANALYSIS');
 
+-- Paciente
+INSERT INTO role_privilege (role_id, privilege_id)
+SELECT 3, privilege_id
+FROM privileges
+WHERE description IN ('VIEW_FORUMS');
+
 -- Doctor
 INSERT INTO role_privilege (role_id, privilege_id)
 VALUES (2, 27);

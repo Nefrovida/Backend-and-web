@@ -18,4 +18,11 @@ router.post(
   addPatientToForumController.addPatientToForum
 );
 
+// Allow authenticated patients to join public forums
+router.post(
+  '/:forumId/join',
+  authenticate,
+  addPatientToForumController.joinForum
+);
+
 export default router;
