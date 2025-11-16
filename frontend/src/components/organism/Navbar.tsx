@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import NavIcon from "../atoms/NavIcon";
 
 import { BsPerson, BsFillPersonFill, BsGear, BsGearFill } from "react-icons/bs";
+import { LuNotebook, LuNotebookPen } from "react-icons/lu";
+import Notas from "../page/Notas";
 
 interface Props {
   children: React.ReactNode;
@@ -9,6 +11,7 @@ interface Props {
 
 function Navbar({ children }: Props) {
   const [selected, setSelected] = useState<Record<string, boolean>>({});
+  const [showNotes, setShowNotes] = useState(false);
 
   function handleHover(key: string) {
     setSelected((prev) => ({
@@ -28,6 +31,11 @@ function Navbar({ children }: Props) {
           selected={selected}
           onHover={handleHover}
         />
+        {showNotes ? (
+          <LuNotebookPen onClick={() => setShowNotes((prev) => !prev)} />
+        ) : (
+          <LuNotebook onClick={() => setShowNotes((prev) => !prev)} />
+        )}
         <NavIcon
           from={<BsGear />}
           to={<BsGearFill />}
@@ -37,6 +45,7 @@ function Navbar({ children }: Props) {
           onHover={handleHover}
         />
       </nav>
+      <Notas className={showNotes ? "" : "hidden"} />
       {children}
     </div>
   );
