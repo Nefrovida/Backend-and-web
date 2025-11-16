@@ -40,6 +40,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Database-Seed
 
+## [0.1.0] - 2025-11-08
+
+### Added
+
+- result by id endpoint
+
 
 ### Fixed
 
@@ -119,6 +125,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 3. **Update links**: Ensure version comparison links are updated at the bottom
 4. **Keep Unreleased section**: Always maintain an empty Unreleased section for ongoing work
 
+
+## [1.2.1]
+
+### Added
+- Added cookie-parser middleware to handle cookies
+- Added logout method to auth service
+
+
+### Changed
+- Modified auth controllers to set JWT tokens in httpOnly cookies instead of returning them in the response body:
+    accessToken: 15 minutes expiry, httpOnly, sameSite strict
+    refreshToken: 7 days expiry, httpOnly, sameSite strict
+- Secure flag enabled in production
+- Updated logout to properly clear cookies
+- Updated auth service to include credentials: "include" in all fetch requests
+- Removed localStorage storage of JWT tokens from Login and Register components
+- Only user data is now stored in localStorage (not sensitive tokens)
+
+Benefits
+XSS Protection: Tokens are now in httpOnly cookies, inaccessible to JavaScript
+CSRF Protection: sameSite: 'strict' prevents cross-site request forgery
+Secure transmission: Tokens sent over HTTPS in production
+Proper expiration: Cookies auto-expire (15 min for access, 7 days for refresh)
+
+The tokens are now securely stored and automatically included in requests without exposing them to XSS attacks.
 ---
 
 [unreleased]: https://github.com/yourusername/502-example/compare/v0.1.0...HEAD
