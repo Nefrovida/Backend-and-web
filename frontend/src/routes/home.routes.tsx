@@ -7,6 +7,8 @@ import analisisRoutes from "./analisis.routes";
 import forumsRoutes from "./forums.routes";
 import Home from "../components/page/Home";
 import forumRoutes from "./forum.routes";
+import AddPatientToForumPage from "../components/page/add_patient_to_forum_page";
+import notesRoutes from "./notes.routes";
 
 const router = createBrowserRouter([
   {
@@ -21,6 +23,8 @@ const router = createBrowserRouter([
       ...analisisRoutes,
       ...forumsRoutes, // administrador
       ...forumRoutes, // chat
+      ...notesRoutes,
+      ...forumsRoutes,
     ],
   },
   {
@@ -30,6 +34,10 @@ const router = createBrowserRouter([
   {
     path: "/register",
     element: <Register />,
+  },
+  {
+    path: "/forums/:forumId/add-patient",
+    element: <AddPatientToForumPage />,
   },
 ]);
 
