@@ -19,8 +19,8 @@ router.get("/analysis", getAnalysis)
 
 // Date format: dd-mm-yyyy
 router.get("/analysis/by-date/:date", 
-  //authenticate,
-  //requirePrivileges([Privilege.VIEW_ANALYSIS]),
+  authenticate,
+  requirePrivileges([Privilege.VIEW_ANALYSIS]),
   getAnalysisByDay);
 
 // Listar pending lab appointments
