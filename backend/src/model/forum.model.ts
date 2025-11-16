@@ -17,6 +17,22 @@ export default class Forum {
       },
     });
   }
+
+  static async getMyForums(userId: string) {
+    return await prisma.users_forums.findMany({
+      where: {
+        user_id: userId,
+      },
+      select: {
+        forum: {
+          select: {
+            forum_id: true,
+            name: true,
+          },
+        },
+      },
+    });
+  }
 }
 
 /**

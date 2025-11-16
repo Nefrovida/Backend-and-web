@@ -4,6 +4,7 @@ import { authenticate } from "../middleware/auth.middleware";
 import { requirePrivileges } from "../middleware/rbac.middleware";
 import { Privilege } from "../types/rbac.types";
 import postNewMessage from "src/controller/forum/postNewMessage.controller";
+import getMyForums from "src/controller/forum/getMyForums.controller";
 
 const router = express.Router();
 
@@ -48,6 +49,8 @@ router.get(
   requirePrivileges([Privilege.VIEW_FORUMS]),
   forumsController.getAll
 );
+
+router.get("/myForums", authenticate, getMyForums);
 
 /**
  * Create a new forum

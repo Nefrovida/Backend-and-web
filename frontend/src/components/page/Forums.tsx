@@ -12,7 +12,6 @@ const Forums = () => {
   }>();
 
   useEffect(() => {
-    console.log(success);
     setInterval(() => {
       setSuccess(null);
     }, 7000);

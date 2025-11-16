@@ -16,12 +16,12 @@ export default function useSendMessage(
   const [forumId, setForumId] = useState<number>();
 
   useEffect(() => {
-    fetch("/api/forums")
+    fetch("/api/forums/myForums")
       .then((res) => res.json())
       .then((data) => {
         const dataInfo = data.map((d) => {
-          const { forum_id, name } = d;
-          return { forumId: forum_id, name: name.split(" -")[0] };
+          const { forumId, name } = d;
+          return { forumId, name: name.split(" -")[0] };
         });
         setForums(dataInfo);
       })
@@ -47,7 +47,6 @@ export default function useSendMessage(
     })
       .then(async (res) => {
         if (res.ok) {
-          console.log("Mensaje enviado");
           setSuccess({ status: true, message: "Mensaje enviado" });
           return;
         } else {
