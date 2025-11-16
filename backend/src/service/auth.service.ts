@@ -1,6 +1,6 @@
 import { prisma } from '../util/prisma.js';
 import { hashPassword, comparePassword } from '../util/password.util';
-import { generateAccessToken, generateRefreshToken } from '../util/jwt.util';
+import { generateAccessToken, generateRefreshToken, verifyToken } from '../util/jwt.util';
 import { LoginRequest, RegisterRequest, AuthResponse, JwtPayload } from '../types/auth.types';
 import { UnauthorizedError, ConflictError } from '../util/errors.util';
 import { DEFAULT_ROLES } from '../config/constants';
@@ -210,10 +210,18 @@ export const register = async (registerData: RegisterRequest): Promise<AuthRespo
 /**
  * Refresh access token
  */
-export const refreshAccessToken = async (userId: string): Promise<string> => {
+export const refreshAccessToken = async (refreshToken: string): Promise<{ accessToken: string; user: { user_id: string; name: string; username: string; role_id: string } }> => {
+  // Verify the refresh token
+  let decoded: JwtPayload;
+  try {
+    decoded = verifyToken(refreshToken);
+  } catch (error) {
+    throw new UnauthorizedError('Invalid or expired refresh token');
+  }
+
   // Fetch user with updated role and privileges
   const user = await prisma.users.findUnique({
-    where: { user_id: userId, active: true },
+    where: { user_id: decoded.userId, active: true },
     include: {
       role: {
         include: {
@@ -243,5 +251,13 @@ export const refreshAccessToken = async (userId: string): Promise<string> => {
     privileges,
   };
 
-  return generateAccessToken(payload);
+  return {
+    accessToken: generateAccessToken(payload),
+    user: {
+      user_id: user.user_id,
+      name: user.name,
+      username: user.username,
+      role_id: user.role_id,
+    },
+  };
 };
