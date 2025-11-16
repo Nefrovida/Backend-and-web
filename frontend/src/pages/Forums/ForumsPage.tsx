@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Forum, CreateForumData } from '../../types/forum.types';
 import { ForumItem } from '../../components/forums/ForumItem';
 import { CreateForumModal } from '../../components/forums/CreateForumModal';
+import { UpdateForumModal } from '../../components/forums/UpdateForumModal';
 
 /**
  * ForumsPage Component
@@ -24,6 +25,8 @@ export const ForumsPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [modalError, setModalError] = useState<string>('');
+  const [selectedForum, setSelectedForum] = useState<Forum | null>(null);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
 
   // Fetch forums on component mount
   useEffect(() => {
@@ -91,9 +94,51 @@ export const ForumsPage = () => {
     }
   };
 
+  const handleUpdateForum = async (forumId: number, publicStatus: boolean) => {
+    try {
+      setModalError(''); // Clear previous modal errors
+      
+      const response = await fetch(`/api/forums/${forumId}`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ public_status: publicStatus }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        
+        // Handle validation errors from Zod
+        if (errorData.errors && Array.isArray(errorData.errors)) {
+          const firstError = errorData.errors[0];
+          setModalError(firstError.message);
+          return; // Don't close modal, show error
+        }
+        
+        // Handle other errors
+        setModalError(errorData.error || 'Error al actualizar el foro');
+        return; // Don't close modal, show error
+      }
+
+      const updatedForum = await response.json();
+      setForums(forums.map(forum => 
+        forum.forum_id === forumId ? updatedForum : forum
+      ));
+      setIsUpdateModalOpen(false);
+      setSelectedForum(null);
+      setModalError(''); // Clear error on success
+      alert('Visibilidad del foro actualizada exitosamente');
+    } catch (err: any) {
+      setModalError(err.message || 'Error al actualizar el foro');
+      console.error('Error updating forum:', err);
+    }
+  };
+
   const handleSettingsClick = (forum: Forum) => {
-    console.log('Settings clicked for forum:', forum);
-    // TODO: Implement settings functionality
+    setSelectedForum(forum);
+    setIsUpdateModalOpen(true);
   };
 
   // Filter forums based on search term
@@ -196,6 +241,19 @@ export const ForumsPage = () => {
           setModalError(''); // Clear error when closing
         }}
         onConfirm={handleCreateForum}
+        externalError={modalError}
+      />
+
+      {/* Update Forum Modal */}
+      <UpdateForumModal
+        isOpen={isUpdateModalOpen}
+        onClose={() => {
+          setIsUpdateModalOpen(false);
+          setSelectedForum(null);
+          setModalError(''); // Clear error when closing
+        }}
+        onConfirm={handleUpdateForum}
+        forum={selectedForum}
         externalError={modalError}
       />
     </div>
