@@ -22,16 +22,24 @@ async function createAppointment(req: Request, res: Response) {
                 error: "No patient was found for this user",
             });
         }
+        const parsedDate = new Date(date_hour);
+
+        if (isNaN(parsedDate.getTime())) {
+            return res.status(400).json({
+                error: "Invalid date format",
+                received: date_hour
+            });
+        }
 
         const newAppointment = await prisma.patient_appointment.create({
             data: {
                 patient_id: patient.patient_id,
                 appointment_id,
-                date_hour: new Date(date_hour),
+                date_hour: parsedDate,
                 duration: 30,
                 link: null,
                 place: null,
-                appointment_status: "REQUESTED",
+                appointment_status: "PROGRAMMED",
                 appointment_type: "PRESENCIAL",
             },
         });
