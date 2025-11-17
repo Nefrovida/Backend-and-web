@@ -35,6 +35,7 @@ export default class Forum {
   }
 }
 
+
 /**
  * Find forum by name (case-insensitive)
  */
