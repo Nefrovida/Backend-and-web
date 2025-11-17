@@ -173,8 +173,8 @@ SELECT
   a.appointment_id,
   NOW() + (random() * (interval '30 days')),
   45,
-  'PRESENCIAL',
-  'PROGRAMMED'
+  'PRESENCIAL'::"Type",
+  'PROGRAMMED'::"Status"
 FROM (
   SELECT patient_id, ROW_NUMBER() OVER () AS rn FROM patients
 ) p
@@ -195,10 +195,10 @@ SELECT
     ELSE 60
   END,
   CASE 
-    WHEN (ROW_NUMBER() OVER ()) % 2 = 0 THEN 'PRESENCIAL'
-    ELSE 'VIRTUAL'
+    WHEN (ROW_NUMBER() OVER ()) % 2 = 0 THEN 'PRESENCIAL'::"Type"
+    ELSE 'VIRTUAL'::"Type"
   END,
-  'REQUESTED'
+  'REQUESTED'::"Status"
 FROM (
   SELECT patient_id FROM patients ORDER BY patient_id
 ) p

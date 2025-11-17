@@ -19,6 +19,8 @@ import historialRoutes from "./historial.routes"
 import historyRoutes from "./history.routes";
 import agendaRoutes from "./agenda.routes";
 
+import expedienteRoutes from "./expediente.routes";
+
 import { authenticate } from "../middleware/auth.middleware";
 import { requirePrivileges } from "../middleware/rbac.middleware";
 import { Privilege } from "../types/rbac.types";
@@ -74,6 +76,10 @@ router.use("/notes", notesRouter);
 // Patients Routes (Protected)
 // ============================================
 router.use("/patients", patientRoutes);
+
+// Expediente Routes (Protected)
+// ============================================
+router.use("/patients", expedienteRoutes);
 
 // ============================================
 // Patient History Questions Templates

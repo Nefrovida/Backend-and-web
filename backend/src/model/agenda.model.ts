@@ -171,7 +171,7 @@ export default class Agenda {
         },
       },
     },
-  });
+  );
 
     if (!appointment) return null;
 
