@@ -28,6 +28,7 @@ const router = createBrowserRouter([
       ...forumRoutes, // chat
       ...notesRoutes,
       ...appointmentsRoutes,
+      ...agendaRoutes,
       ...secretariaRoutes,
       ...agendaRoutes,
     ],
