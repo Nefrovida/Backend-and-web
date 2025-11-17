@@ -3,7 +3,7 @@ import {
   createAnalysisSchema, 
   updateAnalysisSchema,
   getAnalysesQuerySchema 
-} from '../../validators/add.analysis.validator';
+} from '../../validators/analysis/add.analysis.validator';
 import * as analysisService from '../../service/analysis/add.analysis.service';
 import { NotFoundError, ConflictError } from '../../util/errors.util';
 import { ZodError } from 'zod';
@@ -118,6 +118,14 @@ export const getAnalysisById = async (req: Request, res: Response) => {
         success: false,
         error: {
           code: 'ANALYSIS_NOT_FOUND',
+          message: error.message,
+        },
+      });
+    } else if (error instanceof ConflictError) {
+      res.status(409).json({
+        success: false,
+        error: {
+          code: 'ANALYSIS_IN_USE',
           message: error.message,
         },
       });

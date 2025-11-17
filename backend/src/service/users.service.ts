@@ -1,7 +1,6 @@
 import { prisma } from '../util/prisma.js';
 import { UserWithRoleAndPrivileges, UpdateUserRequest } from '../types/user.types';
 import { NotFoundError } from '../util/errors.util';
-import userModel from '../model/user.model';
 
 /**
  * Get all users with their roles and privileges
@@ -122,11 +121,3 @@ export const getUserByUsername = async (username: string): Promise<UserWithRoleA
   });
 };
 
-/**
- * 
- * @param userId 
- * @returns List appointment
- */
-export const getAllAppointmentsByUserId = async (userId: string) => {
-  return await userModel.getAppointmentByUserId(userId);
-};
