@@ -17,7 +17,7 @@ function ListResult() {
   const [name, setName] = useState<string | null>(null);
   const { date, analysisType, status, labFilterUpdate } = useLabFilters();
 
-  const { results, scrollRef, error, handleSearch, handleFilter } =
+  const { results, loading, scrollRef, error, handleSearch, handleFilter } =
     useLabResults<patientLabResults>(
       "/api/laboratory/results",
       [name, date, analysisType, status],
@@ -48,9 +48,13 @@ function ListResult() {
         />
         <Search onChange={handleSearch} />
       </div>
-      {error ? (
-        <div>{error.toString()}</div>
-      ) : (
+      {loading && <div>Cargando análisis...</div>}
+      {results.length == 0 && results.length == 0 && (
+        <div className="text-center text-lg">
+          No se encuentra ningún análisis de este tipo
+        </div>
+      )}
+      {results.length > 0 && !error && (
         <Suspense fallback={<Loading />}>
           <LabResultsList scrollRef={scrollRef} labResults={results} />
         </Suspense>
