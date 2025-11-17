@@ -200,7 +200,7 @@ function Register() {
       <p className="text-center text-gray-600 mb-6">¿Qué tipo de usuario eres?</p>
 
       <div className="space-y-3">
-        {[ROLE_IDS.PATIENT, ROLE_IDS.DOCTOR, ROLE_IDS.LABORATORIST, ROLE_IDS.FAMILIAR].map((roleId) => (
+    {[ROLE_IDS.PATIENT, ROLE_IDS.DOCTOR, ROLE_IDS.LABORATORIST, ROLE_IDS.FAMILIAR, ROLE_IDS.SECRETARIA].map((roleId) => (
           <button
             key={roleId}
             onClick={() => handleStep2Submit(roleId)}
@@ -212,6 +212,7 @@ function Register() {
               {roleId === ROLE_IDS.DOCTOR && "Soy un profesional de la salud"}
               {roleId === ROLE_IDS.LABORATORIST && "Trabajo en laboratorio"}
               {roleId === ROLE_IDS.FAMILIAR && "Soy familiar de un paciente"}
+              {roleId === ROLE_IDS.SECRETARIA && "Soy secretaria"}
             </p>
           </button>
         ))}

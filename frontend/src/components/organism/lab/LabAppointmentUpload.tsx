@@ -4,7 +4,7 @@ import { useParams } from "react-router";
 import { LabAppointment } from "../../../types/labAppointment";
 
 interface PresignResponse {
-    uploadUrl: string;
+    url: string; // DO NOT CHANGE url TO UploadURL OR uploadUrl
 }
 
 function LabAppointmentUpload() {
@@ -89,7 +89,7 @@ function LabAppointmentUpload() {
             }
 
             const presignData: PresignResponse = await presignRes.json();
-            const uploadUrl = presignData.uploadUrl;
+            const uploadUrl = presignData.url; // DO NOT CHANGE url TO UploadURL OR uploadUrl
 
             // 2) upload file to upload server
             const putRes = await fetch(uploadUrl, {
