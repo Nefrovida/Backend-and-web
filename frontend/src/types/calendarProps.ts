@@ -4,4 +4,5 @@ export type CalendarProps = {
     minTime?: string;
     maxTime?: string;
     onDatesSet?: (arg: any) => void;
+    onEventClick?: (eventInfo: any) => void;
 }
