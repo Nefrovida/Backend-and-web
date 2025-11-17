@@ -1,7 +1,10 @@
 import { CreateForumInputValidated, UpdateForumInputValidated } from '../validators/forum.validator';
 import { ForumEntity } from '../types/forum.types';
-import { ConflictError, NotFoundError } from '../util/errors.util';
+import { existsAndActive, isUserMember } from '../model/forum.model'
 import * as forumModel from '../model/forum.model';
+import { createReply } from '../model/messages.model';
+import { prisma } from '../util/prisma';
+import { ConflictError, NotFoundError, BadRequestError } from '../util/errors.util';
 
 /**
  * Create a new forum
@@ -68,7 +71,7 @@ export const getAllForums = async (
   const forums = await forumModel.findAll(skip, limit, {
     search: filters?.search,
     isPublic: filters?.isPublic,
-    active: true, // Only return active forums
+    active: true,
   });
 
   return forums;
@@ -100,4 +103,45 @@ export const updateForum = async (
   // Update the forum
   const updatedForum = await forumModel.update(forumId, data);
   return updatedForum;
+};
+
+
+/**
+ * Service: respond text in a forum
+ */
+export const replyToMessageService = async (
+  forumId: number,
+  userId: string,
+  parentMessageId: number,
+  content: string
+) => {
+  // 1. Validte that the forum exists and is active
+  const forumExists = await existsAndActive(forumId);
+  if (!forumExists) {
+    throw new NotFoundError('El foro no existe o está inactivo');
+  }
+
+  // 2. Validate that the user is a member
+  const isMember = await isUserMember(forumId, userId);
+  if (!isMember) {
+    throw new BadRequestError('El usuario no es miembro del foro');
+  }
+
+  // 3. Validate that the message exists and is part of the forum
+  const parentMessage = await prisma.messages.findUnique({
+    where: { message_id: parentMessageId },
+  });
+  if (!parentMessage || parentMessage.forum_id !== forumId) {
+    throw new NotFoundError('El mensaje padre no existe en este foro');
+  }
+
+  // 4. Validate content
+  if (!content || content.trim().length === 0) {
+    throw new BadRequestError('El contenido de la respuesta no puede estar vacío');
+  }
+
+  // 5. Create response
+  const reply = await createReply(forumId, userId, parentMessageId, content);
+
+  return reply;
 };

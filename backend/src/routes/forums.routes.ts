@@ -96,4 +96,37 @@ router.put(
   forumsController.update
 );
 
+/**
+ * Reply to a message in a forum
+ * 
+ * POST /api/forums/:forumId/replies
+ * 
+ * User Story: "Todos responden mensaje en el foro"
+ * 
+ * Middlewares:
+ * 1. authenticate - Verifies JWT and injects req.user
+ * 2. forumsController.replyToMessage - Handles the request
+ * 
+ * Request Body:
+ * {
+ *   "parentMessageId": 123,
+ *   "content": "Este es mi comentario en hilo"
+ * }
+ * 
+ * Response: 201 Created
+ * {
+ *   "message_id": 456,
+ *   "forum_id": 1,
+ *   "user_id": "user-uuid",
+ *   "content": "Este es mi comentario en hilo",
+ *   "parent_message_id": 123,
+ *   "publication_timestamp": "2025-11-16T..."
+ * }
+ */
+router.post(
+  "/:forumId/replies",
+  authenticate,
+  forumsController.replyToMessage
+);
+
 export default router;
