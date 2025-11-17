@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import NavIcon from "../atoms/NavIcon";
 
 import { BsPerson, BsFillPersonFill, BsGear, BsGearFill } from "react-icons/bs";
+import { MdForum, MdOutlineForum } from "react-icons/md";
 import { LuNotebook, LuNotebookPen } from "react-icons/lu";
 import { FaUserMd, FaListUl } from "react-icons/fa";
 import Notas from "../page/Notas";
@@ -62,6 +63,14 @@ function Navbar({ children }: Props) {
           </>
         )}
 
+        <NavIcon
+          from={<MdOutlineForum />}
+          to={<MdForum />}
+          link={"/foro"}
+          option={"foro"}
+          selected={selected}
+          onHover={handleHover}
+        />
         <NavIcon
           from={<BsGear />}
           to={<BsGearFill />}
