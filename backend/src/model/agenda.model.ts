@@ -65,7 +65,7 @@ export default class Agenda {
   }
 
   /**
-     * Mobile – Daily appointments, including doctor name.
+   * Mobile – Daily appointments, including doctor name.
    */
   static async getAppointmentsPerDay(targetDate: string) {
     const [year, month, day] = targetDate.split("-").map(Number);
@@ -139,7 +139,7 @@ export default class Agenda {
   }
 
   /**
-     * Mobile – Cancel appointment by patient_appointment_id
+   * Mobile – Cancel appointment by patient_appointment_id
    */
   static async cancelAppointment(id: number) {
     await prisma.patient_appointment.update({
@@ -206,7 +206,6 @@ export default class Agenda {
       ...rest,
       appointment_id: nestedAppointment?.appointment_id ?? null,
       name: fullName || null,
-      // Web/mobile extras
       doctor_name: fullName || null,
       appointment_name,
     };
@@ -266,10 +265,204 @@ export default class Agenda {
 
       return {
         ...rest,
-          // patient name for web view
+        // patient name for web view
         name: fullName || null,
         appointment_name: appointment?.name?.trim() ?? null,
       };
     });
+  }
+
+  /**
+   * Secretaria – appointment request list (status REQUESTED).
+   */
+  static async getPendingAppointmentRequests() {
+    const requests = (await prisma.patient_appointment.findMany({
+      where: {
+        appointment_status: "REQUESTED" as any,
+      },
+      include: {
+        patient: {
+          include: {
+            user: {
+              select: {
+                user_id: true,
+                name: true,
+                parent_last_name: true,
+                maternal_last_name: true,
+                phone_number: true,
+                birthday: true,
+                gender: true,
+              },
+            },
+          },
+        },
+        appointment: {
+          include: {
+            doctor: {
+              include: {
+                user: {
+                  select: {
+                    name: true,
+                    parent_last_name: true,
+                    maternal_last_name: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        date_hour: "asc",
+      },
+    })) as any[];
+
+    return requests.map((req) => ({
+      patient_appointment_id: req.patient_appointment_id,
+      patient_id: req.patient_id,
+      patient_name: `${req.patient.user.name} ${req.patient.user.parent_last_name} ${req.patient.user.maternal_last_name}`,
+      patient_phone: req.patient.user.phone_number,
+      appointment_name: req.appointment.name,
+      appointment_type: req.appointment_type,
+      requested_date: req.date_hour,
+      duration: req.duration,
+      current_doctor: req.appointment.doctor
+        ? `${req.appointment.doctor.user.name} ${req.appointment.doctor.user.parent_last_name}`
+        : null,
+    }));
+  }
+
+  static async getDoctors() {
+    const doctors = await prisma.doctors.findMany({
+      include: {
+        user: {
+          select: {
+            name: true,
+            parent_last_name: true,
+            maternal_last_name: true,
+          },
+        },
+      },
+    });
+
+    return doctors.map((doctor) => ({
+      doctor_id: doctor.doctor_id,
+      name: `${doctor.user.name} ${doctor.user.parent_last_name} ${doctor.user.maternal_last_name}`,
+      specialty: doctor.specialty,
+    }));
+  }
+
+  static async getDoctorAvailability(doctorId: string, date: string) {
+    const targetDate = new Date(date);
+    const startOfDay = new Date(targetDate);
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date(targetDate);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    // Get all appointments for this doctor on this date
+    const bookedAppointments = await prisma.patient_appointment.findMany({
+      where: {
+        appointment: {
+          doctor_id: doctorId,
+        },
+        date_hour: {
+          gte: startOfDay,
+          lte: endOfDay,
+        },
+        appointment_status: {
+          in: ["PROGRAMMED", "FINISHED"],
+        },
+      },
+      select: {
+        date_hour: true,
+        duration: true,
+      },
+    });
+
+    // Generate available time slots (e.g., 8 AM to 6 PM, every 30 minutes)
+    const availableSlots: string[] = [];
+    const workStart = 8; // 8 AM
+    const workEnd = 18; // 6 PM
+
+    for (let hour = workStart; hour < workEnd; hour++) {
+      for (let minute = 0; minute < 60; minute += 30) {
+        const slotTime = new Date(targetDate);
+        slotTime.setHours(hour, minute, 0, 0);
+
+        // Check if this slot conflicts with any booked appointment
+        const isBooked = bookedAppointments.some((appt) => {
+          if (!appt.date_hour) return false;
+          const apptStart = new Date(appt.date_hour);
+          const apptEnd = new Date(apptStart.getTime() + appt.duration * 60000);
+          return slotTime >= apptStart && slotTime < apptEnd;
+        });
+
+        if (!isBooked) {
+          availableSlots.push(
+            `${hour.toString().padStart(2, "0")}:${minute
+              .toString()
+              .padStart(2, "0")}`
+          );
+        }
+      }
+    }
+
+    return availableSlots;
+  }
+
+  static async scheduleAppointment(data: {
+    patientAppointmentId: number;
+    doctorId: string;
+    dateHour: string;
+    duration: number;
+    appointmentType: "PRESENCIAL" | "VIRTUAL";
+    place?: string;
+  }) {
+    const { patientAppointmentId, doctorId, dateHour, duration, appointmentType, place } = data;
+
+    // First, get an appointment for this doctor (or create one if needed)
+    const doctorAppointment = await prisma.appointments.findFirst({
+      where: {
+        doctor_id: doctorId,
+      },
+    });
+
+    if (!doctorAppointment) {
+      throw new Error("No appointment type found for this doctor");
+    }
+
+    // Update the patient_appointment with the scheduled details
+    const scheduledAppointment = await prisma.patient_appointment.update({
+      where: {
+        patient_appointment_id: patientAppointmentId,
+      },
+      data: {
+        appointment_id: doctorAppointment.appointment_id,
+        date_hour: new Date(dateHour),
+        duration,
+        appointment_type: appointmentType,
+        place,
+        appointment_status: "PROGRAMMED",
+      },
+      include: {
+        patient: {
+          include: {
+            user: true,
+          },
+        },
+        appointment: {
+          include: {
+            doctor: {
+              include: {
+                user: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return scheduledAppointment;
   }
 }
