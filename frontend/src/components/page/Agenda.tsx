@@ -1,44 +1,88 @@
-import {useEffect, useState} from "react";
-import Scheduler, {SchedulerEvent} from "../organism/agenda/Scheduler";
-import { agendaService } from "../../services/agenda.service";
+import React, { useEffect, useRef, useState } from "react";
+import FullCalendar from "@fullcalendar/react";
+import type { DateSelectArg, EventClickArg, DatesSetArg } from "@fullcalendar/core";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import allLocales from "@fullcalendar/core/locales-all";
+import interactionPlugin from "@fullcalendar/interaction";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import esLocale from "@fullcalendar/core/locales/es";
+import "../../styles/Calendar.css";
+import { mapAppointmentsToEvents } from "../../model/secretaryCalendar.model";
+
+function renderEventContent(eventInfo: any) {
+  return (
+    <div className="calendar-event-card">
+      <div>Paciente: {eventInfo.event.title}</div>
+      <div>Cita: {eventInfo.event.extendedProps.description}</div>
+    </div>
+  );
+}
 
 function Agenda() {
-    const [events, setEvents] = useState<SchedulerEvent[]>([]);
-    const [selectedDate, setSelectedDate] = useState(new Date());
+  const [events, setEvents] = useState<any[]>([]);
+  const lastRange = useRef({ start: "", end: "" }); 
 
-    const fetchAppointments = async (date: Date) => {
-        const yyyy_mm_dd = date.toISOString().split("T")[0];
+  const fetchAppointments = async (start: Date, end: Date) => {
+    try {
+      const startStr = start.toISOString();
+      const endStr = end.toISOString();
 
-        const appointments = await agendaService.getAppointmentsPerDay(yyyy_mm_dd);
+      const res = await fetch(
+        `/api/agenda/appointments/range?start=${startStr}&end=${endStr}`
+      );
+      let data = await res.json();
+      data = data.map((appt: any) => ({
+        ...appt,
+        date_hour: appt.date_hour.replace("Z", "") 
+      }));
+      const mappedEvents = mapAppointmentsToEvents(data);
 
-        const mapped: SchedulerEvent[] = appointments.map((a) => ({
-            id: a.patient_appointment_id,
-            title: `${a.patient_name} ${a.patient_last_name}`,
-            start: new Date(a.date_hour), 
-            end: new Date(new Date(a.date_hour).getTime() + a.duration * 60000),
-        }));
+      setEvents(mappedEvents);
+    } catch (error) {
+      console.error("Error loading appointments:", error);
+      setEvents([]);
+    }
+  };
 
-        setEvents(mapped);
-    };
+  const handleDatesSet = (arg: DatesSetArg) => {
+    const startStr = arg.view.currentStart.toISOString();
+    const endStr = arg.view.currentEnd.toISOString();
 
-    useEffect(() => {
-        fetchAppointments(selectedDate);
-    }, [selectedDate]);
+    if (
+      lastRange.current.start === startStr &&
+      lastRange.current.end === endStr
+    ) {
+      return; 
+    }
 
-    return (
-        <div style={{ padding: "1rem"}}>
-            <h1>Agenda</h1>
+    lastRange.current = { start: startStr, end: endStr };
 
-            <Scheduler
-                events={events}
-                onNavigate={(newDate) => {
-                    console.log("Nueva fecha seleccionada:", newDate);
-                    setSelectedDate(newDate);
-                }}
-                />
-        </div>
-    )
+    fetchAppointments(arg.view.currentStart, arg.view.currentEnd);
+  };
 
+  return (
+    <div className="calendar-container-week">
+      <FullCalendar
+        locales={[esLocale]}
+        locale="es"
+        plugins={[dayGridPlugin, interactionPlugin, timeGridPlugin]}
+        initialView="timeGridWeek"
+        slotDuration="00:15:00"
+        allDaySlot={false}
+        events={events}
+        eventContent={renderEventContent}
+        height="100%"
+        expandRows={true}
+        slotMinTime="09:00:00"
+        slotMaxTime="19:01:00"
+        datesSet={handleDatesSet} 
+        eventDidMount={(info) => {
+          info.el.style.backgroundColor = "#DCEBF1";
+          info.el.style.border = "1px solid #DCEBF1";
+        }}
+      />
+    </div>
+  );
 }
 
 export default Agenda;

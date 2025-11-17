@@ -3,7 +3,7 @@ import Agenda from "../components/page/Agenda";
 
 const agendaRoutes : RouteObject[] = [
     {
-        path: "agenda",
+        path: "/agenda",
         element: <Agenda/>,
         
     },
