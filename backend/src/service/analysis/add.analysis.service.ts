@@ -1,5 +1,9 @@
 import * as analysisModel from '../../model/analysis/add.analysis.model';
-import { CreateAnalysisRequest, AnalysisResponse, UpdateAnalysisRequest } from '../../types/analysis/add.analysis.types';
+import {
+  CreateAnalysisRequest,
+  AnalysisResponse,
+  UpdateAnalysisRequest,
+} from '../../types/analysis/add.analysis.types';
 import { NotFoundError, ConflictError } from '../../util/errors.util';
 
 /**
@@ -31,19 +35,29 @@ export const createAnalysis = async (data: CreateAnalysisRequest) => {
   const existingAnalysis = await analysisModel.findByName(data.name);
 
   if (existingAnalysis) {
-    throw new ConflictError('Analysis with this name already exists');
+    throw new ConflictError('Ya existe un tipo de análisis con ese nombre');
   }
 
-  // Create the analysis
-  const analysis = await analysisModel.create({
-    name: data.name,
-    description: data.description,
-    previous_requirements: data.previousRequirements,
-    general_cost: data.generalCost,
-    community_cost: data.communityCost,
-  });
+  try {
+    // Create the analysis
+    const analysis = await analysisModel.create({
+      name: data.name,
+      description: data.description,
+      previous_requirements: data.previousRequirements,
+      general_cost: data.generalCost,
+      community_cost: data.communityCost,
+    });
 
-  return transformAnalysisToResponse(analysis);
+    return transformAnalysisToResponse(analysis);
+  } catch (error: any) {
+    // Fallback por si el UNIQUE de base de datos se dispara directamente
+    if (error?.code === 'P2002') {
+      // Prisma: unique constraint failed on the fields
+      throw new ConflictError('Ya existe un tipo de análisis con ese nombre');
+    }
+
+    throw error;
+  }
 };
 
 /**
@@ -100,7 +114,7 @@ export const updateAnalysis = async (
     throw new NotFoundError('Analysis not found');
   }
 
-  // If updating name, check for duplicates
+  // If updating name, check for duplicates a nivel aplicación
   if (updateData.name) {
     const duplicateAnalysis = await analysisModel.findDuplicateName(
       updateData.name,
@@ -108,7 +122,7 @@ export const updateAnalysis = async (
     );
 
     if (duplicateAnalysis) {
-      throw new ConflictError('Analysis with this name already exists');
+      throw new ConflictError('Ya existe un tipo de análisis con ese nombre');
     }
   }
 
@@ -116,14 +130,28 @@ export const updateAnalysis = async (
   const dbUpdateData: any = {};
   if (updateData.name) dbUpdateData.name = updateData.name;
   if (updateData.description) dbUpdateData.description = updateData.description;
-  if (updateData.previousRequirements) dbUpdateData.previous_requirements = updateData.previousRequirements;
+  if (updateData.previousRequirements)
+    dbUpdateData.previous_requirements = updateData.previousRequirements;
   if (updateData.generalCost) dbUpdateData.general_cost = updateData.generalCost;
-  if (updateData.communityCost) dbUpdateData.community_cost = updateData.communityCost;
+  if (updateData.communityCost)
+    dbUpdateData.community_cost = updateData.communityCost;
 
-  // Update analysis
-  const updatedAnalysis = await analysisModel.update(analysisId, dbUpdateData);
+  try {
+    // Update analysis
+    const updatedAnalysis = await analysisModel.update(
+      analysisId,
+      dbUpdateData
+    );
 
-  return transformAnalysisToResponse(updatedAnalysis);
+    return transformAnalysisToResponse(updatedAnalysis);
+  } catch (error: any) {
+    // Fallback si el UNIQUE se dispara al actualizar
+    if (error?.code === 'P2002') {
+      throw new ConflictError('Ya existe un tipo de análisis con ese nombre');
+    }
+
+    throw error;
+  }
 };
 
 /**
@@ -137,9 +165,12 @@ export const deleteAnalysis = async (analysisId: number) => {
   }
 
   // Do not allow deletion if analysis is referenced by any patient_analysis
-  const references = await analysisModel.countPatientAnalysisReferences(analysisId);
+  const references =
+    await analysisModel.countPatientAnalysisReferences(analysisId);
   if (references > 0) {
-    throw new ConflictError('Cannot delete analysis that has patient requests');
+    throw new ConflictError(
+      'Cannot delete analysis that has patient requests'
+    );
   }
 
   await analysisModel.deleteById(analysisId);

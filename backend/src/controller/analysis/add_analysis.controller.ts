@@ -23,11 +23,15 @@ export const createAnalysis = async (req: Request, res: Response) => {
     });
   } catch (error) {
     if (error instanceof ZodError) {
+      const firstIssue = error.errors[0];
+      const friendlyMessage =
+        firstIssue?.message || 'Hay errores en los datos ingresados';
+
       res.status(400).json({
         success: false,
         error: {
           code: 'VALIDATION_ERROR',
-          message: 'Invalid input data',
+          message: friendlyMessage,
           details: error.errors,
         },
       });
@@ -169,11 +173,15 @@ export const updateAnalysis = async (req: Request, res: Response) => {
     });
   } catch (error) {
     if (error instanceof ZodError) {
+      const firstIssue = error.errors[0];
+      const friendlyMessage =
+        firstIssue?.message || 'Hay errores en los datos ingresados';
+
       res.status(400).json({
         success: false,
         error: {
           code: 'VALIDATION_ERROR',
-          message: 'Invalid input data',
+          message: friendlyMessage,
           details: error.errors,
         },
       });

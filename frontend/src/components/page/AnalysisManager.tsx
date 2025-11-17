@@ -10,6 +10,13 @@ import {
   UpdateAnalysisData,
 } from "@/types/add.analysis.types";
 
+const extractBackendMessage = (err: any, fallback: string) => {
+  const backendMessage =
+    err?.response?.data?.error?.message || err?.response?.data?.message;
+
+  return backendMessage || fallback;
+};
+
 const AnalysisManager: React.FC = () => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -23,9 +30,9 @@ const AnalysisManager: React.FC = () => {
       setLoading(true);
       const res = await analysisService.getAll(1, 50);
       setAnalyses(res.data);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert("Error al cargar los exámenes");
+      alert(extractBackendMessage(err, "Error al cargar los exámenes"));
     } finally {
       setLoading(false);
     }
@@ -102,7 +109,12 @@ const AnalysisManager: React.FC = () => {
                           await load();
                           alert("Análisis eliminado");
                         } catch (err: any) {
-                          alert(err?.message || "Error al eliminar");
+                          alert(
+                            extractBackendMessage(
+                              err,
+                              "Error al eliminar análisis"
+                            )
+                          );
                         }
                       }}
                     >
@@ -128,7 +140,12 @@ const AnalysisManager: React.FC = () => {
             setIsCreateOpen(false);
             alert("Análisis creado");
           } catch (err: any) {
-            alert(err?.message || "Error al crear análisis");
+            alert(
+              extractBackendMessage(
+                err,
+                "Error al crear análisis"
+              )
+            );
           }
         }}
       />
@@ -153,7 +170,12 @@ const AnalysisManager: React.FC = () => {
             setEditingAnalysis(null);
             alert("Análisis actualizado");
           } catch (err: any) {
-            alert(err?.message || "Error al actualizar análisis");
+            alert(
+              extractBackendMessage(
+                err,
+                "Error al actualizar análisis"
+              )
+            );
           }
         }}
       />
