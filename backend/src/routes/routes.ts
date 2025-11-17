@@ -1,23 +1,22 @@
-import express, { type Request, type Response } from "express";
+// backend/src/routes/routes.ts
+import express from "express";
 
 import labRoutes from "./lab.routes";
 import authRoutes from "./auth.routes";
 import usersRoutes from "./users.routes";
 import rolesRoutes from "./roles.routes";
 import privilegesRoutes from "./privileges.routes";
-
 import appointmentsRoutes from "./appointments.routes";
 import notesRouter from "./notes.routes";
 import forumsRoutes from "./forums.routes";
-import * as analysisController from '../controller/analysis/add.analysis.controller';
-import addPatientToForumRoutes from './forums/add_patient_to_forum.routes';
+import addPatientToForumRoutes from "./forums/add_patient_to_forum.routes";
 import patientRoutes from "./patients.routes";
-
+import clinicalHistoryRoutes from "./clinicalHistory.routes";
 import reportRouter from "./report.routes";
-
 import historyRoutes from "./history.routes";
 import agendaRoutes from "./agenda.routes";
 
+import * as analysisController from "../controller/analysis/add.analysis.controller";
 import { authenticate } from "../middleware/auth.middleware";
 import { requirePrivileges } from "../middleware/rbac.middleware";
 import { Privilege } from "../types/rbac.types";
@@ -35,9 +34,9 @@ router.use("/auth", authRoutes);
 router.use("/users", usersRoutes);
 
 // ============================================
-// Appointments Routes (Protected)
+// Clinical History Routes (Protected)
 // ============================================
-router.use("/appointment", appointmentsRoutes);
+router.use("/clinical-history", clinicalHistoryRoutes);
 
 // ============================================
 // Role Routes (Protected)
@@ -59,10 +58,19 @@ router.use("/forums", forumsRoutes);
 // ============================================
 router.use("/laboratory", labRoutes);
 
+// ============================================
+// Report Routes (Protected)
+// ============================================
 router.use("/report", reportRouter);
 
+// ============================================
+// Notes Routes (Protected)
+// ============================================
 router.use("/notes", notesRouter);
 
+// ============================================
+// Patients Routes (Protected)
+// ============================================
 router.use("/patients", patientRoutes);
 
 // ============================================
@@ -70,15 +78,7 @@ router.use("/patients", patientRoutes);
 // ============================================
 router.use("/history", historyRoutes);
 
-// Agenda Routes
 // ============================================
-router.use("/agenda", agendaRoutes);
-
-// ============================================
-// Patient History Questions Templates
-// ============================================
-router.use("/history", historyRoutes);
-
 // Agenda Routes
 // ============================================
 router.use("/agenda", agendaRoutes);
@@ -89,7 +89,7 @@ router.use("/agenda", agendaRoutes);
 router.use("/appointments", appointmentsRoutes);
 
 // ============================================
-// Analysis Routes
+// Analysis Routes (Secretary: creates / views / updates / deletes analysis types)
 // ============================================
 router.post(
   "/analysis",
@@ -102,7 +102,7 @@ router.get(
   "/analysis",
   authenticate,
   requirePrivileges([Privilege.VIEW_ANALYSIS]),
-  analysisController.getAllAnalyses
+  analysisController.getAllAnalysis
 );
 
 router.get(
@@ -127,7 +127,7 @@ router.delete(
 );
 
 // ============================================
-// FORUM ENDPOINT
+// Forum extra routes (add patient to forum)
 // ============================================
 router.use("/forums", addPatientToForumRoutes);
 

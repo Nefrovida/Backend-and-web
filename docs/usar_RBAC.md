@@ -78,6 +78,7 @@ users → roles → role_privilege ← privileges
 | 3  | Paciente       | Acceso a su información médica     |
 | 4  | Laboratorista  | Gestión de análisis de laboratorio |
 | 5  | Familiar       | Acceso limitado a info del paciente|
+| 6  | Secretaria     | Gestión administrativa / secretaria|
 
 ### Privilegios Definidos
 
