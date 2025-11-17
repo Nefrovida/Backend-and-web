@@ -78,6 +78,14 @@ WHERE description IN (
   'VIEW_ANALYSIS'  -- solo lectura de catálogo
 );
 
+
+-- Paciente
+INSERT INTO role_privilege (role_id, privilege_id)
+SELECT 3, privilege_id
+FROM privileges
+WHERE description IN ('VIEW_FORUMS');
+
+
 -- Doctor also gets VIEW_REPORTS
 INSERT INTO role_privilege (role_id, privilege_id)
 SELECT 2, p.privilege_id

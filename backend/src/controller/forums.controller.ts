@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { ZodError } from 'zod';
 import { createForumSchema, updateForumSchema, replyToMessageSchema } from '../validators/forum.validator';
 import * as forumsService from '../service/forums.service';
+import { DEFAULT_ROLES } from '../config/constants';
 
 /**
  * Create a new forum (Admin only)
@@ -46,10 +47,79 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 20;
     const search = req.query.search as string | undefined;
-    const isPublic = req.query.isPublic === 'true' ? true :
-                     req.query.isPublic === 'false' ? false : undefined;
+    let isPublic = req.query.isPublic === 'true' ? true : 
+                   req.query.isPublic === 'false' ? false : 
+                   undefined;
+
+    // If the user is a Patient and did not specify a visibility filter, default to public-only forums
+    if (req.query.isPublic === undefined && req.user?.roleId === DEFAULT_ROLES.PATIENT) {
+      isPublic = true;
+    }
+
+    // Call service to get forums
+    const forums = await forumsService.getAllForums(page, limit, {
+      search,
+      isPublic,
+    });
 
     const forums = await forumsService.getAllForums(page, limit, { search, isPublic });
+    res.status(200).json(forums);
+  } catch (error: any) {
+    res.status(error.statusCode || 500).json({ error: error.message });
+  }
+};
+
+/**
+ * Get a single forum by id
+ *
+ * GET /api/forums/:forumId
+ * Middlewares:
+ *  - authenticate
+ *  - requirePrivileges([Privilege.VIEW_FORUMS])
+ */
+export const getById = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const forumId = parseInt(req.params.forumId);
+
+    if (isNaN(forumId)) {
+      res.status(400).json({ error: 'ID de foro inválido' });
+      return;
+    }
+
+  const forum = await forumsService.getForumById(forumId);
+
+    if (!forum) {
+      res.status(404).json({ error: 'Foro no encontrado' });
+      return;
+    }
+
+    // If the forum is private, ensure the user is member or has special privileges
+    if (!forum.public_status) {
+      const isMember = await forumsService.isUserMemberOfForum(forumId, req.user!.userId);
+      if (!isMember) {
+        // Non-members cannot access private forums
+        res.status(403).json({ error: 'No tiene permisos para ver este foro' });
+        return;
+      }
+    }
+
+    res.status(200).json(forum);
+  } catch (error: any) {
+    res.status(error.statusCode || 500).json({ error: error.message });
+  }
+};
+
+/**
+ * Get forums where the authenticated user is a member
+ *
+ * GET /api/forums/me
+ */
+export const getMyForums = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = req.user!.userId;
+
+    const forums = await forumsService.getForumsForUser(userId);
+
     res.status(200).json(forums);
   } catch (error: any) {
     res.status(error.statusCode || 500).json({ error: error.message });
