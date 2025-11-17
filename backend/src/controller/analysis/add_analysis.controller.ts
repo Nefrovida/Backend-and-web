@@ -52,9 +52,9 @@ export const createAnalysis = async (req: Request, res: Response) => {
 };
 
 /**
- * Get all analyses with pagination and search
+ * Get all analysis with pagination and search
  */
-export const getAllAnalyses = async (req: Request, res: Response) => {
+export const getAllAnalysis = async (req: Request, res: Response) => {
   try {
     const { page, limit, search } = getAnalysesQuerySchema.parse(req.query);
     const result = await analysisService.getAllAnalysis(page, limit, search);
@@ -118,6 +118,14 @@ export const getAnalysisById = async (req: Request, res: Response) => {
         success: false,
         error: {
           code: 'ANALYSIS_NOT_FOUND',
+          message: error.message,
+        },
+      });
+    } else if (error instanceof ConflictError) {
+      res.status(409).json({
+        success: false,
+        error: {
+          code: 'ANALYSIS_IN_USE',
           message: error.message,
         },
       });
