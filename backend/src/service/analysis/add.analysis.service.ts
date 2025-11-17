@@ -1,5 +1,5 @@
-import * as analysisModel from '../../model/add.analysis.model';
-import { CreateAnalysisRequest, AnalysisResponse, UpdateAnalysisRequest } from '../../types/add.analysis.types';
+import * as analysisModel from '../../model/analysis/add.analysis.model';
+import { CreateAnalysisRequest, AnalysisResponse, UpdateAnalysisRequest } from '../../types/analysis/add.analysis.types';
 import { NotFoundError, ConflictError } from '../../util/errors.util';
 
 /**
@@ -134,6 +134,12 @@ export const deleteAnalysis = async (analysisId: number) => {
 
   if (!analysis) {
     throw new NotFoundError('Analysis not found');
+  }
+
+  // Do not allow deletion if analysis is referenced by any patient_analysis
+  const references = await analysisModel.countPatientAnalysisReferences(analysisId);
+  if (references > 0) {
+    throw new ConflictError('Cannot delete analysis that has patient requests');
   }
 
   await analysisModel.deleteById(analysisId);

@@ -14,6 +14,7 @@ enum Gender {
 }
 
 enum Status {
+  REQUESTED
   MISSED
   CANCELED
   FINISHED
@@ -30,6 +31,13 @@ enum ANALYSIS_STATUS {
 enum Type {
   PRESENCIAL
   VIRTUAL
+}
+
+enum ForumRole {
+  OWNER
+  MODERATOR
+  MEMBER
+  VIEWER
 }
 
 model roles {
@@ -104,6 +112,8 @@ model patients {
   patient_analysis patient_analysis[]
 
   patient_histories patient_history[]
+
+  notes notes[]
 }
 
 model familiars {
@@ -155,7 +165,7 @@ model forums {
 model users_forums {
   user_id       String @db.Uuid
   forum_id      Int
-  forum_role     String
+  forum_role    ForumRole
 
   @@id([user_id, forum_id])
 
@@ -209,7 +219,7 @@ model appointments {
 model patient_appointment {
   patient_appointment_id  Int @id @default(autoincrement())
   patient_id              String @db.Uuid
-  appointment_id          Int @unique
+  appointment_id          Int
   date_hour               DateTime
   duration                Int // minutes
   appointment_type        Type
@@ -225,13 +235,18 @@ model patient_appointment {
 
 model notes {
   note_id                 Int @id @default(autoincrement())
-  patient_appointment_id  Int? @unique
+  patient_id              String? @db.Uuid
+  patient_appointment_id  Int?
   title                   String @db.Char(50)
   content                 String
+  general_notes           String?
+  ailments                String?
+  prescription            String?
   visibility              Boolean @default(true)
   creation_date           DateTime @default(now())
 
-  patient_appointment   patient_appointment? @relation(fields: [patient_appointment_id], references: [patient_appointment_id], onDelete: Cascade)
+  patient                 patients? @relation(fields: [patient_id], references: [patient_id], onDelete: Cascade)
+  patient_appointment     patient_appointment? @relation(fields: [patient_appointment_id], references: [patient_appointment_id], onDelete: Cascade)
 }
 
 // ########## ANALYSIS #########
@@ -283,7 +298,17 @@ model questions_history {
   description String
   type        String
 
+  options options[]
   patient_histories patient_history[]
+}
+
+model options {
+  option_id Int @id @default(autoincrement())
+  question_id Int
+  description String
+
+  question          questions_history @relation(fields: [question_id], references: [question_id], onDelete: Cascade)
+
 }
 
 model patient_history {

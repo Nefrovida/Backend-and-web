@@ -6,12 +6,14 @@ import { Privilege } from '../types/rbac.types';
  * The IDs should match the role_id values in the 'roles' table (e.g., PATIENT = 1, DOCTOR = 2, etc.).
  * Use these constants instead of raw numbers when referencing roles in your application logic.
  */
+// Role IDs should reflect the actual ordering in the database seed file.
 export const DEFAULT_ROLES = {
-  PATIENT: 1,
+  ADMIN: 1,
   DOCTOR: 2,
-  LABORATORIST: 3,
-  ADMIN: 4,
+  PATIENT: 3,
+  LABORATORIST: 4,
   FAMILIAR: 5,
+  SECRETARIA: 6,
 } as const;
 
 /**
