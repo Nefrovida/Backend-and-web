@@ -8,6 +8,7 @@ import forumsRoutes from "./forums.routes";
 import Home from "../components/page/Home";
 import AddPatientToForumPage from "../components/page/add_patient_to_forum_page";
 import notesRoutes from "./notes.routes";
+import appointmentsRoutes from "./appointments.routes";
 
 const router = createBrowserRouter([
   {
@@ -22,6 +23,7 @@ const router = createBrowserRouter([
       ...analisisRoutes,
       ...notesRoutes,
       ...forumsRoutes,
+      ...appointmentsRoutes,
     ],
   },
   {
