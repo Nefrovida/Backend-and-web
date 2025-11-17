@@ -1,6 +1,7 @@
 import * as appointmentsModel from '../model/appointments.model';
 import { NotFoundError } from '../util/errors.util';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
+
 
 const prisma = new PrismaClient();
 

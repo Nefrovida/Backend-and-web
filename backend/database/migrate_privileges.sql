@@ -45,6 +45,16 @@ WHERE NOT EXISTS (
   WHERE role_id = 1 AND role_privilege.privilege_id = privileges.privilege_id
 );
 
+-- Ensure Paciente (role_id = 3) can view public forums
+INSERT INTO role_privilege (role_id, privilege_id)
+SELECT 3, privilege_id
+FROM privileges
+WHERE description = 'VIEW_FORUMS'
+AND NOT EXISTS (
+  SELECT 1 FROM role_privilege
+  WHERE role_id = 3 AND role_privilege.privilege_id = privileges.privilege_id
+);
+
 COMMIT;
 
 -- ========================

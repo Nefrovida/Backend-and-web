@@ -4,12 +4,14 @@ import { authenticate } from "../middleware/auth.middleware";
 import { requirePrivileges } from "../middleware/rbac.middleware";
 import { Privilege } from "../types/rbac.types";
 import { exit } from "process";
+import { checkAdminStatus, getAdminUsers } from "src/controller/forums.controller";
+
 
 const router = express.Router()
 
 router.get("/health", (_req, res) => {
   res.status(200).json({ status: "OK" });
-});
+});1
 
 
 // ============================================

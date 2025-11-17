@@ -78,6 +78,14 @@ WHERE description IN (
   'VIEW_ANALYSIS'  -- solo lectura de catálogo
 );
 
+
+-- Paciente
+INSERT INTO role_privilege (role_id, privilege_id)
+SELECT 3, privilege_id
+FROM privileges
+WHERE description IN ('VIEW_FORUMS');
+
+
 -- Doctor also gets VIEW_REPORTS
 INSERT INTO role_privilege (role_id, privilege_id)
 SELECT 2, p.privilege_id
@@ -107,7 +115,12 @@ VALUES -- passwd: 1234567890
 
 -- Admin user
 INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
-VALUES (gen_random_uuid(), 'Administrador', 'Sistema', 'Admin', true, '5550000000', 'admin', '$2b$10$/aYCozNwvUh8qt41J1diPOwDqeW50wg8nWf76NvAQ9plWjngrj4yS', '1980-01-01', 'MALE', false, 1);
+VALUES -- passwd: 1234567890
+(gen_random_uuid(), 'Administrador', 'Sistema', 'Admin', true, '5550000000', 'admin', '$2b$10$/aYCozNwvUh8qt41J1diPOwDqeW50wg8nWf76NvAQ9plWjngrj4yS', '1980-01-01', 'MALE', false, 1),
+(gen_random_uuid(), 'Ian', 'Hernández', 'Díaz', true, '5550000001', 'ian', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '1990-01-15', 'MALE', false, 1),
+(gen_random_uuid(), 'Leonardo', 'García', 'Martínez', true, '5550000002', 'leonardo', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '1988-03-20', 'MALE', false, 1),
+(gen_random_uuid(), 'Mateo', 'López', 'Rodríguez', true, '5550000003', 'mateo', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '1992-07-10', 'MALE', false, 1);
+
 
 -- ========================
 -- 👨‍⚕️ DOCTORS

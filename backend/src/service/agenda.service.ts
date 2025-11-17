@@ -1,4 +1,4 @@
-import Agenda from '../model/agenda.model';
+import Agenda from "../model/agenda.model";
 
 export const getPendingAppointmentRequests = async () => {
   return await Agenda.getPendingAppointmentRequests();
@@ -17,8 +17,12 @@ export const scheduleAppointment = async (data: {
   doctorId: string;
   dateHour: string;
   duration: number;
-  appointmentType: 'PRESENCIAL' | 'VIRTUAL';
+  appointmentType: "PRESENCIAL" | "VIRTUAL";
   place?: string;
 }) => {
   return await Agenda.scheduleAppointment(data);
+};
+
+export const getAppointmentsInRange = async (start: string, end: string) => {
+  return await Agenda.getAppointmentsInRange(start, end);
 };
