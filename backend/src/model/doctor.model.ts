@@ -1,0 +1,59 @@
+import { prisma } from "../util/prisma";
+import { hashPassword } from "../util/password.util";
+
+// Interface for User entity
+export interface IUser {
+  user_id?: string;
+  name: string;
+  parent_last_name: string;
+  maternal_last_name: string;
+  phone_number: string;
+  username: string;
+  password: string; // will be hashed before saving
+  birthday: Date;
+  gender: "MALE" | "FEMALE" | "OTHER";
+  role_id: number; // doctor role id
+}
+
+// Interface for Doctor entity
+export interface IDoctor {
+  doctor_id?: string;
+  user_id: string;
+  specialty: string;
+  license: string;
+}
+
+// Create a new user with doctor role
+export const createUser = async (user: IUser): Promise<IUser> => {
+  // Hash the password before saving to database
+  const hashedPassword = await hashPassword(user.password);
+
+  const newUser = await prisma.users.create({
+    data: {
+      name: user.name,
+      parent_last_name: user.parent_last_name,
+      maternal_last_name: user.maternal_last_name,
+      phone_number: user.phone_number,
+      username: user.username,
+      password: hashedPassword, // store hashed password
+      birthday: user.birthday,
+      gender: user.gender,
+      role_id: user.role_id,
+      first_login: true,
+    },
+  });
+
+  return newUser;
+};
+
+// Create a doctor linked to the user
+export const createDoctor = async (doctor: IDoctor): Promise<IDoctor> => {
+  const newDoctor = await prisma.doctors.create({
+    data: {
+      user_id: doctor.user_id,
+      specialty: doctor.specialty,
+      license: doctor.license,
+    },
+  });
+  return newDoctor;
+};
