@@ -96,3 +96,34 @@ export const updateForumSchema = z.object({
  * }
  */
 export type UpdateForumInputValidated = z.infer<typeof updateForumSchema>;
+
+
+
+/**
+ * Validation schema for replying to a forum message
+ * 
+ * User Story: "Todos responden mensaje en el foro"
+ * 
+ * Applied validations:
+ * - parentMessageId: must be a positive integer
+ * - content: string between 1 and 500 characters
+ */
+export const replyToMessageSchema = z.object({
+  parentMessageId: z.number({
+    required_error: "Parent message ID is required",
+    invalid_type_error: "Parent message ID must be a number",
+  }).int().positive(),
+
+  content: z.string({
+    required_error: "Content is required",
+    invalid_type_error: "Content must be a text string",
+  })
+  .min(1, "El contenido no puede estar vacío")
+  .max(500, "El contenido no puede exceder 500 caracteres")
+  .trim(),
+});
+
+/**
+ * Type automatically inferred from the Zod schema.
+ */
+export type ReplyToMessageInputValidated = z.infer<typeof replyToMessageSchema>;
