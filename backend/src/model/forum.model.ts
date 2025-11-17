@@ -616,6 +616,11 @@ export const getForumRegularMembers = async (forumId: number) => {
           username: true,
           phone_number: true,
           registration_date: true,
+          role: {
+            select: {
+              role_name: true,
+            },
+          },
         },
       },
     },
@@ -641,6 +646,7 @@ export const getForumRegularMembers = async (forumId: number) => {
     phone_number: item.user.phone_number,
     registration_date: item.user.registration_date,
     forum_role: item.forum_role,
+    role: item.user.role, // Incluir información del rol del usuario
   }));
 };
 
