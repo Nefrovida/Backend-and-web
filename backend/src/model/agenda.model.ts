@@ -1,13 +1,16 @@
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+// backend/src/model/agenda.model.ts
+import { prisma } from "../util/prisma";
 
 export default class Agenda {
-  constructor() {}
-  //todo: verify this function isn´t necessary anymore and delete
-  /*static async getAppointmentsPerDaySec(targetDate: string) {
+  constructor() { }
+
+  /**
+   * Secretaria (web) – Daily appointments, including patient name.
+   */
+  static async getAppointmentsPerDaySec(targetDate: string) {
     const [year, month, day] = targetDate.split("-").map(Number);
 
-    // Convert to Mexico time
+    // Local time MX
     const start = new Date(year, month - 1, day, 0, 0, 0);
     const end = new Date(year, month - 1, day + 1, 0, 0, 0);
 
@@ -18,7 +21,7 @@ export default class Agenda {
           lt: end,
         },
         appointment_status: {
-          not: "CANCELED",   
+          not: "CANCELED",
         },
       },
       include: {
@@ -39,7 +42,7 @@ export default class Agenda {
       },
     });
 
-    // Desanidar joins
+    // Unnest joins -> patient name
     const flattened = appointments.map((a) => {
       const user = a.patient?.user;
       const { patient, ...rest } = a;
@@ -47,101 +50,97 @@ export default class Agenda {
       const fullName = [
         user?.name,
         user?.parent_last_name,
-        user?.maternal_last_name
-      ].filter(Boolean)
-      .join(' '); 
+        user?.maternal_last_name,
+      ]
+        .filter(Boolean)
+        .join(" ");
 
       return {
         ...rest,
-        name: fullName || null, 
+        name: fullName || null,
       };
     });
 
-
     return flattened;
-  }*/
+  }
 
+  /**
+     * Mobile – Daily appointments, including doctor name.
+   */
+  static async getAppointmentsPerDay(targetDate: string) {
+    const [year, month, day] = targetDate.split("-").map(Number);
 
-/**
- * Mobile - bring back all appointment that match targetDate
- * @param targetDate 
- * @returns 
- */
-static async getAppointmentsPerDay(targetDate: string) {
-  const [year, month, day] = targetDate.split("-").map(Number);
+    const start = new Date(year, month - 1, day, 0, 0, 0);
+    const end = new Date(year, month - 1, day + 1, 0, 0, 0);
 
-  const start = new Date(year, month - 1, day, 0, 0, 0);
-  const end = new Date(year, month - 1, day + 1, 0, 0, 0);
-
-  const appointments = await prisma.patient_appointment.findMany({
-    where: {
-      date_hour: {
-        gte: start,
-        lt: end,
+    const appointments = await prisma.patient_appointment.findMany({
+      where: {
+        date_hour: {
+          gte: start,
+          lt: end,
+        },
+        appointment_status: {
+          not: "CANCELED",
+        },
       },
-      appointment_status: {
-        not: "CANCELED",
-      },
-    },
-    select: {
-      patient_appointment_id: true,
-      patient_id: true,
-      date_hour: true,
-      appointment_type: true,
-      duration: true,
-      link: true, 
-      place: true, 
-      appointment_status: true,
-
-      appointment: {
-        select: {
-          appointment_id: true,
-          name: true,
-          doctor: {
-            select: {
-              doctor_id: true,
-              user: {
-                select: {
-                  name: true,
-                  parent_last_name: true,
-                  maternal_last_name: true,
+      select: {
+        patient_appointment_id: true,
+        patient_id: true,
+        date_hour: true,
+        duration: true,
+        link: true,
+        place: true,
+        appointment_type: true,
+        appointment_status: true,
+        appointment: {
+          select: {
+            appointment_id: true,
+            name: true,
+            doctor: {
+              select: {
+                doctor_id: true,
+                user: {
+                  select: {
+                    name: true,
+                    parent_last_name: true,
+                    maternal_last_name: true,
+                  },
                 },
               },
             },
           },
         },
       },
-    },
-  });
+    });
 
-  // Flatten joins
-  return appointments.map((a) => {
-    const doctorUser = a.appointment?.doctor?.user;
+    // Unnest -> doctor name + appointment name
+    return appointments.map((a) => {
+      const { appointment, ...rest } = a;
+      const doctorUser = appointment?.doctor?.user;
 
-    const { appointment, ...rest } = a;
+      const fullName = [
+        doctorUser?.name,
+        doctorUser?.parent_last_name,
+        doctorUser?.maternal_last_name,
+      ]
+        .filter(Boolean)
+        .join(" ");
 
-    const fullName = [
-      doctorUser?.name,
-      doctorUser?.parent_last_name,
-      doctorUser?.maternal_last_name
-    ]
-      .filter(Boolean)
-      .join(" ");
+      const appointmentName = appointment?.name?.trim() ?? null;
 
-    return {
-      ...rest,
-      appointment_id: appointment?.appointment_id ?? null,
-      appointment_name: appointment?.name?.trim() ?? null, 
-      doctor_name: fullName || null,
-    };
-  });
-}
+      return {
+        ...rest,
+        appointment_id: appointment?.appointment_id ?? null,
+        name: fullName || null,
+        doctor_name: fullName || null,
+        appointment_name: appointmentName,
+      };
+    });
+  }
 
-
-/**
- * Mobile - cancel appointment by patient_appointment_id
- * @param id 
- */
+  /**
+     * Mobile – Cancel appointment by patient_appointment_id
+   */
   static async cancelAppointment(id: number) {
     await prisma.patient_appointment.update({
       where: { patient_appointment_id: id },
@@ -150,134 +149,127 @@ static async getAppointmentsPerDay(targetDate: string) {
   }
 
   /**
-   * Mobile - bring back appointment by id for appointment detail (card)
-   * @param id 
-   * @returns 
+   * Mobile – Appointment details (card), by id.
    */
   static async getAppointmentById(id: number) {
-  const appointment = await prisma.patient_appointment.findUnique({
-    where: {
-      patient_appointment_id: Number(id),
-    },
-    select: {  
-      patient_appointment_id: true,
-      patient_id: true,  
-      date_hour: true,
-      duration: true,
-      link: true,
-      place: true,
-      appointment_type: true,
-      appointment_status: true,  
-      appointment: {
-        select: {  
-          appointment_id: true,
-          name: true,
-          doctor: {
-            select: {
-              doctor_id: true,  
-              user: {
-                select: {
-                  name: true,
-                  parent_last_name: true,
-                  maternal_last_name: true,
+    const appointment = await prisma.patient_appointment.findUnique({
+      where: {
+        patient_appointment_id: Number(id),
+      },
+      select: {
+        patient_appointment_id: true,
+        patient_id: true,
+        date_hour: true,
+        duration: true,
+        link: true,
+        place: true,
+        appointment_type: true,
+        appointment_status: true,
+        appointment: {
+          select: {
+            appointment_id: true,
+            name: true,
+            doctor: {
+              select: {
+                doctor_id: true,
+                user: {
+                  select: {
+                    name: true,
+                    parent_last_name: true,
+                    maternal_last_name: true,
+                  },
                 },
               },
             },
           },
         },
       },
-    },
-  });
+    });
 
-  if (!appointment) return null;
+    if (!appointment) return null;
 
-  // Flatten joins
-  const { appointment: nestedAppointment, ...rest } = appointment;
+    // Unnest
+    const { appointment: nestedAppointment, ...rest } = appointment;
+    const nestedUser = nestedAppointment?.doctor?.user;
 
-  const appointment_id = nestedAppointment?.appointment_id;
-  const appointment_name = nestedAppointment?.name?.trim() ?? null;
+    const fullName = [
+      nestedUser?.name,
+      nestedUser?.parent_last_name,
+      nestedUser?.maternal_last_name,
+    ]
+      .filter(Boolean)
+      .join(" ");
 
-  const user = nestedAppointment?.doctor?.user;
+    const appointment_name = nestedAppointment?.name?.trim() ?? null;
 
-  const fullName = [
-    user?.name,
-    user?.parent_last_name,
-    user?.maternal_last_name,
-  ]
-    .filter(Boolean)
-    .join(" ");
+    return {
+      ...rest,
+      appointment_id: nestedAppointment?.appointment_id ?? null,
+      name: fullName || null,
+      // Web/mobile extras
+      doctor_name: fullName || null,
+      appointment_name,
+    };
+  }
 
-  return {
-    ...rest,
-    appointment_id,
-    doctor_name: fullName || null,
-    appointment_name,
-  };
-}
+  /**
+   * Web – List of appointments in a date range (calendar view).
+   */
+  static async getAppointmentsInRange(startDate: string, endDate: string) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
 
-
-/**
- * Web - bring back list of appointments that match the range of days given by calendar view (week)
- * @param startDate 
- * @param endDate 
- * @returns 
- */
-static async getAppointmentsInRange(startDate: string, endDate: string) {
-  const appointments = await prisma.patient_appointment.findMany({
-    where: {
-      date_hour: {
-        gte: startDate,
-        lt: endDate,
+    const appointments = await prisma.patient_appointment.findMany({
+      where: {
+        date_hour: {
+          gte: start,
+          lt: end,
+        },
+        appointment_status: {
+          not: "CANCELED",
+        },
       },
-      appointment_status: {
-        not: "CANCELED",
-      },
-    },
-    include: {
-      patient: {
-        include: {
-          user: {
-            select: {
-              name: true,
-              parent_last_name: true,
-              maternal_last_name: true,
+      include: {
+        patient: {
+          include: {
+            user: {
+              select: {
+                name: true,
+                parent_last_name: true,
+                maternal_last_name: true,
+              },
             },
           },
         },
-      },
-
-      appointment: {
-        select: {
-          name: true,
+        appointment: {
+          select: {
+            name: true,
+          },
         },
       },
-    },
-    orderBy: {
-      date_hour: "asc",
-    },
-  });
+      orderBy: {
+        date_hour: "asc",
+      },
+    });
 
     return appointments.map((a) => {
       const user = a.patient?.user;
-
       const { patient, appointment, ...rest } = a;
 
       const fullName = [
         user?.name,
         user?.parent_last_name,
-        user?.maternal_last_name
+        user?.maternal_last_name,
       ]
         .filter(Boolean)
         .join(" ");
 
       return {
         ...rest,
+          // patient name for web view
         name: fullName || null,
-        appointment_name: a.appointment?.name?.trim() ?? null,
+        appointment_name: appointment?.name?.trim() ?? null,
       };
     });
   }
-
-
 }
-
