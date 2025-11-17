@@ -62,11 +62,6 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
     }
 
     // Call service to get forums
-    const forums = await forumsService.getAllForums(page, limit, {
-      search,
-      isPublic,
-    });
-
     const forums = await forumsService.getAllForums(page, limit, { search, isPublic });
     res.status(200).json(forums);
   } catch (error: any) {
