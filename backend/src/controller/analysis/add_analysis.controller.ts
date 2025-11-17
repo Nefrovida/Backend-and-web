@@ -52,7 +52,7 @@ export const createAnalysis = async (req: Request, res: Response) => {
 };
 
 /**
- * Get all analyses with pagination and search
+ * Get all analysis with pagination and search
  */
 export const getAllAnalysis = async (req: Request, res: Response) => {
   try {
