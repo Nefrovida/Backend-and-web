@@ -28,7 +28,7 @@ const RescheduleModal: React.FC<RescheduleModalProps> = ({
 
     setLoading(true);
     
-    const dateTimeString = `${date}T${time}:00.000Z`;
+    const dateTimeString = `${date}T${time}:00.00`;
 
     const rescheduleData: RescheduleData = {
       date_hour: dateTimeString,

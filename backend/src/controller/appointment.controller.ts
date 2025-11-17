@@ -72,14 +72,6 @@ export default class AppointmentController {
         });
       }
 
-      // Verificar disponibilidad del horario
-      const isAvailable = await AppointmentModel.isTimeSlotAvailable(newDate);
-      if (!isAvailable) {
-        return res.status(409).json({ 
-          error: 'El horario ya está ocupado' 
-        });
-      }
-
       // Reagendar
       const updated = await AppointmentModel.rescheduleAppointment(
         appointmentId,

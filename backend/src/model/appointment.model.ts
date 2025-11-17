@@ -21,6 +21,11 @@ export default class AppointmentModel {
             },
           },
         },
+        appointment: {
+          select: {
+            name: true,
+          },
+        },
       },
       orderBy: {
         date_hour: 'asc',
@@ -71,7 +76,7 @@ export default class AppointmentModel {
    */
   static async getAppointmentById(id: number) {
     const appointment = await prisma.patient_appointment.findUnique({
-      where: { id },
+      where: {  patient_appointment_id: id  },
       include: {
         patient: {
           include: {
@@ -96,52 +101,40 @@ export default class AppointmentModel {
   /**
    * Reagendar una cita (actualizar fecha y motivo)
    */
-  static async rescheduleAppointment(
-    id: number,
-    date_hour: Date,
-    reason: string
+ static async rescheduleAppointment(
+  id: number,
+  date_hour: Date,
+  reason: string
   ) {
-    const updated = await prisma.patient_appointment.update({
-      where: { id },
-      data: {
-        date_hour,
-        reason,
-        status: 'rescheduled',
-      },
-      include: {
-        patient: {
-          include: {
-            user: {
-              select: {
-                name: true,
-                parent_last_name: true,
-                maternal_last_name: true,
-              },
+  const updated = await prisma.patient_appointment.update({
+    where: { patient_appointment_id: id },
+    data: {
+      date_hour, 
+      appointment_status: 'PROGRAMMED',
+    },
+    include: {
+      patient: {
+        include: {
+          user: {
+            select: {
+              name: true,
+              parent_last_name: true,
+              maternal_last_name: true,
             },
           },
         },
       },
-    });
-
-    const [flattened] = this.flattenAppointments([updated]);
-    return flattened;
-  }
-
-  /**
-   * Verificar disponibilidad de horario
-   */
-  static async isTimeSlotAvailable(date_hour: Date): Promise<boolean> {
-    const existing = await prisma.patient_appointment.findFirst({
-      where: {
-        date_hour,
-        status: {
-          not: 'cancelled',
+      appointment: {
+        select: {
+          name: true, 
         },
       },
-    });
+    },
+  });
 
-    return !existing;
-  }
+  const [flattened] = this.flattenAppointments([updated]);
+  return flattened;
+}
 
   /**
    * Desanidar joins (helper method)
@@ -153,9 +146,11 @@ export default class AppointmentModel {
 
       return {
         ...rest,
+        id: a.patient_appointment_id, // ← Mapear el ID correctamente
         patient_name: user?.name ?? null,
         patient_parent_last_name: user?.parent_last_name ?? null,
         patient_maternal_last_name: user?.maternal_last_name ?? null,
+        reason: a.appointment?.name ?? 'Sin motivo', // ← Agregar reason
       };
     });
   }
