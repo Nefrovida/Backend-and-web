@@ -105,6 +105,14 @@ router.get(
   forumsController.getAdminUsers
 );
 
+// Admin routes - Get non-admin users with pagination
+router.get(
+  '/regular-users', 
+  authenticate, 
+  requirePrivileges([Privilege.VIEW_USERS]), 
+  forumsController.getRegularUsers
+);
+
 // Admin routes - Check if user is admin
 router.get(
   '/admin-status/:userId', 
@@ -133,6 +141,28 @@ router.delete(
   authenticate,
   requirePrivileges([Privilege.UPDATE_FORUMS]),
   forumsController.removeForumAdministrator
+);
+
+// Forum members routes
+router.get(
+  '/:forumId/members',
+  authenticate,
+  requirePrivileges([Privilege.VIEW_USERS]),
+  forumsController.getForumMembers
+);
+
+router.post(
+  '/:forumId/members',
+  authenticate,
+  requirePrivileges([Privilege.ADD_USER_TO_FORUM]),
+  forumsController.addForumMember
+);
+
+router.delete(
+  '/:forumId/members/:userId',
+  authenticate,
+  requirePrivileges([Privilege.UPDATE_FORUMS]),
+  forumsController.removeForumMember
 );
 
 // Forum users routes (from add_patient_to_forum.routes.ts)

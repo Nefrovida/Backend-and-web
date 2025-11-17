@@ -419,3 +419,198 @@ export const removeForumAdministrator = async (req: Request, res: Response): Pro
   }
 };
 
+/**
+ * Get all regular users (non-admin) with pagination
+ */
+export const getRegularUsers = async (req: Request, res: Response): Promise<void> => {
+  try {
+    // Extract and validate query parameters
+    const page = Math.max(1, parseInt(req.query.page as string) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 10));
+
+    // Calculate pagination values
+    const skip = (page - 1) * limit;
+    const take = limit;
+
+    // Get regular users and total count in parallel for better performance
+    const [regularUsers, totalCount] = await Promise.all([
+      forumModel.getNonAdminUsersWithPagination(skip, take),
+      forumModel.countNonAdminUsers()
+    ]);
+
+    // Calculate pagination metadata
+    const totalPages = Math.ceil(totalCount / limit);
+    const hasNext = page < totalPages;
+    const hasPrevious = page > 1;
+
+    // Build response with data and pagination metadata
+    const response = {
+      data: regularUsers,
+      pagination: {
+        currentPage: page,
+        pageSize: limit,
+        totalRecords: totalCount,
+        totalPages,
+        hasNext,
+        hasPrevious
+      }
+    };
+
+    // Respond with paginated regular users
+    res.status(200).json(response);
+  } catch (error: any) {
+    console.error('Error fetching regular users:', error);
+    res.status(error.statusCode || 500).json({ 
+      error: error.message || 'Error interno del servidor al obtener usuarios'
+    });
+  }
+};
+
+/**
+ * Get forum members (regular members)
+ */
+export const getForumMembers = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const forumId = parseInt(req.params.forumId);
+    
+    if (isNaN(forumId)) {
+      res.status(400).json({ error: 'ID de foro inválido' });
+      return;
+    }
+
+    // Verificar que el foro existe
+    const forum = await forumModel.findById(forumId);
+    if (!forum) {
+      res.status(404).json({ error: 'Foro no encontrado' });
+      return;
+    }
+
+    // Obtener miembros regulares del foro (MEMBER y VIEWER)
+    const members = await forumModel.getForumRegularMembers(forumId);
+
+    res.status(200).json({ 
+      data: members,
+      forum: {
+        forum_id: forum.forum_id,
+        name: forum.name
+      }
+    });
+  } catch (error: any) {
+    console.error('Error fetching forum members:', error);
+    res.status(error.statusCode || 500).json({ 
+      error: error.message || 'Error interno del servidor'
+    });
+  }
+};
+
+/**
+ * Add member to forum
+ */
+export const addForumMember = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const forumId = parseInt(req.params.forumId);
+    const { user_id } = req.body;
+    
+    if (isNaN(forumId)) {
+      res.status(400).json({ error: 'ID de foro inválido' });
+      return;
+    }
+
+    if (!user_id) {
+      res.status(400).json({ error: 'ID de usuario requerido' });
+      return;
+    }
+
+    // Verificar que el foro existe
+    const forum = await forumModel.findById(forumId);
+    if (!forum) {
+      res.status(404).json({ error: 'Foro no encontrado' });
+      return;
+    }
+
+    // Verificar que el usuario no es admin (los admins se manejan en otro endpoint)
+    const isAdmin = await forumModel.isUserAdmin(user_id);
+    if (isAdmin) {
+      res.status(400).json({ error: 'Los administradores deben ser agregados a través del endpoint de administradores' });
+      return;
+    }
+
+    // Verificar si ya está en el foro
+    const existingRole = await forumModel.getUserRole(forumId, user_id);
+    
+    if (existingRole) {
+      res.status(400).json({ error: 'El usuario ya es miembro de este foro' });
+      return;
+    }
+
+    // Agregar como MEMBER
+    await forumModel.addUserToForum(forumId, user_id, 'MEMBER');
+
+    res.status(200).json({ 
+      message: 'Usuario agregado como miembro del foro exitosamente',
+      user_id,
+      forum_id: forumId,
+      role: 'MEMBER'
+    });
+  } catch (error: any) {
+    console.error('Error adding forum member:', error);
+    res.status(error.statusCode || 500).json({ 
+      error: error.message || 'Error interno del servidor'
+    });
+  }
+};
+
+/**
+ * Remove member from forum
+ */
+export const removeForumMember = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const forumId = parseInt(req.params.forumId);
+    const userId = req.params.userId;
+    
+    if (isNaN(forumId)) {
+      res.status(400).json({ error: 'ID de foro inválido' });
+      return;
+    }
+
+    if (!userId) {
+      res.status(400).json({ error: 'ID de usuario requerido' });
+      return;
+    }
+
+    // Verificar que el foro existe
+    const forum = await forumModel.findById(forumId);
+    if (!forum) {
+      res.status(404).json({ error: 'Foro no encontrado' });
+      return;
+    }
+
+    // Verificar que el usuario está en el foro
+    const userRole = await forumModel.getUserRole(forumId, userId);
+    if (!userRole) {
+      res.status(404).json({ error: 'Usuario no encontrado en el foro' });
+      return;
+    }
+
+    // No permitir remover al OWNER o MODERATOR desde este endpoint
+    if (userRole === 'OWNER' || userRole === 'MODERATOR') {
+      res.status(400).json({ error: 'Los administradores deben ser removidos a través del endpoint de administradores' });
+      return;
+    }
+
+    // Remover del foro completamente
+    await forumModel.removeUserFromForum(forumId, userId);
+
+    res.status(200).json({ 
+      message: 'Miembro removido del foro exitosamente',
+      user_id: userId,
+      forum_id: forumId
+    });
+  } catch (error: any) {
+    console.error('Error removing forum member:', error);
+    res.status(error.statusCode || 500).json({ 
+      error: error.message || 'Error interno del servidor'
+    });
+  }
+};
+

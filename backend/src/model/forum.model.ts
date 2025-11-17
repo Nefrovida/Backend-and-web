@@ -545,3 +545,102 @@ export const getForumAdministrators = async (forumId: number) => {
   }));
 };
 
+/**
+ * Get all non-admin users (role_id != 1) with pagination
+ */
+export const getNonAdminUsersWithPagination = async (
+  skip: number,
+  take: number
+) => {
+  return await prisma.users.findMany({
+    where: {
+      role_id: {
+        not: 1, // Excluir administradores
+      },
+      active: true,
+    },
+    select: {
+      user_id: true,
+      name: true,
+      parent_last_name: true,
+      maternal_last_name: true,
+      username: true,
+      phone_number: true,
+      registration_date: true,
+      role: {
+        select: {
+          role_name: true,
+        },
+      },
+    },
+    orderBy: {
+      registration_date: 'desc',
+    },
+    skip,
+    take,
+  });
+};
+
+/**
+ * Count total non-admin users
+ */
+export const countNonAdminUsers = async () => {
+  return await prisma.users.count({
+    where: {
+      role_id: {
+        not: 1, // Excluir administradores
+      },
+      active: true,
+    },
+  });
+};
+
+/**
+ * Get forum members (all roles except OWNER and MODERATOR)
+ */
+export const getForumRegularMembers = async (forumId: number) => {
+  const result = await prisma.users_forums.findMany({
+    where: {
+      forum_id: forumId,
+      forum_role: {
+        in: ['MEMBER', 'VIEWER'],
+      },
+    },
+    include: {
+      user: {
+        select: {
+          user_id: true,
+          name: true,
+          parent_last_name: true,
+          maternal_last_name: true,
+          username: true,
+          phone_number: true,
+          registration_date: true,
+        },
+      },
+    },
+    orderBy: [
+      {
+        forum_role: 'asc', // MEMBER primero, luego VIEWER
+      },
+      {
+        user: {
+          registration_date: 'desc',
+        },
+      },
+    ],
+  });
+
+  // Aplanar la estructura para que sea más fácil de usar en el frontend
+  return result.map(item => ({
+    user_id: item.user.user_id,
+    name: item.user.name,
+    parent_last_name: item.user.parent_last_name,
+    maternal_last_name: item.user.maternal_last_name,
+    username: item.user.username,
+    phone_number: item.user.phone_number,
+    registration_date: item.user.registration_date,
+    forum_role: item.forum_role,
+  }));
+};
+
