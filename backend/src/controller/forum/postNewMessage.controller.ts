@@ -8,7 +8,7 @@ async function postNewMessage(req: Request, res: Response) {
     const content: string | null = req.body.message ?? null;
 
     if (!content) {
-      res.status(401).json({ message: "Mensaje vació" });
+      res.status(401).json({ message: "Mensaje vacio" });
       return;
     }
 
