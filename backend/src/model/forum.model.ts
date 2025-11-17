@@ -1,5 +1,5 @@
 import { prisma } from '../util/prisma';
-import { ForumRole } from '.prisma/client';
+import { ForumRole } from '@prisma/client';
 
 /**
  * Find forum by name (case-insensitive)

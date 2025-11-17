@@ -136,5 +136,11 @@ export const deleteAnalysis = async (analysisId: number) => {
     throw new NotFoundError('Analysis not found');
   }
 
+  // Do not allow deletion if analysis is referenced by any patient_analysis
+  const references = await analysisModel.countPatientAnalysisReferences(analysisId);
+  if (references > 0) {
+    throw new ConflictError('Cannot delete analysis that has patient requests');
+  }
+
   await analysisModel.deleteById(analysisId);
 };
