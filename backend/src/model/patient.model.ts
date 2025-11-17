@@ -1,4 +1,3 @@
-import { doctors } from './../../prisma/database/prisma/client';
 import { prisma } from "src/util/prisma";
 
 export default class Patients {
