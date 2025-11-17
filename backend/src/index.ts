@@ -109,8 +109,6 @@ app.use("/api", router);
 app.use(errorHandler);
 
 // Start server
-/*app.listen(port, () => {
+app.listen(port, () => {
   console.log(`The server is running at http://localhost:${port}`);
-});*/
-
-app.listen(3001, "0.0.0.0") ;
+});
