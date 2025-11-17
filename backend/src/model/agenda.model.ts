@@ -173,27 +173,26 @@ static async getAppointmentById(id: number) {
     },
   });
 
-  if (!appointment) return null;
+    if (!appointment) return null;
 
-  // Desanidar 
-  const { appointment: nestedAppointment, ...rest } = appointment;
-  const appointment_id = nestedAppointment?.appointment_id;
-  const user = nestedAppointment?.doctor?.user;
+    // Unnest
+    const { appointment: nestedAppointment, ...rest } = appointment;
+    const nestedUser = nestedAppointment?.doctor?.user;
 
-  const fullName = [
-    user?.name,
-    user?.parent_last_name,
-    user?.maternal_last_name,
-  ]
-    .filter(Boolean)
-    .join(" ");
+    const fullName = [
+      nestedUser?.name,
+      nestedUser?.parent_last_name,
+      nestedUser?.maternal_last_name,
+    ]
+      .filter(Boolean)
+      .join(" ");
 
-  return {
-    ...rest,
-    appointment_id,
-    name: fullName || null,
-  };
-}
+    return {
+      ...rest,
+      appointment_id: nestedAppointment?.appointment_id ?? null,
+      name: fullName || null,
+    };
+  }
 
   static async getPendingAppointmentRequests() {
     const requests = await prisma.patient_appointment.findMany({
@@ -383,5 +382,4 @@ static async getAppointmentById(id: number) {
 
     return scheduledAppointment;
   }
-
 }
