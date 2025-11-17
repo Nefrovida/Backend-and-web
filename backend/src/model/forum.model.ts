@@ -404,3 +404,95 @@ export const getUserForums = async (userId: string) => {
   });
 };
 
+/**
+ * Get all admin users (role_id = 1)
+ */
+export const getAdminUsers = async () => {
+  return await prisma.users.findMany({
+    where: {
+      role_id: 1,
+      active: true, // Solo usuarios activos
+    },
+    select: {
+      user_id: true,
+      name: true,
+      parent_last_name: true,
+      maternal_last_name: true,
+      username: true,
+      phone_number: true,
+      registration_date: true,
+      role: {
+        select: {
+          role_name: true,
+        },
+      },
+    },
+    orderBy: {
+      registration_date: 'desc',
+    },
+  });
+};
+
+/**
+ * Get admin users with pagination
+ */
+export const getAdminUsersWithPagination = async (
+  skip: number,
+  take: number
+) => {
+  return await prisma.users.findMany({
+    where: {
+      role_id: 1,
+      active: true,
+    },
+    select: {
+      user_id: true,
+      name: true,
+      parent_last_name: true,
+      maternal_last_name: true,
+      username: true,
+      phone_number: true,
+      registration_date: true,
+      role: {
+        select: {
+          role_name: true,
+        },
+      },
+    },
+    orderBy: {
+      registration_date: 'desc',
+    },
+    skip,
+    take,
+  });
+};
+
+/**
+ * Count total admin users
+ */
+export const countAdminUsers = async () => {
+  return await prisma.users.count({
+    where: {
+      role_id: 1,
+      active: true,
+    },
+  });
+};
+
+/**
+ * Check if user is admin
+ */
+export const isUserAdmin = async (userId: string) => {
+  const user = await prisma.users.findUnique({
+    where: {
+      user_id: userId,
+    },
+    select: {
+      role_id: true,
+      active: true,
+    },
+  });
+  
+  return user?.role_id === 1 && user?.active === true;
+};
+

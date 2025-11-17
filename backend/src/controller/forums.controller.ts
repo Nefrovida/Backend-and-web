@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { ZodError } from 'zod';
 import { createForumSchema, updateForumSchema } from '../validators/forum.validator';
 import * as forumsService from '../service/forums.service';
+import * as forumModel from '../model/forum.model';
 
 /**
  * Create a new forum (Admin only)
@@ -21,6 +22,7 @@ import * as forumsService from '../service/forums.service';
  * @param req - Express request with validated user and body
  * @param res - Express response
  */
+
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
     // Validate request body with Zod
@@ -157,3 +159,115 @@ export const update = async (req: Request, res: Response): Promise<void> => {
     res.status(error.statusCode || 400).json({ error: error.message });
   }
 };
+
+/**
+ * Get all admin users with pagination
+ * 
+ * User Story: "Admin: View Admin Users List"
+ * 
+ * Flow:
+ * 1. Extract query parameters (page, limit)
+ * 2. Calculate skip and take values for pagination
+ * 3. Call model function to retrieve admin users
+ * 4. Return paginated admin users with metadata
+ * 
+ * Prerequisites (handled by middlewares):
+ * - authenticate: Ensures req.user exists and is valid
+ * - requirePrivileges(['MANAGE_USERS']): Ensures user has permission
+ * 
+ * Query Parameters:
+ * - page: number (default: 1, minimum: 1)
+ * - limit: number (default: 10, minimum: 1, maximum: 100)
+ * 
+ * Response format:
+ * {
+ *   data: User[],
+ *   pagination: {
+ *     currentPage: number,
+ *     pageSize: number,
+ *     totalRecords: number,
+ *     totalPages: number,
+ *     hasNext: boolean,
+ *     hasPrevious: boolean
+ *   }
+ * }
+ * 
+ * @param req - Express request with query params
+ * @param res - Express response
+ */
+export const getAdminUsers = async (req: Request, res: Response): Promise<void> => {
+  try {
+    // Extract and validate query parameters
+    const page = Math.max(1, parseInt(req.query.page as string) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 10));
+
+    // Calculate pagination values
+    const skip = (page - 1) * limit;
+    const take = limit;
+
+    // Get admin users and total count in parallel for better performance
+    const [adminUsers, totalCount] = await Promise.all([
+      forumModel.getAdminUsersWithPagination(skip, take),
+      forumModel.countAdminUsers()
+    ]);
+
+    // Calculate pagination metadata
+    const totalPages = Math.ceil(totalCount / limit);
+    const hasNext = page < totalPages;
+    const hasPrevious = page > 1;
+
+    // Build response with data and pagination metadata
+    const response = {
+      data: adminUsers,
+      pagination: {
+        currentPage: page,
+        pageSize: limit,
+        totalRecords: totalCount,
+        totalPages,
+        hasNext,
+        hasPrevious
+      }
+    };
+
+    // Respond with paginated admin users
+    res.status(200).json(response);
+  } catch (error: any) {
+    console.error('Error fetching admin users:', error);
+    res.status(error.statusCode || 500).json({ 
+      error: error.message || 'Error interno del servidor al obtener administradores'
+    });
+  }
+};
+
+/**
+ * Check if a specific user is admin
+ * 
+ * User Story: "System: Verify Admin Status"
+ * 
+ * @param req - Express request with userId in params
+ * @param res - Express response
+ */
+export const checkAdminStatus = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = req.params.userId;
+    
+    if (!userId) {
+      res.status(400).json({ error: 'ID de usuario requerido' });
+      return;
+    }
+
+    const isAdmin = await forumModel.isUserAdmin(userId);
+
+    res.status(200).json({ 
+      userId,
+      isAdmin,
+      message: isAdmin ? 'El usuario es administrador' : 'El usuario no es administrador'
+    });
+  } catch (error: any) {
+    console.error('Error checking admin status:', error);
+    res.status(error.statusCode || 500).json({ 
+      error: error.message || 'Error interno del servidor al verificar estado de administrador'
+    });
+  }
+};
+

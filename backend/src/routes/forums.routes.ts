@@ -96,4 +96,21 @@ router.put(
   forumsController.update
 );
 
+// Admin routes - Get admin users with pagination
+router.get(
+  '/admin-users', 
+  authenticate, 
+  requirePrivileges([Privilege.VIEW_USERS]), 
+  forumsController.getAdminUsers
+);
+
+// Admin routes - Check if user is admin
+router.get(
+  '/admin-status/:userId', 
+  authenticate, 
+  requirePrivileges([Privilege.VIEW_USERS]), 
+  forumsController.checkAdminStatus
+);
+
+
 export default router;

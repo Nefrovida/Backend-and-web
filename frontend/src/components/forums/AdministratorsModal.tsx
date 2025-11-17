@@ -2,11 +2,27 @@ import { useState, useEffect } from 'react';
 import { Forum } from '../../types/forum.types';
 
 interface Administrator {
-  admin_id: number;
-  user_id: number;
+  user_id: string;
+  name: string;
+  parent_last_name: string;
+  maternal_last_name: string;
   username: string;
-  email: string;
-  status: 'active' | 'inactive';
+  phone_number: string;
+  registration_date: string;
+  role: {
+    role_name: string;
+  };
+}
+
+interface ForumAdministrator {
+  user_id: string;
+  name: string;
+  parent_last_name: string;
+  maternal_last_name: string;
+  username: string;
+  phone_number: string;
+  registration_date: string;
+  assigned_date: string;
 }
 
 interface AdministratorsModalProps {
@@ -32,10 +48,15 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
   externalError,
 }) => {
   const [administrators, setAdministrators] = useState<Administrator[]>([]);
+  const [forumAdministrators, setForumAdministrators] = useState<ForumAdministrator[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingForum, setIsLoadingForum] = useState(false);
   const [error, setError] = useState<string>('');
   const [showAddSection, setShowAddSection] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalRecords, setTotalRecords] = useState(0);
 
   // Update local error when external error changes
   useEffect(() => {
@@ -46,17 +67,21 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
 
   // Fetch administrators when modal opens
   useEffect(() => {
-    if (isOpen && forum) {
+    if (isOpen) {
       fetchAdministrators();
+      if (forum?.forum_id) {
+        fetchForumAdministrators();
+      }
     }
-  }, [isOpen, forum]);
+  }, [isOpen, currentPage, forum?.forum_id]);
 
   const fetchAdministrators = async () => {
-    if (!forum) return;
-
     try {
       setIsLoading(true);
-      const response = await fetch(`/api/forums/${forum.forum_id}/administrators`, {
+      setError('');
+      
+      // Backend está en el puerto 3000 según index.ts
+      const response = await fetch(`http://localhost:3000/api/forums/admin-users?page=${currentPage}&limit=10`, {
         credentials: 'include',
       });
 
@@ -65,8 +90,9 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
       }
 
       const data = await response.json();
-      setAdministrators(data);
-      setError('');
+      setAdministrators(data.data || []);
+      setTotalPages(data.pagination?.totalPages || 1);
+      setTotalRecords(data.pagination?.totalRecords || 0);
     } catch (err: any) {
       setError(err.message);
       console.error('Error fetching administrators:', err);
@@ -75,61 +101,79 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
     }
   };
 
-  const handleAddAdministrator = async (username: string) => {
-    if (!forum || !username.trim()) return;
-
+  const fetchForumAdministrators = async () => {
+    if (!forum?.forum_id) return;
+    
     try {
-      const response = await fetch(`/api/forums/${forum.forum_id}/administrators`, {
-        method: 'POST',
+      setIsLoadingForum(true);
+      setError('');
+      
+      // TODO: Reemplazar con el endpoint real para administradores del foro específico
+      const response = await fetch(`http://localhost:3000/api/forums/${forum.forum_id}/administrators`, {
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username: username.trim() }),
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Error al agregar administrador');
+        throw new Error('Error al cargar los administradores del foro');
       }
 
-      const newAdmin = await response.json();
-      setAdministrators([...administrators, newAdmin]);
-      setSearchTerm('');
-      setShowAddSection(false);
+      const data = await response.json();
+      setForumAdministrators(data.data || []);
     } catch (err: any) {
-      setError(err.message);
-      console.error('Error adding administrator:', err);
+      // Por ahora, solo mostrar datos mock si el endpoint no existe
+      console.warn('Endpoint de administradores del foro no disponible, usando datos mock');
+      setForumAdministrators([]);
+    } finally {
+      setIsLoadingForum(false);
     }
   };
 
-  const handleRemoveAdministrator = async (adminId: number) => {
-    if (!forum) return;
+  const handleAddAdministrator = async (username: string) => {
+    // Por ahora solo mostramos un mensaje, ya que necesitaríamos
+    // un endpoint específico para convertir usuarios en admins
+    setError('Funcionalidad de agregar administradores aún no implementada');
+    console.log('Agregar administrador:', username);
+  };
 
+  const handleRemoveAdministrator = async (userId: string) => {
+    // Por ahora solo mostramos un mensaje, ya que necesitaríamos
+    // un endpoint específico para remover rol de admin
+    setError('Funcionalidad de remover administradores aún no implementada');
+    console.log('Remover administrador:', userId);
+  };
+
+  const handleRemoveForumAdministrator = async (userId: string) => {
+    if (!forum?.forum_id) return;
+    
     try {
-      const response = await fetch(`/api/forums/${forum.forum_id}/administrators/${adminId}`, {
+      setError('');
+      
+      // TODO: Reemplazar con el endpoint real para remover admin del foro
+      const response = await fetch(`http://localhost:3000/api/forums/${forum.forum_id}/administrators/${userId}`, {
         method: 'DELETE',
         credentials: 'include',
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Error al eliminar administrador');
+        throw new Error('Error al remover administrador del foro');
       }
 
-      setAdministrators(administrators.filter(admin => admin.admin_id !== adminId));
+      // Actualizar la lista de administradores del foro
+      await fetchForumAdministrators();
+      setError(''); // Clear any previous errors on success
     } catch (err: any) {
-      setError(err.message);
-      console.error('Error removing administrator:', err);
+      setError('Funcionalidad de remover administradores del foro aún no implementada');
+      console.error('Error removing forum administrator:', err);
     }
   };
 
-  if (!isOpen || !forum) return null;
+  if (!isOpen) return null;
 
   // Filter administrators based on search
   const filteredAdministrators = administrators.filter(admin =>
     admin.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    admin.email.toLowerCase().includes(searchTerm.toLowerCase())
+    admin.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    `${admin.name} ${admin.parent_last_name}`.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -174,6 +218,57 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
           </div>
         )}
 
+        {/* Forum Administrators Section */}
+        {forum && (
+          <div className="mb-6">
+            <div className="bg-white rounded-lg p-4 border border-gray-200">
+              <h3 className="text-sm font-semibold text-gray-800 mb-3">
+                Administradores de "{forum.name}"
+              </h3>
+              
+              {isLoadingForum ? (
+                <div className="text-center py-2">
+                  <p className="text-gray-600 text-sm">Cargando administradores del foro...</p>
+                </div>
+              ) : forumAdministrators.length === 0 ? (
+                <div className="text-center py-2">
+                  <p className="text-gray-600 text-sm">Este foro no tiene administradores asignados</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {forumAdministrators.map((admin) => (
+                    <div key={admin.user_id} className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2">
+                      <div className="flex items-center space-x-2">
+                        {/* Avatar placeholder */}
+                        <div className="w-6 h-6 bg-blue-300 rounded-full flex items-center justify-center">
+                          <span className="text-xs font-semibold text-blue-800">
+                            {admin.name.charAt(0).toUpperCase()}{admin.parent_last_name.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">{admin.username}</p>
+                          <p className="text-xs text-gray-500">
+                            {admin.name} {admin.parent_last_name}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      {/* Remove Forum Admin button */}
+                      <button
+                        onClick={() => handleRemoveForumAdministrator(admin.user_id)}
+                        className="px-2 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600 transition-colors"
+                        title="Quitar de este foro"
+                      >
+                        Quitar Admin
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Search Section */}
         <div className="mb-6">
           <div className="relative">
@@ -201,8 +296,8 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
             </svg>
           </div>
 
-          {/* Add Administrator Button */}
-          {showAddSection && searchTerm.trim() && (
+          {/* Add Administrator Button - Only show when not searching */}
+          {showAddSection && searchTerm.trim() && filteredAdministrators.length === 0 && (
             <div className="mt-2">
               <button
                 onClick={() => handleAddAdministrator(searchTerm)}
@@ -216,7 +311,36 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
 
         {/* Current Administrators Section */}
         <div className="mb-4">
-          <h3 className="text-sm font-semibold text-gray-700 mb-3">Actuales</h3>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold text-gray-700">
+              Todos los Administradores ({totalRecords} administradores)
+            </h3>
+            {totalPages > 1 && (
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1}
+                  className="p-1 hover:bg-gray-200 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                <span className="text-xs text-gray-500">
+                  {currentPage} / {totalPages}
+                </span>
+                <button
+                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                  disabled={currentPage === totalPages}
+                  className="p-1 hover:bg-gray-200 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+            )}
+          </div>
           
           {isLoading ? (
             <div className="text-center py-4">
@@ -231,37 +355,39 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
           ) : (
             <div className="space-y-2">
               {filteredAdministrators.map((admin) => (
-                <div key={admin.admin_id} className="flex items-center justify-between bg-white rounded-lg px-4 py-3">
+                <div key={admin.user_id} className="flex items-center justify-between bg-white rounded-lg px-4 py-3">
                   <div className="flex items-center space-x-3">
                     {/* Avatar placeholder */}
                     <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 text-gray-600"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                        />
-                      </svg>
+                      <span className="text-xs font-semibold text-gray-600">
+                        {admin.name.charAt(0).toUpperCase()}{admin.parent_last_name.charAt(0).toUpperCase()}
+                      </span>
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-900">{admin.username}</p>
-                      <p className="text-xs text-gray-500">{admin.email}</p>
+                      <p className="text-xs text-gray-500">
+                        {admin.name} {admin.parent_last_name}
+                      </p>
+                      <p className="text-xs text-blue-500">{admin.role.role_name}</p>
                     </div>
                   </div>
                   
                   {/* Action buttons */}
                   <div className="flex items-center space-x-2">
-                    {/* Settings button */}
+                    {/* Make Admin button */}
                     <button
-                      onClick={() => {/* TODO: Implement settings */}}
+                      onClick={() => handleAddAdministrator(admin.username)}
+                      className="px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 transition-colors"
+                      title="Hacer administrador"
+                    >
+                      Admin
+                    </button>
+                    
+                    {/* Message button */}
+                    <button
+                      onClick={() => {/* TODO: Send message */}}
                       className="p-1 hover:bg-gray-100 rounded transition-colors"
+                      title="Enviar mensaje"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -274,28 +400,7 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           strokeWidth={2}
-                          d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
-                        />
-                      </svg>
-                    </button>
-                    
-                    {/* Remove button */}
-                    <button
-                      onClick={() => handleRemoveAdministrator(admin.admin_id)}
-                      className="p-1 hover:bg-red-100 rounded transition-colors"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 text-red-500"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                          d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
                         />
                       </svg>
                     </button>
