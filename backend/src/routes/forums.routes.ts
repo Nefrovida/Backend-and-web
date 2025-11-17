@@ -49,6 +49,20 @@ router.get(
   forumsController.getAll
 );
 
+router.get(
+  "/:forumId",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_FORUMS]),
+  forumsController.getById
+);
+
+router.get(
+  "/me",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_FORUMS]),
+  forumsController.getMyForums
+);
+
 /**
  * Create a new forum
  * 
