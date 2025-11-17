@@ -5,13 +5,18 @@ export default class MedicalRecord {
 
   /**
    * Get complete medical record for a patient
-   * @param patientId - The patient's UUID
+   * @param patientId - The patient's UUID (can be user_id or patient_id)
    * @returns Complete medical record with all related data
    */
   static async getMedicalRecord(patientId: string) {
-    // Get patient basic info
-    const patient = await prisma.patients.findUnique({
-      where: { patient_id: patientId },
+    // Get patient basic info - search by user_id first, then by patient_id
+    let patient = await prisma.patients.findFirst({
+      where: { 
+        OR: [
+          { user_id: patientId },
+          { patient_id: patientId }
+        ]
+      },
       select: {
         patient_id: true,
         curp: true,

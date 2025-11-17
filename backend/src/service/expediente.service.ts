@@ -17,6 +17,9 @@ export const getMedicalRecord = async (
     throw new NotFoundError("Patient not found");
   }
 
+  // Use the actual patient_id from the medical record for access verification
+  const actualPatientId = medicalRecord.patient.patient_id;
+
   // Admin (role_id = 1) has access to all records
   if (userRoleId === 1) {
     return medicalRecord;
@@ -26,7 +29,7 @@ export const getMedicalRecord = async (
   if (userRoleId === 2) {
     const hasAccess = await MedicalRecord.verifyDoctorAccess(
       requestingUserId,
-      patientId
+      actualPatientId
     );
     if (!hasAccess) {
       throw new ForbiddenError(
@@ -40,7 +43,7 @@ export const getMedicalRecord = async (
   if (userRoleId === 3 || userRoleId === 5) {
     const hasAccess = await MedicalRecord.verifyPatientOrFamiliarAccess(
       requestingUserId,
-      patientId
+      actualPatientId
     );
     if (!hasAccess) {
       throw new ForbiddenError("You don't have access to this medical record");
