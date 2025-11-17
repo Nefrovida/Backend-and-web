@@ -271,3 +271,151 @@ export const checkAdminStatus = async (req: Request, res: Response): Promise<voi
   }
 };
 
+/**
+ * Get forum administrators
+ */
+export const getForumAdministrators = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const forumId = parseInt(req.params.forumId);
+    
+    if (isNaN(forumId)) {
+      res.status(400).json({ error: 'ID de foro inválido' });
+      return;
+    }
+
+    // Verificar que el foro existe
+    const forum = await forumModel.findById(forumId);
+    if (!forum) {
+      res.status(404).json({ error: 'Foro no encontrado' });
+      return;
+    }
+
+    // Obtener administradores del foro (OWNER y MODERATOR)
+    const administrators = await forumModel.getForumAdministrators(forumId);
+
+    res.status(200).json({ 
+      data: administrators,
+      forum: {
+        forum_id: forum.forum_id,
+        name: forum.name
+      }
+    });
+  } catch (error: any) {
+    console.error('Error fetching forum administrators:', error);
+    res.status(error.statusCode || 500).json({ 
+      error: error.message || 'Error interno del servidor'
+    });
+  }
+};
+
+/**
+ * Add administrator to forum
+ */
+export const addForumAdministrator = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const forumId = parseInt(req.params.forumId);
+    const { user_id } = req.body;
+    
+    if (isNaN(forumId)) {
+      res.status(400).json({ error: 'ID de foro inválido' });
+      return;
+    }
+
+    if (!user_id) {
+      res.status(400).json({ error: 'ID de usuario requerido' });
+      return;
+    }
+
+    // Verificar que el foro existe
+    const forum = await forumModel.findById(forumId);
+    if (!forum) {
+      res.status(404).json({ error: 'Foro no encontrado' });
+      return;
+    }
+
+    // Verificar que el usuario es admin global
+    const isAdmin = await forumModel.isUserAdmin(user_id);
+    if (!isAdmin) {
+      res.status(400).json({ error: 'Solo los administradores globales pueden ser asignados como administradores de foro' });
+      return;
+    }
+
+    // Verificar si ya está en el foro
+    const existingRole = await forumModel.getUserRole(forumId, user_id);
+    
+    if (existingRole) {
+      // Si ya está en el foro, actualizar a MODERATOR
+      await forumModel.updateUserRole(forumId, user_id, 'MODERATOR');
+    } else {
+      // Si no está en el foro, agregarlo como MODERATOR
+      await forumModel.addUserToForum(forumId, user_id, 'MODERATOR');
+    }
+
+    res.status(200).json({ 
+      message: 'Usuario asignado como administrador del foro exitosamente',
+      user_id,
+      forum_id: forumId,
+      role: 'MODERATOR'
+    });
+  } catch (error: any) {
+    console.error('Error adding forum administrator:', error);
+    res.status(error.statusCode || 500).json({ 
+      error: error.message || 'Error interno del servidor'
+    });
+  }
+};
+
+/**
+ * Remove administrator from forum
+ */
+export const removeForumAdministrator = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const forumId = parseInt(req.params.forumId);
+    const userId = req.params.userId;
+    
+    if (isNaN(forumId)) {
+      res.status(400).json({ error: 'ID de foro inválido' });
+      return;
+    }
+
+    if (!userId) {
+      res.status(400).json({ error: 'ID de usuario requerido' });
+      return;
+    }
+
+    // Verificar que el foro existe
+    const forum = await forumModel.findById(forumId);
+    if (!forum) {
+      res.status(404).json({ error: 'Foro no encontrado' });
+      return;
+    }
+
+    // Verificar que el usuario está en el foro
+    const userRole = await forumModel.getUserRole(forumId, userId);
+    if (!userRole) {
+      res.status(404).json({ error: 'Usuario no encontrado en el foro' });
+      return;
+    }
+
+    // No permitir remover al OWNER
+    if (userRole === 'OWNER') {
+      res.status(400).json({ error: 'No se puede remover al creador del foro' });
+      return;
+    }
+
+    // Remover del foro completamente
+    await forumModel.removeUserFromForum(forumId, userId);
+
+    res.status(200).json({ 
+      message: 'Administrador removido del foro exitosamente',
+      user_id: userId,
+      forum_id: forumId
+    });
+  } catch (error: any) {
+    console.error('Error removing forum administrator:', error);
+    res.status(error.statusCode || 500).json({ 
+      error: error.message || 'Error interno del servidor'
+    });
+  }
+};
+

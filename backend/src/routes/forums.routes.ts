@@ -1,5 +1,6 @@
 import express from "express";
 import * as forumsController from "../controller/forums.controller";
+import * as addPatientToForumController from '../controller/forums/add_patient_to_forum.controller';
 import { authenticate } from "../middleware/auth.middleware";
 import { requirePrivileges } from "../middleware/rbac.middleware";
 import { Privilege } from "../types/rbac.types";
@@ -112,5 +113,34 @@ router.get(
   forumsController.checkAdminStatus
 );
 
+// Forum administrators routes
+router.get(
+  '/:forumId/administrators',
+  authenticate,
+  requirePrivileges([Privilege.VIEW_USERS]),
+  forumsController.getForumAdministrators
+);
+
+router.post(
+  '/:forumId/administrators',
+  authenticate,
+  requirePrivileges([Privilege.UPDATE_FORUMS]),
+  forumsController.addForumAdministrator
+);
+
+router.delete(
+  '/:forumId/administrators/:userId',
+  authenticate,
+  requirePrivileges([Privilege.UPDATE_FORUMS]),
+  forumsController.removeForumAdministrator
+);
+
+// Forum users routes (from add_patient_to_forum.routes.ts)
+router.post(
+  '/:forumId/users',
+  authenticate,
+  requirePrivileges([Privilege.ADD_USER_TO_FORUM]),
+  addPatientToForumController.addPatientToForum
+);
 
 export default router;

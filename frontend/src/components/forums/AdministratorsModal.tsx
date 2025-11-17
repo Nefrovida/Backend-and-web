@@ -22,7 +22,7 @@ interface ForumAdministrator {
   username: string;
   phone_number: string;
   registration_date: string;
-  assigned_date: string;
+  forum_role: string;
 }
 
 interface AdministratorsModalProps {
@@ -108,7 +108,6 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
       setIsLoadingForum(true);
       setError('');
       
-      // TODO: Reemplazar con el endpoint real para administradores del foro específico
       const response = await fetch(`http://localhost:3000/api/forums/${forum.forum_id}/administrators`, {
         credentials: 'include',
       });
@@ -120,19 +119,47 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
       const data = await response.json();
       setForumAdministrators(data.data || []);
     } catch (err: any) {
-      // Por ahora, solo mostrar datos mock si el endpoint no existe
-      console.warn('Endpoint de administradores del foro no disponible, usando datos mock');
+      console.error('Error fetching forum administrators:', err);
       setForumAdministrators([]);
     } finally {
       setIsLoadingForum(false);
     }
   };
 
-  const handleAddAdministrator = async (username: string) => {
-    // Por ahora solo mostramos un mensaje, ya que necesitaríamos
-    // un endpoint específico para convertir usuarios en admins
-    setError('Funcionalidad de agregar administradores aún no implementada');
-    console.log('Agregar administrador:', username);
+  const handleAddAdministrator = async (userId: string) => {
+    if (!forum?.forum_id) {
+      setError('No se ha seleccionado un foro');
+      return;
+    }
+
+    try {
+      setError('');
+      
+      const response = await fetch(`http://localhost:3000/api/forums/${forum.forum_id}/administrators`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ user_id: userId }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error al agregar administrador');
+      }
+
+      // Actualizar ambas listas para reflejar los cambios
+      await Promise.all([
+        fetchForumAdministrators(),
+        fetchAdministrators()
+      ]);
+      
+      console.log('Administrador agregado exitosamente');
+    } catch (err: any) {
+      setError(err.message);
+      console.error('Error adding administrator:', err);
+    }
   };
 
   const handleRemoveAdministrator = async (userId: string) => {
@@ -148,33 +175,45 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
     try {
       setError('');
       
-      // TODO: Reemplazar con el endpoint real para remover admin del foro
       const response = await fetch(`http://localhost:3000/api/forums/${forum.forum_id}/administrators/${userId}`, {
         method: 'DELETE',
         credentials: 'include',
       });
 
       if (!response.ok) {
-        throw new Error('Error al remover administrador del foro');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error al remover administrador del foro');
       }
 
-      // Actualizar la lista de administradores del foro
-      await fetchForumAdministrators();
-      setError(''); // Clear any previous errors on success
+      // Actualizar ambas listas para reflejar los cambios
+      await Promise.all([
+        fetchForumAdministrators(),
+        fetchAdministrators()
+      ]);
+      
+      console.log('Administrador removido exitosamente');
     } catch (err: any) {
-      setError('Funcionalidad de remover administradores del foro aún no implementada');
+      setError(err.message);
       console.error('Error removing forum administrator:', err);
     }
   };
 
   if (!isOpen) return null;
 
-  // Filter administrators based on search
-  const filteredAdministrators = administrators.filter(admin =>
-    admin.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    admin.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    `${admin.name} ${admin.parent_last_name}`.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filter administrators based on search and exclude those already in the forum
+  const filteredAdministrators = administrators.filter(admin => {
+    // First filter by search terms
+    const matchesSearch = admin.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      admin.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      `${admin.name} ${admin.parent_last_name}`.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    // Then exclude administrators who are already in the forum
+    const isNotInForum = !forumAdministrators.some(forumAdmin => 
+      forumAdmin.user_id === admin.user_id
+    );
+    
+    return matchesSearch && isNotInForum;
+  });
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]">
@@ -300,10 +339,30 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
           {showAddSection && searchTerm.trim() && filteredAdministrators.length === 0 && (
             <div className="mt-2">
               <button
-                onClick={() => handleAddAdministrator(searchTerm)}
+                onClick={() => {
+                  // Buscar usuario por username en la lista de administradores (incluyendo los ya asignados)
+                  const userToAdd = administrators.find(admin => 
+                    admin.username.toLowerCase() === searchTerm.toLowerCase()
+                  );
+                  
+                  if (userToAdd) {
+                    // Verificar si ya está en el foro
+                    const isAlreadyInForum = forumAdministrators.some(forumAdmin => 
+                      forumAdmin.user_id === userToAdd.user_id
+                    );
+                    
+                    if (isAlreadyInForum) {
+                      setError(`El usuario "${searchTerm}" ya es administrador de este foro`);
+                    } else {
+                      handleAddAdministrator(userToAdd.user_id);
+                    }
+                  } else {
+                    setError(`Usuario "${searchTerm}" no encontrado en la lista de administradores`);
+                  }
+                }}
                 className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm"
               >
-                Agregar "{searchTerm}" como administrador
+                Agregar "{searchTerm}" como administrador del foro
               </button>
             </div>
           )}
@@ -313,7 +372,7 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
         <div className="mb-4">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold text-gray-700">
-              Todos los Administradores ({totalRecords} administradores)
+              Administradores Disponibles ({filteredAdministrators.length} de {totalRecords})
             </h3>
             {totalPages > 1 && (
               <div className="flex items-center space-x-2">
@@ -349,7 +408,9 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
           ) : filteredAdministrators.length === 0 ? (
             <div className="text-center py-4">
               <p className="text-gray-600 text-sm">
-                {searchTerm ? 'No se encontraron administradores' : 'No hay administradores asignados'}
+                {searchTerm 
+                  ? 'No se encontraron administradores que coincidan con la búsqueda' 
+                  : 'Todos los administradores ya están asignados a este foro'}
               </p>
             </div>
           ) : (
@@ -376,9 +437,9 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
                   <div className="flex items-center space-x-2">
                     {/* Make Admin button */}
                     <button
-                      onClick={() => handleAddAdministrator(admin.username)}
+                      onClick={() => handleAddAdministrator(admin.user_id)}
                       className="px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 transition-colors"
-                      title="Hacer administrador"
+                      title="Hacer administrador de este foro"
                     >
                       Admin
                     </button>
