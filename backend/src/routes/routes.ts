@@ -12,12 +12,13 @@ import forumsRoutes from "./forums.routes";
 import addPatientToForumRoutes from "./forums/add_patient_to_forum.routes";
 import patientRoutes from "./patients.routes";
 import clinicalHistoryRoutes from "./clinicalHistory.routes";
+import * as analysisController from '../controller/analysis/add_analysis.controller';
+
 import reportRouter from "./report.routes";
 import historialRoutes from "./historial.routes"
 import historyRoutes from "./history.routes";
 import agendaRoutes from "./agenda.routes";
 
-import * as analysisController from "../controller/analysis/add.analysis.controller";
 import { authenticate } from "../middleware/auth.middleware";
 import { requirePrivileges } from "../middleware/rbac.middleware";
 import { Privilege } from "../types/rbac.types";
