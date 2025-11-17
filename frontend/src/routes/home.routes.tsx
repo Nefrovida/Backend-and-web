@@ -5,6 +5,8 @@ import Login from "../components/page/Login";
 import Register from "../components/page/Register";
 import analisisRoutes from "./analisis.routes";
 import forumsRoutes from "./forums.routes";
+import agendaRoutes from "./agenda.routes";
+import secretariaRoutes from "./secretaria.routes";
 import Home from "../components/page/Home";
 import forumRoutes from "./forum.routes";
 import AddPatientToForumPage from "../components/page/add_patient_to_forum_page";
@@ -23,8 +25,9 @@ const router = createBrowserRouter([
       ...analisisRoutes,
       ...forumsRoutes, // administrador
       ...forumRoutes, // chat
+      ...agendaRoutes,
       ...notesRoutes,
-      ...forumsRoutes,
+      ...secretariaRoutes,
     ],
   },
   {
