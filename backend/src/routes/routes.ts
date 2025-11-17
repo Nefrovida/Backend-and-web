@@ -23,9 +23,7 @@ import { Privilege } from "../types/rbac.types";
 
 const router = express.Router();
 
-router.get("/", (req: Request, res: Response) => {
-    res.send("Welcome to the Medical Analysis API");
-});
+
 // ============================================
 // Authentication Routes (Public)
 // ============================================
