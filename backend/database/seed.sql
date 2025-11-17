@@ -181,6 +181,30 @@ FROM (
 JOIN (
   SELECT appointment_id, ROW_NUMBER() OVER () AS rn FROM appointments
 ) a ON p.rn = a.rn
+LIMIT 2;
+
+-- Solicitudes de citas pendientes (REQUESTED)
+INSERT INTO patient_appointment (patient_id, appointment_id, date_hour, duration, appointment_type, appointment_status)
+SELECT 
+  p.patient_id,
+  a.appointment_id,
+  NOW() + (interval '1 day'),
+  CASE 
+    WHEN (ROW_NUMBER() OVER ()) % 3 = 0 THEN 30
+    WHEN (ROW_NUMBER() OVER ()) % 3 = 1 THEN 45
+    ELSE 60
+  END,
+  CASE 
+    WHEN (ROW_NUMBER() OVER ()) % 2 = 0 THEN 'PRESENCIAL'
+    ELSE 'VIRTUAL'
+  END,
+  'REQUESTED'
+FROM (
+  SELECT patient_id FROM patients ORDER BY patient_id
+) p
+CROSS JOIN (
+  SELECT appointment_id FROM appointments LIMIT 1
+) a
 LIMIT 5;
 
 -- ========================
