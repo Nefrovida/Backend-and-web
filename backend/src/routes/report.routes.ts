@@ -1,3 +1,4 @@
+//backend/src/routes/report.routes.ts
 import express, { Request, Response } from "express";
 const router = express.Router()
 
@@ -12,6 +13,13 @@ router.get(
     authenticate, 
     requirePrivileges([Privilege.VIEW_ANALYSIS]), 
     getResult
+);
+
+router.get(
+    "/get-result-android/:patient_analysis_id",
+    authenticate,
+    requirePrivileges([Privilege.VIEW_ANALYSIS]),
+    reportController.getResultV2
 );
 
 router.get("/risk-questions",
