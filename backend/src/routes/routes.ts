@@ -28,6 +28,7 @@ import { Privilege } from "../types/rbac.types";
 
 const router = express.Router();
 
+
 // ============================================
 // Authentication Routes (Public)
 // ============================================
