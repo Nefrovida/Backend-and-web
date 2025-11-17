@@ -62,10 +62,25 @@ export const getResultV2 = async (req: Request, res: Response) => {
   }
 };
 
+export const getRiskQuestions = async (req: Request, res: Response) => {
+  try {
+    const questions = await getResultsService.getRiskQuestions();
+    res.status(200).json(questions);
+  } catch (error) {
+    console.error('Error fetching risk questions:', error);
+    res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Internal Server Error' } });
+  }
+};
+
 async function getResult (req: Request, res: Response) {
     try {
-        
-        const results = await getResultsService.getResultById(req, res);
+    const id = Number(req.params.patient_analysis_id);
+
+    if (Number.isNaN(id)) {
+      return res.status(400).json({ message: 'Invalid patient_analysis_id' });
+    }
+
+    const results = await getResultsService.getResultById(id);
 
         res.status(200).json(results);
 
