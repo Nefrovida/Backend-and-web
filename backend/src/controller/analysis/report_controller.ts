@@ -1,5 +1,8 @@
 import { type Request, type Response } from "express";
 import * as getResultsService from "../../service/analysis/getResult.service"
+import { getResultParamsSchema } from "../../validators/report.validators";
+import { NotFoundError } from "../../util/errors.util";
+import { ZodError } from "zod";
 
 
 
@@ -15,10 +18,69 @@ import * as getResultsService from "../../service/analysis/getResult.service"
     res.status(200).json(info);
 }*/
 
+// ======================
+// Endpoint for Android
+// ======================
+export const getResultV2 = async (req: Request, res: Response) => {
+  try {
+    const { patient_analysis_id } = getResultParamsSchema.parse(req.params);
+    const result = await getResultsService.getResultById(patient_analysis_id);
+
+    res.status(200).json({
+      success: true,
+      message: "Result retrieved successfully",
+      data: result,
+    });
+  } catch (error) {
+    if (error instanceof ZodError) {
+      res.status(400).json({
+        success: false,
+        error: {
+          code: "VALIDATION_ERROR",
+          message: "Invalid patient_analysis_id",
+          details: error.errors,
+        },
+      });
+    } else if (error instanceof NotFoundError) {
+      res.status(404).json({
+        success: false,
+        error: {
+          code: "RESULT_NOT_FOUND",
+          message: error.message,
+        },
+      });
+    } else {
+      console.error(error);
+      res.status(500).json({
+        success: false,
+        error: {
+          code: "INTERNAL_ERROR",
+          message: "An unexpected error occurred",
+        },
+      });
+    }
+  }
+};
+
+export const getRiskQuestions = async (req: Request, res: Response) => {
+  try {
+    const questions = await getResultsService.getRiskQuestions();
+    res.status(200).json(questions);
+  } catch (error) {
+    console.error('Error fetching risk questions:', error);
+    res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Internal Server Error' } });
+  }
+};
+
 async function getResult (req: Request, res: Response) {
     try {
-        
-        const results = await getResultsService.getResultById(req, res);
+    const id = Number(req.params.patient_analysis_id);
+
+    if (Number.isNaN(id)) {
+      return res.status(400).json({ message: 'Invalid patient_analysis_id' });
+    }
+
+    const results = await getResultsService.getResultById(id);
 
         res.status(200).json(results);
 
@@ -26,32 +88,6 @@ async function getResult (req: Request, res: Response) {
         console.log(error);
     }
 }
-export const getRiskQuestions = async (req: Request, res: Response) => {
-    try {
-        
-        if(!req.user){
-            return  res.status(401).json("Unauthorized");
-        }
-        const questions = await getResultsService.getRiskQuestions(req, res);
 
-        res.status(200).json(questions);
-
-    }
-    catch (error) {
-        res.status(500).json("Internal Server Error");
-        console.log(error);
-    }
-}
-
-export const getRiskOptions = async (req: Request, res: Response) => {
-    try {
-        const options = await getResultsService.getRiskOptions(req, res);
-
-        res.status(200).json(options);
-    } catch (error) {
-        res.status(500).json("Internal Server Error");
-        console.log(error);
-    }
-}
 
 export default getResult;

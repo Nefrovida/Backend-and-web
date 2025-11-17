@@ -1,5 +1,6 @@
 import express from "express";
 import * as forumsController from "../controller/forums.controller";
+import * as addPatientToForumController from "../controller/forums/add_patient_to_forum.controller";
 import { authenticate } from "../middleware/auth.middleware";
 import { requirePrivileges } from "../middleware/rbac.middleware";
 import { Privilege } from "../types/rbac.types";
@@ -51,6 +52,19 @@ router.get(
 );
 
 router.get("/myForums", authenticate, getMyForums);
+router.get(
+  "/:forumId",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_FORUMS]),
+  forumsController.getById
+);
+
+router.get(
+  "/me",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_FORUMS]),
+  forumsController.getMyForums
+);
 
 /**
  * Create a new forum
@@ -106,5 +120,110 @@ router.put(
   requirePrivileges([Privilege.UPDATE_FORUMS]),
   forumsController.update
 );
+
+// Admin routes - Get admin users with pagination
+router.get(
+  "/admin-users",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_USERS]),
+  forumsController.getAdminUsers
+);
+
+// Admin routes - Get non-admin users with pagination
+router.get(
+  "/regular-users",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_USERS]),
+  forumsController.getRegularUsers
+);
+
+// Admin routes - Check if user is admin
+router.get(
+  "/admin-status/:userId",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_USERS]),
+  forumsController.checkAdminStatus
+);
+
+// Forum administrators routes
+router.get(
+  "/:forumId/administrators",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_USERS]),
+  forumsController.getForumAdministrators
+);
+
+router.post(
+  "/:forumId/administrators",
+  authenticate,
+  requirePrivileges([Privilege.UPDATE_FORUMS]),
+  forumsController.addForumAdministrator
+);
+
+router.delete(
+  "/:forumId/administrators/:userId",
+  authenticate,
+  requirePrivileges([Privilege.UPDATE_FORUMS]),
+  forumsController.removeForumAdministrator
+);
+
+// Forum members routes
+router.get(
+  "/:forumId/members",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_USERS]),
+  forumsController.getForumMembers
+);
+
+router.post(
+  "/:forumId/members",
+  authenticate,
+  requirePrivileges([Privilege.ADD_USER_TO_FORUM]),
+  forumsController.addForumMember
+);
+
+router.delete(
+  "/:forumId/members/:userId",
+  authenticate,
+  requirePrivileges([Privilege.UPDATE_FORUMS]),
+  forumsController.removeForumMember
+);
+
+// Forum users routes (from add_patient_to_forum.routes.ts)
+router.post(
+  "/:forumId/users",
+  authenticate,
+  requirePrivileges([Privilege.ADD_USER_TO_FORUM]),
+  addPatientToForumController.addPatientToForum
+);
+
+/**
+ * Reply to a message in a forum
+ *
+ * POST /api/forums/:forumId/replies
+ *
+ * User Story: "Todos responden mensaje en el foro"
+ *
+ * Middlewares:
+ * 1. authenticate - Verifies JWT and injects req.user
+ * 2. forumsController.replyToMessage - Handles the request
+ *
+ * Request Body:
+ * {
+ *   "parentMessageId": 123,
+ *   "content": "Este es mi comentario en hilo"
+ * }
+ *
+ * Response: 201 Created
+ * {
+ *   "message_id": 456,
+ *   "forum_id": 1,
+ *   "user_id": "user-uuid",
+ *   "content": "Este es mi comentario en hilo",
+ *   "parent_message_id": 123,
+ *   "publication_timestamp": "2025-11-16T..."
+ * }
+ */
+router.post("/:forumId/replies", authenticate, forumsController.replyToMessage);
 
 export default router;

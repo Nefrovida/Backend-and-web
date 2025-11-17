@@ -1,31 +1,21 @@
-import { prisma } from "../util/prisma.js";
+import { prisma } from "../util/prisma";
 
 export default class Report {
-  Report() {
-
-  }
+  Report() {}
 
   static async getResult(patientAnalysisId: number) {
-    
-  return prisma.results.findFirst({
+    return prisma.results.findFirst({
       where: {
-        patient_analysis_id: patientAnalysisId
+        patient_analysis_id: patientAnalysisId,
       },
       include: {
         patient_analysis: {
           include: {
-              analysis: true,
-          }
-        }
-      }
-      });
+            analysis: true,
+          },
+        },
+      },
+    });
   }
 
-  static async getRiskQuestions() {
-    return prisma.questions_history.findMany();
-  }
-
-  static async getRiskOptions() {
-    return prisma.options.findMany();
-  }
 }
