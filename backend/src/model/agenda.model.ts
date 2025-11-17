@@ -1,5 +1,8 @@
-// backend/src/model/agenda.model.ts
-import { prisma } from "../util/prisma";
+
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
 
 export default class Agenda {
   constructor() { }
