@@ -1,25 +1,24 @@
-import { FC, ReactNode } from "react";
-import { Link } from "react-router-dom";
+import { FC, ReactNode, useState } from "react";
+import { NavLink } from "react-router-dom";
 
 interface Props {
   from: ReactNode;
   to: ReactNode;
   link: string;
-  option: string;
-  selected: Record<string, boolean>;
-  onHover: (key: string, value: boolean) => void;
 }
 
-const NavIcon: FC<Props> = ({ from, to, link, option, selected, onHover }) => {
+const NavIcon: FC<Props> = ({ from, to, link }) => {
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
-    <Link
+    <NavLink
       to={link}
-      onMouseEnter={() => onHover(option, true)}
-      onMouseLeave={() => onHover(option, false)}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       className="my-2 flex items-center justify-center"
     >
-      {selected[option] ? to : from}
-    </Link>
+      {({ isActive }) => (isActive || isHovered ? to : from)}
+    </NavLink>
   );
 };
 
