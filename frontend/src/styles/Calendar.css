@@ -3,7 +3,7 @@
   background-color: #e6f3fa;
   border-radius: 1px;
   padding: 10px;
-  font-size: 10px;
+  font-size: 14px;
   font-weight: bold;
   color: #000;
   line-height: 1.1;
@@ -24,7 +24,7 @@
 
 
 .full-page-calendar {
-  height: calc(100vh - 0px); /* Puedes restar header o navbar si tienes */
+  height: calc(100vh - 0px);
   width: 80%;
   justify-content: center;
   align-items: center;
@@ -32,7 +32,7 @@
 }
 
 
-/* ---------- SCROLLER: AQUÍ VA EL SCROLL REAL ---------- */
+/* ---------- SCROLLER ---------- */
 .calendar .fc-timegrid-body .fc-scroller,
 .calendar .fc-scroller-harness > .fc-scroller {
   overflow-y: auto !important;
@@ -63,16 +63,14 @@
   background-color: #fff !important;
 }
 
-/* Forzar que la barra sea un contenedor relativo */
 .fc-header-toolbar {
   position: relative;
   width: 100%;
   display: flex;
-  justify-content: flex-end; /* Botones a la derecha */
+  justify-content: flex-end;
   align-items: center;
 }
 
-/* Título centrado REAL */
 .fc-toolbar-title {
   position: absolute;
   left: 50%;
@@ -82,13 +80,12 @@
   font-size: 1.4rem;
 }
 
-/* Los botones se quedan a la derecha */
 .fc-toolbar-chunk:nth-child(3) {
   margin-left: auto;
 }
 
 .fc .fc-button {
-  background-color: #010C5E !important; /* Color */
+  background-color: #010C5E !important;
   border-color: #010C5E !important;
   color: white !important;
 }

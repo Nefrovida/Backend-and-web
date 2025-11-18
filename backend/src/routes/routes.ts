@@ -1,6 +1,6 @@
 // backend/src/routes/routes.ts
 import express from "express";
-
+import doctorRoutes from "./doctor.routes";
 import labRoutes from "./lab.routes";
 import authRoutes from "./auth.routes";
 import usersRoutes from "./users.routes";
@@ -108,6 +108,10 @@ router.use("/historial", historialRoutes);
 // Appointments Routes (Protected)
 // ============================================
 router.use("/appointments", appointmentsRoutes);
+
+// Doctors Routes (Protected)
+// ============================================
+router.use("/doctors", doctorRoutes);
 
 // ============================================
 // Analysis Routes (Secretary: creates / views / updates / deletes analysis types)
