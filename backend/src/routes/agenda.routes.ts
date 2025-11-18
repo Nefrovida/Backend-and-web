@@ -11,6 +11,8 @@ import getAppointmentById from "src/controller/agenda/getAppointmentById.control
 import { authenticate } from "src/middleware/auth.middleware";
 import { requirePrivileges } from "src/middleware/rbac.middleware";
 import { Privilege } from "src/types/rbac.types";
+import AppointmentsPerDayByAppointmentId from "src/controller/agenda/AppointmentsPerDayByAppointmentId.controller";
+import createAppointment from "../controller/agenda/createAppointment.controller";
 
 // Secretaria – day appointments (secretary view, with patient names)
 router.get(
@@ -79,6 +81,20 @@ router.post(
   authenticate,
   requirePrivileges([Privilege.CREATE_APPOINTMENTS]),
   secretariaController.scheduleAppointment
+);
+
+router.get(
+    "/appointments-per-day/by-appointment",
+    authenticate,
+    requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
+    AppointmentsPerDayByAppointmentId
+);
+
+router.post(
+    "/appointment",
+    authenticate,
+    requirePrivileges([Privilege.CREATE_APPOINTMENTS]),
+    createAppointment
 );
 
 export default router;
