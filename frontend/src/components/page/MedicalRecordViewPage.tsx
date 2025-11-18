@@ -32,7 +32,7 @@ const MedicalRecordViewPage = () => {
 
   if (loading) {
     return (
-      <div className="w-full min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="w-full h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary mx-auto mb-4"></div>
           <p className="text-gray-600 font-medium text-lg">Cargando expediente...</p>
@@ -43,7 +43,7 @@ const MedicalRecordViewPage = () => {
 
   if (error) {
     return (
-      <div className="w-full min-h-screen flex items-center justify-center p-4 bg-gray-50">
+      <div className="w-full h-screen flex items-center justify-center p-4 bg-gray-50">
         <div className="bg-white rounded-xl shadow-lg border border-red-100 p-8 max-w-md w-full text-center">
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <FaExclamationTriangle className="text-red-500 text-2xl" />
@@ -63,7 +63,7 @@ const MedicalRecordViewPage = () => {
 
   if (!data) {
     return (
-      <div className="w-full min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="w-full h-screen flex items-center justify-center bg-gray-50">
         <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8 text-center max-w-md">
           <p className="text-gray-600 text-lg">No se encontró el expediente</p>
           <button
@@ -111,7 +111,7 @@ const MedicalRecordViewPage = () => {
   ];
 
   return (
-    <div className="w-full min-h-screen bg-gray-50/50 p-6">
+    <div className="w-full h-screen overflow-y-auto bg-gray-50/50 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
@@ -155,7 +155,7 @@ const MedicalRecordViewPage = () => {
                   </div>
 
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
-                    <div className="p-2 bg-white rounded-md shadow-sm text-green-500">
+                    <div className="p-2 bg-white rounded-md shadow-sm text-blue-500">
                       <FaPhone />
                     </div>
                     <div>
@@ -165,7 +165,7 @@ const MedicalRecordViewPage = () => {
                   </div>
 
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
-                    <div className="p-2 bg-white rounded-md shadow-sm text-purple-500">
+                    <div className="p-2 bg-white rounded-md shadow-sm text-blue-500">
                       <FaBirthdayCake />
                     </div>
                     <div>
@@ -175,7 +175,7 @@ const MedicalRecordViewPage = () => {
                   </div>
 
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
-                    <div className="p-2 bg-white rounded-md shadow-sm text-pink-500">
+                    <div className="p-2 bg-white rounded-md shadow-sm text-blue-500">
                       <FaVenusMars />
                     </div>
                     <div>
@@ -200,8 +200,8 @@ const MedicalRecordViewPage = () => {
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={`flex items-center gap-2 px-5 py-3.5 font-medium text-sm transition-all rounded-t-lg relative group ${activeTab === tab.id
-                        ? "bg-white text-primary shadow-[0_-1px_2px_rgba(0,0,0,0.05)] border-t border-x border-gray-200 z-10"
-                        : "text-gray-500 hover:text-gray-800 hover:bg-gray-100/50 border-transparent"
+                      ? "bg-white text-primary shadow-[0_-1px_2px_rgba(0,0,0,0.05)] border-t border-x border-gray-200 z-10"
+                      : "text-gray-500 hover:text-gray-800 hover:bg-gray-100/50 border-transparent"
                       }`}
                     style={{ marginBottom: "-1px" }}
                   >
@@ -209,8 +209,8 @@ const MedicalRecordViewPage = () => {
                     <span className="whitespace-nowrap">{tab.label}</span>
                     {tab.count !== null && tab.count > 0 && (
                       <span className={`ml-1 px-2 py-0.5 rounded-full text-xs font-bold ${activeTab === tab.id
-                          ? "bg-blue-50 text-primary"
-                          : "bg-gray-200 text-gray-600"
+                        ? "bg-blue-50 text-primary"
+                        : "bg-gray-200 text-gray-600"
                         }`}>
                         {tab.count}
                       </span>
@@ -287,10 +287,10 @@ const MedicalRecordViewPage = () => {
                           </div>
                           <span
                             className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide ${appointment.appointment_status === "completed"
-                                ? "bg-green-100 text-green-700 border border-green-200"
-                                : appointment.appointment_status === "pending"
-                                  ? "bg-yellow-100 text-yellow-700 border border-yellow-200"
-                                  : "bg-gray-100 text-gray-700 border border-gray-200"
+                              ? "bg-green-100 text-green-700 border border-green-200"
+                              : appointment.appointment_status === "pending"
+                                ? "bg-yellow-100 text-yellow-700 border border-yellow-200"
+                                : "bg-gray-100 text-gray-700 border border-gray-200"
                               }`}
                           >
                             {appointment.appointment_status}
@@ -412,10 +412,10 @@ const MedicalRecordViewPage = () => {
                           </div>
                           <span
                             className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide ${item.analysis_status === "completed"
-                                ? "bg-green-100 text-green-700 border border-green-200"
-                                : item.analysis_status === "pending"
-                                  ? "bg-yellow-100 text-yellow-700 border border-yellow-200"
-                                  : "bg-gray-100 text-gray-700 border border-gray-200"
+                              ? "bg-green-100 text-green-700 border border-green-200"
+                              : item.analysis_status === "pending"
+                                ? "bg-yellow-100 text-yellow-700 border border-yellow-200"
+                                : "bg-gray-100 text-gray-700 border border-gray-200"
                               }`}
                           >
                             {item.analysis_status}
@@ -531,7 +531,7 @@ const MedicalRecordViewPage = () => {
               <div className="animate-fadeIn">
                 <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
                   <FaExclamationTriangle className="text-primary" />
-                  Reportes e Incidentes
+                  Reportes
                 </h3>
                 {reports.length > 0 ? (
                   <div className="space-y-4">
@@ -544,8 +544,8 @@ const MedicalRecordViewPage = () => {
                           <h4 className="text-lg font-bold text-gray-900">{report.cause}</h4>
                           <span
                             className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${report.status === "resolved"
-                                ? "bg-green-100 text-green-700"
-                                : "bg-red-100 text-red-700"
+                              ? "bg-green-100 text-green-700"
+                              : "bg-red-100 text-red-700"
                               }`}
                           >
                             {report.status}

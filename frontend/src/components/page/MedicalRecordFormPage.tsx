@@ -86,7 +86,7 @@ const MedicalRecordFormPage = () => {
 
   if (loading) {
     return (
-      <div className="w-full min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="w-full h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary mx-auto mb-4"></div>
           <p className="text-gray-600 font-medium text-lg">Cargando formulario...</p>
@@ -96,7 +96,7 @@ const MedicalRecordFormPage = () => {
   }
 
   return (
-    <div className="w-full min-h-screen bg-gray-50/50 p-6">
+    <div className="w-full h-screen overflow-y-auto bg-gray-50/50 p-6">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="mb-8 text-center md:text-left">
@@ -129,10 +129,10 @@ const MedicalRecordFormPage = () => {
                   <div key={index} className="flex flex-col items-center relative z-10 bg-gray-50 px-2 md:px-4">
                     <div
                       className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg transition-all duration-300 shadow-sm ${isActive
-                          ? "bg-primary text-white scale-110 ring-4 ring-blue-100"
-                          : isCompleted
-                            ? "bg-green-500 text-white"
-                            : "bg-white text-gray-400 border-2 border-gray-200"
+                        ? "bg-primary text-white scale-110 ring-4 ring-blue-100"
+                        : isCompleted
+                          ? "bg-green-500 text-white"
+                          : "bg-white text-gray-400 border-2 border-gray-200"
                         }`}
                     >
                       {isCompleted ? <FaCheck /> : <Icon className="text-lg" />}
@@ -170,8 +170,8 @@ const MedicalRecordFormPage = () => {
               onClick={handlePrevious}
               disabled={currentSection === 0}
               className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-medium transition-all ${currentSection === 0
-                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                  : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-300 shadow-sm hover:shadow"
+                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-300 shadow-sm hover:shadow"
                 }`}
             >
               <FaChevronLeft className="text-sm" />
