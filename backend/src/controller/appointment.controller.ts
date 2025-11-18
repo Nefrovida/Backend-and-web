@@ -1,5 +1,3 @@
-// controllers/appointment.controller.ts
-
 import { Request, Response } from 'express';
 import AppointmentModel from '../model/appointment.model';
 
@@ -69,6 +67,14 @@ export default class AppointmentController {
       if (newDate < new Date()) {
         return res.status(400).json({ 
           error: 'No se puede agendar en el pasado' 
+        });
+      }
+
+      // Verificar disponibilidad del horario
+      const isAvailable = await AppointmentModel.isTimeSlotAvailable(newDate);
+      if (!isAvailable) {
+        return res.status(409).json({ 
+          error: 'El horario ya está ocupado' 
         });
       }
 

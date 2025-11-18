@@ -1,5 +1,3 @@
-// models/appointment.model.ts
-
 import { prisma } from '../util/prisma';
 
 export default class AppointmentModel {
@@ -99,6 +97,23 @@ export default class AppointmentModel {
   }
 
   /**
+   * Verificar disponibilidad de horario
+   */
+  static async isTimeSlotAvailable(date_hour: Date): Promise<boolean> {
+    const existing = await prisma.patient_appointment.findFirst({
+      where: {
+        date_hour,
+        appointment_status: {
+          not: 'CANCELED',
+        },
+      },
+    });
+
+
+    return !existing;
+  }
+
+  /**
    * Reagendar una cita (actualizar fecha y motivo)
    */
  static async rescheduleAppointment(
@@ -146,11 +161,11 @@ export default class AppointmentModel {
 
       return {
         ...rest,
-        id: a.patient_appointment_id, // ← Mapear el ID correctamente
+        id: a.patient_appointment_id,
         patient_name: user?.name ?? null,
         patient_parent_last_name: user?.parent_last_name ?? null,
         patient_maternal_last_name: user?.maternal_last_name ?? null,
-        reason: a.appointment?.name ?? 'Sin motivo', // ← Agregar reason
+        reason: a.appointment?.name ?? 'Sin motivo',
       };
     });
   }

@@ -1,5 +1,3 @@
-// routes/appointment.routes.ts
-
 import express from 'express';
 import AppointmentController from '../controller/appointment.controller';
 // import { authenticate } from '../middleware/auth.middleware';
