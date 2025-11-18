@@ -66,8 +66,6 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
       search,
       isPublic,
     });
-
-    const forums = await forumsService.getAllForums(page, limit, { search, isPublic });
     res.status(200).json(forums);
   } catch (error: any) {
     res.status(error.statusCode || 500).json({ error: error.message });
