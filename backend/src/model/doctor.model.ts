@@ -1,5 +1,6 @@
 import { prisma } from "../util/prisma";
 import { hashPassword } from "../util/password.util";
+import type { Gender } from "@prisma/client";
 
 // Interface for User entity
 export interface IUser {
@@ -11,7 +12,7 @@ export interface IUser {
   username: string;
   password: string; // will be hashed before saving
   birthday: Date;
-  gender: "MALE" | "FEMALE" | "OTHER";
+  gender: Gender;
   role_id: number; // doctor role id
 }
 
