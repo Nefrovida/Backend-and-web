@@ -4,7 +4,8 @@ import NavIcon from "../atoms/NavIcon";
 import { BsPerson, BsFillPersonFill, BsGear, BsGearFill } from "react-icons/bs";
 import { MdForum, MdOutlineForum } from "react-icons/md";
 import { LuNotebook, LuNotebookPen } from "react-icons/lu";
-import { FaUserMd, FaListUl, FaFolderOpen, FaFolder, FaRegFolder, FaOpencart, FaClipboardCheck, FaRegClipboard } from "react-icons/fa";
+import { IoFlaskSharp, IoFlaskOutline } from "react-icons/io5";
+import { FaUserMd, FaListUl, FaFolderOpen, FaFolder, FaRegFolder, FaOpencart, FaClipboardCheck, FaRegClipboard, FaRegClock, FaClock } from "react-icons/fa";
 import Notas from "../page/Notas";
 import { ROLE_IDS } from "../../types/auth.types";
 
@@ -63,6 +64,18 @@ function Navbar({ children }: Props) {
           from={<FaRegClipboard />}
           to={<FaClipboardCheck />}
           link="/agenda"
+        />
+
+        <NavIcon
+          from={<IoFlaskOutline />}
+          to={<IoFlaskSharp />}
+          link="/laboratorio"
+        />
+
+        <NavIcon
+          from={<FaRegClock />}
+          to={<FaClock />}
+          link="/laboratorio/subir"
         />
 
         <NavIcon
