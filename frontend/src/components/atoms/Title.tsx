@@ -26,7 +26,7 @@ function Title(props: { children: ReactElement | string, size: string }) {
     }
 
   return (
-    <h1 className="font-semibold text-2xl text-primary mb-3">{props.children}</h1>
+    <h1 className="font-semibold text-2xl text-primary">{props.children}</h1>
   );
 }
 

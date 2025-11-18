@@ -83,8 +83,6 @@ export default function useLabResults<T>(
     loadMoreResults();
   }, [...watch]);
 
-  console.log("results: ", results)
-
   return {
     results,
     loading,
