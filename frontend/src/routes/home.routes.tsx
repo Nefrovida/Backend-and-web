@@ -3,23 +3,17 @@ import { createBrowserRouter } from "react-router-dom";
 import NotFoundPage from "../components/page/NotFoundPage";
 import Login from "../components/page/Login";
 import Register from "../components/page/Register";
-import analisisRoutes from "./analisis.routes";
-import forumsRoutes from "./forums.routes";
-import agendaRoutes from "./agenda.routes";
-import secretariaRoutes from "./secretaria.routes";
 
 import Home from "../components/page/Home";
 import AddPatientToForumPage from "../components/page/add_patient_to_forum_page";
-import notesRoutes from "./notes.routes";
-import appointmentsRoutes from "./appointments.routes";
 import RegisterDoctorPage from "../components/page/RegisterDoctorpage";
 import DoctorsListPage from "../components/page/DoctorsListPage";
 import expedienteRoutes from "./expediente.routes";
 
 // Module routes
 import analisisRoutes from "./analisis.routes";
-import forumsRoutes from "./forums.routes";      // admin
-import forumRoutes from "./forum.routes";       // chat
+import forumsRoutes from "./forums.routes"; // admin
+import forumRoutes from "./forum.routes"; // chat
 import notesRoutes from "./notes.routes";
 import appointmentsRoutes from "./appointments.routes";
 import agendaRoutes from "./agenda.routes";
@@ -46,8 +40,6 @@ const router = createBrowserRouter([
       ...agendaRoutes,
       ...secretariaRoutes,
       ...expedienteRoutes,
-     
-     
       ...adminRoutes,
 
       {
