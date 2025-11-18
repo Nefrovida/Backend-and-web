@@ -18,7 +18,10 @@ import * as analysisController from '../controller/analysis/add_analysis.control
 import reportRouter from "./report.routes";
 import historialRoutes from "./historial.routes"
 import historyRoutes from "./history.routes";
-import agendaRoutes from "./agenda.routes";
+import agendaRoutes from "./agenda.routes"
+import appointmentRoutes from "./appointment.routes";
+
+import expedienteRoutes from "./expediente.routes";
 
 import { authenticate } from "../middleware/auth.middleware";
 import { requirePrivileges } from "../middleware/rbac.middleware";
@@ -77,6 +80,10 @@ router.use("/notes", notesRouter);
 // ============================================
 router.use("/patients", patientRoutes);
 
+// Expediente Routes (Protected)
+// ============================================
+router.use("/patients", expedienteRoutes);
+
 // ============================================
 // Patient History Questions Templates
 // ============================================
@@ -86,6 +93,16 @@ router.use("/history", historyRoutes);
 // Agenda Routes
 // ============================================
 router.use("/agenda", agendaRoutes);
+
+// ============================================
+// Appointments Routes (Protected)
+// ============================================
+router.use("/appointments", appointmentRoutes); 
+
+// ============================================
+// Appointments Routes (Protected)
+// ============================================
+router.use("/appointments", appointmentRoutes); 
 
 // ============================================
 // Historial Routes (Patient Analysis History)
