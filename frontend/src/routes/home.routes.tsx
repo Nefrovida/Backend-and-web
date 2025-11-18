@@ -11,13 +11,13 @@ import DoctorsListPage from "../components/page/DoctorsListPage";
 
 // Module routes
 import analisisRoutes from "./analisis.routes";
-import forumsRoutes from "./forums.routes";      // administrador
+import forumsRoutes from "./forums.routes";      // admin
 import forumRoutes from "./forum.routes";       // chat
 import notesRoutes from "./notes.routes";
 import appointmentsRoutes from "./appointments.routes";
 import agendaRoutes from "./agenda.routes";
 import secretariaRoutes from "./secretaria.routes";
-import adminRoutes from "./admin.routes";       // si tu archivo exporta un arreglo de rutas
+import adminRoutes from "./admin.routes";
 
 const router = createBrowserRouter([
   {
