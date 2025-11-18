@@ -5,12 +5,13 @@ import Login from "../components/page/Login";
 import Register from "../components/page/Register";
 import analisisRoutes from "./analisis.routes";
 import forumsRoutes from "./forums.routes";
-import agendaRoutes from "./agenda.routes";
 import secretariaRoutes from "./secretaria.routes";
 import Home from "../components/page/Home";
+import forumRoutes from "./forum.routes";
 import AddPatientToForumPage from "../components/page/add_patient_to_forum_page";
 import notesRoutes from "./notes.routes";
-import appointmentsRoutes from "./appointments.routes";
+import RegisterDoctorPage from "../components/page/RegisterDoctorpage";
+import DoctorsListPage from "../components/page/DoctorsListPage";
 
 const router = createBrowserRouter([
   {
@@ -23,11 +24,24 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       ...analisisRoutes,
-      ...agendaRoutes,
+      ...forumsRoutes, // administrador
+      ...forumRoutes, // chat
       ...notesRoutes,
-      ...forumsRoutes,
       ...appointmentsRoutes,
+      ...agendaRoutes,
       ...secretariaRoutes,
+      ...agendaRoutes,
+     
+     
+
+      {
+        path: "/register-doctor",
+        element: <RegisterDoctorPage />,
+      },
+      {
+        path: "/doctors",
+        element: <DoctorsListPage />,
+      }
     ],
   },
   {
@@ -39,8 +53,8 @@ const router = createBrowserRouter([
     element: <Register />,
   },
   {
-  path: "/forums/:forumId/add-patient",
-  element: <AddPatientToForumPage />
+    path: "/forums/:forumId/add-patient",
+    element: <AddPatientToForumPage />,
   },
 ]);
 

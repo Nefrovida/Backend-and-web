@@ -1,3 +1,4 @@
+// backend/src/service/analysis/add.analysis.service.ts
 import * as analysisModel from '../../model/analysis/add.analysis.model';
 import {
   CreateAnalysisRequest,
@@ -49,14 +50,14 @@ export const createAnalysis = async (data: CreateAnalysisRequest) => {
     });
 
     return transformAnalysisToResponse(analysis);
-  } catch (error: any) {
-    // Fallback por si el UNIQUE de base de datos se dispara directamente
-    if (error?.code === 'P2002') {
-      // Prisma: unique constraint failed on the fields
+  } catch (err: any) {
+    const code = err?.code as string | undefined;
+
+    if (code === '23505' || code === 'P2002') {
       throw new ConflictError('Ya existe un tipo de análisis con ese nombre');
     }
 
-    throw error;
+    throw err;
   }
 };
 
@@ -114,7 +115,7 @@ export const updateAnalysis = async (
     throw new NotFoundError('Analysis not found');
   }
 
-  // If updating name, check for duplicates a nivel aplicación
+  // If updating name, check for duplicates
   if (updateData.name) {
     const duplicateAnalysis = await analysisModel.findDuplicateName(
       updateData.name,
@@ -144,13 +145,14 @@ export const updateAnalysis = async (
     );
 
     return transformAnalysisToResponse(updatedAnalysis);
-  } catch (error: any) {
-    // Fallback si el UNIQUE se dispara al actualizar
-    if (error?.code === 'P2002') {
+  } catch (err: any) {
+    const code = err?.code as string | undefined;
+
+    if (code === '23505' || code === 'P2002') {
       throw new ConflictError('Ya existe un tipo de análisis con ese nombre');
     }
 
-    throw error;
+    throw err;
   }
 };
 
@@ -165,8 +167,9 @@ export const deleteAnalysis = async (analysisId: number) => {
   }
 
   // Do not allow deletion if analysis is referenced by any patient_analysis
-  const references =
-    await analysisModel.countPatientAnalysisReferences(analysisId);
+  const references = await analysisModel.countPatientAnalysisReferences(
+    analysisId
+  );
   if (references > 0) {
     throw new ConflictError(
       'Cannot delete analysis that has patient requests'

@@ -1,5 +1,39 @@
-import { prisma } from '../util/prisma';
-import { ForumRole } from '@prisma/client';
+import { prisma } from "../util/prisma";
+import { ForumRole } from ".prisma/client";
+
+export default class Forum {
+  Forum() {}
+
+  static async postNewMessage(
+    userId: string,
+    forumId: number,
+    content: string
+  ) {
+    return await prisma.messages.create({
+      data: {
+        forum_id: forumId,
+        user_id: userId,
+        content: content,
+      },
+    });
+  }
+
+  static async getMyForums(userId: string) {
+    return await prisma.users_forums.findMany({
+      where: {
+        user_id: userId,
+      },
+      select: {
+        forum: {
+          select: {
+            forum_id: true,
+            name: true,
+          },
+        },
+      },
+    });
+  }
+}
 
 /**
  * Find forum by name (case-insensitive)
@@ -9,7 +43,7 @@ export const findByName = async (name: string) => {
     where: {
       name: {
         equals: name,
-        mode: 'insensitive',
+        mode: "insensitive",
       },
     },
   });
@@ -77,7 +111,7 @@ export const findAll = async (
   if (filters?.search) {
     whereClause.name = {
       contains: filters.search,
-      mode: 'insensitive' as const,
+      mode: "insensitive" as const,
     };
   }
 
@@ -110,7 +144,7 @@ export const findAll = async (
       },
     },
     orderBy: {
-      creation_date: 'desc',
+      creation_date: "desc",
     },
     skip,
     take,
@@ -131,7 +165,7 @@ export const count = async (filters?: {
   if (filters?.search) {
     whereClause.name = {
       contains: filters.search,
-      mode: 'insensitive' as const,
+      mode: "insensitive" as const,
     };
   }
 
@@ -197,7 +231,7 @@ export const findDuplicateName = async (name: string, excludeId: number) => {
     where: {
       name: {
         equals: name,
-        mode: 'insensitive',
+        mode: "insensitive",
       },
       NOT: {
         forum_id: excludeId,
@@ -225,7 +259,7 @@ export const findPublicForums = async (skip: number, take: number) => {
       },
     },
     orderBy: {
-      creation_date: 'desc',
+      creation_date: "desc",
     },
     skip,
     take,
@@ -265,10 +299,7 @@ export const addUserToForum = async (
 /**
  * Remove user from forum
  */
-export const removeUserFromForum = async (
-  forumId: number,
-  userId: string
-) => {
+export const removeUserFromForum = async (forumId: number, userId: string) => {
   return await prisma.users_forums.delete({
     where: {
       user_id_forum_id: {
@@ -357,7 +388,7 @@ export const getForumMembers = async (
       },
     },
     orderBy: {
-      forum_role: 'asc', // OWNER first, then MODERATOR, MEMBER, VIEWER
+      forum_role: "asc", // OWNER first, then MODERATOR, MEMBER, VIEWER
     },
     skip,
     take,
@@ -398,7 +429,7 @@ export const getUserForums = async (userId: string) => {
     },
     orderBy: {
       forum: {
-        creation_date: 'desc',
+        creation_date: "desc",
       },
     },
   });
@@ -428,7 +459,7 @@ export const getAdminUsers = async () => {
       },
     },
     orderBy: {
-      registration_date: 'desc',
+      registration_date: "desc",
     },
   });
 };
@@ -460,7 +491,7 @@ export const getAdminUsersWithPagination = async (
       },
     },
     orderBy: {
-      registration_date: 'desc',
+      registration_date: "desc",
     },
     skip,
     take,
@@ -492,7 +523,7 @@ export const isUserAdmin = async (userId: string) => {
       active: true,
     },
   });
-  
+
   return user?.role_id === 1 && user?.active === true;
 };
 
@@ -504,7 +535,7 @@ export const getForumAdministrators = async (forumId: number) => {
     where: {
       forum_id: forumId,
       forum_role: {
-        in: ['OWNER', 'MODERATOR'],
+        in: ["OWNER", "MODERATOR"],
       },
     },
     include: {
@@ -522,18 +553,18 @@ export const getForumAdministrators = async (forumId: number) => {
     },
     orderBy: [
       {
-        forum_role: 'asc', // OWNER primero, luego MODERATOR
+        forum_role: "asc", // OWNER primero, luego MODERATOR
       },
       {
         user: {
-          registration_date: 'desc',
+          registration_date: "desc",
         },
       },
     ],
   });
 
   // Aplanar la estructura para que sea más fácil de usar en el frontend
-  return result.map(item => ({
+  return result.map((item) => ({
     user_id: item.user.user_id,
     name: item.user.name,
     parent_last_name: item.user.parent_last_name,
@@ -574,7 +605,7 @@ export const getNonAdminUsersWithPagination = async (
       },
     },
     orderBy: {
-      registration_date: 'desc',
+      registration_date: "desc",
     },
     skip,
     take,
@@ -603,7 +634,7 @@ export const getForumRegularMembers = async (forumId: number) => {
     where: {
       forum_id: forumId,
       forum_role: {
-        in: ['MEMBER', 'VIEWER'],
+        in: ["MEMBER", "VIEWER"],
       },
     },
     include: {
@@ -626,18 +657,18 @@ export const getForumRegularMembers = async (forumId: number) => {
     },
     orderBy: [
       {
-        forum_role: 'asc', // MEMBER primero, luego VIEWER
+        forum_role: "asc", // MEMBER primero, luego VIEWER
       },
       {
         user: {
-          registration_date: 'desc',
+          registration_date: "desc",
         },
       },
     ],
   });
 
   // Aplanar la estructura para que sea más fácil de usar en el frontend
-  return result.map(item => ({
+  return result.map((item) => ({
     user_id: item.user.user_id,
     name: item.user.name,
     parent_last_name: item.user.parent_last_name,
@@ -649,4 +680,3 @@ export const getForumRegularMembers = async (forumId: number) => {
     role: item.user.role, // Incluir información del rol del usuario
   }));
 };
-

@@ -1,6 +1,6 @@
 /**
  * Forum Types
- * 
+ *
  * Interfaces for the Forums module
  */
 
@@ -19,3 +19,8 @@ export interface CreateForumData {
   description: string;
   public_status: boolean;
 }
+
+export type BasicForumInfo = {
+  forumId: string;
+  name: string;
+};
