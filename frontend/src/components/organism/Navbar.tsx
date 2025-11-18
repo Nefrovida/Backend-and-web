@@ -8,6 +8,8 @@ import { IoFlaskSharp, IoFlaskOutline } from "react-icons/io5";
 import {
   FaUserMd,
   FaListUl,
+  FaListAlt,
+  FaRegListAlt,
   FaFolderOpen,
   FaRegFolder,
   FaClipboardCheck,
@@ -60,6 +62,7 @@ function Navbar({ children }: Props) {
           </>
         )}
 
+        {/* No sé */}
         <NavIcon
           from={<FaRegFolder />}
           to={<FaFolderOpen />}
@@ -67,6 +70,7 @@ function Navbar({ children }: Props) {
           end
         />
 
+        {/* Todos? */}
         <NavIcon
           from={<MdOutlineForum />}
           to={<MdForum />}
@@ -74,6 +78,7 @@ function Navbar({ children }: Props) {
           end
         />
 
+        {/* No sé */}
         <NavIcon
           from={<FaRegClipboard />}
           to={<FaClipboardCheck />}
@@ -81,6 +86,7 @@ function Navbar({ children }: Props) {
           end
         />
 
+        {/* Laboratorio */}
         <NavIcon
           from={<IoFlaskOutline />}
           to={<IoFlaskSharp />}
@@ -88,6 +94,7 @@ function Navbar({ children }: Props) {
           end
         />
 
+        {/* Laboratorio */}
         <NavIcon
           from={<FaRegClock />}
           to={<FaClock />}
@@ -95,6 +102,23 @@ function Navbar({ children }: Props) {
           end
         />
 
+        {/* Secretaria */}
+        <NavIcon
+          from={<FaRegClock />}
+          to={<FaClock />}
+          link="/secretaria/agendar"
+          end
+        />
+        
+        {/* Secretaria */}
+        <NavIcon
+          from={<FaRegListAlt />}
+          to={<FaListAlt />}
+          link="/analisis"
+          end
+        />
+
+        {/* TODOS */}
         <NavIcon
           from={<BsGear />}
           to={<BsGearFill />}
