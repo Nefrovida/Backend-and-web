@@ -33,7 +33,7 @@ export const getMedicalRecord = async (
     );
     if (!hasAccess) {
       throw new ForbiddenError(
-        "You don't have access to this patient's medical record"
+        "No tienes acceso a este expediente"
       );
     }
     return medicalRecord;
@@ -46,11 +46,11 @@ export const getMedicalRecord = async (
       actualPatientId
     );
     if (!hasAccess) {
-      throw new ForbiddenError("You don't have access to this medical record");
+      throw new ForbiddenError("No tienes acceso a este expediente");
     }
     return medicalRecord;
   }
 
   // Other roles don't have access
-  throw new ForbiddenError("You don't have permission to view medical records");
+  throw new ForbiddenError("No tienes permiso para ver los expedientes médicos");
 };
