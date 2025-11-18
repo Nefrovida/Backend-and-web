@@ -61,7 +61,8 @@ function Agenda() {
   };
 
   return (
-    <div className="calendar-container-week">
+    <div className="h-full w-full flex flex-col">
+      <div className="flex-1 min-h-0">
       <FullCalendar
         locales={[esLocale]}
         locale="es"
@@ -81,6 +82,7 @@ function Agenda() {
           info.el.style.border = "1px solid #DCEBF1";
         }}
       />
+      </div>
     </div>
   );
 }

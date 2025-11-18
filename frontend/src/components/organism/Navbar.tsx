@@ -141,7 +141,7 @@ function Navbar({ children }: Props) {
   const isPatient = roleId === ROLE_IDS.PATIENT;
 
   return (
-    <div className="flex h-screen w-full bg-gray-50 overflow-hidden relative">
+    <div className="flex h-screen w-full bg-gray-50 relative">
       
       {/* Floating Navigation Bar */}
       <nav className={`
@@ -320,8 +320,10 @@ function Navbar({ children }: Props) {
       </div>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto p-4 transition-all duration-300 relative z-0">
-        {children}
+      <main className="flex-1 h-screen p-4 transition-all duration-300 relative z-10 overflow-auto">
+        <div className="h-full min-h-0">
+          {children}
+        </div>
       </main>
     </div>
   );
