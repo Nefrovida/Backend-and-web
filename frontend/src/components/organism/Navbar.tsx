@@ -152,6 +152,17 @@ function Navbar({ children }: Props) {
             />
           )}
 
+          {/* Upload Results, only Laboratorist */}
+          {(isLaboratorist || isAdmin) && (
+            <CustomLink
+              label="Subir Resultados"
+              to="/laboratorio/subir"
+              icon={<FaRegClock />}
+              activeIcon={<FaClock />}
+              end
+            />
+          )}
+
           {/* Expedientes */}
           <CustomLink 
             label="Expedientes"
@@ -181,9 +192,8 @@ function Navbar({ children }: Props) {
             />
           )}
 
-          {/* Laboratory */}
-          {(isLaboratorist || isAdmin) && (
-            <>
+          {/* Laboratory results, Doctor */}
+          {(isDoctor || isAdmin) && (
               <CustomLink 
                 label="Laboratorio"
                 to="/laboratorio"
@@ -191,14 +201,6 @@ function Navbar({ children }: Props) {
                 activeIcon={<IoFlaskSharp />}
                 end
               />
-              <CustomLink 
-                label="Subir Resultados"
-                to="/laboratorio/subir"
-                icon={<FaRegClock />}
-                activeIcon={<FaClock />}
-                end
-              />
-            </>
           )}
 
           {/* Secretary */}
