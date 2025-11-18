@@ -70,3 +70,4 @@ export const getProfile = async (req: Request, res: Response): Promise<void> => 
     res.status(error.statusCode || 500).json({ error: error.message });
   }
 };
+

@@ -1,156 +1,138 @@
-import express, { Request, Response } from "express";
-import * as authController from "../controller/auth.controller";
-import * as usersController from "../controller/users.controller";
-import * as rolesController from "../controller/roles.controller";
-import * as privilegesController from "../controller/privileges.controller";
-import * as appointmentsController from "../controller/appointments.controller";
+// backend/src/routes/routes.ts
+import express from "express";
+
+import labRoutes from "./lab.routes";
+import authRoutes from "./auth.routes";
+import usersRoutes from "./users.routes";
+import rolesRoutes from "./roles.routes";
+import privilegesRoutes from "./privileges.routes";
+import appointmentsRoutes from "./appointments.routes";
+import notesRouter from "./notes.routes";
+import forumsRoutes from "./forums.routes";
+
+
+import patientRoutes from "./patients.routes";
+import clinicalHistoryRoutes from "./clinicalHistory.routes";
+import * as analysisController from '../controller/analysis/add_analysis.controller';
+
+import reportRouter from "./report.routes";
+import historialRoutes from "./historial.routes"
+import historyRoutes from "./history.routes";
+import agendaRoutes from "./agenda.routes";
+
 import { authenticate } from "../middleware/auth.middleware";
 import { requirePrivileges } from "../middleware/rbac.middleware";
 import { Privilege } from "../types/rbac.types";
 
 const router = express.Router();
 
-// Health check
-router.get("/", (_req: Request, res: Response) => {
-  console.log("API hit");
-  res.json({ message: "Welcome to the Express + TypeScript Server!" });
-});
 
 // ============================================
 // Authentication Routes (Public)
 // ============================================
-router.post("/auth/register", authController.register);
-router.post("/auth/login", authController.login);
-
-// Protected auth routes
-router.post("/auth/refresh", authenticate, authController.refreshToken);
-router.post("/auth/logout", authenticate, authController.logout);
+router.use("/auth", authRoutes);
 
 // ============================================
 // User Routes (Protected)
 // ============================================
-router.get("/users/profile", authenticate, usersController.getProfile);
+router.use("/users", usersRoutes);
 
-router.get(
-  "/users",
-  authenticate,
-  requirePrivileges([Privilege.VIEW_USERS]),
-  usersController.getAllUsers
-);
-
-router.get(
-  "/users/:id",
-  authenticate,
-  requirePrivileges([Privilege.VIEW_USERS]),
-  usersController.getUserById
-);
-
-router.put(
-  "/users/:id",
-  authenticate,
-  requirePrivileges([Privilege.UPDATE_USERS]),
-  usersController.updateUser
-);
-
-router.delete(
-  "/users/:id",
-  authenticate,
-  requirePrivileges([Privilege.DELETE_USERS]),
-  usersController.deleteUser
-);
+// ============================================
+// Clinical History Routes (Protected)
+// ============================================
+router.use("/clinical-history", clinicalHistoryRoutes);
 
 // ============================================
 // Role Routes (Protected)
 // ============================================
-router.get(
-  "/roles",
-  authenticate,
-  requirePrivileges([Privilege.VIEW_ROLES]),
-  rolesController.getAllRoles
-);
-
-router.get(
-  "/roles/:id",
-  authenticate,
-  requirePrivileges([Privilege.VIEW_ROLES]),
-  rolesController.getRoleById
-);
-
-router.post(
-  "/roles",
-  authenticate,
-  requirePrivileges([Privilege.CREATE_ROLES]),
-  rolesController.createRole
-);
-
-router.put(
-  "/roles/:id",
-  authenticate,
-  requirePrivileges([Privilege.UPDATE_ROLES]),
-  rolesController.updateRole
-);
-
-router.delete(
-  "/roles/:id",
-  authenticate,
-  requirePrivileges([Privilege.DELETE_ROLES]),
-  rolesController.deleteRole
-);
-
-router.post(
-  "/roles/:id/privileges",
-  authenticate,
-  requirePrivileges([Privilege.UPDATE_ROLES]),
-  rolesController.assignPrivileges
-);
-
-// ============================================
-// Privilege Routes (Protected)
-// ============================================
-router.get(
-  "/privileges",
-  authenticate,
-  requirePrivileges([Privilege.VIEW_PRIVILEGES]),
-  privilegesController.getAllPrivileges
-);
-
-router.get(
-  "/privileges/:id",
-  authenticate,
-  requirePrivileges([Privilege.VIEW_PRIVILEGES]),
-  privilegesController.getPrivilegeById
-);
-
-router.post(
-  "/privileges",
-  authenticate,
-  requirePrivileges([Privilege.CREATE_PRIVILEGES]),
-  privilegesController.createPrivilege
-);
-
-router.put(
-  "/privileges/:id",
-  authenticate,
-  requirePrivileges([Privilege.UPDATE_PRIVILEGES]),
-  privilegesController.updatePrivilege
-);
-
-router.delete(
-  "/privileges/:id",
-  authenticate,
-  requirePrivileges([Privilege.DELETE_PRIVILEGES]),
-  privilegesController.deletePrivilege
-);
+router.use("/roles", rolesRoutes);
 
 // ============================================
 // Appointment Routes (Protected)
 // ============================================
+router.use("/privileges", privilegesRoutes);
+
+// ============================================
+// Forum Routes (Protected)
+// ============================================
+router.use("/forums", forumsRoutes);
+
+// ============================================
+// Laboratory Routes (Protected)
+// ============================================
+router.use("/laboratory", labRoutes);
+
+// ============================================
+// Report Routes (Protected)
+// ============================================
+router.use("/report", reportRouter);
+
+// ============================================
+// Notes Routes (Protected)
+// ============================================
+router.use("/notes", notesRouter);
+
+// ============================================
+// Patients Routes (Protected)
+// ============================================
+router.use("/patients", patientRoutes);
+
+// ============================================
+// Patient History Questions Templates
+// ============================================
+router.use("/history", historyRoutes);
+
+// ============================================
+// Agenda Routes
+// ============================================
+router.use("/agenda", agendaRoutes);
+
+// ============================================
+// Historial Routes (Patient Analysis History)
+// ============================================
+router.use("/historial", historialRoutes);
+
+// Appointments Routes (Protected)
+// ============================================
+router.use("/appointments", appointmentsRoutes);
+
+// ============================================
+// Analysis Routes (Secretary: creates / views / updates / deletes analysis types)
+// ============================================
+router.post(
+  "/analysis",
+  authenticate,
+  requirePrivileges([Privilege.CREATE_ANALYSIS]),
+  analysisController.createAnalysis
+);
 
 router.get(
-  "/appointments"/:id",
+  "/analysis",
   authenticate,
-  requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
-  appointmentsController.getAppointmentById
+  requirePrivileges([Privilege.VIEW_ANALYSIS]),
+  analysisController.getAllAnalysis
+);
+
+router.get(
+  "/analysis/:id",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_ANALYSIS]),
+  analysisController.getAnalysisById
+);
+
+router.put(
+  "/analysis/:id",
+  authenticate,
+  requirePrivileges([Privilege.UPDATE_ANALYSIS]),
+  analysisController.updateAnalysis
+);
+
+router.delete(
+  "/analysis/:id",
+  authenticate,
+  requirePrivileges([Privilege.DELETE_ANALYSIS]),
+  analysisController.deleteAnalysis
 );
 
 export default router;
+

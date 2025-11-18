@@ -7,14 +7,19 @@ import { UnauthorizedError } from '../util/errors.util';
  */
 export const authenticate = (req: Request, res: Response, next: NextFunction): void => {
   try {
-    // Get token from Authorization header
-    const authHeader = req.headers.authorization;
+    // Get token from cookies or Authorization header
+    let token = req.cookies?.accessToken;
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      throw new UnauthorizedError('No token provided');
+    if (!token) {
+      // Fallback to Authorization header
+      const authHeader = req.headers.authorization;
+      
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        throw new UnauthorizedError('No token provided');
+      }
+      
+      token = authHeader.substring(7);
     }
-
-    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
 
     // Verify token and attach user to request
     const decoded = verifyToken(token);
@@ -22,10 +27,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction): v
 
     next();
   } catch (error) {
-    if (error instanceof UnauthorizedError) {
-      res.status(error.statusCode).json({ error: error.message });
-    } else {
-      res.status(401).json({ error: 'Invalid or expired token' });
-    }
+    // Pass error to the next middleware
+    next(error instanceof UnauthorizedError ? error : new UnauthorizedError('Invalid or expired token'));
   }
 };

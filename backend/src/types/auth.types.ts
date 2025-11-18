@@ -1,4 +1,4 @@
-import { Gender } from '../../prisma/database/prisma/enums';
+import { Gender } from '../../prisma/database/prisma/index.js';
 
 /**
  * JWT Payload structure
@@ -35,7 +35,7 @@ export interface RegisterRequest {
   curp?: string;
   
   // Doctor-specific fields
-  speciality?: string;
+  specialty?: string;
   license?: string;
   
   // Familiar-specific fields (Note: familiars are not a role, but users with patient associations)

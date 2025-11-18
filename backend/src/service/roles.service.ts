@@ -1,4 +1,4 @@
-import { prisma } from '../util/prisma';
+import { prisma } from '../util/prisma.js';
 import { NotFoundError, ConflictError, BadRequestError } from '../util/errors.util';
 
 /**
@@ -44,7 +44,7 @@ export const getRoleById = async (roleId: number) => {
 export const createRole = async (roleName: string) => {
   // Check if role already exists
   const existingRole = await prisma.roles.findFirst({
-    where: { rol_name: roleName },
+    where: { role_name: roleName },
   });
 
   if (existingRole) {
@@ -52,7 +52,7 @@ export const createRole = async (roleName: string) => {
   }
 
   return await prisma.roles.create({
-    data: { rol_name: roleName },
+    data: { role_name: roleName },
   });
 };
 
@@ -70,7 +70,7 @@ export const updateRole = async (roleId: number, roleName: string) => {
 
   return await prisma.roles.update({
     where: { role_id: roleId },
-    data: { rol_name: roleName },
+    data: { role_name: roleName },
   });
 };
 

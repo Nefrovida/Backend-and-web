@@ -2,9 +2,20 @@ import { RouteObject } from "react-router-dom";
 
 import AgendaPage from "../components/page/AgendaPage";
 import AppointmentDetailPage from "../components/page/AppointmentDetailPage";
+import ProtectedRoute from "../components/common/ProtectedRoute";
+import DoctorAppointments from "../components/page/DoctorAppointments";
 
 
-const appointmentsRutas: RouteObject[] = [
+const appointmentsRoutes: RouteObject[] = [
+  {
+    // Only Doctor (2) can access their appointments
+    path: "/mis-citas",
+    element: (
+      <ProtectedRoute allowedRoles={[2]}>
+        <DoctorAppointments />
+      </ProtectedRoute>
+    ),
+  },
   {
     path: "/agenda",
     element: <AgendaPage />,
@@ -15,4 +26,4 @@ const appointmentsRutas: RouteObject[] = [
   }
 ];
 
-export default appointmentsRutas;
+export default appointmentsRoutes;
