@@ -16,35 +16,41 @@ import * as labAppointmentsController from "../controller/lab/labAppointments.co
 router.use(authenticate);
 
 router.get("/results", 
+  autenticate,
   requirePrivileges([Privilege.VIEW_ANALYSIS]),
   getLabResults);
 
 router.get(
   "/analysis",
+  autenticate,
   requirePrivileges([Privilege.VIEW_ANALYSIS]),
   getAnalysis
 )
 
 router.get(
   "/patient-full-results",
+  autenticate,
   requirePrivileges([Privilege.VIEW_LAB_RESULTS]),
   getFullLabResults
 )
 
 router.get(
   "/results-pdf",
+  autenticate,
   requirePrivileges([Privilege.VIEW_LAB_RESULTS]),
   getResultsPDF
 )
 
 // Date format: dd-mm-yyyy
 router.get("/analysis/by-date/:date", 
+  autenticate,
   requirePrivileges([Privilege.VIEW_ANALYSIS]),
   getAnalysisByDay);
 
 // List pending lab appointments (US5)
 router.get(
   "/lab-appointments",
+  autenticate,
   requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
   labAppointmentsController.getLabAppointments
 );
@@ -52,6 +58,7 @@ router.get(
 // Request URL for file upload (US5)
 router.post(
   "/lab-appointments/:id/presign",
+  autenticate,
   requirePrivileges([Privilege.UPDATE_APPOINTMENTS]),
   labAppointmentsController.requestPresign
 );
@@ -59,12 +66,14 @@ router.post(
 // Confirm file has been uploaded and is in DB (US5)
 router.post(
   "/lab-appointments/:id/result",
+  autenticate,
   requirePrivileges([Privilege.UPDATE_APPOINTMENTS]),
   labAppointmentsController.confirmUpload
 );
 
 router.post(
   "/generate-report", 
+  autenticate,
   requirePrivileges([Privilege.EDIT_LAB_RESULTS]),
   generateLabReport
 )
