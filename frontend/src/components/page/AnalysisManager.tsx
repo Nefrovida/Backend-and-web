@@ -10,11 +10,17 @@ import {
   UpdateAnalysisData,
 } from "@/types/add.analysis.types";
 
-const extractBackendMessage = (err: any, fallback: string) => {
+// Helper to extract the friendly message from the backend
+const getBackendErrorMessage = (err: any, fallback: string) => {
   const backendMessage =
-    err?.response?.data?.error?.message || err?.response?.data?.message;
+    err?.response?.data?.error?.message ??
+    err?.response?.data?.message;
 
-  return backendMessage || fallback;
+  if (typeof backendMessage === "string" && backendMessage.trim() !== "") {
+    return backendMessage;
+  }
+
+  return err?.message || fallback;
 };
 
 const AnalysisManager: React.FC = () => {
@@ -30,9 +36,9 @@ const AnalysisManager: React.FC = () => {
       setLoading(true);
       const res = await analysisService.getAll(1, 50);
       setAnalyses(res.data);
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
-      alert(extractBackendMessage(err, "Error al cargar los exámenes"));
+      alert("Error al cargar los exámenes");
     } finally {
       setLoading(false);
     }
@@ -109,12 +115,11 @@ const AnalysisManager: React.FC = () => {
                           await load();
                           alert("Análisis eliminado");
                         } catch (err: any) {
-                          alert(
-                            extractBackendMessage(
-                              err,
-                              "Error al eliminar análisis"
-                            )
+                          const msg = getBackendErrorMessage(
+                            err,
+                            "Error al eliminar el análisis"
                           );
+                          alert(msg);
                         }
                       }}
                     >
@@ -140,12 +145,11 @@ const AnalysisManager: React.FC = () => {
             setIsCreateOpen(false);
             alert("Análisis creado");
           } catch (err: any) {
-            alert(
-              extractBackendMessage(
-                err,
-                "Error al crear análisis"
-              )
+            const msg = getBackendErrorMessage(
+              err,
+              "Error al crear análisis"
             );
+            alert(msg);
           }
         }}
       />
@@ -170,12 +174,11 @@ const AnalysisManager: React.FC = () => {
             setEditingAnalysis(null);
             alert("Análisis actualizado");
           } catch (err: any) {
-            alert(
-              extractBackendMessage(
-                err,
-                "Error al actualizar análisis"
-              )
+            const msg = getBackendErrorMessage(
+              err,
+              "Error al actualizar análisis"
             );
+            alert(msg);
           }
         }}
       />

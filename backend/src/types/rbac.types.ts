@@ -70,6 +70,7 @@ export enum Privilege {
   // Lab results/reports management
   VIEW_LAB_RESULTS = "VIEW_LAB_RESULTS",
   EDIT_LAB_RESULTS = "EDIT_LAB_RESULTS",
+  CREATE_DOCTOR = "CREATE_DOCTOR",
 }
 
 /**
