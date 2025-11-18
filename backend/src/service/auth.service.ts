@@ -26,7 +26,6 @@ export const login = async (loginData: LoginRequest): Promise<AuthResponse> => {
       },
     },
   });
-  console.log("existingUser: ", existingUser)
 
   if (!existingUser) {
     throw new UnauthorizedError('Invalid credentials');

@@ -15,7 +15,6 @@ export default class Laboratory {
       status?: ANALYSIS_STATUS[] | null
     }) {
     const paginationSkip = 10;
-
     const patientResults = await prisma.patient_analysis.findMany({
       where: {
         ...(filter.name
@@ -79,7 +78,6 @@ export default class Laboratory {
         name: true
       }
     });
-    console.log("analysis found: ", analysis)
     return analysis
   }
 
