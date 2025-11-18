@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import NavIcon from "../atoms/NavIcon";
 
-import { BsPerson, BsFillPersonFill, BsGear, BsGearFill } from "react-icons/bs";
+import { BsPerson, BsFillPersonFill, BsGear, BsGearFill, BsCalendar, BsCalendarFill } from "react-icons/bs";
 
 interface Props {
   children: React.ReactNode;
@@ -28,6 +28,17 @@ function Navbar({ children }: Props) {
           selected={selected}
           onHover={handleHover}
         />
+
+        <NavIcon
+          from={<BsCalendar />}
+          to={<BsCalendarFill />}
+          link={"/agenda"} 
+          option={"agenda"}
+          selected={selected}
+          onHover={handleHover}
+        />
+
+
         <NavIcon
           from={<BsGear />}
           to={<BsGearFill />}
