@@ -43,7 +43,14 @@ const MedicalRecordViewPage = () => {
     );
   }
 
-  const { patient, appointments, notes, analysis, clinicalHistory, reports } = data;
+  const {
+    patient,
+    appointments = [],
+    notes = [],
+    analysis = [],
+    clinicalHistory = [],
+    reports = [],
+  } = data as any;
 
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleDateString("es-MX", {
@@ -230,12 +237,12 @@ const MedicalRecordViewPage = () => {
                       {item.analysis.description}
                     </p>
                   )}
-                  {item.results.length > 0 && (
+                  {(item.results ?? []).length > 0 && (
                     <div className="mt-2">
                       <p className="text-sm font-medium text-gray-700 mb-1">
                         Resultados:
                       </p>
-                      {item.results.map((result) => (
+                      {(item.results ?? []).map((result) => (
                         <div
                           key={result.result_id}
                           className="bg-gray-50 p-2 rounded mb-2"

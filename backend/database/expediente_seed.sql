@@ -374,35 +374,35 @@ ON CONFLICT (patient_analysis_id) DO NOTHING;
 -- Resultado 1: Biometría inicial
 INSERT INTO results (result_id, patient_analysis_id, date, path, interpretation)
 VALUES 
-(6001, 5001, NOW() - INTERVAL '6 months 1 day', '/results/patient_450e8400/biometria_inicial_2024_05.pdf',
+(6001, 5001, NOW() - INTERVAL '6 months 1 day', '/uploads/MateoMinghi_CV.pdf',
 'Hemoglobina: 12.8 g/dL (leve anemia). Leucocitos normales. Plaquetas normales.')
 ON CONFLICT (result_id) DO NOTHING;
 
 -- Resultado 2: Química sanguínea inicial
 INSERT INTO results (result_id, patient_analysis_id, date, path, interpretation)
 VALUES 
-(6002, 5002, NOW() - INTERVAL '6 months 1 day', '/results/patient_450e8400/quimica_inicial_2024_05.pdf',
+(6002, 5002, NOW() - INTERVAL '6 months 1 day', '/uploads/MateoMinghi_CV.pdf',
 'Glucosa: 102 mg/dL. Creatinina: 1.8 mg/dL (elevada). Urea: 45 mg/dL. Ácido úrico: 7.2 mg/dL. Colesterol total: 215 mg/dL. Triglicéridos: 180 mg/dL.')
 ON CONFLICT (result_id) DO NOTHING;
 
 -- Resultado 3: Examen de orina inicial
 INSERT INTO results (result_id, patient_analysis_id, date, path, interpretation)
 VALUES 
-(6003, 5003, NOW() - INTERVAL '6 months 1 day', '/results/patient_450e8400/orina_inicial_2024_05.pdf',
+(6003, 5003, NOW() - INTERVAL '6 months 1 day', '/uploads/MateoMinghi_CV.pdf',
 'Proteinuria +. Glucosuria negativa. Sedimento: cilindros hialinos escasos.')
 ON CONFLICT (result_id) DO NOTHING;
 
 -- Resultado 4: Química seguimiento 3 meses
 INSERT INTO results (result_id, patient_analysis_id, date, path, interpretation)
 VALUES 
-(6004, 5004, NOW() - INTERVAL '3 months 2 days', '/results/patient_450e8400/quimica_seg_2024_08.pdf',
+(6004, 5004, NOW() - INTERVAL '3 months 2 days', '/uploads/MateoMinghi_CV.pdf',
 'Glucosa: 95 mg/dL. Creatinina: 1.7 mg/dL (mejoría leve). Urea: 42 mg/dL. Ácido úrico: 6.8 mg/dL. Colesterol: 195 mg/dL (mejoría). Triglicéridos: 150 mg/dL (mejoría).')
 ON CONFLICT (result_id) DO NOTHING;
 
 -- Resultado 5: Química seguimiento reciente
 INSERT INTO results (result_id, patient_analysis_id, date, path, interpretation)
 VALUES 
-(6005, 5005, NOW() - INTERVAL '1 month 1 day', '/results/patient_450e8400/quimica_seg_2024_10.pdf',
+(6005, 5005, NOW() - INTERVAL '1 month 1 day', '/uploads/MateoMinghi_CV.pdf',
 'Glucosa: 92 mg/dL. Creatinina: 1.65 mg/dL (estable). Urea: 40 mg/dL. Ácido úrico: 6.5 mg/dL. Colesterol: 185 mg/dL. Triglicéridos: 140 mg/dL.')
 ON CONFLICT (result_id) DO NOTHING;
 
