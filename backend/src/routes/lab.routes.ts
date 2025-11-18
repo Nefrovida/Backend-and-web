@@ -1,5 +1,5 @@
-import express from "express"
-const router = express.Router()
+import express from "express";
+const router = express.Router();
 
 import getLabResults from "../controller/lab/getLabResults.controller";
 import getAnalysis from "src/controller/lab/getAnalysis.controller";
@@ -9,43 +9,50 @@ import { Privilege } from "src/types/rbac.types";
 
 import getAnalysisByDay from "../controller/lab/laboratoristGetAnalysis.controller";
 import generateLabReport from "../controller/lab/generateReport.controller";
-import { getFullLabResults, getResultsPDF } from "../controller/lab/getFullLabResults.controller";
+import {
+  getFullLabResults,
+  getResultsPDF,
+} from "../controller/lab/getFullLabResults.controller";
 
 import * as labAppointmentsController from "../controller/lab/labAppointments.controller";
 
 router.use(authenticate);
 
-router.get("/results", 
+router.get(
+  "/results",
   authenticate,
   requirePrivileges([Privilege.VIEW_ANALYSIS]),
-  getLabResults);
+  getLabResults
+);
 
 router.get(
   "/analysis",
   authenticate,
   requirePrivileges([Privilege.VIEW_ANALYSIS]),
   getAnalysis
-)
+);
 
 router.get(
   "/patient-full-results",
   authenticate,
   requirePrivileges([Privilege.VIEW_LAB_RESULTS]),
   getFullLabResults
-)
+);
 
 router.get(
   "/results-pdf",
   authenticate,
   requirePrivileges([Privilege.VIEW_LAB_RESULTS]),
   getResultsPDF
-)
+);
 
 // Date format: dd-mm-yyyy
-router.get("/analysis/by-date/:date", 
+router.get(
+  "/analysis/by-date/:date",
   authenticate,
   requirePrivileges([Privilege.VIEW_ANALYSIS]),
-  getAnalysisByDay);
+  getAnalysisByDay
+);
 
 // List pending lab appointments (US5)
 router.get(
@@ -72,10 +79,10 @@ router.post(
 );
 
 router.post(
-  "/generate-report", 
+  "/generate-report",
   authenticate,
   requirePrivileges([Privilege.EDIT_LAB_RESULTS]),
   generateLabReport
-)
+);
 
 export default router;
