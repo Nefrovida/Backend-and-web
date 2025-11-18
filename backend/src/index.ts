@@ -6,7 +6,7 @@ import dotenv from "dotenv"
 import session from "express-session"
 import { errorHandler } from './middleware/error.middleware';
 
-dotenv.config({path: "../.env"})
+dotenv.config({ path: "../.env" });
 
 // Initialize server
 const app = express();
@@ -110,5 +110,5 @@ app.use(errorHandler);
 
 // Start server
 app.listen(port, () => {
-  console.log(`The server is running at http://localhost:${port}`);
+    console.log(`The server is running at http://localhost:${port}`);
 });

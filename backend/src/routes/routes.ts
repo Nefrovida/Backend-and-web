@@ -6,21 +6,17 @@ import authRoutes from "./auth.routes";
 import usersRoutes from "./users.routes";
 import rolesRoutes from "./roles.routes";
 import privilegesRoutes from "./privileges.routes";
+import * as analysisController from "../controller/analysis/add_analysis.controller";
 import appointmentsRoutes from "./appointments.routes";
 import notesRouter from "./notes.routes";
 import forumsRoutes from "./forums.routes";
-
-
 import patientRoutes from "./patients.routes";
 import clinicalHistoryRoutes from "./clinicalHistory.routes";
-import * as analysisController from '../controller/analysis/add_analysis.controller';
-
 import reportRouter from "./report.routes";
 import historialRoutes from "./historial.routes"
 import historyRoutes from "./history.routes";
 import agendaRoutes from "./agenda.routes"
 import appointmentRoutes from "./appointment.routes";
-
 import expedienteRoutes from "./expediente.routes";
 
 import { authenticate } from "../middleware/auth.middleware";

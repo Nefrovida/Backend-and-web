@@ -115,7 +115,9 @@ WHERE description IN (
 INSERT INTO role_privilege (role_id, privilege_id)
 SELECT 3, privilege_id
 FROM privileges
-WHERE description IN ('VIEW_FORUMS');
+WHERE description IN ('VIEW_FORUMS',
+'VIEW_APPOINTMENTS',
+'CREATE_APPOINTMENTS');
 
 
 -- Secretaria (role_id = 6)
