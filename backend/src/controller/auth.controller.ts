@@ -9,7 +9,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   try {
     const loginData: LoginRequest = req.body;
     const result = await authService.login(loginData);
-    
+
     // Set tokens in httpOnly cookies
     res.cookie('accessToken', result.accessToken, {
       httpOnly: true,

@@ -29,4 +29,18 @@ export default class User {
 
         return newRiskForm;
     }
+
+    static async getUserByPatientId(PatientId: string) {
+        try {
+            const user = await prisma.patients.findUnique({
+                where: { patient_id: PatientId },
+                include: { user: true }
+            })
+            if (!user) throw new Error("No user found with given patient id");
+
+            return user;
+        } catch (error) {
+            throw new Error("Request to db for user with patient id failed");
+        }
+    }
 }

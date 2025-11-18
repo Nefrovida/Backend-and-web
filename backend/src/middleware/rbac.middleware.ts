@@ -13,8 +13,10 @@ export const requirePrivileges = (requiredPrivileges: string[]) => {
       if (!req.user) {
         throw new ForbiddenError('User not authenticated');
       }
+      // console.log("req.user: ", req.user)
 
       const userPrivileges = req.user.privileges;
+      // console.log("required privileges: ", requiredPrivileges)
 
       // Check if user has all required privileges
       const hasAllPrivileges = requiredPrivileges.every((privilege) =>

@@ -6,7 +6,7 @@ import useLabResults from "../../../hooks/useLabResults";
 import LabFilter from "../../molecules/lab/LabFilter";
 import patientLabResults from "@/types/patientsLabResults";
 
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 
 import labResultsFilter from "../../../services/labResultFilter";
 import useLabFilters from "@/hooks/lab/useLabFilter";
@@ -34,7 +34,7 @@ function ListResult() {
 
   return (
     <div className="w-1/3 p-2 h-screen overflow-hidden">
-      <Title>Resultados de laboratorio</Title>
+      <Title size={"large"} >Resultados de laboratorio</Title>
       <div className="w-full flex items-end justify-end gap-5 pb-2">
         <Filter
           show={
