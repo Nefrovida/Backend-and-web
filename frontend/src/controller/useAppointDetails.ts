@@ -3,7 +3,7 @@ import { AppointmentData } from '../types/appointment.types';
 import { getDetailledAppointment } from '../services/appointment.service';
 
 ''
-export const useAppointmentDeatils = (AppoiID: string | null) => {
+export const useAppointmentDetails = (AppoiID: string | null) => {
   
   const [appointment, setAppointment] = useState<AppointmentData | null>(null);
   
