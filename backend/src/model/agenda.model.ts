@@ -170,8 +170,7 @@ export default class Agenda {
           },
         },
       },
-    },
-  });
+    });
 
     if (!appointment) return null;
 
@@ -381,5 +380,58 @@ export default class Agenda {
     });
 
     return scheduledAppointment;
+  }
+
+  static async createAppointment(data: {
+    patientId: string;
+    doctorId: string;
+    dateHour: string;
+    duration: number;
+    appointmentType: 'PRESENCIAL' | 'VIRTUAL';
+    place?: string;
+  }) {
+    const { patientId, doctorId, dateHour, duration, appointmentType, place } = data;
+
+    // Get an appointment for this doctor
+    const doctorAppointment = await prisma.appointments.findFirst({
+      where: {
+        doctor_id: doctorId,
+      },
+    });
+
+    if (!doctorAppointment) {
+      throw new Error('No appointment type found for this doctor');
+    }
+
+    // Create a new patient_appointment directly
+    const newAppointment = await prisma.patient_appointment.create({
+      data: {
+        patient_id: patientId,
+        appointment_id: doctorAppointment.appointment_id,
+        date_hour: new Date(dateHour),
+        duration,
+        appointment_type: appointmentType,
+        place: place || (appointmentType === 'PRESENCIAL' ? 'Consultorio' : undefined),
+        appointment_status: 'PROGRAMMED',
+      },
+      include: {
+        patient: {
+          include: {
+            user: true,
+          },
+        },
+        appointment: {
+          include: {
+            doctor: {
+              include: {
+                user: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return newAppointment;
   }
 }

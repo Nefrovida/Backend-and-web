@@ -22,3 +22,14 @@ export const scheduleAppointment = async (data: {
 }) => {
   return await Agenda.scheduleAppointment(data);
 };
+
+export const createAppointment = async (data: {
+  patientId: string;
+  doctorId: string;
+  dateHour: string;
+  duration: number;
+  appointmentType: 'PRESENCIAL' | 'VIRTUAL';
+  place?: string;
+}) => {
+  return await Agenda.createAppointment(data);
+};

@@ -66,4 +66,11 @@ router.post(
   secretariaController.scheduleAppointment
 );
 
+router.post(
+  "/create-appointment",
+  authenticate,
+  requirePrivileges([Privilege.CREATE_APPOINTMENTS]),
+  secretariaController.createAppointment
+);
+
 export default router;
