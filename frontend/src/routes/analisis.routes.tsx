@@ -6,6 +6,7 @@ import AnalysisManager from "../components/page/AnalysisManager";
 import ProtectedRoute from "../components/common/ProtectedRoute";
 import LabUploadPage from "../components/page/LabUploadPage";
 import LabAppointmentUpload from "../components/organism/lab/LabAppointmentUpload";
+import { LaboratoristAnalysisCalendarC } from "@/controller/laboratoristAnalysisCalendar.controller";
 
 const analisisRoutes: RouteObject[] = [
   {
@@ -44,6 +45,10 @@ const analisisRoutes: RouteObject[] = [
         element: <LabAppointmentUpload />,
       },
     ],
+  },
+  {
+    path: "/analisis-dia",
+    element: <LaboratoristAnalysisCalendarC />,
   },
 ];
 
