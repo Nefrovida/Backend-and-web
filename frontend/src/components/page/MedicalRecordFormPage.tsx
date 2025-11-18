@@ -189,7 +189,7 @@ const MedicalRecordFormPage = () => {
             ) : (
               <button
                 onClick={handleSubmit}
-                className="flex items-center gap-2 px-8 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all shadow-md hover:shadow-lg font-medium"
+                className="flex items-center justify-center gap-2 px-5 py-2.5 bg-primary text-white rounded-lg hover:bg-opacity-90 transition-all shadow-sm hover:shadow-md font-medium"
               >
                 <FaSave />
                 Guardar Expediente
