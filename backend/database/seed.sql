@@ -55,7 +55,8 @@ VALUES
 ('UPDATE_CLINICAL_HISTORY'),
 ('DELETE_CLINICAL_HISTORY'),
 ('VIEW_MEDICAL_RECORD'),
-('CREATE_DOCTOR');
+('CREATE_DOCTOR'),
+('MANAGE_ANALYSIS_TYPES');
 
 -- ========================
 -- 🧩 ROLES - PRIVILEGIOS
@@ -127,7 +128,8 @@ WHERE description IN (
     'VIEW_ANALYSIS', 
     'CREATE_ANALYSIS', 
     'UPDATE_ANALYSIS', 
-    'DELETE_ANALYSIS'
+    'DELETE_ANALYSIS',
+    'MANAGE_ANALYSIS_TYPES'
 );
 
 -- ========================

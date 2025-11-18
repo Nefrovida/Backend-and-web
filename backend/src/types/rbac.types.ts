@@ -38,6 +38,9 @@ export enum Privilege {
   UPDATE_ANALYSIS = "UPDATE_ANALYSIS",
   DELETE_ANALYSIS = "DELETE_ANALYSIS",
 
+  // Analysis types management for secretary
+  MANAGE_ANALYSIS_TYPES = "MANAGE_ANALYSIS_TYPES",
+
   // Forum management
   VIEW_FORUMS = 'VIEW_FORUMS',
   CREATE_FORUMS = 'CREATE_FORUMS',

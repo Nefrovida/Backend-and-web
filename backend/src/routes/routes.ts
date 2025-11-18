@@ -112,13 +112,7 @@ router.use("/appointments", appointmentsRoutes);
 // ============================================
 // Analysis Routes (Secretary: creates / views / updates / deletes analysis types)
 // ============================================
-router.post(
-  "/analysis",
-  authenticate,
-  requirePrivileges([Privilege.CREATE_ANALYSIS]),
-  analysisController.createAnalysis
-);
-
+// List / view details: anyone with VIEW_ANALYSIS (doctor, lab, secretary, admin)
 router.get(
   "/analysis",
   authenticate,
@@ -132,18 +126,26 @@ router.get(
   requirePrivileges([Privilege.VIEW_ANALYSIS]),
   analysisController.getAnalysisById
 );
+// Create / update / delete analysis types:
+// only those with MANAGE_ANALYSIS_TYPES (secretary + admin)
+router.post(
+  "/analysis",
+  authenticate,
+  requirePrivileges([Privilege.MANAGE_ANALYSIS_TYPES]),
+  analysisController.createAnalysis
+);
 
 router.put(
   "/analysis/:id",
   authenticate,
-  requirePrivileges([Privilege.UPDATE_ANALYSIS]),
+  requirePrivileges([Privilege.MANAGE_ANALYSIS_TYPES]),
   analysisController.updateAnalysis
 );
 
 router.delete(
   "/analysis/:id",
   authenticate,
-  requirePrivileges([Privilege.DELETE_ANALYSIS]),
+  requirePrivileges([Privilege.MANAGE_ANALYSIS_TYPES]),
   analysisController.deleteAnalysis
 );
 
