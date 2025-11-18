@@ -25,7 +25,17 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
     
-    // Return only user data, not tokens
+    // Return only user data, not tokens by default
+    // Mobile/native clients can request tokens in the JSON response by
+    // sending the header 'x-return-tokens: true' or query param 'returnTokens=true'
+    const returnTokensHeader = String(req.headers['x-return-tokens'] || '').toLowerCase() === 'true';
+    const returnTokensQuery = String(req.query.returnTokens || '').toLowerCase() === 'true';
+
+    if (returnTokensHeader || returnTokensQuery) {
+      res.status(200).json({ user: result.user, accessToken: result.accessToken, refreshToken: result.refreshToken });
+      return;
+    }
+
     res.status(200).json({ user: result.user });
   } catch (error: any) {
     res.status(error.statusCode || 500).json({ error: error.message });
@@ -55,7 +65,17 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
     
-    // Return only user data, not tokens
+    // Return only user data, not tokens by default
+    // Mobile/native clients can request tokens in the JSON response by
+    // sending the header 'x-return-tokens: true' or query param 'returnTokens=true'
+    const returnTokensHeader = String(req.headers['x-return-tokens'] || '').toLowerCase() === 'true';
+    const returnTokensQuery = String(req.query.returnTokens || '').toLowerCase() === 'true';
+
+    if (returnTokensHeader || returnTokensQuery) {
+      res.status(201).json({ user: result.user, accessToken: result.accessToken, refreshToken: result.refreshToken });
+      return;
+    }
+
     res.status(201).json({ user: result.user });
   } catch (error: any) {
     res.status(error.statusCode || 500).json({ error: error.message });
@@ -68,7 +88,15 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 export const refreshToken = async (req: Request, res: Response): Promise<void> => {
   try {
     // Get refresh token from cookie
-    const refreshTokenFromCookie = req.cookies?.refreshToken;
+    let refreshTokenFromCookie = req.cookies?.refreshToken;
+
+    // If cookie isn't available (native/mobile clients), allow Authorization: Bearer <refreshToken>
+    if (!refreshTokenFromCookie) {
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        refreshTokenFromCookie = authHeader.substring(7);
+      }
+    }
     
     if (!refreshTokenFromCookie) {
       res.status(401).json({ error: 'No refresh token provided' });
