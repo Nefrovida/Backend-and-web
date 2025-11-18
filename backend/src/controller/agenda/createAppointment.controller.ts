@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Type, Status } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -39,8 +39,8 @@ async function createAppointment(req: Request, res: Response) {
                 duration: 30,
                 link: null,
                 place: null,
-                appointment_status: "PROGRAMMED",
-                appointment_type: "PRESENCIAL",
+                appointment_status: Status.REQUESTED,
+                appointment_type: Type.PRESENCIAL,
             },
         });
 
