@@ -78,7 +78,7 @@ const LabFilter: FC<Props> = ({ onChange }) => {
 
   return (
     <>
-      <div className="absolute top-[4.3rem] -translate-x-28 bg-white rounded-md h-[30rem] w-80 z-10 drop-shadow-xl shadow-lg p-2">
+      <div className="absolute top-[6.2rem] -translate-x-28 bg-white rounded-md h-[30rem] w-80 z-10 drop-shadow-xl shadow-lg p-2">
         <div className="flex justify-between items-center mb-2">
           <h1 className="text-lg font-semibold">Filtro</h1>
           <div className="flex gap-2">
