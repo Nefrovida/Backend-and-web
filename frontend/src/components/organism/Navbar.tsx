@@ -4,7 +4,7 @@ import NavIcon from "../atoms/NavIcon";
 import { BsPerson, BsFillPersonFill, BsGear, BsGearFill } from "react-icons/bs";
 import { MdForum, MdOutlineForum } from "react-icons/md";
 import { LuNotebook, LuNotebookPen } from "react-icons/lu";
-import { FaUserMd, FaListUl, FaFolderOpen, FaFolder } from "react-icons/fa";
+import { FaUserMd, FaListUl, FaFolderOpen, FaFolder, FaRegFolder, FaOpencart } from "react-icons/fa";
 import Notas from "../page/Notas";
 import { ROLE_IDS } from "../../types/auth.types";
 
@@ -64,8 +64,8 @@ function Navbar({ children }: Props) {
         )}
 
         <NavIcon
-          from={<FaFolder />}
-          to={<FaFolderOpen />}
+          from={<FaRegFolder />}
+          to={<FaFolderOpen/>}
           link="/expedientes"
           option="expedientes"
           selected={selected}
