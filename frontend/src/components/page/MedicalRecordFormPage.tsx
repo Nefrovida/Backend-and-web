@@ -1,110 +1,34 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import PersonalInfoSection from "../organism/medical-record/PersonalInfoSection";
-import MedicalHistorySection from "../organism/medical-record/MedicalHistorySection";
+import ClinicalHistoryFormSection from "../organism/medical-record/ClinicalHistoryFormSection";
 import LabResultsSection from "../organism/medical-record/LabResultsSection";
 import { useMedicalRecord } from "../../hooks/useMedicalRecord";
+import { clinicalHistoryService } from "../../services/clinicalHistory.service";
 import Title from "../atoms/Title";
 import {
-  MedicalRecordFormData,
-  PersonalInfoFormData,
-  MedicalHistoryFormData,
   LabResultFormData,
+  ClinicalHistoryAnswer,
 } from "../../types/expediente.types";
 
 const MedicalRecordFormPage = () => {
   const navigate = useNavigate();
   const { patientId } = useParams<{ patientId: string }>();
   const [currentSection, setCurrentSection] = useState(0);
-  const [profileImage, setProfileImage] = useState<string | null>(null);
-  const [profileFile, setProfileFile] = useState<File | null>(null);
 
   // Fetch existing medical record data if editing
   const { data: existingData, loading } = useMedicalRecord(patientId);
 
-  const [formData, setFormData] = useState<MedicalRecordFormData>({
-    personalInfo: {
-      name: "",
-      parent_last_name: "",
-      maternal_last_name: "",
-      curp: "",
-      birthday: "",
-      gender: "",
-      phone_number: "",
-      address: "",
-    },
-    medicalHistory: {
-      allergies: "",
-      previous_illnesses: "",
-      previous_surgeries: "",
-      previous_hospitalizations: "",
-      current_medications: "",
-      previous_medications: "",
-      drug_consumption: "",
-      other_conditions: "",
-    },
-    labResult: {},
-  });
-
-  // Populate form with existing data when editing
-  useEffect(() => {
-    if (existingData?.patient) {
-      const patient = existingData.patient;
-      setFormData(prev => ({
-        ...prev,
-        personalInfo: {
-          name: patient.user.name,
-          parent_last_name: patient.user.parent_last_name,
-          maternal_last_name: patient.user.maternal_last_name,
-          curp: patient.curp,
-          birthday: new Date(patient.user.birthday).toISOString().split('T')[0],
-          gender: patient.user.gender,
-          phone_number: patient.user.phone_number,
-          address: "",
-        },
-      }));
-    }
-  }, [existingData]);
+  const [clinicalHistory, setClinicalHistory] = useState<ClinicalHistoryAnswer[]>([]);
+  const [labResult, setLabResult] = useState<LabResultFormData>({});
 
   const sections = [
     {
-      title: "Información Personal",
+      title: "Historial Clínico",
       component: (
-        <PersonalInfoSection
-          data={formData.personalInfo}
-          onChange={(data) =>
-            setFormData((prev) => ({
-              ...prev,
-              personalInfo: { ...prev.personalInfo, ...data },
-            }))
-          }
-          profileImage={profileImage}
-          onImageChange={(file) => {
-            setProfileFile(file);
-            if (file) {
-              const reader = new FileReader();
-              reader.onloadend = () => {
-                setProfileImage(reader.result as string);
-              };
-              reader.readAsDataURL(file);
-            } else {
-              setProfileImage(null);
-            }
-          }}
-        />
-      ),
-    },
-    {
-      title: "Antecedentes Médicos",
-      component: (
-        <MedicalHistorySection
-          data={formData.medicalHistory}
-          onChange={(data) =>
-            setFormData((prev) => ({
-              ...prev,
-              medicalHistory: { ...prev.medicalHistory, ...data },
-            }))
-          }
+        <ClinicalHistoryFormSection
+          patientId={patientId}
+          data={clinicalHistory}
+          onChange={(data) => setClinicalHistory(data)}
         />
       ),
     },
@@ -112,13 +36,8 @@ const MedicalRecordFormPage = () => {
       title: "Resultados de Laboratorio",
       component: (
         <LabResultsSection
-          data={formData.labResult}
-          onChange={(data) =>
-            setFormData((prev) => ({
-              ...prev,
-              labResult: { ...prev.labResult, ...data },
-            }))
-          }
+          data={labResult}
+          onChange={(data) => setLabResult({ ...labResult, ...data })}
           existingAnalysis={existingData?.analysis || []}
           patientId={patientId}
         />
@@ -145,12 +64,16 @@ const MedicalRecordFormPage = () => {
         return;
       }
       
+      // Submit clinical history answers if any
+      if (clinicalHistory && clinicalHistory.length > 0) {
+        await clinicalHistoryService.submitRiskForm(patientId, clinicalHistory);
+      }
+      
       // Note: PDFs are uploaded individually using the "Subir PDF" button on each analysis
-      // This button just navigates back to view the expediente
       navigate(`/expediente/${patientId}`);
     } catch (error) {
       console.error("Error:", error);
-      alert("Error al procesar el expediente");
+      alert("Error al guardar el historial clínico");
     }
   };
 

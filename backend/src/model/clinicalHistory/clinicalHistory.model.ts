@@ -18,8 +18,17 @@ export default class CH {
 
     for (const item of answers) {
 
-      const entry = await prisma.patient_history.create({
-        data: {
+      const entry = await prisma.patient_history.upsert({
+        where: {
+          question_id_patient_id: {
+            question_id: item.question_id,
+            patient_id: id
+          }
+        },
+        update: {
+          answer: item.answer
+        },
+        create: {
           patient_id: id,
           question_id: item.question_id, 
           answer: item.answer

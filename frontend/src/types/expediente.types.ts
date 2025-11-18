@@ -142,8 +142,14 @@ export interface LabResultFormData {
   interpretations?: string[];
 }
 
+export interface ClinicalHistoryAnswer {
+  question_id: number;
+  answer: string;
+}
+
 export interface MedicalRecordFormData {
   personalInfo: PersonalInfoFormData;
   medicalHistory: MedicalHistoryFormData;
   labResult: LabResultFormData;
+  clinicalHistory?: ClinicalHistoryAnswer[];
 }

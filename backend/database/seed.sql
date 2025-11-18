@@ -49,15 +49,46 @@ VALUES
 ('UPDATE_HISTORY_QUESTIONS'),
 ('DELETE_HISTORY_QUESTIONS'),
 ('VIEW_REPORTS'),
-('ADD_USER_TO_FORUM');
+('ADD_USER_TO_FORUM'),
+('CREATE_CLINICAL_HISTORY'),
+('VIEW_CLINICAL_HISTORY'),
+('UPDATE_CLINICAL_HISTORY'),
+('DELETE_CLINICAL_HISTORY'),
+('VIEW_MEDICAL_RECORD');
 
 -- ========================
 -- 🧩 ROLES - PRIVILEGIOS
 -- ========================
 
--- Doctor (role_id = 2)
+-- Doctor (role_id = 2) - Assign common privileges
 INSERT INTO role_privilege (role_id, privilege_id)
-SELECT 2, generate_series(1, 20);
+SELECT 2, privilege_id
+FROM privileges
+WHERE description IN (
+  'VIEW_PATIENTS',
+  'CREATE_PATIENTS',
+  'UPDATE_PATIENTS',
+  'VIEW_APPOINTMENTS',
+  'CREATE_APPOINTMENTS',
+  'UPDATE_APPOINTMENTS',
+  'VIEW_ANALYSIS',
+  'CREATE_ANALYSIS',
+  'UPDATE_ANALYSIS',
+  'VIEW_FORUMS',
+  'CREATE_FORUMS',
+  'UPDATE_FORUMS',
+  'DELETE_FORUMS',
+  'VIEW_HISTORY_QUESTIONS',
+  'CREATE_HISTORY_QUESTIONS',
+  'UPDATE_HISTORY_QUESTIONS',
+  'DELETE_HISTORY_QUESTIONS',
+  'VIEW_REPORTS',
+  'ADD_USER_TO_FORUM',
+  'CREATE_CLINICAL_HISTORY',
+  'VIEW_CLINICAL_HISTORY',
+  'UPDATE_CLINICAL_HISTORY',
+  'VIEW_MEDICAL_RECORD'
+);
 
 -- Admin (role_id = 1): full privileges
 INSERT INTO role_privilege (role_id, privilege_id)
@@ -85,12 +116,6 @@ SELECT 3, privilege_id
 FROM privileges
 WHERE description IN ('VIEW_FORUMS');
 
-
--- Doctor also gets VIEW_REPORTS
-INSERT INTO role_privilege (role_id, privilege_id)
-SELECT 2, p.privilege_id
-FROM privileges p
-WHERE p.description = 'VIEW_REPORTS';
 
 -- Secretaria (role_id = 6)
 INSERT INTO role_privilege (role_id, privilege_id)

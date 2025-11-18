@@ -3,7 +3,7 @@ const router = express.Router()
 
 import * as CHC from "../controller/clinicalHistory/clinicalHistory.controller"; 
 import { authenticate } from "../middleware/auth.middleware";
-import { requirePrivileges } from "../middleware/rbac.middleware";
+import { requirePrivileges, requireAnyPrivilege } from "../middleware/rbac.middleware";
 import { Privilege } from "../types/rbac.types";
 
 router.get("/risk-questions",
@@ -18,6 +18,7 @@ router.get("/risk-options",
 
 router.post("/risk-form/submit/:id",
     authenticate,
+    requireAnyPrivilege([Privilege.CREATE_CLINICAL_HISTORY, Privilege.UPDATE_CLINICAL_HISTORY]),
     CHC.submitRiskForm);
 
 router.get("/risk-form/get/:id",

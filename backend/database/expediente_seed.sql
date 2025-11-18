@@ -69,6 +69,8 @@ WHERE p.description IN (
   
   -- Historial clínico
   'VIEW_CLINICAL_HISTORY',      -- Ver historial clínico del paciente
+  'CREATE_CLINICAL_HISTORY',    -- Crear/editar historial clínico del paciente
+  'UPDATE_CLINICAL_HISTORY',    -- Actualizar historial clínico del paciente
   
   -- Reportes
   'VIEW_REPORTS'                -- Ver reportes/resultados
@@ -472,7 +474,6 @@ VALUES
 (9014, '450e8400-e29b-41d4-a716-446655440002'::uuid, 'No'),
 (9015, '450e8400-e29b-41d4-a716-446655440002'::uuid, 'No')
 ON CONFLICT DO NOTHING;
-
 
 -- ========================
 -- ✅ SEED DE EXPEDIENTE COMPLETADO
