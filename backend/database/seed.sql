@@ -49,15 +49,47 @@ VALUES
 ('UPDATE_HISTORY_QUESTIONS'),
 ('DELETE_HISTORY_QUESTIONS'),
 ('VIEW_REPORTS'),
-('ADD_USER_TO_FORUM');
+('ADD_USER_TO_FORUM'),
+('CREATE_CLINICAL_HISTORY'),
+('VIEW_CLINICAL_HISTORY'),
+('UPDATE_CLINICAL_HISTORY'),
+('DELETE_CLINICAL_HISTORY'),
+('VIEW_MEDICAL_RECORD'),
+('CREATE_DOCTOR');
 
 -- ========================
 -- 🧩 ROLES - PRIVILEGIOS
 -- ========================
 
--- Doctor (role_id = 2)
+-- Doctor (role_id = 2) - Assign common privileges
 INSERT INTO role_privilege (role_id, privilege_id)
-SELECT 2, generate_series(1, 20);
+SELECT 2, privilege_id
+FROM privileges
+WHERE description IN (
+  'VIEW_PATIENTS',
+  'CREATE_PATIENTS',
+  'UPDATE_PATIENTS',
+  'VIEW_APPOINTMENTS',
+  'CREATE_APPOINTMENTS',
+  'UPDATE_APPOINTMENTS',
+  'VIEW_ANALYSIS',
+  'CREATE_ANALYSIS',
+  'UPDATE_ANALYSIS',
+  'VIEW_FORUMS',
+  'CREATE_FORUMS',
+  'UPDATE_FORUMS',
+  'DELETE_FORUMS',
+  'VIEW_HISTORY_QUESTIONS',
+  'CREATE_HISTORY_QUESTIONS',
+  'UPDATE_HISTORY_QUESTIONS',
+  'DELETE_HISTORY_QUESTIONS',
+  'VIEW_REPORTS',
+  'ADD_USER_TO_FORUM',
+  'CREATE_CLINICAL_HISTORY',
+  'VIEW_CLINICAL_HISTORY',
+  'UPDATE_CLINICAL_HISTORY',
+  'VIEW_MEDICAL_RECORD'
+);
 
 -- Admin (role_id = 1): full privileges
 INSERT INTO role_privilege (role_id, privilege_id)
@@ -78,11 +110,15 @@ WHERE description IN (
   'VIEW_ANALYSIS'  -- solo lectura de catálogo
 );
 
--- Doctor also gets VIEW_REPORTS
+
+-- Paciente
 INSERT INTO role_privilege (role_id, privilege_id)
-SELECT 2, p.privilege_id
-FROM privileges p
-WHERE p.description = 'VIEW_REPORTS';
+SELECT 3, privilege_id
+FROM privileges
+WHERE description IN ('VIEW_FORUMS',
+'VIEW_APPOINTMENTS',
+'CREATE_APPOINTMENTS');
+
 
 -- Secretaria (role_id = 6)
 INSERT INTO role_privilege (role_id, privilege_id)
@@ -107,7 +143,12 @@ VALUES -- passwd: 1234567890
 
 -- Admin user
 INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
-VALUES (gen_random_uuid(), 'Administrador', 'Sistema', 'Admin', true, '5550000000', 'admin', '$2b$10$/aYCozNwvUh8qt41J1diPOwDqeW50wg8nWf76NvAQ9plWjngrj4yS', '1980-01-01', 'MALE', false, 1);
+VALUES -- passwd: 1234567890
+(gen_random_uuid(), 'Administrador', 'Sistema', 'Admin', true, '5550000000', 'admin', '$2b$10$/aYCozNwvUh8qt41J1diPOwDqeW50wg8nWf76NvAQ9plWjngrj4yS', '1980-01-01', 'MALE', false, 1),
+(gen_random_uuid(), 'Ian', 'Hernández', 'Díaz', true, '5550000001', 'ian', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '1990-01-15', 'MALE', false, 1),
+(gen_random_uuid(), 'Leonardo', 'García', 'Martínez', true, '5550000002', 'leonardo', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '1988-03-20', 'MALE', false, 1),
+(gen_random_uuid(), 'Mateo', 'López', 'Rodríguez', true, '5550000003', 'mateo', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '1992-07-10', 'MALE', false, 1);
+
 
 -- ========================
 -- 👨‍⚕️ DOCTORS
@@ -173,8 +214,8 @@ SELECT
   a.appointment_id,
   NOW() + (random() * (interval '30 days')),
   45,
-  'PRESENCIAL',
-  'PROGRAMMED'
+  'PRESENCIAL'::"Type",
+  'PROGRAMMED'::"Status"
 FROM (
   SELECT patient_id, ROW_NUMBER() OVER () AS rn FROM patients
 ) p
@@ -195,10 +236,10 @@ SELECT
     ELSE 60
   END,
   CASE 
-    WHEN (ROW_NUMBER() OVER ()) % 2 = 0 THEN 'PRESENCIAL'
-    ELSE 'VIRTUAL'
+    WHEN (ROW_NUMBER() OVER ()) % 2 = 0 THEN 'PRESENCIAL'::"Type"
+    ELSE 'VIRTUAL'::"Type"
   END,
-  'REQUESTED'
+  'REQUESTED'::"Status"
 FROM (
   SELECT patient_id FROM patients ORDER BY patient_id
 ) p

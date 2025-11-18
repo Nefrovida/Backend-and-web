@@ -1,5 +1,39 @@
-import { prisma } from '../util/prisma';
-import { ForumRole } from '@prisma/client';
+import { prisma } from "../util/prisma";
+import { ForumRole } from ".prisma/client";
+
+export default class Forum {
+  Forum() {}
+
+  static async postNewMessage(
+    userId: string,
+    forumId: number,
+    content: string
+  ) {
+    return await prisma.messages.create({
+      data: {
+        forum_id: forumId,
+        user_id: userId,
+        content: content,
+      },
+    });
+  }
+
+  static async getMyForums(userId: string) {
+    return await prisma.users_forums.findMany({
+      where: {
+        user_id: userId,
+      },
+      select: {
+        forum: {
+          select: {
+            forum_id: true,
+            name: true,
+          },
+        },
+      },
+    });
+  }
+}
 
 /**
  * Find forum by name (case-insensitive)
@@ -9,7 +43,7 @@ export const findByName = async (name: string) => {
     where: {
       name: {
         equals: name,
-        mode: 'insensitive',
+        mode: "insensitive",
       },
     },
   });
@@ -77,7 +111,7 @@ export const findAll = async (
   if (filters?.search) {
     whereClause.name = {
       contains: filters.search,
-      mode: 'insensitive' as const,
+      mode: "insensitive" as const,
     };
   }
 
@@ -110,7 +144,7 @@ export const findAll = async (
       },
     },
     orderBy: {
-      creation_date: 'desc',
+      creation_date: "desc",
     },
     skip,
     take,
@@ -131,7 +165,7 @@ export const count = async (filters?: {
   if (filters?.search) {
     whereClause.name = {
       contains: filters.search,
-      mode: 'insensitive' as const,
+      mode: "insensitive" as const,
     };
   }
 
@@ -197,7 +231,7 @@ export const findDuplicateName = async (name: string, excludeId: number) => {
     where: {
       name: {
         equals: name,
-        mode: 'insensitive',
+        mode: "insensitive",
       },
       NOT: {
         forum_id: excludeId,
@@ -225,7 +259,7 @@ export const findPublicForums = async (skip: number, take: number) => {
       },
     },
     orderBy: {
-      creation_date: 'desc',
+      creation_date: "desc",
     },
     skip,
     take,
@@ -265,10 +299,7 @@ export const addUserToForum = async (
 /**
  * Remove user from forum
  */
-export const removeUserFromForum = async (
-  forumId: number,
-  userId: string
-) => {
+export const removeUserFromForum = async (forumId: number, userId: string) => {
   return await prisma.users_forums.delete({
     where: {
       user_id_forum_id: {
@@ -357,7 +388,7 @@ export const getForumMembers = async (
       },
     },
     orderBy: {
-      forum_role: 'asc', // OWNER first, then MODERATOR, MEMBER, VIEWER
+      forum_role: "asc", // OWNER first, then MODERATOR, MEMBER, VIEWER
     },
     skip,
     take,
@@ -398,9 +429,254 @@ export const getUserForums = async (userId: string) => {
     },
     orderBy: {
       forum: {
-        creation_date: 'desc',
+        creation_date: "desc",
       },
     },
   });
 };
 
+/**
+ * Get all admin users (role_id = 1)
+ */
+export const getAdminUsers = async () => {
+  return await prisma.users.findMany({
+    where: {
+      role_id: 1,
+      active: true, // Solo usuarios activos
+    },
+    select: {
+      user_id: true,
+      name: true,
+      parent_last_name: true,
+      maternal_last_name: true,
+      username: true,
+      phone_number: true,
+      registration_date: true,
+      role: {
+        select: {
+          role_name: true,
+        },
+      },
+    },
+    orderBy: {
+      registration_date: "desc",
+    },
+  });
+};
+
+/**
+ * Get admin users with pagination
+ */
+export const getAdminUsersWithPagination = async (
+  skip: number,
+  take: number
+) => {
+  return await prisma.users.findMany({
+    where: {
+      role_id: 1,
+      active: true,
+    },
+    select: {
+      user_id: true,
+      name: true,
+      parent_last_name: true,
+      maternal_last_name: true,
+      username: true,
+      phone_number: true,
+      registration_date: true,
+      role: {
+        select: {
+          role_name: true,
+        },
+      },
+    },
+    orderBy: {
+      registration_date: "desc",
+    },
+    skip,
+    take,
+  });
+};
+
+/**
+ * Count total admin users
+ */
+export const countAdminUsers = async () => {
+  return await prisma.users.count({
+    where: {
+      role_id: 1,
+      active: true,
+    },
+  });
+};
+
+/**
+ * Check if user is admin
+ */
+export const isUserAdmin = async (userId: string) => {
+  const user = await prisma.users.findUnique({
+    where: {
+      user_id: userId,
+    },
+    select: {
+      role_id: true,
+      active: true,
+    },
+  });
+
+  return user?.role_id === 1 && user?.active === true;
+};
+
+/**
+ * Get forum administrators (OWNER and MODERATOR)
+ */
+export const getForumAdministrators = async (forumId: number) => {
+  const result = await prisma.users_forums.findMany({
+    where: {
+      forum_id: forumId,
+      forum_role: {
+        in: ["OWNER", "MODERATOR"],
+      },
+    },
+    include: {
+      user: {
+        select: {
+          user_id: true,
+          name: true,
+          parent_last_name: true,
+          maternal_last_name: true,
+          username: true,
+          phone_number: true,
+          registration_date: true,
+        },
+      },
+    },
+    orderBy: [
+      {
+        forum_role: "asc", // OWNER primero, luego MODERATOR
+      },
+      {
+        user: {
+          registration_date: "desc",
+        },
+      },
+    ],
+  });
+
+  // Aplanar la estructura para que sea más fácil de usar en el frontend
+  return result.map((item) => ({
+    user_id: item.user.user_id,
+    name: item.user.name,
+    parent_last_name: item.user.parent_last_name,
+    maternal_last_name: item.user.maternal_last_name,
+    username: item.user.username,
+    phone_number: item.user.phone_number,
+    registration_date: item.user.registration_date,
+    forum_role: item.forum_role,
+  }));
+};
+
+/**
+ * Get all non-admin users (role_id != 1) with pagination
+ */
+export const getNonAdminUsersWithPagination = async (
+  skip: number,
+  take: number
+) => {
+  return await prisma.users.findMany({
+    where: {
+      role_id: {
+        not: 1, // Excluir administradores
+      },
+      active: true,
+    },
+    select: {
+      user_id: true,
+      name: true,
+      parent_last_name: true,
+      maternal_last_name: true,
+      username: true,
+      phone_number: true,
+      registration_date: true,
+      role: {
+        select: {
+          role_name: true,
+        },
+      },
+    },
+    orderBy: {
+      registration_date: "desc",
+    },
+    skip,
+    take,
+  });
+};
+
+/**
+ * Count total non-admin users
+ */
+export const countNonAdminUsers = async () => {
+  return await prisma.users.count({
+    where: {
+      role_id: {
+        not: 1, // Excluir administradores
+      },
+      active: true,
+    },
+  });
+};
+
+/**
+ * Get forum members (all roles except OWNER and MODERATOR)
+ */
+export const getForumRegularMembers = async (forumId: number) => {
+  const result = await prisma.users_forums.findMany({
+    where: {
+      forum_id: forumId,
+      forum_role: {
+        in: ["MEMBER", "VIEWER"],
+      },
+    },
+    include: {
+      user: {
+        select: {
+          user_id: true,
+          name: true,
+          parent_last_name: true,
+          maternal_last_name: true,
+          username: true,
+          phone_number: true,
+          registration_date: true,
+          role: {
+            select: {
+              role_name: true,
+            },
+          },
+        },
+      },
+    },
+    orderBy: [
+      {
+        forum_role: "asc", // MEMBER primero, luego VIEWER
+      },
+      {
+        user: {
+          registration_date: "desc",
+        },
+      },
+    ],
+  });
+
+  // Aplanar la estructura para que sea más fácil de usar en el frontend
+  return result.map((item) => ({
+    user_id: item.user.user_id,
+    name: item.user.name,
+    parent_last_name: item.user.parent_last_name,
+    maternal_last_name: item.user.maternal_last_name,
+    username: item.user.username,
+    phone_number: item.user.phone_number,
+    registration_date: item.user.registration_date,
+    forum_role: item.forum_role,
+    role: item.user.role, // Incluir información del rol del usuario
+  }));
+};

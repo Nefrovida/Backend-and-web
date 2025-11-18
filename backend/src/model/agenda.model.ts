@@ -1,14 +1,16 @@
-// backend/src/model/agenda.model.ts
 import { prisma } from "../util/prisma";
+
 
 export default class Agenda {
   constructor() { }
 
-  // Daily secretary appointments (includes patient name)
+  /**
+   * Secretaria (web) – Daily appointments, including patient name.
+   */
   static async getAppointmentsPerDaySec(targetDate: string) {
     const [year, month, day] = targetDate.split("-").map(Number);
 
-    // MX local time
+    // Local time MX
     const start = new Date(year, month - 1, day, 0, 0, 0);
     const end = new Date(year, month - 1, day + 1, 0, 0, 0);
 
@@ -35,12 +37,12 @@ export default class Agenda {
           },
         },
       },
-      orderBy: {
-        date_hour: "asc",
-      },
-    });
+            orderBy: {
+                date_hour: "asc",
+            },
+        });
 
-    // Unnest joins
+    // Unnest joins -> patient name
     const flattened = appointments.map((a) => {
       const user = a.patient?.user;
       const { patient, ...rest } = a;
@@ -62,7 +64,9 @@ export default class Agenda {
     return flattened;
   }
 
-  // Daily doctor appointments (includes doctor name)
+  /**
+   * Mobile – Daily appointments, including doctor name.
+   */
   static async getAppointmentsPerDay(targetDate: string) {
     const [year, month, day] = targetDate.split("-").map(Number);
 
@@ -91,6 +95,7 @@ export default class Agenda {
         appointment: {
           select: {
             appointment_id: true,
+            name: true,
             doctor: {
               select: {
                 doctor_id: true,
@@ -108,10 +113,10 @@ export default class Agenda {
       },
     });
 
-    // Unnest
-    const flattened = appointments.map((a) => {
-      const doctorUser = a.appointment?.doctor?.user;
+    // Unnest -> doctor name + appointment name
+    return appointments.map((a) => {
       const { appointment, ...rest } = a;
+      const doctorUser = appointment?.doctor?.user;
 
       const fullName = [
         doctorUser?.name,
@@ -121,16 +126,21 @@ export default class Agenda {
         .filter(Boolean)
         .join(" ");
 
+      const appointmentName = appointment?.name?.trim() ?? null;
+
       return {
         ...rest,
         appointment_id: appointment?.appointment_id ?? null,
         name: fullName || null,
+        doctor_name: fullName || null,
+        appointment_name: appointmentName,
       };
     });
-
-    return flattened;
   }
 
+  /**
+   * Mobile – Cancel appointment by patient_appointment_id
+   */
   static async cancelAppointment(id: number) {
     await prisma.patient_appointment.update({
       where: { patient_appointment_id: id },
@@ -138,6 +148,9 @@ export default class Agenda {
     });
   }
 
+  /**
+   * Mobile – Appointment details (card), by id.
+   */
   static async getAppointmentById(id: number) {
     const appointment = await prisma.patient_appointment.findUnique({
       where: {
@@ -155,6 +168,7 @@ export default class Agenda {
         appointment: {
           select: {
             appointment_id: true,
+            name: true,
             doctor: {
               select: {
                 doctor_id: true,
@@ -186,17 +200,85 @@ export default class Agenda {
       .filter(Boolean)
       .join(" ");
 
+    const appointment_name = nestedAppointment?.name?.trim() ?? null;
+
     return {
       ...rest,
       appointment_id: nestedAppointment?.appointment_id ?? null,
       name: fullName || null,
+      doctor_name: fullName || null,
+      appointment_name,
     };
   }
 
-  static async getPendingAppointmentRequests() {
-    const requests = await prisma.patient_appointment.findMany({
+  /**
+   * Web – List of appointments in a date range (calendar view).
+   */
+  static async getAppointmentsInRange(startDate: string, endDate: string) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    const appointments = await prisma.patient_appointment.findMany({
       where: {
-        appointment_status: 'REQUESTED',
+        date_hour: {
+          gte: start,
+          lt: end,
+        },
+        appointment_status: {
+          not: "CANCELED",
+        },
+      },
+      include: {
+        patient: {
+          include: {
+            user: {
+              select: {
+                name: true,
+                parent_last_name: true,
+                maternal_last_name: true,
+              },
+            },
+          },
+        },
+        appointment: {
+          select: {
+            name: true,
+          },
+        },
+      },
+      orderBy: {
+        date_hour: "asc",
+      },
+    });
+
+    return appointments.map((a) => {
+      const user = a.patient?.user;
+      const { patient, appointment, ...rest } = a;
+
+      const fullName = [
+        user?.name,
+        user?.parent_last_name,
+        user?.maternal_last_name,
+      ]
+        .filter(Boolean)
+        .join(" ");
+
+      return {
+        ...rest,
+        // patient name for web view
+        name: fullName || null,
+        appointment_name: appointment?.name?.trim() ?? null,
+      };
+    });
+  }
+
+  /**
+   * Secretaria – appointment request list (status REQUESTED).
+   */
+  static async getPendingAppointmentRequests() {
+    const requests = (await prisma.patient_appointment.findMany({
+      where: {
+        appointment_status: "REQUESTED" as any,
       },
       include: {
         patient: {
@@ -231,9 +313,9 @@ export default class Agenda {
         },
       },
       orderBy: {
-        date_hour: 'asc',
+        date_hour: "asc",
       },
-    });
+    })) as any[];
 
     return requests.map((req) => ({
       patient_appointment_id: req.patient_appointment_id,
@@ -289,7 +371,7 @@ export default class Agenda {
           lte: endOfDay,
         },
         appointment_status: {
-          in: ['PROGRAMMED', 'FINISHED'],
+          in: ["PROGRAMMED", "FINISHED"],
         },
       },
       select: {
@@ -318,7 +400,9 @@ export default class Agenda {
 
         if (!isBooked) {
           availableSlots.push(
-            `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`
+            `${hour.toString().padStart(2, "0")}:${minute
+              .toString()
+              .padStart(2, "0")}`
           );
         }
       }
@@ -332,7 +416,7 @@ export default class Agenda {
     doctorId: string;
     dateHour: string;
     duration: number;
-    appointmentType: 'PRESENCIAL' | 'VIRTUAL';
+    appointmentType: "PRESENCIAL" | "VIRTUAL";
     place?: string;
   }) {
     const { patientAppointmentId, doctorId, dateHour, duration, appointmentType, place } = data;
@@ -345,7 +429,7 @@ export default class Agenda {
     });
 
     if (!doctorAppointment) {
-      throw new Error('No appointment type found for this doctor');
+      throw new Error("No appointment type found for this doctor");
     }
 
     // Update the patient_appointment with the scheduled details
@@ -359,7 +443,7 @@ export default class Agenda {
         duration,
         appointment_type: appointmentType,
         place,
-        appointment_status: 'PROGRAMMED',
+        appointment_status: "PROGRAMMED",
       },
       include: {
         patient: {
@@ -381,7 +465,6 @@ export default class Agenda {
 
     return scheduledAppointment;
   }
-
   static async createAppointment(data: {
     patientId: string;
     doctorId: string;
@@ -433,5 +516,54 @@ export default class Agenda {
     });
 
     return newAppointment;
+  }
+
+  static async getAppointmentsPerDayByAppointmentId(
+    targetDate: string,
+    appointmentId: number
+  ) {
+    const [year, month, day] = targetDate.split("-").map(Number);
+
+    // rangos por si la fecha viene así: 2025-11-14T01:19:52.415
+    const start = new Date(year, month - 1, day, 0, 0, 0);
+    const end = new Date(year, month - 1, day + 1, 0, 0, 0);
+
+    const appointments = await prisma.patient_appointment.findMany({
+      where: {
+        date_hour: {
+          gte: start,
+          lt: end,
+        },
+        appointment_id: appointmentId,
+      },
+      include: {
+        patient: {
+          include: {
+            user: {
+              select: {
+                name: true,
+                parent_last_name: true,
+                maternal_last_name: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        date_hour: "asc",
+      },
+    });
+
+    return appointments.map((a) => {
+      const { patient, ...rest } = a;
+      const user = patient?.user;
+
+      return {
+        ...rest,
+        patient_name: user?.name ?? null,
+        patient_parent_last_name: user?.parent_last_name ?? null,
+        patient_maternal_last_name: user?.maternal_last_name ?? null,
+      };
+    });
   }
 }

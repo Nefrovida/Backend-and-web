@@ -15,7 +15,6 @@ export default class Laboratory {
       status?: ANALYSIS_STATUS[] | null
     }) {
     const paginationSkip = 10;
-    
     const patientResults = await prisma.patient_analysis.findMany({
       where: {
         ...(filter.name
@@ -151,5 +150,53 @@ export default class Laboratory {
         },
       });
     });
+  }
+
+  static async getFullLabResults(
+    patient_analysis_id: number
+  ) {
+    try {
+      const analysis_res = await prisma.patient_analysis.findUnique({
+        where: { patient_analysis_id: patient_analysis_id },
+        include: {
+          analysis: true
+        }
+      });
+      const results_res = await prisma.results.findUnique({
+        where: { patient_analysis_id: patient_analysis_id }
+      });
+
+      const result = {
+        analysis: analysis_res,
+        results: results_res
+      };
+
+      return result;
+    } catch (error) {
+      throw new Error("request to db for patient analysis results failed");
+    }
+  }
+    
+  static async generateReport(
+    patient_analysis_id: number,
+    interpretations: string, 
+    recommendations: string) {
+    try {
+      console.log("generating report for patient analysis id: ", patient_analysis_id);
+      console.log("interpretations: ", interpretations);
+      console.log("recommendations: ", recommendations);
+      await prisma.results.update({
+        where: { patient_analysis_id: patient_analysis_id },
+        data: {
+          interpretation: interpretations,
+          recommendation: recommendations,
+          updated: new Date(),
+        },
+      })
+      return { success: true }
+    } catch (error) {
+      console.error("Error creating lab report in db: ", error);
+      throw new Error(`Error creating lab report in db ${error}`);
+    }
   }
 }

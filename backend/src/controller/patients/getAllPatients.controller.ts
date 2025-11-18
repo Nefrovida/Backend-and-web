@@ -2,10 +2,16 @@ import { type Request, type Response } from "express";
 import Patients from "src/model/patient.model";
 
 /**
+/**
  * Get all patients in the system (for secretaries to schedule appointments)
  */
 async function getAllPatients(req: Request, res: Response) {
   try {
+    if (!req.user) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+
     const patients = await Patients.getAllPatients();
     
     // Flatten the user data for easier consumption
@@ -21,10 +27,18 @@ async function getAllPatients(req: Request, res: Response) {
       gender: patient.user.gender,
     }));
 
-    res.status(200).json(formattedPatients);
+    res.status(200).json({
+      success: true,
+      data: formattedPatients
+    });
   } catch (error: any) {
     console.error("Error fetching all patients:", error);
-    res.status(error.statusCode || 500).json({ error: error.message || "Failed to fetch patients" });
+    res.status(error.statusCode || 500).json({ 
+      success: false,
+      error: error.message || "Failed to fetch patients"
+    });
+  }
+}
   }
 }
 

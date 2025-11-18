@@ -15,6 +15,7 @@ export const Calendar = ({
     minTime = "09:00:00",
     maxTime = "18:01:00",
     onDatesSet,
+    onEventClick,
 }: CalendarProps) => {
 
     return (
@@ -59,6 +60,9 @@ export const Calendar = ({
 
             // Exec every time the user navigates thru dates
             datesSet={onDatesSet}
+
+            // Handle event clicks
+            eventClick={onEventClick}
         />
         </div>
     )
