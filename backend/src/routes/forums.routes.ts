@@ -103,12 +103,7 @@ router.post(
   forumsController.create
 );
 
-router.post(
-  "/:forumId",
-  authenticate,
-  requirePrivileges([Privilege.CREATE_FORUMS]),
-  postNewMessage
-);
+router.post("/:forumId", authenticate, postNewMessage);
 
 /**
  * Update a forum
