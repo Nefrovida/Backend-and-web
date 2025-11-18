@@ -1,5 +1,4 @@
-import { PrismaClient } from "../../prisma/database/prisma/client";
-const prisma = new PrismaClient();
+import { prisma } from "src/util/prisma";
 
 export default class Agenda {
     constructor() {}
