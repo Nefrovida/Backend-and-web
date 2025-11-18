@@ -10,6 +10,19 @@ import {
   UpdateAnalysisData,
 } from "@/types/add.analysis.types";
 
+// Helper to extract the friendly message from the backend
+const getBackendErrorMessage = (err: any, fallback: string) => {
+  const backendMessage =
+    err?.response?.data?.error?.message ??
+    err?.response?.data?.message;
+
+  if (typeof backendMessage === "string" && backendMessage.trim() !== "") {
+    return backendMessage;
+  }
+
+  return err?.message || fallback;
+};
+
 const AnalysisManager: React.FC = () => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -102,7 +115,11 @@ const AnalysisManager: React.FC = () => {
                           await load();
                           alert("Análisis eliminado");
                         } catch (err: any) {
-                          alert(err?.message || "Error al eliminar");
+                          const msg = getBackendErrorMessage(
+                            err,
+                            "Error al eliminar el análisis"
+                          );
+                          alert(msg);
                         }
                       }}
                     >
@@ -128,7 +145,11 @@ const AnalysisManager: React.FC = () => {
             setIsCreateOpen(false);
             alert("Análisis creado");
           } catch (err: any) {
-            alert(err?.message || "Error al crear análisis");
+            const msg = getBackendErrorMessage(
+              err,
+              "Error al crear análisis"
+            );
+            alert(msg);
           }
         }}
       />
@@ -153,7 +174,11 @@ const AnalysisManager: React.FC = () => {
             setEditingAnalysis(null);
             alert("Análisis actualizado");
           } catch (err: any) {
-            alert(err?.message || "Error al actualizar análisis");
+            const msg = getBackendErrorMessage(
+              err,
+              "Error al actualizar análisis"
+            );
+            alert(msg);
           }
         }}
       />

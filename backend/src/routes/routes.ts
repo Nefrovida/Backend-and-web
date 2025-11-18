@@ -9,7 +9,8 @@ import privilegesRoutes from "./privileges.routes";
 import appointmentsRoutes from "./appointments.routes";
 import notesRouter from "./notes.routes";
 import forumsRoutes from "./forums.routes";
-import addPatientToForumRoutes from "./forums/add_patient_to_forum.routes";
+
+
 import patientRoutes from "./patients.routes";
 import clinicalHistoryRoutes from "./clinicalHistory.routes";
 import * as analysisController from '../controller/analysis/add_analysis.controller';
@@ -24,6 +25,7 @@ import { requirePrivileges } from "../middleware/rbac.middleware";
 import { Privilege } from "../types/rbac.types";
 
 const router = express.Router();
+
 
 // ============================================
 // Authentication Routes (Public)
@@ -132,9 +134,5 @@ router.delete(
   analysisController.deleteAnalysis
 );
 
-// ============================================
-// Forum extra routes (add patient to forum)
-// ============================================
-router.use("/forums", addPatientToForumRoutes);
-
 export default router;
+

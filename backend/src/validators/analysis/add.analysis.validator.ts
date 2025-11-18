@@ -3,59 +3,61 @@ import { z } from 'zod';
 export const createAnalysisSchema = z.object({
   name: z
     .string()
-    .min(1, 'Name is required')
-    .max(50, 'Name must not exceed 50 characters')
+    .min(1, 'El nombre es obligatorio')
+    .max(50, 'El nombre no debe exceder 50 caracteres')
     .trim(),
   description: z
     .string()
-    .min(1, 'Description is required')
-    .max(500, 'Description must not exceed 500 characters')
+    .min(1, 'La descripción es obligatoria')
+    .max(500, 'La descripción no debe exceder 500 caracteres')
     .trim(),
   previousRequirements: z
     .string()
-    .min(1, 'Previous requirements are required')
+    .min(1, 'Los requisitos previos son obligatorios')
     .trim(),
   generalCost: z
     .number()
-    .positive('General cost must be greater than 0')
-    .finite('General cost must be a valid number'),
+    .positive('El costo general debe ser mayor que 0')
+    .finite('El costo general debe ser un número válido'),
   communityCost: z
     .number()
-    .positive('Community cost must be greater than 0')
-    .finite('Community cost must be a valid number'),
+    .positive('El costo comunitario debe ser mayor que 0')
+    .finite('El costo comunitario debe ser un número válido'),
 });
 
-export const updateAnalysisSchema = z.object({
-  name: z
-    .string()
-    .min(1, 'Name cannot be empty')
-    .max(50, 'Name must not exceed 50 characters')
-    .trim()
-    .optional(),
-  description: z
-    .string()
-    .min(1, 'Description cannot be empty')
-    .max(500, 'Description must not exceed 500 characters')
-    .trim()
-    .optional(),
-  previousRequirements: z
-    .string()
-    .min(1, 'Previous requirements cannot be empty')
-    .trim()
-    .optional(),
-  generalCost: z
-    .number()
-    .positive('General cost must be greater than 0')
-    .finite('General cost must be a valid number')
-    .optional(),
-  communityCost: z
-    .number()
-    .positive('Community cost must be greater than 0')
-    .finite('Community cost must be a valid number')
-    .optional(),
-}).refine((data) => Object.keys(data).length > 0, {
-  message: 'At least one field must be provided for update',
-});
+export const updateAnalysisSchema = z
+  .object({
+    name: z
+      .string()
+      .min(1, 'El nombre no puede estar vacío')
+      .max(50, 'El nombre no debe exceder 50 caracteres')
+      .trim()
+      .optional(),
+    description: z
+      .string()
+      .min(1, 'La descripción no puede estar vacía')
+      .max(500, 'La descripción no debe exceder 500 caracteres')
+      .trim()
+      .optional(),
+    previousRequirements: z
+      .string()
+      .min(1, 'Los requisitos previos no pueden estar vacíos')
+      .trim()
+      .optional(),
+    generalCost: z
+      .number()
+      .positive('El costo general debe ser mayor que 0')
+      .finite('El costo general debe ser un número válido')
+      .optional(),
+    communityCost: z
+      .number()
+      .positive('El costo comunitario debe ser mayor que 0')
+      .finite('El costo comunitario debe ser un número válido')
+      .optional(),
+  })
+  .refine((data) => Object.keys(data).length > 0, {
+    message: 'Debes modificar al menos un campo para actualizar',
+  });
 
 export const getAnalysesQuerySchema = z.object({
   page: z.string().optional().default('1').transform(Number),

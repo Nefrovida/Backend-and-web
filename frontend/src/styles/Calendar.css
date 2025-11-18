@@ -11,6 +11,17 @@
   opacity: 0.8;
 }
 
+/* Make events appear clickable */
+.fc-event {
+  cursor: pointer !important;
+  transition: opacity 0.2s ease, transform 0.1s ease !important;
+}
+
+.fc-event:hover {
+  opacity: 1 !important;
+  transform: scale(1.02) !important;
+}
+
 
 .full-page-calendar {
   height: calc(100vh - 0px); /* Puedes restar header o navbar si tienes */
