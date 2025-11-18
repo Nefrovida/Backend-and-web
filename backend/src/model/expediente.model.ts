@@ -38,9 +38,12 @@ export default class MedicalRecord {
       return null;
     }
 
+    // Use the actual patient_id for all subsequent queries
+    const actualPatientId = patient.patient_id;
+
     // Get all appointments
     const appointments = await prisma.patient_appointment.findMany({
-      where: { patient_id: patientId },
+      where: { patient_id: actualPatientId },
       select: {
         patient_appointment_id: true,
         date_hour: true,
@@ -79,7 +82,7 @@ export default class MedicalRecord {
 
     // Get all clinical notes
     const notes = await prisma.notes.findMany({
-      where: { patient_id: patientId },
+      where: { patient_id: actualPatientId },
       select: {
         note_id: true,
         title: true,
@@ -98,7 +101,7 @@ export default class MedicalRecord {
 
     // Get all analysis
     const analysis = await prisma.patient_analysis.findMany({
-      where: { patient_id: patientId },
+      where: { patient_id: actualPatientId },
       select: {
         patient_analysis_id: true,
         analysis_date: true,
@@ -145,7 +148,7 @@ export default class MedicalRecord {
 
     // Get clinical history (patient_history)
     const clinicalHistory = await prisma.patient_history.findMany({
-      where: { patient_id: patientId },
+      where: { patient_id: actualPatientId },
       select: {
         question_id: true,
         patient_id: true,

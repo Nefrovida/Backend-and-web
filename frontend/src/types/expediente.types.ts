@@ -81,7 +81,7 @@ export interface MedicalRecordAnalysis {
     date: Date;
     path: string;
     interpretation: string | null;
-  }[];
+  } | null;
 }
 
 export interface ClinicalHistoryItem {
@@ -136,8 +136,10 @@ export interface MedicalHistoryFormData {
 }
 
 export interface LabResultFormData {
-  file: File | null;
-  interpretation: string;
+  file?: File | null;
+  files?: File[];
+  interpretation?: string;
+  interpretations?: string[];
 }
 
 export interface MedicalRecordFormData {

@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import PersonalInfoSection from "../organism/medical-record/PersonalInfoSection";
 import MedicalHistorySection from "../organism/medical-record/MedicalHistorySection";
 import LabResultsSection from "../organism/medical-record/LabResultsSection";
+import { useMedicalRecord } from "../../hooks/useMedicalRecord";
 import {
   MedicalRecordFormData,
   PersonalInfoFormData,
@@ -16,6 +17,9 @@ const MedicalRecordFormPage = () => {
   const [currentSection, setCurrentSection] = useState(0);
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [profileFile, setProfileFile] = useState<File | null>(null);
+
+  // Fetch existing medical record data if editing
+  const { data: existingData, loading } = useMedicalRecord(patientId);
 
   const [formData, setFormData] = useState<MedicalRecordFormData>({
     personalInfo: {
@@ -38,11 +42,28 @@ const MedicalRecordFormPage = () => {
       drug_consumption: "",
       other_conditions: "",
     },
-    labResult: {
-      file: null,
-      interpretation: "",
-    },
+    labResult: {},
   });
+
+  // Populate form with existing data when editing
+  useEffect(() => {
+    if (existingData?.patient) {
+      const patient = existingData.patient;
+      setFormData(prev => ({
+        ...prev,
+        personalInfo: {
+          name: patient.user.name,
+          parent_last_name: patient.user.parent_last_name,
+          maternal_last_name: patient.user.maternal_last_name,
+          curp: patient.curp,
+          birthday: new Date(patient.user.birthday).toISOString().split('T')[0],
+          gender: patient.user.gender,
+          phone_number: patient.user.phone_number,
+          address: "",
+        },
+      }));
+    }
+  }, [existingData]);
 
   const sections = [
     {
@@ -97,6 +118,8 @@ const MedicalRecordFormPage = () => {
               labResult: { ...prev.labResult, ...data },
             }))
           }
+          existingAnalysis={existingData?.analysis || []}
+          patientId={patientId}
         />
       ),
     },
@@ -116,23 +139,30 @@ const MedicalRecordFormPage = () => {
 
   const handleSubmit = async () => {
     try {
-      // TODO: Connect to backend - Create patient and medical record
-      console.log("Patient ID:", patientId);
-      console.log("Form data to submit:", formData);
-      console.log("Profile image file:", profileFile);
-      
       if (!patientId) {
         alert("Error: No se proporcionó el ID del paciente");
         return;
       }
       
-      alert("Expediente creado exitosamente (pendiente conectar con backend)");
-      navigate(`/expediente/${patientId}`); // Navigate to view page after creation
+      // Note: PDFs are uploaded individually using the "Subir PDF" button on each analysis
+      // This button just navigates back to view the expediente
+      navigate(`/expediente/${patientId}`);
     } catch (error) {
-      console.error("Error creating medical record:", error);
-      alert("Error al crear el expediente");
+      console.error("Error:", error);
+      alert("Error al procesar el expediente");
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Cargando expediente...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -140,7 +170,7 @@ const MedicalRecordFormPage = () => {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-gray-800 mb-2">
-            Crear Expediente Médico
+            {existingData ? "Editar Expediente Médico" : "Crear Expediente Médico"}
           </h1>
           <p className="text-gray-600">
             Sección {currentSection + 1} de {sections.length}: {sections[currentSection].title}

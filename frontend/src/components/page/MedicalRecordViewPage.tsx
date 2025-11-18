@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useMedicalRecord } from "../../hooks/useMedicalRecord";
 
@@ -6,6 +6,12 @@ const MedicalRecordViewPage = () => {
   const { patientId } = useParams<{ patientId: string }>();
   const navigate = useNavigate();
   const { data, loading, error } = useMedicalRecord(patientId);
+  const [pdfOpen, setPdfOpen] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+
+  // Derive backend origin from Vite env or default to http://localhost:3001
+  const API_BASE = (import.meta as any).env?.VITE_APP_API_URL || "http://localhost:3001/api";
+  const BACKEND_ORIGIN = API_BASE.replace(/\/api$/, "");
 
   if (loading) {
     return (
@@ -59,6 +65,13 @@ const MedicalRecordViewPage = () => {
       day: "numeric",
     });
   };
+
+  function getFullPath(path: string | null | undefined) {
+    if (!path) return null;
+    if (/^https?:\/\//i.test(path)) return path; // full URL already
+    if (path.startsWith("/")) return `${BACKEND_ORIGIN}${path}`; // relative path to backend
+    return `${BACKEND_ORIGIN}/${path}`; // other relative path
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -237,34 +250,53 @@ const MedicalRecordViewPage = () => {
                       {item.analysis.description}
                     </p>
                   )}
-                  {(item.results ?? []).length > 0 && (
+                  {item.results && (
                     <div className="mt-2">
                       <p className="text-sm font-medium text-gray-700 mb-1">
-                        Resultados:
+                        Resultado:
                       </p>
-                      {(item.results ?? []).map((result) => (
-                        <div
-                          key={result.result_id}
-                          className="bg-gray-50 p-2 rounded mb-2"
-                        >
+                      <div className="bg-gray-50 p-2 rounded mb-2">
+                        <p className="text-sm text-gray-600">
+                          Fecha: {formatDate(item.results.date)}
+                        </p>
+                        {item.results.interpretation && (
                           <p className="text-sm text-gray-600">
-                            Fecha: {formatDate(result.date)}
+                            Interpretación: {item.results.interpretation}
                           </p>
-                          {result.interpretation && (
-                            <p className="text-sm text-gray-600">
-                              Interpretación: {result.interpretation}
-                            </p>
-                          )}
+                        )}
+                        {item.results.path ? (
+                        <div className="flex gap-3 items-center mt-2">
                           <a
-                            href={result.path}
+                            href={getFullPath(item.results.path)}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-blue-600 text-sm hover:underline"
                           >
-                            Ver archivo
+                            Abrir en pestaña
+                          </a>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const url = getFullPath(item.results.path);
+                              setPdfUrl(url);
+                              setPdfOpen(Boolean(url));
+                            }}
+                            className="text-xs px-2 py-1 rounded bg-slate-100 hover:bg-slate-200"
+                          >
+                            Vista previa
+                          </button>
+                          <a
+                            href={getFullPath(item.results.path)}
+                            download
+                            className="text-xs px-2 py-1 rounded bg-gray-100 hover:bg-gray-200 text-slate-700"
+                          >
+                            Descargar
                           </a>
                         </div>
-                      ))}
+                        ) : (
+                          <span className="text-xs text-slate-500">Sin archivo</span>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
@@ -274,6 +306,40 @@ const MedicalRecordViewPage = () => {
             <p className="text-gray-500">No hay análisis registrados</p>
           )}
         </div>
+
+        {/* PDF Preview Modal */}
+        {pdfOpen && pdfUrl && (
+          <div
+            role="dialog"
+            aria-modal="true"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+            onClick={() => setPdfOpen(false)}
+          >
+            <div
+              className="bg-white rounded-lg shadow-lg overflow-hidden w-full max-w-4xl h-[80vh]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between p-2 border-b">
+                <h3 className="text-sm font-semibold">Vista previa PDF</h3>
+                <div className="flex items-center gap-2">
+                  <a href={pdfUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-700 hover:underline px-2 py-1">Abrir en pestaña</a>
+                  <a href={pdfUrl} download className="text-xs px-2 py-1 rounded bg-gray-100 hover:bg-gray-200 text-slate-700">Descargar</a>
+                  <button
+                    onClick={() => setPdfOpen(false)}
+                    className="text-sm px-3 py-1 rounded bg-red-500 text-white hover:bg-red-600"
+                  >
+                    Cerrar
+                  </button>
+                </div>
+              </div>
+              <iframe
+                src={pdfUrl}
+                title="Vista previa PDF"
+                className="w-full h-full"
+              />
+            </div>
+          </div>
+        )}
 
         {/* Clinical History Section */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">

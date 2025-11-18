@@ -23,4 +23,26 @@ router.get(
   expedienteController.getMedicalRecord
 );
 
+/**
+ * POST /patients/:patientId/expediente/presign
+ * Request presigned URL for uploading analysis result PDF
+ */
+router.post(
+  "/:patientId/expediente/presign",
+  authenticate,
+  requirePrivileges([Privilege.UPDATE_ANALYSIS]),
+  expedienteController.requestPresignForResult
+);
+
+/**
+ * POST /patients/:patientId/expediente/result
+ * Confirm upload and save analysis result
+ */
+router.post(
+  "/:patientId/expediente/result",
+  authenticate,
+  requirePrivileges([Privilege.UPDATE_ANALYSIS]),
+  expedienteController.uploadAnalysisResult
+);
+
 export default router;
