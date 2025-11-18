@@ -17,10 +17,10 @@ function Navbar({ children }: Props) {
   const [showNotes, setShowNotes] = useState(false);
   const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
 
-  function handleHover(key: string) {
+  function handleHover(key: string, value: boolean) {
     setSelected((prev) => ({
       ...prev,
-      [key]: !prev[key],
+      [key]: value,
     }));
   }
 
@@ -30,8 +30,8 @@ function Navbar({ children }: Props) {
         <NavIcon
           from={<BsPerson />}
           to={<BsFillPersonFill />}
-          link={"/profile"}
-          option={"profile"}
+          link="/profile"
+          option="profile"
           selected={selected}
           onHover={handleHover}
         />
@@ -47,16 +47,16 @@ function Navbar({ children }: Props) {
             <NavIcon
               from={<FaUserMd />}
               to={<FaUserMd />}
-              link={"/register-doctor"}
-              option={"register-doctor"}
+              link="/register-doctor"
+              option="register-doctor"
               selected={selected}
               onHover={handleHover}
             />
             <NavIcon
               from={<FaListUl />}
               to={<FaListUl />}
-              link={"/doctors"}
-              option={"doctors"}
+              link="/doctors"
+              option="doctors"
               selected={selected}
               onHover={handleHover}
             />
@@ -66,8 +66,8 @@ function Navbar({ children }: Props) {
         <NavIcon
           from={<FaFolder />}
           to={<FaFolderOpen />}
-          link={"/expedientes"}
-          option={"expedientes"}
+          link="/expedientes"
+          option="expedientes"
           selected={selected}
           onHover={handleHover}
         />
@@ -75,16 +75,17 @@ function Navbar({ children }: Props) {
         <NavIcon
           from={<MdOutlineForum />}
           to={<MdForum />}
-          link={"/foro"}
-          option={"foro"}
+          link="/foro"
+          option="foro"
           selected={selected}
           onHover={handleHover}
         />
+
         <NavIcon
           from={<BsGear />}
           to={<BsGearFill />}
-          link={"/settings"}
-          option={"settings"}
+          link="/settings"
+          option="settings"
           selected={selected}
           onHover={handleHover}
         />
