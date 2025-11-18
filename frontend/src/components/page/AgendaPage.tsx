@@ -1,8 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-/*Pagina creada para poner a prueba la historia de usuario. Solo te redirige
-a una pagina con un boton para que simule el hecho de pulsar a alguna cita agendada en el calendario
+/*Page created in order to have a test case for navigating to Appointment Detail
 */
 
 export const AgendaPage = () => {
