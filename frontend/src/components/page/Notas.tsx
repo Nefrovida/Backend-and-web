@@ -78,11 +78,11 @@ const Notas = ({ className }: { className: string }) => {
 
   return (
     <div
-      className={`absolute top-0 left-14 bg-gray-200 w-[45vw] h-screen flex flex-col p-4 overflow-hidden ${className}`}
+      className={`absolute top-0 left-14 bg-gray-200 w-[45vw] h-screen flex flex-col z-50 p-4 overflow-hidden ${className}`}
     >
       <div className="max-w-3xl mx-auto w-full flex flex-col h-full">
         <div className="mb-4 flex-shrink-0">
-          <Title>Notas</Title>
+          <Title size={"medium"}>Notas</Title>
         </div>
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4 flex-shrink-0">

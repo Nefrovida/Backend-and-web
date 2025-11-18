@@ -1,33 +1,37 @@
 import React, { ReactElement } from "react";
 
-function Title(props: { children: ReactElement | string, size: string }) {
-    if (props.size == "large") {
-      return (
-        <h1 className="font-semibold text-4xl text-primary mb-4">{props.children}</h1>
-      )
-    }
+function Title({
+  size = "medium",
+  children,
+}: {
+  size: string;
+  children: ReactElement | string;
+}) {
+  if (size == "large") {
+    return (
+      <h1 className="font-semibold text-4xl text-primary mb-4">{children}</h1>
+    );
+  }
 
-    if (props.size == "medium") {
-      return (
-        <h3 className="font-semibold text-2xl text-primary mb-3">{props.children}</h3>
-      )
-    }
+  if (size == "medium") {
+    return (
+      <h3 className="font-semibold text-2xl text-primary mb-3">{children}</h3>
+    );
+  }
 
-    if (props.size == "small") {
-      return (
-        <h5 className="font-semibold text-lg text-primary mb-2">{props.children}</h5>
-      )
-    }
+  if (size == "small") {
+    return (
+      <h5 className="font-semibold text-lg text-primary mb-2">{children}</h5>
+    );
+  }
 
-    if (props.size == "subtitle") {
-      return (
-        <p className="font-semibold text-base text-primary mb-2">{props.children}</p>
-      )
-    }
+  if (size == "subtitle") {
+    return (
+      <p className="font-semibold text-base text-primary mb-2">{children}</p>
+    );
+  }
 
-  return (
-    <h1 className="font-semibold text-2xl text-primary">{props.children}</h1>
-  );
+  return <h1 className="font-semibold text-2xl text-primary">{children}</h1>;
 }
 
 export default Title;
