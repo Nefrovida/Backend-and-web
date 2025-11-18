@@ -3,6 +3,7 @@ import * as authController from "../controller/auth.controller";
 import * as usersController from "../controller/users.controller";
 import * as rolesController from "../controller/roles.controller";
 import * as privilegesController from "../controller/privileges.controller";
+import * as appointmentsController from "../controller/appointments.controller";
 import { authenticate } from "../middleware/auth.middleware";
 import { requirePrivileges } from "../middleware/rbac.middleware";
 import { Privilege } from "../types/rbac.types";
@@ -139,6 +140,17 @@ router.delete(
   authenticate,
   requirePrivileges([Privilege.DELETE_PRIVILEGES]),
   privilegesController.deletePrivilege
+);
+
+// ============================================
+// Appointment Routes (Protected)
+// ============================================
+
+router.get(
+  "/appointments"/:id",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
+  appointmentsController.getAppointmentById
 );
 
 export default router;
