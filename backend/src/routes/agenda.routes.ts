@@ -85,15 +85,15 @@ router.post(
 
 router.get(
     "/appointments-per-day/by-appointment",
-    //authenticate,
-    //requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
+    authenticate,
+    requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
     AppointmentsPerDayByAppointmentId
 );
 
 router.post(
     "/appointment",
-    // authenticate,
-    // requirePrivileges([Privilege.CREATE_APPOINTMENTS]),
+    authenticate,
+    requirePrivileges([Privilege.CREATE_APPOINTMENTS]),
     createAppointment
 );
 
