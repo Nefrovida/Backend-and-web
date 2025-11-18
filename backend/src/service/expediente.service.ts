@@ -25,17 +25,8 @@ export const getMedicalRecord = async (
     return medicalRecord;
   }
 
-  // Doctor (role_id = 2) - verify they have treated this patient
+  // Doctor (role_id = 2) - has access to all patient records
   if (userRoleId === 2) {
-    const hasAccess = await MedicalRecord.verifyDoctorAccess(
-      requestingUserId,
-      actualPatientId
-    );
-    if (!hasAccess) {
-      throw new ForbiddenError(
-        "No tienes acceso a este expediente"
-      );
-    }
     return medicalRecord;
   }
 
