@@ -82,7 +82,6 @@ const Notas = ({ className }: { className: string }) => {
     >
       <div className="max-w-3xl mx-auto w-full flex flex-col h-full">
         <div className="mb-4 flex-shrink-0">
-          <Title size={"medium"}>Notas</Title>
         </div>
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4 flex-shrink-0">
