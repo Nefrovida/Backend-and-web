@@ -56,7 +56,10 @@ VALUES
 ('DELETE_CLINICAL_HISTORY'),
 ('VIEW_MEDICAL_RECORD'),
 ('CREATE_DOCTOR'),
-('MANAGE_ANALYSIS_TYPES');
+('MANAGE_ANALYSIS_TYPES'),
+('VIEW_LAB_APPOINTMENTS'),
+('UPLOAD_LAB_RESULTS'),
+('EDIT_LAB_RESULTS');
 
 -- ========================
 -- 🧩 ROLES - PRIVILEGIOS
@@ -92,6 +95,17 @@ WHERE description IN (
   'VIEW_MEDICAL_RECORD'
 );
 
+-- Give permission to edit lab results to Doctor
+INSERT INTO role_privilege (role_id, privilege_id)
+SELECT 2, privilege_id
+FROM privileges
+WHERE description = 'EDIT_LAB_RESULTS'
+  AND NOT EXISTS (
+    SELECT 1 FROM role_privilege rp
+    JOIN privileges p ON rp.privilege_id = p.privilege_id
+    WHERE rp.role_id = 2 AND p.description = 'EDIT_LAB_RESULTS'
+  );
+
 -- Admin (role_id = 1): full privileges
 INSERT INTO role_privilege (role_id, privilege_id)
 SELECT 1, privilege_id 
@@ -108,7 +122,9 @@ FROM privileges
 WHERE description IN (
   'VIEW_APPOINTMENTS',
   'UPDATE_APPOINTMENTS',
-  'VIEW_ANALYSIS'  -- solo lectura de catálogo
+  'VIEW_ANALYSIS',  -- only catalogue viewing
+  'VIEW_LAB_APPOINTMENTS',
+  'UPLOAD_LAB_RESULTS'
 );
 
 
