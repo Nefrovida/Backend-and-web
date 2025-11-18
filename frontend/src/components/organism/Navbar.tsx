@@ -28,9 +28,17 @@ function Navbar({ children }: Props) {
   const [showNotes, setShowNotes] = useState(false);
   const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
 
+  const roleId = currentUser?.role_id;
+  const isAdmin = roleId === ROLE_IDS.ADMIN;
+  const isDoctor = roleId === ROLE_IDS.DOCTOR;
+  const isSecretary = roleId === ROLE_IDS.SECRETARIA;
+  const isLaboratorist = roleId === ROLE_IDS.LABORATORIST;
+  const isPatient = roleId === ROLE_IDS.PATIENT;
+
   return (
     <div className="flex">
       <nav className="w-[3rem] bg-white drop-shadow-md h-screen mr-2 flex flex-col items-center py-2 justify-between text-3xl">
+        {/* Profile: EVERYONE */}
         <NavIcon
           from={<BsPerson />}
           to={<BsFillPersonFill />}
@@ -38,14 +46,15 @@ function Navbar({ children }: Props) {
           end
         />
 
-
+        {/* Notes pending */}
         {showNotes ? (
           <LuNotebookPen onClick={() => setShowNotes((prev) => !prev)} />
         ) : (
           <LuNotebook onClick={() => setShowNotes((prev) => !prev)} />
         )}
 
-        {currentUser?.role_id === ROLE_IDS.ADMIN && (
+        {/* ADMIN ONLY */}
+        {isAdmin && (
           <>
             <NavIcon
               from={<FaUserMd />}
@@ -62,7 +71,7 @@ function Navbar({ children }: Props) {
           </>
         )}
 
-        {/* No sé */}
+        {/* Expedientes pending */}
         <NavIcon
           from={<FaRegFolder />}
           to={<FaFolderOpen />}
@@ -70,7 +79,7 @@ function Navbar({ children }: Props) {
           end
         />
 
-        {/* Todos? */}
+        {/* Foro: EVERYONE */}
         <NavIcon
           from={<MdOutlineForum />}
           to={<MdForum />}
@@ -78,47 +87,57 @@ function Navbar({ children }: Props) {
           end
         />
 
-        {/* No sé */}
-        <NavIcon
-          from={<FaRegClipboard />}
-          to={<FaClipboardCheck />}
-          link="/agenda"
-          end
-        />
+        {/* Agenda: doctors, patients, secretary and admin */}
+        {(isAdmin || isDoctor || isSecretary || isPatient) && (
+          <NavIcon
+            from={<FaRegClipboard />}
+            to={<FaClipboardCheck />}
+            link="/agenda"
+            end
+          />
+        )}
 
-        {/* Laboratorio */}
-        <NavIcon
-          from={<IoFlaskOutline />}
-          to={<IoFlaskSharp />}
-          link="/laboratorio"
-          end
-        />
+        {/* Lab main: laboratorist */}
+        {(isLaboratorist) && (
+          <NavIcon
+            from={<IoFlaskOutline />}
+            to={<IoFlaskSharp />}
+            link="/laboratorio"
+            end
+          />
+        )}
 
-        {/* Laboratorio */}
-        <NavIcon
-          from={<FaRegClock />}
-          to={<FaClock />}
-          link="/laboratorio/subir"
-          end
-        />
+        {/* Lab results upload: laboratorist */}
+        {(isLaboratorist) && (
+          <NavIcon
+            from={<FaRegClock />}
+            to={<FaClock />}
+            link="/laboratorio/subir"
+            end
+          />
+        )}
 
-        {/* Secretaria */}
-        <NavIcon
-          from={<FaRegClock />}
-          to={<FaClock />}
-          link="/secretaria/agendar"
-          end
-        />
-        
-        {/* Secretaria */}
-        <NavIcon
-          from={<FaRegListAlt />}
-          to={<FaListAlt />}
-          link="/analisis"
-          end
-        />
+        {/* Secretaria agendar: secretary */}
+        {(isSecretary) && (
+          <NavIcon
+            from={<FaRegClock />}
+            to={<FaClock />}
+            link="/secretaria/agendar"
+            end
+          />
+        )}
 
-        {/* TODOS */}
+        {/* Secretaria analysis types manager: secretary */}
+        {(isSecretary) && (
+          <NavIcon
+            from={<FaRegListAlt />}
+            to={<FaListAlt />}
+            link="/analisis"
+            end
+          />
+        )}
+
+        {/* Settings: EVERYONE */}
         <NavIcon
           from={<BsGear />}
           to={<BsGearFill />}
