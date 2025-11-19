@@ -59,6 +59,7 @@ VALUES
 ('MANAGE_ANALYSIS_TYPES'),
 ('VIEW_LAB_APPOINTMENTS'),
 ('UPLOAD_LAB_RESULTS'),
+('VIEW_LAB_RESULTS'),
 ('EDIT_LAB_RESULTS');
 
 -- ========================
@@ -92,7 +93,9 @@ WHERE description IN (
   'CREATE_CLINICAL_HISTORY',
   'VIEW_CLINICAL_HISTORY',
   'UPDATE_CLINICAL_HISTORY',
-  'VIEW_MEDICAL_RECORD'
+  'VIEW_MEDICAL_RECORD',
+  'VIEW_LAB_RESULTS',
+  'EDIT_LAB_RESULTS'
 );
 
 -- Give permission to edit lab results to Doctor

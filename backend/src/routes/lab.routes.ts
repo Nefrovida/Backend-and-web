@@ -21,7 +21,7 @@ router.use(authenticate);
 router.get(
   "/results",
   authenticate,
-  requirePrivileges([Privilege.VIEW_ANALYSIS]),
+  requirePrivileges([Privilege.VIEW_LAB_RESULTS]),
   getLabResults
 );
 
