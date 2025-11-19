@@ -28,7 +28,7 @@ function ExpedientesListPage() {
   };
 
   const handlePatientClick = (patientId: string) => {
-    navigate(`/expediente/${patientId}`);
+    navigate(`/dashboard/expediente/${patientId}`);
   };
 
   const getFullName = (patient: Patient) => {
