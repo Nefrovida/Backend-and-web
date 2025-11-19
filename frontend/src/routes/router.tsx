@@ -15,12 +15,18 @@ import secretariaRoutes from "./secretaria.routes";
 import adminRoutes from "./admin.routes";
 import expedienteRoutes from "./expediente.routes";
 
+import ProtectedRoute from "../components/common/ProtectedRoute";
+
 const router = createBrowserRouter([
   ...authRoutes,
   ...patientsRoutes,
   {
     path: "/dashboard",
-    element: <Dashboard />,
+    element: (
+      <ProtectedRoute>
+        <Dashboard />
+      </ProtectedRoute>
+    ),
     errorElement: <NotFoundPage />,
     children: [
       ...analisisRoutes,
