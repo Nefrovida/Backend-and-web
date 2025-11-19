@@ -6,6 +6,7 @@ import { BsPerson, BsFillPersonFill, BsGear, BsGearFill, BsDoorClosed, BsDoorOpe
 import { MdForum, MdOutlineForum } from "react-icons/md";
 import { LuNotebook, LuNotebookPen } from "react-icons/lu";
 import { IoFlaskSharp, IoFlaskOutline } from "react-icons/io5";
+import { RiChatSettingsLine, RiChatSettingsFill } from "react-icons/ri";
 import {
   FaUserMd,
   FaListAlt,
@@ -225,15 +226,25 @@ function Navbar({ children }: Props) {
             end
           />
 
-          {/* Forum */}
+          {/* Forum access EVERYONE */}
           <CustomLink
             label="Foros"
-            to="/dashboard/foros"
+            to="/dashboard/foro"
             icon={<MdOutlineForum />}
             activeIcon={<MdForum />}
             end
           />
-
+        
+          {/* Forum settings ONLY ADMIN*/}
+          {isAdmin && (
+            <CustomLink
+              label="Configuración de Foros"
+              to="/dashboard/foros"
+              icon={<RiChatSettingsLine />}
+              activeIcon={<RiChatSettingsFill />}
+              end
+            />
+          )}
           {/* Agenda */}
           {(isAdmin || isDoctor || isSecretary || isPatient) && (
             <CustomLink
