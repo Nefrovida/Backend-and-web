@@ -98,30 +98,28 @@ export const getResultsPDF = async (req: Request, res: Response) => {
             });
         }
 
-        // console.log(`Database path value: "${results.path}"`);
+        console.log(`Database path value: "${results.path}"`);
 
-        // Resolve the file path - handle different path formats
-        let relativePath = results.path.trim();
+        // Extract filename from the path (handles URLs and file paths)
+        let filename = results.path.trim();
         
-        // Remove leading slash if present
-        if (relativePath.startsWith('/')) {
-            relativePath = relativePath.slice(1);
+        try {
+            // Try to parse as URL
+            const url = new URL(filename);
+            // Extract filename from URL pathname
+            filename = path.basename(url.pathname);
+        } catch (e) {
+            // Not a URL, extract filename from path
+            filename = path.basename(filename);
         }
-        
-        // Remove 'uploads/' prefix if present (case insensitive)
-        if (relativePath.toLowerCase().startsWith('uploads/')) {
-            relativePath = relativePath.substring(7); // Remove 'uploads/'
-        }
+
+        console.log(`Extracted filename: ${filename}`);
 
         const uploadDir = path.join(process.cwd(), "uploads");
-        // Use path.join to properly handle path segments
-        // Split by both forward and backslash to handle cross-platform paths
-        const pathSegments = relativePath.split(/[/\\]/).filter(Boolean);
-        const filePath = path.join(uploadDir, ...pathSegments);
+        const filePath = path.join(uploadDir, filename);
 
-        // console.log(`Resolved file path: ${filePath}`);
-        // console.log(`Upload directory: ${uploadDir}`);
-        // console.log(`Relative path segments: ${JSON.stringify(pathSegments)}`);
+        console.log(`Resolved file path: ${filePath}`);
+        console.log(`Upload directory: ${uploadDir}`);
 
         // Check if file exists
         if (!fs.existsSync(filePath)) {
@@ -135,6 +133,7 @@ export const getResultsPDF = async (req: Request, res: Response) => {
 
         // Set content type for PDF
         res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
         
         // Send the file
         res.sendFile(filePath, (err) => {
@@ -158,4 +157,3 @@ export const getResultsPDF = async (req: Request, res: Response) => {
         }
     }
 };
-
