@@ -78,3 +78,32 @@ export const scheduleAppointment = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to schedule appointment' });
   }
 };
+
+/**
+ * Create a new appointment directly (without a prior request)
+ */
+export const createAppointment = async (req: Request, res: Response) => {
+  try {
+    const { patientId, doctorId, dateHour, duration, appointmentType, place } = req.body;
+
+    if (!patientId || !doctorId || !dateHour) {
+      return res.status(400).json({ 
+        error: 'patientId, doctorId, and dateHour are required' 
+      });
+    }
+
+    const newAppointment = await agendaService.createAppointment({
+      patientId,
+      doctorId,
+      dateHour,
+      duration: duration || 45,
+      appointmentType: appointmentType || 'PRESENCIAL',
+      place: place || (appointmentType === 'PRESENCIAL' ? 'Consultorio' : undefined)
+    });
+
+    res.json(newAppointment);
+  } catch (error) {
+    console.error('Error creating appointment:', error);
+    res.status(500).json({ error: 'Failed to create appointment' });
+  }
+};

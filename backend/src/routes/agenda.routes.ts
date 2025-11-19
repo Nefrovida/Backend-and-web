@@ -83,18 +83,25 @@ router.post(
   secretariaController.scheduleAppointment
 );
 
+router.post(
+  "/create-appointment",
+  authenticate,
+  requirePrivileges([Privilege.CREATE_APPOINTMENTS]),
+  secretariaController.createAppointment
+);
+
 router.get(
-    "/appointments-per-day/by-appointment",
-    authenticate,
-    requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
-    AppointmentsPerDayByAppointmentId
+  "/appointments-per-day/by-appointment",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
+  AppointmentsPerDayByAppointmentId
 );
 
 router.post(
-    "/appointment",
-    authenticate,
-    requirePrivileges([Privilege.CREATE_APPOINTMENTS]),
-    createAppointment
+  "/appointment",
+  authenticate,
+  requirePrivileges([Privilege.CREATE_APPOINTMENTS]),
+  createAppointment
 );
 
 export default router;

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Title from "../../atoms/Title";
 import Search from "../../atoms/Search";
 import AppointmentRequestCard from "../../atoms/appointments/AppointmentRequestCard";
@@ -9,13 +10,16 @@ interface Props {
   onSelectRequest: (request: AppointmentRequest) => void;
   selectedRequest: AppointmentRequest | null;
   refreshTrigger: number;
+  onCreateNew?: () => void;
 }
 
 const AppointmentRequestsList: React.FC<Props> = ({ 
   onSelectRequest, 
   selectedRequest,
-  refreshTrigger 
+  refreshTrigger,
+  onCreateNew
 }) => {
+  const navigate = useNavigate();
   const [requests, setRequests] = useState<AppointmentRequest[]>([]);
   const [filteredRequests, setFilteredRequests] = useState<AppointmentRequest[]>([]);
   const [loading, setLoading] = useState(true);
@@ -62,6 +66,20 @@ const AppointmentRequestsList: React.FC<Props> = ({
       <div className="w-full flex items-end justify-end pb-4 pt-2">
         <Search onChange={handleSearch} />
       </div>
+
+        <div className="w-full flex justify-center pb-4">
+          <button
+              type="button"
+              onClick={() => {
+                // If caller didn't provide handler, fallback to opening the agendar route
+                if (onCreateNew) return onCreateNew();
+                navigate("/secretaria/agendar?direct=true");
+              }}
+            className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark transition-colors"
+          >
+            Crear Nueva Cita
+          </button>
+        </div>
 
       {loading ? (
         <div className="flex items-center justify-center h-64">

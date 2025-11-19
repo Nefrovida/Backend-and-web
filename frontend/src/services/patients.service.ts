@@ -29,8 +29,15 @@ export const patientsService = {
       throw new Error("Failed to fetch patients");
     }
 
-    const result: PatientsResponse = await response.json();
-    return result.data || [];
+    const result = await response.json().catch(() => ({}));
+
+    // Support both response shapes:
+    // 1) { success: true, data: Patient[] }
+    // 2) Patient[] (raw array)
+    if (Array.isArray(result)) return result as Patient[];
+    if (result?.data && Array.isArray(result.data)) return result.data as Patient[];
+
+    return [];
   },
 
   /**

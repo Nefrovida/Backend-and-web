@@ -18,5 +18,10 @@ router.get("/doctorPatients",
   requirePrivileges([Privilege.VIEW_PATIENTS]),
   getDoctorPatients)
 
+router.get("/all", 
+  authenticate,
+  requirePrivileges([Privilege.VIEW_PATIENTS]),
+  getAllPatients)
+
 
 export default router

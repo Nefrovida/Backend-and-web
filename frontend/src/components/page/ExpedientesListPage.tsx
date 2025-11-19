@@ -32,10 +32,13 @@ function ExpedientesListPage() {
   };
 
   const getFullName = (patient: Patient) => {
+    // Some responses may come flattened with `full_name` (agenda) or with nested `user` object.
+    if ((patient as any).full_name) return (patient as any).full_name as string;
+
     const parts = [
-      patient.user.name,
-      patient.user.parent_last_name,
-      patient.user.maternal_last_name,
+      patient.user?.name,
+      patient.user?.parent_last_name,
+      patient.user?.maternal_last_name,
     ].filter(Boolean);
     return parts.length > 0 ? parts.join(" ") : "Sin nombre";
   };

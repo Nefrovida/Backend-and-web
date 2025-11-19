@@ -184,8 +184,7 @@ export default class Agenda {
           },
         },
       },
-    },
-  );
+    });
 
     if (!appointment) return null;
 
@@ -466,52 +465,105 @@ export default class Agenda {
 
     return scheduledAppointment;
   }
-   static async getAppointmentsPerDayByAppointmentId(
-        targetDate: string,
-        appointmentId: number
-    ) {
-        const [year, month, day] = targetDate.split("-").map(Number);
+  static async createAppointment(data: {
+    patientId: string;
+    doctorId: string;
+    dateHour: string;
+    duration: number;
+    appointmentType: 'PRESENCIAL' | 'VIRTUAL';
+    place?: string;
+  }) {
+    const { patientId, doctorId, dateHour, duration, appointmentType, place } = data;
 
-        // rangos por si la fecha viene así: 2025-11-14T01:19:52.415
-        const start = new Date(year, month - 1, day, 0, 0, 0);
-        const end = new Date(year, month - 1, day + 1, 0, 0, 0);
+    // Get an appointment for this doctor
+    const doctorAppointment = await prisma.appointments.findFirst({
+      where: {
+        doctor_id: doctorId,
+      },
+    });
 
-        const appointments = await prisma.patient_appointment.findMany({
-            where: {
-                date_hour: {
-                    gte: start,
-                    lt: end,
-                },
-                appointment_id: appointmentId,
-            },
-            include: {
-                patient: {
-                    include: {
-                        user: {
-                            select: {
-                                name: true,
-                                parent_last_name: true,
-                                maternal_last_name: true,
-                            },
-                        },
-                    },
-                },
-            },
-            orderBy: {
-                date_hour: "asc",
-            },
-        });
-
-        return appointments.map((a) => {
-            const { patient, ...rest } = a;
-            const user = patient?.user;
-
-            return {
-                ...rest,
-                patient_name: user?.name ?? null,
-                patient_parent_last_name: user?.parent_last_name ?? null,
-                patient_maternal_last_name: user?.maternal_last_name ?? null,
-            };
-        });
+    if (!doctorAppointment) {
+      throw new Error('No appointment type found for this doctor');
     }
+
+    // Create a new patient_appointment directly
+    const newAppointment = await prisma.patient_appointment.create({
+      data: {
+        patient_id: patientId,
+        appointment_id: doctorAppointment.appointment_id,
+        date_hour: new Date(dateHour),
+        duration,
+        appointment_type: appointmentType,
+        place: place || (appointmentType === 'PRESENCIAL' ? 'Consultorio' : undefined),
+        appointment_status: 'PROGRAMMED',
+      },
+      include: {
+        patient: {
+          include: {
+            user: true,
+          },
+        },
+        appointment: {
+          include: {
+            doctor: {
+              include: {
+                user: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return newAppointment;
+  }
+
+  static async getAppointmentsPerDayByAppointmentId(
+    targetDate: string,
+    appointmentId: number
+  ) {
+    const [year, month, day] = targetDate.split("-").map(Number);
+
+    // rangos por si la fecha viene así: 2025-11-14T01:19:52.415
+    const start = new Date(year, month - 1, day, 0, 0, 0);
+    const end = new Date(year, month - 1, day + 1, 0, 0, 0);
+
+    const appointments = await prisma.patient_appointment.findMany({
+      where: {
+        date_hour: {
+          gte: start,
+          lt: end,
+        },
+        appointment_id: appointmentId,
+      },
+      include: {
+        patient: {
+          include: {
+            user: {
+              select: {
+                name: true,
+                parent_last_name: true,
+                maternal_last_name: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        date_hour: "asc",
+      },
+    });
+
+    return appointments.map((a) => {
+      const { patient, ...rest } = a;
+      const user = patient?.user;
+
+      return {
+        ...rest,
+        patient_name: user?.name ?? null,
+        patient_parent_last_name: user?.parent_last_name ?? null,
+        patient_maternal_last_name: user?.maternal_last_name ?? null,
+      };
+    });
+  }
 }
