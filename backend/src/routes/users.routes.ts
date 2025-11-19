@@ -23,8 +23,8 @@ router.get("/profile", authenticate, usersController.getProfile);
 
 router.get(
   "/",
-  // authenticate,
-  // requirePrivileges([Privilege.VIEW_USERS]),
+  authenticate,
+  requirePrivileges([Privilege.VIEW_USERS]),
   usersController.getAllUsers
 );
 

@@ -4,9 +4,10 @@ import { agendaService } from "../../../services/agenda.service";
 
 interface Props {
   onAppointmentCreated: () => void;
+  initialPatientId?: string;
 }
 
-const DirectAppointmentForm: React.FC<Props> = ({ onAppointmentCreated }) => {
+const DirectAppointmentForm: React.FC<Props> = ({ onAppointmentCreated, initialPatientId }) => {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [selectedPatient, setSelectedPatient] = useState<string>("");
@@ -16,18 +17,27 @@ const DirectAppointmentForm: React.FC<Props> = ({ onAppointmentCreated }) => {
   const [selectedTime, setSelectedTime] = useState<string>("");
   const [appointmentType, setAppointmentType] = useState<'PRESENCIAL' | 'VIRTUAL'>('PRESENCIAL');
   const [duration, setDuration] = useState<number>(45);
-  const [place, setPlace] = useState<string>("Consultorio");
   const [loading, setLoading] = useState(false);
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [error, setError] = useState<string>("");
-  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [patientSearchTerm, setPatientSearchTerm] = useState<string>("");
+  const [doctorSearchTerm, setDoctorSearchTerm] = useState<string>("");
+  const [showPatientDropdown, setShowPatientDropdown] = useState<boolean>(false);
+  const [showDoctorDropdown, setShowDoctorDropdown] = useState<boolean>(false);
 
   useEffect(() => {
     loadPatients();
     loadDoctors();
   }, []);
+
+  useEffect(() => {
+    if (initialPatientId && Array.isArray(patients) && patients.length > 0) {
+      const exists = patients.find(p => p.patient_id === initialPatientId);
+      if (exists) setSelectedPatient(initialPatientId);
+    }
+  }, [initialPatientId, patients]);
 
   useEffect(() => {
     if (selectedDoctor && selectedDate) {
@@ -93,7 +103,6 @@ const DirectAppointmentForm: React.FC<Props> = ({ onAppointmentCreated }) => {
         dateHour: dateTime.toISOString(),
         duration,
         appointmentType,
-        place: appointmentType === "PRESENCIAL" ? place : undefined,
       });
 
       setShowConfirmation(false);
@@ -115,8 +124,8 @@ const DirectAppointmentForm: React.FC<Props> = ({ onAppointmentCreated }) => {
     setSelectedTime("");
     setAppointmentType("PRESENCIAL");
     setDuration(45);
-    setPlace("Consultorio");
-    setSearchTerm("");
+    setPatientSearchTerm("");
+    setDoctorSearchTerm("");
     setError("");
   };
 
@@ -134,12 +143,37 @@ const DirectAppointmentForm: React.FC<Props> = ({ onAppointmentCreated }) => {
     onAppointmentCreated();
   };
 
-  const selectedPatientInfo = patients.find((p) => p.patient_id === selectedPatient);
-  const selectedDoctorInfo = doctors.find((d) => d.doctor_id === selectedDoctor);
+  const selectedPatientInfo = Array.isArray(patients) ? patients.find((p) => p.patient_id === selectedPatient) : undefined;
+  const selectedDoctorInfo = Array.isArray(doctors) ? doctors.find((d) => d.doctor_id === selectedDoctor) : undefined;
 
-  const filteredPatients = patients.filter(patient =>
-    patient.full_name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredPatients = Array.isArray(patients) ? (
+    patientSearchTerm
+      ? patients.filter(patient =>
+          patient.full_name.toLowerCase().includes(patientSearchTerm.toLowerCase())
+        )
+      : patients.slice(0, 10)
+  ) : [];
+
+  const filteredDoctors = Array.isArray(doctors) ? (
+    doctorSearchTerm
+      ? doctors.filter(doctor =>
+          (doctor.name.toLowerCase().includes(doctorSearchTerm.toLowerCase()) ||
+           doctor.specialty.toLowerCase().includes(doctorSearchTerm.toLowerCase()))
+        )
+      : doctors.slice(0, 10)
+  ) : [];
+
+  const handlePatientSelect = (patient: Patient) => {
+    setSelectedPatient(patient.patient_id);
+    setPatientSearchTerm(patient.full_name);
+    setShowPatientDropdown(false);
+  };
+
+  const handleDoctorSelect = (doctor: Doctor) => {
+    setSelectedDoctor(doctor.doctor_id);
+    setDoctorSearchTerm(`${doctor.name} - ${doctor.specialty}`);
+    setShowDoctorDropdown(false);
+  };
 
   return (
     <div className="flex-1 p-6 bg-white overflow-y-auto">
@@ -157,48 +191,81 @@ const DirectAppointmentForm: React.FC<Props> = ({ onAppointmentCreated }) => {
       {!showConfirmation ? (
         <div className="space-y-6">
           {/* Patient Selection */}
-          <div>
+          <div className="relative">
             <label className="block text-lg font-medium text-gray-700 mb-2">
               Seleccionar Paciente
             </label>
             <input
               type="text"
-              placeholder="Buscar paciente..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full p-3 mb-2 border-2 border-gray-300 rounded-lg focus:border-primary focus:outline-none"
-            />
-            <select
-              value={selectedPatient}
-              onChange={(e) => setSelectedPatient(e.target.value)}
+              placeholder="Buscar paciente por nombre..."
+              value={patientSearchTerm}
+              onChange={(e) => {
+                setPatientSearchTerm(e.target.value);
+                setShowPatientDropdown(true);
+                if (!e.target.value) setSelectedPatient("");
+              }}
+              onFocus={() => setShowPatientDropdown(true)}
               className="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-primary focus:outline-none"
-            >
-              <option value="">-- Selecciona un paciente --</option>
-              {filteredPatients.map((patient) => (
-                <option key={patient.patient_id} value={patient.patient_id}>
-                  {patient.full_name} {patient.phone_number ? `- ${patient.phone_number}` : ''}
-                </option>
-              ))}
-            </select>
+            />
+            {showPatientDropdown && filteredPatients.length > 0 && (
+              <div className="absolute z-10 w-full mt-1 bg-white border-2 border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                {filteredPatients.map((patient) => (
+                  <div
+                    key={patient.patient_id}
+                    onClick={() => handlePatientSelect(patient)}
+                    className="p-3 hover:bg-blue-50 cursor-pointer border-b border-gray-200 last:border-b-0"
+                  >
+                    <div className="font-medium text-gray-800">{patient.full_name}</div>
+                    {patient.phone_number && (
+                      <div className="text-sm text-gray-600">{patient.phone_number}</div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+            {showPatientDropdown && patientSearchTerm && filteredPatients.length === 0 && (
+              <div className="absolute z-10 w-full mt-1 bg-white border-2 border-gray-300 rounded-lg shadow-lg p-3">
+                <p className="text-gray-500 text-center">No se encontraron pacientes</p>
+              </div>
+            )}
           </div>
 
           {/* Doctor Selection */}
-          <div>
+          <div className="relative">
             <label className="block text-lg font-medium text-gray-700 mb-2">
               Seleccionar Doctor
             </label>
-            <select
-              value={selectedDoctor}
-              onChange={(e) => setSelectedDoctor(e.target.value)}
+            <input
+              type="text"
+              placeholder="Buscar doctor por nombre o especialidad..."
+              value={doctorSearchTerm}
+              onChange={(e) => {
+                setDoctorSearchTerm(e.target.value);
+                setShowDoctorDropdown(true);
+                if (!e.target.value) setSelectedDoctor("");
+              }}
+              onFocus={() => setShowDoctorDropdown(true)}
               className="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-primary focus:outline-none"
-            >
-              <option value="">-- Selecciona un doctor --</option>
-              {doctors.map((doctor) => (
-                <option key={doctor.doctor_id} value={doctor.doctor_id}>
-                  {doctor.name} - {doctor.specialty}
-                </option>
-              ))}
-            </select>
+            />
+            {showDoctorDropdown && filteredDoctors.length > 0 && (
+              <div className="absolute z-10 w-full mt-1 bg-white border-2 border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                {filteredDoctors.map((doctor) => (
+                  <div
+                    key={doctor.doctor_id}
+                    onClick={() => handleDoctorSelect(doctor)}
+                    className="p-3 hover:bg-blue-50 cursor-pointer border-b border-gray-200 last:border-b-0"
+                  >
+                    <div className="font-medium text-gray-800">{doctor.name}</div>
+                    <div className="text-sm text-gray-600">{doctor.specialty}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+            {showDoctorDropdown && doctorSearchTerm && filteredDoctors.length === 0 && (
+              <div className="absolute z-10 w-full mt-1 bg-white border-2 border-gray-300 rounded-lg shadow-lg p-3">
+                <p className="text-gray-500 text-center">No se encontraron doctores</p>
+              </div>
+            )}
           </div>
 
           {/* Appointment Type */}
@@ -229,21 +296,6 @@ const DirectAppointmentForm: React.FC<Props> = ({ onAppointmentCreated }) => {
               </label>
             </div>
           </div>
-
-          {/* Place (only for PRESENCIAL) */}
-          {appointmentType === 'PRESENCIAL' && (
-            <div>
-              <label className="block text-lg font-medium text-gray-700 mb-2">
-                Lugar
-              </label>
-              <input
-                type="text"
-                value={place}
-                onChange={(e) => setPlace(e.target.value)}
-                className="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-primary focus:outline-none"
-              />
-            </div>
-          )}
 
           {/* Duration */}
           <div>
@@ -362,12 +414,6 @@ const DirectAppointmentForm: React.FC<Props> = ({ onAppointmentCreated }) => {
                 <span className="font-medium text-gray-700">Tipo:</span>
                 <span>{appointmentType}</span>
               </div>
-              {appointmentType === 'PRESENCIAL' && (
-                <div className="flex justify-between">
-                  <span className="font-medium text-gray-700">Lugar:</span>
-                  <span>{place}</span>
-                </div>
-              )}
             </div>
 
             <div className="flex gap-4">

@@ -2,7 +2,6 @@ import { type Request, type Response } from "express";
 import Patients from "src/model/patient.model";
 
 /**
-/**
  * Get all patients in the system (for secretaries to schedule appointments)
  */
 async function getAllPatients(req: Request, res: Response) {
@@ -37,8 +36,6 @@ async function getAllPatients(req: Request, res: Response) {
       success: false,
       error: error.message || "Failed to fetch patients"
     });
-  }
-}
   }
 }
 

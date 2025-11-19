@@ -4,7 +4,7 @@ const API_BASE_URL = (import.meta as any).env.VITE_APP_API_URL || "http://localh
 
 export const agendaService = {
   async getPendingRequests(): Promise<AppointmentRequest[]> {
-    const response = await fetch(`${API_BASE_URL}/api/agenda/pending-requests`, {
+    const response = await fetch(`${API_BASE_URL}/agenda/pending-requests`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -20,7 +20,7 @@ export const agendaService = {
   },
 
   async getDoctors(): Promise<Doctor[]> {
-    const response = await fetch(`${API_BASE_URL}/api/agenda/doctors`, {
+    const response = await fetch(`${API_BASE_URL}/agenda/doctors`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -37,7 +37,7 @@ export const agendaService = {
 
   async getDoctorAvailability(doctorId: string, date: string): Promise<string[]> {
     const response = await fetch(
-      `${API_BASE_URL}/api/agenda/doctor-availability?doctorId=${doctorId}&date=${date}`,
+      `${API_BASE_URL}/agenda/doctor-availability?doctorId=${doctorId}&date=${date}`,
       {
         method: "GET",
         headers: {
@@ -55,7 +55,7 @@ export const agendaService = {
   },
 
   async scheduleAppointment(data: ScheduleAppointmentData): Promise<any> {
-    const response = await fetch(`${API_BASE_URL}/api/agenda/schedule-appointment`, {
+    const response = await fetch(`${API_BASE_URL}/agenda/schedule-appointment`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -73,7 +73,7 @@ export const agendaService = {
   },
 
   async getAllPatients(): Promise<Patient[]> {
-    const response = await fetch(`${API_BASE_URL}/api/patients/all`, {
+    const response = await fetch(`${API_BASE_URL}/patients/all`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -85,11 +85,14 @@ export const agendaService = {
       throw new Error("Failed to fetch patients");
     }
 
-    return response.json();
+    const result = await response.json();
+    // Endpoint returns { success: boolean, data: Patient[] }
+    // Normalize to return only the array so callers can safely call patients.find
+    return result && result.data ? result.data : [];
   },
 
   async createAppointment(data: CreateAppointmentData): Promise<any> {
-    const response = await fetch(`${API_BASE_URL}/api/agenda/create-appointment`, {
+    const response = await fetch(`${API_BASE_URL}/agenda/create-appointment`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

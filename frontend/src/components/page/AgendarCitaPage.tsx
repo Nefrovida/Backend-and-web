@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import AppointmentRequestsList from "../organism/appointments/AppointmentRequestsList";
 import AppointmentScheduleForm from "../organism/appointments/AppointmentScheduleForm";
 import DirectAppointmentForm from "../organism/appointments/DirectAppointmentForm";
@@ -7,10 +8,20 @@ import { AppointmentRequest } from "../../types/appointment";
 const AgendarCitaPage: React.FC = () => {
   const [selectedRequest, setSelectedRequest] = useState<AppointmentRequest | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const [mode, setMode] = useState<'requests' | 'direct'>('direct');
+  const [isDirectMode, setIsDirectMode] = useState(false);
+  const [searchParams] = useSearchParams();
+  const patientIdFromQuery = searchParams.get("patientId") || undefined;
+  const directFromQuery = searchParams.get("direct") === "true";
+
+  useEffect(() => {
+    if (directFromQuery) {
+      setIsDirectMode(true);
+    }
+  }, [directFromQuery]);
 
   const handleSelectRequest = (request: AppointmentRequest) => {
     setSelectedRequest(request);
+    setIsDirectMode(false); // When selecting a request, exit direct mode
   };
 
   const handleScheduleComplete = () => {
@@ -20,55 +31,40 @@ const AgendarCitaPage: React.FC = () => {
 
   const handleAppointmentCreated = () => {
     setRefreshTrigger((prev) => prev + 1);
+    setIsDirectMode(false); // After creating, exit direct mode
+  };
+
+  const handleCreateNew = () => {
+    setIsDirectMode(true);
+    setSelectedRequest(null); // Clear selected request
   };
 
   return (
     <section className="flex flex-col w-full h-screen">
-      {/* Mode Toggle */}
-      <div className="bg-white border-b-2 border-gray-200 p-4">
-        <div className="flex items-center justify-center gap-4">
-          <span className="text-gray-700 font-medium">Modo:</span>
-          <div className="flex bg-gray-100 rounded-lg p-1">
-            <button
-              onClick={() => setMode('direct')}
-              className={`px-6 py-2 rounded-md font-medium transition-all ${
-                mode === 'direct'
-                  ? 'bg-primary text-white shadow-md'
-                  : 'text-gray-600 hover:text-gray-800'
-              }`}
-            >
-              Nueva Cita
-            </button>
-            <button
-              onClick={() => setMode('requests')}
-              className={`px-6 py-2 rounded-md font-medium transition-all ${
-                mode === 'requests'
-                  ? 'bg-primary text-white shadow-md'
-                  : 'text-gray-600 hover:text-gray-800'
-              }`}
-            >
-              Solicitudes Pendientes
-            </button>
-          </div>
-        </div>
-      </div>
-
       {/* Content */}
-      {mode === 'requests' ? (
-        <div className="flex flex-1 overflow-hidden">
-          <AppointmentRequestsList
-            onSelectRequest={handleSelectRequest}
-            selectedRequest={selectedRequest}
-            refreshTrigger={refreshTrigger}
-          />
+      <div className="flex flex-1 overflow-hidden">
+        <AppointmentRequestsList
+          onSelectRequest={handleSelectRequest}
+          selectedRequest={selectedRequest}
+          refreshTrigger={refreshTrigger}
+          onCreateNew={handleCreateNew}
+        />
+        {selectedRequest ? (
           <AppointmentScheduleForm
             selectedRequest={selectedRequest}
             onScheduleComplete={handleScheduleComplete}
           />
-        </div>
-      ) : (
-        <DirectAppointmentForm onAppointmentCreated={handleAppointmentCreated} />
-      )}
+        ) : isDirectMode ? (
+          <DirectAppointmentForm
+            onAppointmentCreated={handleAppointmentCreated}
+            initialPatientId={patientIdFromQuery}
+          />
+        ) : (
+          <div className="flex-1 flex items-center justify-center">
+            <p className="text-gray-500">Selecciona una solicitud o crea una nueva cita</p>
+          </div>
+        )}
+      </div>
     </section>
   );
 };
