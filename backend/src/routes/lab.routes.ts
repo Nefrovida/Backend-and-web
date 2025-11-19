@@ -21,7 +21,7 @@ router.use(authenticate);
 router.get(
   "/results",
   authenticate,
-  requirePrivileges([Privilege.VIEW_ANALYSIS]),
+  requirePrivileges([Privilege.VIEW_LAB_RESULTS]),
   getLabResults
 );
 
@@ -58,7 +58,7 @@ router.get(
 router.get(
   "/lab-appointments",
   authenticate,
-  requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
+  requirePrivileges([Privilege.VIEW_LAB_APPOINTMENTS]),
   labAppointmentsController.getLabAppointments
 );
 
@@ -66,7 +66,7 @@ router.get(
 router.post(
   "/lab-appointments/:id/presign",
   authenticate,
-  requirePrivileges([Privilege.UPDATE_APPOINTMENTS]),
+  requirePrivileges([Privilege.UPLOAD_LAB_RESULTS]),
   labAppointmentsController.requestPresign
 );
 
@@ -74,7 +74,7 @@ router.post(
 router.post(
   "/lab-appointments/:id/result",
   authenticate,
-  requirePrivileges([Privilege.UPDATE_APPOINTMENTS]),
+  requirePrivileges([Privilege.UPLOAD_LAB_RESULTS]),
   labAppointmentsController.confirmUpload
 );
 

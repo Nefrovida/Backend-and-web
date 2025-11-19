@@ -12,7 +12,8 @@ const analisisRoutes: RouteObject[] = [
   {
     path: "/laboratorio",
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute allowedRoles={[1, 2]}>
+        {/* 1 = Admin, 2 = Doctor */}
         <LabPage />
       </ProtectedRoute>
     ),
@@ -35,7 +36,7 @@ const analisisRoutes: RouteObject[] = [
   {
     path: "/laboratorio/subir",
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute allowedRoles={[1, 4]}>
         <LabUploadPage />
       </ProtectedRoute>
     ),

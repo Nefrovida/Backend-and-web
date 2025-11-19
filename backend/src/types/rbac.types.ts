@@ -38,6 +38,9 @@ export enum Privilege {
   UPDATE_ANALYSIS = "UPDATE_ANALYSIS",
   DELETE_ANALYSIS = "DELETE_ANALYSIS",
 
+  // Analysis types management for secretary
+  MANAGE_ANALYSIS_TYPES = "MANAGE_ANALYSIS_TYPES",
+
   // Forum management
   VIEW_FORUMS = 'VIEW_FORUMS',
   CREATE_FORUMS = 'CREATE_FORUMS',
@@ -70,6 +73,11 @@ export enum Privilege {
   // Lab results/reports management
   VIEW_LAB_RESULTS = "VIEW_LAB_RESULTS",
   EDIT_LAB_RESULTS = "EDIT_LAB_RESULTS",
+
+  // Lab appointments & uploads (US5)
+  VIEW_LAB_APPOINTMENTS = "VIEW_LAB_APPOINTMENTS",
+  UPLOAD_LAB_RESULTS = "UPLOAD_LAB_RESULTS",
+
   VIEW_MEDICAL_RECORD = "VIEW_MEDICAL_RECORD",
   CREATE_DOCTOR = "CREATE_DOCTOR",
 }
