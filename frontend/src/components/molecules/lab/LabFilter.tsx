@@ -104,6 +104,19 @@ const LabFilter: FC<Props> = ({ onChange }) => {
 
       <h2 className="mt-2 text-lg">Estatus</h2>
       <div>
+        <label htmlFor="pending" className="flex gap-1 items-center">
+          <input
+            className="flex items-center hover:underline"
+            onChange={handleChangeStatus}
+            type="checkbox"
+            name="pending"
+            value="pending"
+            id="pending"
+          />
+          <FiAlertTriangle className="text-orange-400" />
+          Agendado
+        </label>
+
         <label htmlFor="lab" className="flex gap-1 items-center">
           <input
             className="flex items-center hover:underline"
@@ -128,19 +141,6 @@ const LabFilter: FC<Props> = ({ onChange }) => {
           />
           <MdPendingActions className="text-yellow-400" />
           Enviado
-        </label>
-
-        <label htmlFor="pending" className="flex gap-1 items-center">
-          <input
-            className="flex items-center hover:underline"
-            onChange={handleChangeStatus}
-            type="checkbox"
-            name="pending"
-            value="pending"
-            id="pending"
-          />
-          <FiAlertTriangle className="text-orange-400" />
-          Pendiente
         </label>
 
         <label htmlFor="sent" className="flex gap-1 items-center">
