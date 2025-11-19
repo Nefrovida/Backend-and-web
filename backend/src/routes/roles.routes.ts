@@ -9,6 +9,13 @@ const router = express.Router()
 // ============================================
 // Role Routes (Protected)
 // ============================================
+
+
+// NOTE 19 nov 2025:
+// Routes here shoulnd't have /roles prefix because they are
+// mounted in the main app with that prefix already.
+// example: app.use('/roles', rolesRoutes);
+// which would equal to /roles/roles in this file.
 router.get(
   "/roles",
   authenticate,
