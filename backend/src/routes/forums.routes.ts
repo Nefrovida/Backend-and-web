@@ -191,6 +191,14 @@ router.post(
   requirePrivileges([Privilege.ADD_USER_TO_FORUM]),
   addPatientToForumController.addPatientToForum
 );
+router.post("/forums/:forumId/message", forumsController.replyToMessage);
+
+router.get(
+  "/:forumId/messages",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_FORUMS]),
+  forumsController.getMessages
+);
 
 // Allow authenticated patients to join public forums (self-join)
 router.post(

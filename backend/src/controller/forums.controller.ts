@@ -20,7 +20,7 @@ export const create = async (req: Request, res: Response): Promise<void> => {
     res.status(201).json(newForum);
   } catch (error: any) {
     if (error instanceof ZodError) {
-      const formatted = error.issues.map((issue) => {
+      const formatted = error.issues.map((issue: { path: any[]; message: any; code: string; }) => {
         const field = issue.path?.[0];
         let message = issue.message;
 
@@ -143,7 +143,7 @@ export const update = async (req: Request, res: Response): Promise<void> => {
     res.status(200).json(updatedForum);
   } catch (error: any) {
     if (error instanceof ZodError) {
-      const formatted = error.issues.map((issue) => {
+      const formatted = error.issues.map((issue: { path: any[]; message: any; code: string; }) => {
         const field = issue.path?.[0];
         let message = issue.message;
 
@@ -649,7 +649,7 @@ export const replyToMessage = async (req: Request, res: Response): Promise<void>
     res.status(201).json(reply);
   } catch (error: any) {
     if (error instanceof ZodError) {
-      const formatted = error.issues.map((issue) => ({
+      const formatted = error.issues.map((issue: { path: any[]; message: any; }) => ({
         field: issue.path?.[0],
         message: issue.message,
       }));
@@ -661,3 +661,32 @@ export const replyToMessage = async (req: Request, res: Response): Promise<void>
   }
 };
 
+
+/**
+ * Get root messages of a forum
+ */
+export const getMessages = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const forumId = parseInt(req.params.forumId);
+    if (isNaN(forumId)) {
+      res.status(400).json({ error: "ID de foro inválido" });
+      return;
+    }
+
+    const messages = await forumModel.getRootMessagesByForum(forumId);
+
+    // Mapear campos al formato que espera iOS
+    const mapped = messages.map(m => ({
+      id: m.message_id,
+      forumId: m.forum_id,
+      parentMessageId: m.parent_message_id,
+      content: m.content,
+      createdBy: m.user_id,
+      createdAt: m.publication_timestamp
+    }));
+
+    res.status(200).json(mapped);
+  } catch (error: any) {
+    res.status(error.statusCode || 500).json({ error: error.message });
+  }
+};

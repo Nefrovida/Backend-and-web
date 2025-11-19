@@ -150,6 +150,13 @@ export const replyToMessageService = async (
     throw new NotFoundError('El mensaje padre no existe en este foro');
   }
 
+  if (!parentMessage.active) {
+  throw new BadRequestError("No se puede responder a un mensaje inactivo");
+}
+if (!parentMessage.active) {
+  throw new BadRequestError("No se puede responder a un mensaje inactivo");
+}
+
   // 4. Validate content
   if (!content || content.trim().length === 0) {
     throw new BadRequestError('El contenido de la respuesta no puede estar vacío');
