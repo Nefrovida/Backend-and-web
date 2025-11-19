@@ -228,7 +228,7 @@ function Navbar({ children }: Props) {
           {/* Forum */}
           <CustomLink
             label="Foros"
-            to="/dashboard/foro"
+            to="/dashboard/foros"
             icon={<MdOutlineForum />}
             activeIcon={<MdForum />}
             end
