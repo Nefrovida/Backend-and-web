@@ -131,7 +131,7 @@ export default class Agenda {
       return {
         ...rest,
         appointment_id: appointment?.appointment_id ?? null,
-        name: fullName || null,
+        // name: fullName || null,
         doctor_name: fullName || null,
         appointment_name: appointmentName,
       };
