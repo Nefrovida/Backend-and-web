@@ -4,11 +4,11 @@ import { RouteObject } from "react-router-dom";
 
 const notesRoutes: RouteObject[] = [
   {
-    path: "/notas",
+    path: "notas",
     element: <Notas />,
   },
   {
-    path: "/patients/:patientId/notes",
+    path: "patients/:patientId/notes",
     element: <NotesListPage />,
   },
 ];

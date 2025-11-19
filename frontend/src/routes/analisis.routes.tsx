@@ -10,7 +10,7 @@ import { LaboratoristAnalysisCalendarC } from "@/controller/laboratoristAnalysis
 
 const analisisRoutes: RouteObject[] = [
   {
-    path: "/laboratorio",
+    path: "laboratorio",
     element: (
       <ProtectedRoute allowedRoles={[1, 2]}>
         {/* 1 = Admin, 2 = Doctor */}
@@ -26,7 +26,7 @@ const analisisRoutes: RouteObject[] = [
   },
   {
     // Only Admin (1) and Secretaria (6) can access the analysis types manager
-    path: "/analisis",
+    path: "analisis",
     element: (
       <ProtectedRoute allowedRoles={[1, 6]}>
         <AnalysisManager />
@@ -34,7 +34,7 @@ const analisisRoutes: RouteObject[] = [
     ),
   },
   {
-    path: "/laboratorio/subir",
+    path: "laboratorio/subir",
     element: (
       <ProtectedRoute allowedRoles={[1, 4]}>
         <LabUploadPage />
@@ -48,7 +48,7 @@ const analisisRoutes: RouteObject[] = [
     ],
   },
   {
-    path: "/analisis-dia",
+    path: "analisis-dia",
     element: <LaboratoristAnalysisCalendarC />,
   },
 ];

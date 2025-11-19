@@ -1,4 +1,3 @@
-// navbar.tsx
 import React, { useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -173,21 +172,21 @@ function Navbar({ children }: Props) {
 
         {/* Top Section */}
         <div className="flex flex-col gap-2 items-center w-full">
-          <CustomLink
-            label="Mi Perfil"
-            to="/"
-            icon={<BsPerson />}
-            activeIcon={<BsFillPersonFill />}
-            end
-          />
-          <NavButton
-            label={showNotes ? "Cerrar Notas" : "Notas"}
-            isActive={showNotes}
-            onClick={() => setShowNotes(!showNotes)}
-            icon={<LuNotebook />}
-            activeIcon={<LuNotebookPen />}
-            activeClass="bg-green-50 text-green-600 scale-105 shadow-sm ring-1 ring-green-100"
-          />
+            <CustomLink 
+              label="Mi Perfil"
+              to="/dashboard/"
+              icon={<BsPerson />}
+              activeIcon={<BsFillPersonFill />}
+              end
+            />
+            <NavButton 
+              label={showNotes ? "Cerrar Notas" : "Notas"}
+              isActive={showNotes}
+              onClick={() => setShowNotes(!showNotes)}
+              icon={<LuNotebook />}
+              activeIcon={<LuNotebookPen />}
+              activeClass="bg-green-50 text-green-600 scale-105 shadow-sm ring-1 ring-green-100"
+            />
 
           <div className="w-8 h-0.5 bg-gray-200/60 rounded-full mt-1"></div>
         </div>
@@ -199,7 +198,7 @@ function Navbar({ children }: Props) {
           {isAdmin && (
             <CustomLink
               label="Registrar Doctor"
-              to="/register-doctor"
+              to="/dashboard/register-doctor"
               icon={<FaUserMd />}
               activeIcon={<FaUserMd />}
               end
@@ -210,7 +209,7 @@ function Navbar({ children }: Props) {
           {(isLaboratorist || isAdmin) && (
             <CustomLink
               label="Subir Resultados"
-              to="/laboratorio/subir"
+              to="/dashboard/laboratorio/subir"
               icon={<FaRegClock />}
               activeIcon={<FaClock />}
               end
@@ -220,7 +219,7 @@ function Navbar({ children }: Props) {
           {/* Expedientes */}
           <CustomLink
             label="Expedientes"
-            to="/expedientes"
+            to="/dashboard/expedientes"
             icon={<FaRegFolder />}
             activeIcon={<FaFolderOpen />}
             end
@@ -229,7 +228,7 @@ function Navbar({ children }: Props) {
           {/* Forum */}
           <CustomLink
             label="Foros"
-            to="/foro"
+            to="/dashboard/foro"
             icon={<MdOutlineForum />}
             activeIcon={<MdForum />}
             end
@@ -239,7 +238,7 @@ function Navbar({ children }: Props) {
           {(isAdmin || isDoctor || isSecretary || isPatient) && (
             <CustomLink
               label="Agenda"
-              to="/agenda"
+              to="/dashboard/agenda"
               icon={<FaRegClipboard />}
               activeIcon={<FaClipboardCheck />}
               end
@@ -248,13 +247,13 @@ function Navbar({ children }: Props) {
 
           {/* Laboratory results, Doctor */}
           {(isDoctor || isAdmin) && (
-            <CustomLink
-              label="Laboratorio"
-              to="/laboratorio"
-              icon={<IoFlaskOutline />}
-              activeIcon={<IoFlaskSharp />}
-              end
-            />
+              <CustomLink 
+                label="Laboratorio"
+                to="/dashboard/laboratorio"
+                icon={<IoFlaskOutline />}
+                activeIcon={<IoFlaskSharp />}
+                end
+              />
           )}
 
           {/* Secretary */}
@@ -262,14 +261,14 @@ function Navbar({ children }: Props) {
             <>
               <CustomLink
                 label="Agendar Cita"
-                to="/secretaria/agendar"
+                to="/dashboard/secretaria/agendar"
                 icon={<FaRegClock />}
                 activeIcon={<FaClock />}
                 end
               />
               <CustomLink
                 label="Catálogo Análisis"
-                to="/analisis"
+                to="/dashboard/analisis"
                 icon={<FaRegListAlt />}
                 activeIcon={<FaListAlt />}
                 end

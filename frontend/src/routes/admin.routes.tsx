@@ -3,7 +3,7 @@ import RegisterDoctorPage from "../components/page/RegisterDoctorpage";
 
 const adminRoutes: RouteObject[] = [
   {
-    path: "/register-doctor",
+    path: "register-doctor",
     element: <RegisterDoctorPage />,
   },
 ];
