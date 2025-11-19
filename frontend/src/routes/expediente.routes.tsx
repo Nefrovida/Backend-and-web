@@ -4,19 +4,19 @@ import ExpedientesListPage from "../components/page/ExpedientesListPage";
 
 const expedienteRoutes = [
   {
-    path: "/expedientes",
+    path: "expedientes",
     element: <ExpedientesListPage />,
   },
   {
-    path: "/expediente/:patientId",
+    path: "expediente/:patientId",
     element: <MedicalRecordViewPage />,
   },
   {
-    path: "/expediente/new/:patientId",
+    path: "expediente/new/:patientId",
     element: <MedicalRecordFormPage />,
   },
   {
-    path: "/expediente/:patientId/edit",
+    path: "expediente/:patientId/edit",
     element: <MedicalRecordFormPage />,
   },
 ];

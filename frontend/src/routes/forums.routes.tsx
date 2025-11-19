@@ -3,7 +3,7 @@ import { RouteObject } from "react-router-dom";
 
 const forumsRoutes: RouteObject[] = [
   {
-    path: "/foros",
+    path: "foros",
     element: <ForumsPage />,
   },
 ];

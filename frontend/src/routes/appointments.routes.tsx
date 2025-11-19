@@ -5,7 +5,7 @@ import DoctorAppointments from "../components/page/DoctorAppointments";
 const appointmentsRoutes: RouteObject[] = [
   {
     // Only Doctor (2) can access their appointments
-    path: "/mis-citas",
+    path: "mis-citas",
     element: (
       <ProtectedRoute allowedRoles={[2]}>
         <DoctorAppointments />

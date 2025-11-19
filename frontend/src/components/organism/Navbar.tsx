@@ -158,7 +158,7 @@ function Navbar({ children }: Props) {
         <div className="flex flex-col gap-2 items-center w-full">
             <CustomLink 
               label="Mi Perfil"
-              to="/"
+              to="/dashboard/"
               icon={<BsPerson />}
               activeIcon={<BsFillPersonFill />}
               end
@@ -182,7 +182,7 @@ function Navbar({ children }: Props) {
           {isAdmin && (
             <CustomLink 
               label="Registrar Doctor"
-              to="/register-doctor"
+              to="/dashboard/register-doctor"
               icon={<FaUserMd />}
               activeIcon={<FaUserMd />} 
               end
@@ -193,7 +193,7 @@ function Navbar({ children }: Props) {
           {(isLaboratorist || isAdmin) && (
             <CustomLink
               label="Subir Resultados"
-              to="/laboratorio/subir"
+              to="/dashboard/laboratorio/subir"
               icon={<FaRegClock />}
               activeIcon={<FaClock />}
               end
@@ -203,7 +203,7 @@ function Navbar({ children }: Props) {
           {/* Expedientes */}
           <CustomLink 
             label="Expedientes"
-            to="/expedientes"
+            to="/dashboard/expedientes"
             icon={<FaRegFolder />}
             activeIcon={<FaFolderOpen />}
             end
@@ -212,7 +212,7 @@ function Navbar({ children }: Props) {
           {/* Forum */}
           <CustomLink 
             label="Foros"
-            to="/foro"
+            to="/dashboard/foro"
             icon={<MdOutlineForum />}
             activeIcon={<MdForum />}
             end
@@ -222,7 +222,7 @@ function Navbar({ children }: Props) {
           {(isAdmin || isDoctor || isSecretary || isPatient) && (
             <CustomLink 
               label="Agenda"
-              to="/agenda"
+              to="/dashboard/agenda"
               icon={<FaRegClipboard />}
               activeIcon={<FaClipboardCheck />}
               end
@@ -233,7 +233,7 @@ function Navbar({ children }: Props) {
           {(isDoctor || isAdmin) && (
               <CustomLink 
                 label="Laboratorio"
-                to="/laboratorio"
+                to="/dashboard/laboratorio"
                 icon={<IoFlaskOutline />}
                 activeIcon={<IoFlaskSharp />}
                 end
@@ -245,14 +245,14 @@ function Navbar({ children }: Props) {
             <>
               <CustomLink 
                 label="Agendar Cita"
-                to="/secretaria/agendar"
+                to="/dashboard/secretaria/agendar"
                 icon={<FaRegClock />}
                 activeIcon={<FaClock />}
                 end
               />
               <CustomLink 
                 label="Catálogo Análisis"
-                to="/analisis"
+                to="/dashboard/analisis"
                 icon={<FaRegListAlt />}
                 activeIcon={<FaListAlt />}
                 end
@@ -266,7 +266,7 @@ function Navbar({ children }: Props) {
             <div className="w-8 h-0.5 bg-gray-200/60 rounded-full mb-1"></div>
             <CustomLink 
               label="Configuración"
-              to="/"
+              to="/dashboard/"
               icon={<BsGear />}
               activeIcon={<BsGearFill />}
               end
