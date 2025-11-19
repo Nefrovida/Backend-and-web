@@ -20,7 +20,7 @@ export interface RegisterData {
   curp?: string;
 
   // Doctor-specific fields
-  speciality?: string;
+  specialty?: string;
   license?: string;
 
   // Familiar-specific fields
@@ -43,18 +43,22 @@ export interface LoginData {
   password: string;
 }
 
+// NOTE: these IDs should match the IDs in the database `roles` table (see seed.sql)
+// Keep values in sync with backend.DEFAULT_ROLES / roles table.
 export const ROLE_IDS = {
-  PATIENT: 1,
+  ADMIN: 1,
   DOCTOR: 2,
-  LABORATORIST: 3,
-  ADMIN: 4,
+  PATIENT: 3,
+  LABORATORIST: 4,
   FAMILIAR: 5,
+  SECRETARIA: 6,
 } as const;
 
 export const ROLE_NAMES = {
-  [ROLE_IDS.PATIENT]: "Paciente",
-  [ROLE_IDS.DOCTOR]: "Doctor",
-  [ROLE_IDS.LABORATORIST]: "Laboratorista",
   [ROLE_IDS.ADMIN]: "Administrador",
+  [ROLE_IDS.SECRETARIA]: "Secretaria",
+  [ROLE_IDS.DOCTOR]: "Doctor",
+  [ROLE_IDS.PATIENT]: "Paciente",
+  [ROLE_IDS.LABORATORIST]: "Laboratorista",
   [ROLE_IDS.FAMILIAR]: "Familiar",
 } as const;

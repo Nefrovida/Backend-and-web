@@ -48,9 +48,7 @@ export const getAnalysisResultsForPatient = async (userId: string) => {
       include: {
         analysis: true, 
         
-        results: { 
-          take: 1 
-        }
+        results: true
       }
     });
 

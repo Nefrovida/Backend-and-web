@@ -15,7 +15,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 15 * 60 * 1000 // 15 minutes
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
     });
     
     res.cookie('refreshToken', result.refreshToken, {
@@ -25,7 +25,17 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
     
-    // Return only user data, not tokens
+    // Return only user data, not tokens by default
+    // Mobile/native clients can request tokens in the JSON response by
+    // sending the header 'x-return-tokens: true' or query param 'returnTokens=true'
+    const returnTokensHeader = String(req.headers['x-return-tokens'] || '').toLowerCase() === 'true';
+    const returnTokensQuery = String(req.query.returnTokens || '').toLowerCase() === 'true';
+
+    if (returnTokensHeader || returnTokensQuery) {
+      res.status(200).json({ user: result.user, accessToken: result.accessToken, refreshToken: result.refreshToken });
+      return;
+    }
+
     res.status(200).json({ user: result.user });
   } catch (error: any) {
     res.status(error.statusCode || 500).json({ error: error.message });
@@ -44,18 +54,28 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     res.cookie('accessToken', result.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 15 * 60 * 1000 // 15 minutes
+      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
     });
     
     res.cookie('refreshToken', result.refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
     
-    // Return only user data, not tokens
+    // Return only user data, not tokens by default
+    // Mobile/native clients can request tokens in the JSON response by
+    // sending the header 'x-return-tokens: true' or query param 'returnTokens=true'
+    const returnTokensHeader = String(req.headers['x-return-tokens'] || '').toLowerCase() === 'true';
+    const returnTokensQuery = String(req.query.returnTokens || '').toLowerCase() === 'true';
+
+    if (returnTokensHeader || returnTokensQuery) {
+      res.status(201).json({ user: result.user, accessToken: result.accessToken, refreshToken: result.refreshToken });
+      return;
+    }
+
     res.status(201).json({ user: result.user });
   } catch (error: any) {
     res.status(error.statusCode || 500).json({ error: error.message });
@@ -67,14 +87,33 @@ export const register = async (req: Request, res: Response): Promise<void> => {
  */
 export const refreshToken = async (req: Request, res: Response): Promise<void> => {
   try {
-    // User should be attached by auth middleware
-    if (!req.user) {
-      res.status(401).json({ error: 'Unauthorized' });
+    // Get refresh token from cookie
+    let refreshTokenFromCookie = req.cookies?.refreshToken;
+
+    // If cookie isn't available (native/mobile clients), allow Authorization: Bearer <refreshToken>
+    if (!refreshTokenFromCookie) {
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        refreshTokenFromCookie = authHeader.substring(7);
+      }
+    }
+    
+    if (!refreshTokenFromCookie) {
+      res.status(401).json({ error: 'No refresh token provided' });
       return;
     }
 
-    const newAccessToken = await authService.refreshAccessToken(req.user.userId);
-    res.status(200).json({ accessToken: newAccessToken });
+    const result = await authService.refreshAccessToken(refreshTokenFromCookie);
+    
+    // Update accessToken cookie
+    res.cookie('accessToken', result.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    });
+    
+    res.status(200).json({ user: result.user });
   } catch (error: any) {
     res.status(error.statusCode || 500).json({ error: error.message });
   }
@@ -88,13 +127,13 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
   res.clearCookie('accessToken', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict'
+    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax'
   });
   
   res.clearCookie('refreshToken', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict'
+    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax'
   });
   
   res.status(200).json({ message: 'Logged out successfully' });
