@@ -3,6 +3,9 @@ import * as authController from "../controller/auth.controller";
 import * as usersController from "../controller/users.controller";
 import * as rolesController from "../controller/roles.controller";
 import * as privilegesController from "../controller/privileges.controller";
+
+import * as analysisController from "../controller/analysis.controller";
+
 import { authenticate } from "../middleware/auth.middleware";
 import { requirePrivileges } from "../middleware/rbac.middleware";
 import { Privilege } from "../types/rbac.types";
@@ -14,6 +17,13 @@ router.get("/", (_req: Request, res: Response) => {
   console.log("API hit");
   res.json({ message: "Welcome to the Express + TypeScript Server!" });
 });
+
+//Analysis Routes
+router.get(
+  "/analysis/my-results",
+  authenticate,
+  analysisController.getMyAnalysisResultsController as express.RequestHandler
+);
 
 // ============================================
 // Authentication Routes (Public)
