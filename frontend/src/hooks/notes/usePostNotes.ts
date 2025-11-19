@@ -12,35 +12,35 @@ function usePostNotes() {
   const [noteData, setNoteData] = useState({
     general_notes: "",
     ailments: "",
-    prescription: ""
+    prescription: "",
   });
 
   useEffect(() => {
     fetch("/api/patients/doctorPatients", {
-      credentials: "include"
+      credentials: "include",
     })
-      .then(async res => {
+      .then(async (res) => {
         const data = await res.json();
-        
+
         if (!res.ok) {
           throw new Error(data.error || "Error desconocido");
         }
 
         return data;
       })
-      .then(data => {
-        const patientsInfo: patient[] = data.map(d => {
+      .then((data) => {
+        const patientsInfo: patient[] = data.map((d) => {
           const name = d.user.name;
           const parentalLastName = d.user.parent_last_name;
           const maternalLastName = d.user.maternal_last_name;
           const userId = d.patient_id;
-          
+
           return { name, parentalLastName, maternalLastName, userId };
         });
 
         setPatients(patientsInfo);
       })
-      .catch(error => {
+      .catch((error) => {
         setError(error.message || "Error al cargar pacientes");
       });
   }, []);
@@ -53,10 +53,10 @@ function usePostNotes() {
       const response = await fetch("/api/notes", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
-        credentials: "include"
+        credentials: "include",
       });
 
       if (!response.ok) {
@@ -65,10 +65,11 @@ function usePostNotes() {
       }
 
       const data = await response.json();
-      setRefreshTrigger(prev => prev + 1);
+      setRefreshTrigger((prev) => prev + 1);
       return data;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Error desconocido";
+      const errorMessage =
+        err instanceof Error ? err.message : "Error desconocido";
       setError(errorMessage);
       throw err;
     } finally {
@@ -89,7 +90,7 @@ function usePostNotes() {
       general_notes: noteData.general_notes || undefined,
       ailments: noteData.ailments || undefined,
       prescription: noteData.prescription || undefined,
-      visibility: true
+      visibility: true,
     };
 
     try {
@@ -98,10 +99,12 @@ function usePostNotes() {
       setNoteData({
         general_notes: "",
         ailments: "",
-        prescription: ""
+        prescription: "",
       });
     } catch (error) {
-      setError(error instanceof Error ? error.message : "Error al guardar nota");
+      setError(
+        error instanceof Error ? error.message : "Error al guardar nota"
+      );
     }
   }
 
@@ -116,7 +119,7 @@ function usePostNotes() {
     postNote,
     isLoading,
     error,
-    refreshTrigger
+    refreshTrigger,
   };
 }
 

@@ -6,6 +6,7 @@ import { requirePrivileges } from "../middleware/rbac.middleware";
 import { Privilege } from "../types/rbac.types";
 import postNewMessage from "src/controller/forum/postNewMessage.controller";
 import getMyForums from "src/controller/forum/getMyForums.controller";
+import getForumFeed from "src/controller/forum/getForumFeed.controller";
 
 const router = express.Router();
 
@@ -44,6 +45,8 @@ const router = express.Router();
  *   }
  * ]
  */
+router.get("/myForums", authenticate, getMyForums);
+
 router.get(
   "/",
   authenticate,
@@ -51,7 +54,6 @@ router.get(
   forumsController.getAll
 );
 
-router.get("/myForums", authenticate, getMyForums);
 router.get(
   "/:forumId",
   authenticate,
@@ -104,6 +106,8 @@ router.post(
 );
 
 router.post("/:forumId", authenticate, postNewMessage);
+
+router.get("/feed", authenticate, getForumFeed);
 
 /**
  * Update a forum

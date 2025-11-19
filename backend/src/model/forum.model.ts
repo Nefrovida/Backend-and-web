@@ -1,3 +1,4 @@
+import { users_forums } from "./../../prisma/database/prisma/browser";
 import { prisma } from "../util/prisma";
 import { ForumRole } from ".prisma/client";
 
@@ -18,8 +19,21 @@ export default class Forum {
     });
   }
 
+  private static async getPublicForums() {
+    return await prisma.forums.findMany({
+      where: {
+        public_status: true,
+        active: true,
+      },
+      select: {
+        forum_id: true,
+        name: true,
+      },
+    });
+  }
+
   static async getMyForums(userId: string) {
-    return await prisma.users_forums.findMany({
+    const myForums = await prisma.users_forums.findMany({
       where: {
         user_id: userId,
       },
@@ -32,6 +46,14 @@ export default class Forum {
         },
       },
     });
+
+    const publicForums = await this.getPublicForums();
+
+    return [...myForums, ...publicForums];
+  }
+
+  static async getForumFeed(userId: string) {
+    return await prisma.users_forums;
   }
 }
 
