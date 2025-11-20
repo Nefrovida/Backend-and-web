@@ -156,7 +156,7 @@ router.delete(
   analysisController.deleteAnalysis
 );
 
-//Analysis Routes
+//AnalysisPDF Routes
 router.get(
   "/analysis/my-results",
   authenticate,

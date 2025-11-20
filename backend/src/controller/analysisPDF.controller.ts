@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 
 import { NotFoundError, ConflictError } from '../util/errors.util'; 
-import { getAnalysisResultsForPatient } from '../service/analysis.service';
+import { getAnalysisResultsForPatient } from '../service/analysisPDF.service';
 
 
 interface JwtPayload {
