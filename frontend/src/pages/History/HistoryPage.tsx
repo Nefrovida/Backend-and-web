@@ -1,9 +1,9 @@
 import { useParams } from 'react-router-dom';
 import { usePatientHistory } from '../../hooks/usePatientHistory';
-import { Title } from '../../components/atoms/Title'; // Reutilizamos el componente
+import { Title } from '../../components/atoms/Title'; // Re-use the component
 
 export const HistoryPage = () => {
-  // Obtenemos el ID del paciente desde la URL (lo configuraremos en el siguiente paso)
+  // Obtain patient ID from the URL
   const { patientId } = useParams<{ patientId: string }>();
 
   if (!patientId) {
@@ -18,12 +18,9 @@ export const HistoryPage = () => {
   return (
     <div className="container mx-auto p-4">
       <Title title={`Historial Clínico - Paciente ${patientId}`} />
-
-      {/* Aquí puedes crear un componente HistoryList que muestre los datos */}
       <div className="mt-4 space-y-4">
         {history.length > 0 ? (
           history.map((record) => (
-            // TODO: Mover esto a un componente 'HistoryRecordCard.tsx'
             <div key={record.id} className="p-4 border rounded shadow">
               <p className="font-bold">{new Date(record.date).toLocaleDateString()}</p>
               <p>{record.description}</p>
