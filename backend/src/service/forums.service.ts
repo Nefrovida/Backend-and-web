@@ -142,14 +142,13 @@ export const replyToMessageService = async (
   if (!forumExists) {
     throw new NotFoundError("El foro no existe o está inactivo");
   }
-  console.log("forumExists");
-
+  
   // 2. Validate that the user is a member of the forum
   const isMember = await isUserMember(forumId, userId);
   if (!isMember) {
     throw new BadRequestError("El usuario no es miembro del foro");
   }
-  console.log("isMember");
+  
 
   // 3. Validate that the parent message exists, is active, and belongs to the forum
   const parentMessage = await forumModel.findMessageInForum(
@@ -157,7 +156,6 @@ export const replyToMessageService = async (
     forumId
   );
 
-  console.log(parentMessage);
   if (!parentMessage) {
     throw new NotFoundError(
       "El mensaje padre no existe, está inactivo o no pertenece a este foro"
@@ -172,7 +170,6 @@ export const replyToMessageService = async (
     content
   );
 
-  console.log("reply");
   // 5. Transform the response to match the expected format
   return {
     success: true,
