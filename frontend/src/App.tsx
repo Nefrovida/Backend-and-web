@@ -1,13 +1,13 @@
-import { Outlet } from "react-router";
+import { Outlet } from "react-router-dom";
 import Navbar from "./components/organism/Navbar";
 
 function App() {
   return (
-    <main className="bg-gray-200">
+    <div className="bg-gray-200 min-h-screen">
       <Navbar>
         <Outlet />
       </Navbar>
-    </main>
+    </div>
   );
 }
 
