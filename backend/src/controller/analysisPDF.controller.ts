@@ -3,25 +3,9 @@ import { NotFoundError, ConflictError } from '../util/errors.util';
 import * as analysisService from '../service/analysisPDF.service';
 
 
-interface JwtPayload {
-  id: string;
-  userId: string;
-  roleId: number;
-  privileges: string[];
-  [key: string]: any;
-}
-
-interface AuthRequest extends Request {
-  user?: JwtPayload;
-}
-// --------------------------------------------------------------
-
-/**
- * Get analysis results (PDFs) for the authenticated patient
- */
-export const getMyAnalysisResultsController = async (req: AuthRequest, res: Response) => {
+export const getMyAnalysisResultsController = async (req: Request, res: Response) => {
   try {
-    if (!req.user || !req.user.id) {
+    if (!req.user || !req.user.userId) {
       return res.status(401).json({
         success: false,
         error: {
@@ -31,9 +15,10 @@ export const getMyAnalysisResultsController = async (req: AuthRequest, res: Resp
       });
     }
 
-    const userId = req.user.id;
-
     
+    const userId = req.user.userId;
+
+   
     const analysisData = await analysisService.getAnalysisResultsForPatient(userId);
 
     
