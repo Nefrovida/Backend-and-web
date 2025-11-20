@@ -1,3 +1,4 @@
+// backend/src/validators/forum.validator.ts
 import { z } from "zod";
 
 /**
@@ -97,30 +98,17 @@ export const updateForumSchema = z.object({
  */
 export type UpdateForumInputValidated = z.infer<typeof updateForumSchema>;
 
-
-
 /**
- * Validation schema for replying to a forum message
- * 
- * User Story: "Todos responden mensaje en el foro"
- * 
- * Applied validations:
- * - parentMessageId: must be a positive integer
- * - content: string between 1 and 500 characters
+ * Schema for replying to a message in a forum
  */
 export const replyToMessageSchema = z.object({
-  parentMessageId: z.number({
-    required_error: "Parent message ID is required",
-    invalid_type_error: "Parent message ID must be a number",
-  }).int().positive(),
-
-  content: z.string({
-    required_error: "Content is required",
-    invalid_type_error: "Content must be a text string",
-  })
-  .min(1, "El contenido no puede estar vacío")
-  .max(500, "El contenido no puede exceder 500 caracteres")
-  .trim(),
+  parentMessageId: z.number().int().positive({
+    message: 'El ID del mensaje padre debe ser un número entero positivo'
+  }),
+  content: z.string()
+    .min(1, { message: 'El contenido no puede estar vacío' })
+    .max(5000, { message: 'El contenido no puede exceder 5000 caracteres' })
+    .trim()
 });
 
 /**

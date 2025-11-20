@@ -80,8 +80,7 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
       setIsLoading(true);
       setError('');
       
-      // Backend está en el puerto 3000 según index.ts
-      const response = await fetch(`http://localhost:3000/api/forums/admin-users?page=${currentPage}&limit=10`, {
+      const response = await fetch(`/api/forums/admin-users?page=${currentPage}&limit=10`, {
         credentials: 'include',
       });
 
@@ -108,7 +107,7 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
       setIsLoadingForum(true);
       setError('');
       
-      const response = await fetch(`http://localhost:3000/api/forums/${forum.forum_id}/administrators`, {
+      const response = await fetch(`/api/forums/${forum.forum_id}/administrators`, {
         credentials: 'include',
       });
 
@@ -135,7 +134,7 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
     try {
       setError('');
       
-      const response = await fetch(`http://localhost:3000/api/forums/${forum.forum_id}/administrators`, {
+      const response = await fetch(`/api/forums/${forum.forum_id}/administrators`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -175,7 +174,7 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
     try {
       setError('');
       
-      const response = await fetch(`http://localhost:3000/api/forums/${forum.forum_id}/administrators/${userId}`, {
+      const response = await fetch(`/api/forums/${forum.forum_id}/administrators/${userId}`, {
         method: 'DELETE',
         credentials: 'include',
       });

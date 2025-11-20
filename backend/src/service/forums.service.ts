@@ -1,9 +1,8 @@
+// backend/src/service/forums.service.ts
 import { CreateForumInputValidated, UpdateForumInputValidated } from '../validators/forum.validator';
 import { ForumEntity } from '../types/forum.types';
 import { existsAndActive, isUserMember } from '../model/forum.model'
 import * as forumModel from '../model/forum.model';
-import { createReply } from '../model/messages.model';
-import { prisma } from '../util/prisma';
 import { ConflictError, NotFoundError, BadRequestError } from '../util/errors.util';
 
 /**
@@ -122,7 +121,7 @@ export const updateForum = async (
 
 
 /**
- * Service: respond text in a forum
+ * Service: Reply to a message in a forum
  */
 export const replyToMessageService = async (
   forumId: number,
@@ -130,33 +129,50 @@ export const replyToMessageService = async (
   parentMessageId: number,
   content: string
 ) => {
-  // 1. Validte that the forum exists and is active
+  // 1. Validate that the forum exists and is active
   const forumExists = await existsAndActive(forumId);
   if (!forumExists) {
     throw new NotFoundError('El foro no existe o está inactivo');
   }
 
-  // 2. Validate that the user is a member
+  // 2. Validate that the user is a member of the forum
   const isMember = await isUserMember(forumId, userId);
   if (!isMember) {
     throw new BadRequestError('El usuario no es miembro del foro');
   }
 
-  // 3. Validate that the message exists and is part of the forum
-  const parentMessage = await prisma.messages.findUnique({
-    where: { message_id: parentMessageId },
-  });
-  if (!parentMessage || parentMessage.forum_id !== forumId) {
-    throw new NotFoundError('El mensaje padre no existe en este foro');
+  // 3. Validate that the parent message exists, is active, and belongs to the forum
+  const parentMessage = await forumModel.findMessageInForum(parentMessageId, forumId);
+  if (!parentMessage) {
+    throw new NotFoundError('El mensaje padre no existe, está inactivo o no pertenece a este foro');
   }
 
-  // 4. Validate content
-  if (!content || content.trim().length === 0) {
-    throw new BadRequestError('El contenido de la respuesta no puede estar vacío');
-  }
+  // 4. Create the reply
+  const reply = await forumModel.createReplyToMessage(forumId, userId, parentMessageId, content);
 
-  // 5. Create response
-  const reply = await createReply(forumId, userId, parentMessageId, content);
-
-  return reply;
+  // 5. Transform the response to match the expected format
+  return {
+    success: true,
+    message: 'Respuesta creada exitosamente',
+    data: {
+      messageId: reply.message_id,
+      forumId: reply.forum_id,
+      userId: reply.user_id,
+      content: reply.content,
+      parentMessageId: reply.parent_message_id,
+      publicationTimestamp: reply.publication_timestamp,
+      active: reply.active,
+      author: {
+        userId: reply.user.user_id,
+        name: reply.user.name,
+        parentLastName: reply.user.parent_last_name,
+        maternalLastName: reply.user.maternal_last_name,
+        username: reply.user.username
+      },
+      stats: {
+        repliesCount: reply._count.messages,
+        likesCount: reply._count.likes
+      }
+    }
+  };
 };
