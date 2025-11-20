@@ -1,47 +1,78 @@
 import { Request, Response } from 'express';
+
+import { NotFoundError, ConflictError } from '../util/errors.util'; 
 import { getAnalysisResultsForPatient } from '../service/analysis.service';
 
-/*
-Defining the structure of the JWT payload 
-*/
 
 interface JwtPayload {
-  
+  id: string; 
   userId: string;
   roleId: number;
   privileges: string[]; 
-
-  id: string; 
-  
   [key: string]: any; 
 }
 
-/*
-Extends the Express Request interface to include the 'user' property
- */
 interface AuthRequest extends Request {
   user?: JwtPayload; 
 }
+// -----------------------------------------------------------------------
 
-/*Controller for obtaining analysis results for the authenticated patient
+/**
+ * Get analysis results (including PDF path from 'results' table) for the authenticated patient
  */
 export const getMyAnalysisResultsController = async (req: AuthRequest, res: Response) => {
   try {
-
+    
     if (!req.user || !req.user.id) {
-
-      return res.status(401).json({ message: 'Usuario no autenticado correctamente.' });
+      return res.status(401).json({
+        success: false,
+        error: {
+          code: 'UNAUTHORIZED',
+          message: 'Usuario no autenticado correctamente.',
+        },
+      });
     }
 
     const userId = req.user.id;
 
-    
+    // 2. Service call
+    // This query fetches analysis results along with the PDF URLs in the table 'results'
     const analysisData = await getAnalysisResultsForPatient(userId);
 
-    res.status(200).json(analysisData);
+  
+    res.status(200).json({
+      success: true,
+      message: 'Analysis results retrieved successfully',
+      data: analysisData,
+    });
 
-  } catch (error) {
-    const e = error as Error;
-    res.status(500).json({ message: 'Error al obtener los resultados de análisis', error: e.message });
+  } catch (error: any) {
+    
+    if (error instanceof NotFoundError) {
+      res.status(404).json({
+        success: false,
+        error: {
+          code: 'ANALYSIS_NOT_FOUND',
+          message: error.message,
+        },
+      });
+    } else if (error instanceof ConflictError) {
+      res.status(409).json({
+        success: false,
+        error: {
+          code: 'CONFLICT_ERROR',
+          message: error.message,
+        },
+      });
+    } else {
+      
+      res.status(500).json({
+        success: false,
+        error: {
+          code: 'INTERNAL_ERROR',
+          message: 'An unexpected error occurred',
+        },
+      });
+    }
   }
 };

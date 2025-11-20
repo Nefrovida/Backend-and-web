@@ -27,12 +27,7 @@ import { Privilege } from "../types/rbac.types";
 const router = express.Router();
 
 
-//Analysis Routes
-router.get(
-  "/analysis/my-results",
-  authenticate,
-  analysisPDFController.getMyAnalysisResultsController as express.RequestHandler
-);
+
 
 // ============================================
 // Authentication Routes (Public)
@@ -159,6 +154,14 @@ router.delete(
   authenticate,
   requirePrivileges([Privilege.MANAGE_ANALYSIS_TYPES]),
   analysisController.deleteAnalysis
+);
+
+//Analysis Routes
+router.get(
+  "/analysis/my-results",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_ANALYSIS]),
+  analysisPDFController.getMyAnalysisResultsController as express.RequestHandler
 );
 
 export default router;
