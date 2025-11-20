@@ -729,8 +729,8 @@ export const replyToMessage = async (
     const result = await forumsService.replyToMessageService(
       forumId,
       userId,
-      content,
-      parent_message_id
+      parent_message_id,
+      content
     );
 
     res.status(201).json(result);
