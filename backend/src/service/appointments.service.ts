@@ -1,6 +1,7 @@
 import * as appointmentsModel from '../model/appointments.model';
 import { NotFoundError } from '../util/errors.util';
 import { PrismaClient } from "@prisma/client";
+import { Request, Response } from 'express';
 
 
 const prisma = new PrismaClient();
@@ -34,6 +35,6 @@ export const getAllAppointments = async () => {
  * @param userId 
  * @returns List appointment
  */
-export const getAllAppointmentsByUserId = async (userId: string) => {
-  return await appointmentsModel.getAppointmentByUserId(userId);
+export const getAllAppointmentsByUserId = async (req: Request, res: Response,userId: string) => {
+  return await appointmentsModel.getAppointmentByUserId(req,res, userId);
 }
