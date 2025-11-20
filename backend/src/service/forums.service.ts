@@ -156,13 +156,13 @@ export const replyToMessageService = async (
     parentMessageId,
     forumId
   );
+
+  console.log(parentMessage);
   if (!parentMessage) {
     throw new NotFoundError(
       "El mensaje padre no existe, está inactivo o no pertenece a este foro"
     );
   }
-
-  console.log("parentMesage");
 
   // 4. Create the reply
   const reply = await forumModel.createReplyToMessage(

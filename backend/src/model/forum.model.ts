@@ -695,13 +695,17 @@ export const findMessageInForum = async (
   messageId: number,
   forumId: number
 ) => {
-  return await prisma.messages.findFirst({
+  console.log(messageId, forumId);
+  const response = await prisma.messages.findFirst({
     where: {
       message_id: messageId,
       forum_id: forumId,
       active: true,
     },
   });
+
+  console.log(response);
+  return response;
 };
 
 /**
