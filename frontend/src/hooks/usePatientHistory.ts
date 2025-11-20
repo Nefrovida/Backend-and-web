@@ -8,7 +8,7 @@ export const usePatientHistory = (patientId: string) => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!patientId) return; // No buscar si no hay ID
+    if (!patientId) return; // Do not look up if there is no ID
 
     const fetchHistory = async () => {
       try {
@@ -23,7 +23,7 @@ export const usePatientHistory = (patientId: string) => {
     };
 
     fetchHistory();
-  }, [patientId]); // Se ejecuta cada vez que el patientId cambie
+  }, [patientId]); // Will execute every time that patientId changes
 
   return { history, loading, error };
 };
