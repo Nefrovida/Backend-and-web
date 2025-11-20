@@ -5,10 +5,11 @@ import Login from "../components/page/Login";
 import Register from "../components/page/Register";
 import analisisRoutes from "./analisis.routes";
 import forumsRoutes from "./forums.routes";
-import Home from "../components/page/Home";
 import historyRoutes  from './history.routes';
+import Home from "@/components/page/Home";
+import { RouteObject } from "react-router-dom";
 
-const router = createBrowserRouter([
+const homeRoutes: RouteObject[] = [
   {
     path: "/",
     element: <App />,
@@ -22,15 +23,8 @@ const router = createBrowserRouter([
       ...forumsRoutes,
       ...historyRoutes,
     ],
+    element: <Home />,
   },
-  {
-    path: "/login",
-    element: <Login />,
-  },
-  {
-    path: "/register",
-    element: <Register />,
-  },
-]);
+];
 
-export default router;
+export default homeRoutes;

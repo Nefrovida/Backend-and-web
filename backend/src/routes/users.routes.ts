@@ -4,6 +4,8 @@ import { authenticate } from "../middleware/auth.middleware";
 import { requirePrivileges } from "../middleware/rbac.middleware";
 import { Privilege } from "../types/rbac.types";
 import { exit } from "process";
+import { checkAdminStatus, getAdminUsers } from "src/controller/forums.controller";
+
 
 const router = express.Router()
 
@@ -21,8 +23,8 @@ router.get("/profile", authenticate, usersController.getProfile);
 
 router.get(
   "/",
-  // authenticate,
-  // requirePrivileges([Privilege.VIEW_USERS]),
+  authenticate,
+  requirePrivileges([Privilege.VIEW_USERS]),
   usersController.getAllUsers
 );
 
@@ -52,7 +54,5 @@ router.delete(
   requirePrivileges([Privilege.DELETE_USERS]),
   usersController.deleteUser
 );
-
-router.get("/appointments/:id",authenticate, usersController.getUserAppointments);
 
 export default router;
