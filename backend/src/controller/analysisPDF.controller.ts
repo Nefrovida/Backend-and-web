@@ -1,28 +1,26 @@
 import { Request, Response } from 'express';
-
-import { NotFoundError, ConflictError } from '../util/errors.util'; 
-import { getAnalysisResultsForPatient } from '../service/analysisPDF.service';
+import { NotFoundError, ConflictError } from '../util/errors.util';
+import * as analysisService from '../service/analysisPDF.service';
 
 
 interface JwtPayload {
-  id: string; 
+  id: string;
   userId: string;
   roleId: number;
-  privileges: string[]; 
-  [key: string]: any; 
+  privileges: string[];
+  [key: string]: any;
 }
 
 interface AuthRequest extends Request {
-  user?: JwtPayload; 
+  user?: JwtPayload;
 }
-// -----------------------------------------------------------------------
+// --------------------------------------------------------------
 
 /**
- * Get analysis results (including PDF path from 'results' table) for the authenticated patient
+ * Get analysis results (PDFs) for the authenticated patient
  */
 export const getMyAnalysisResultsController = async (req: AuthRequest, res: Response) => {
   try {
-    
     if (!req.user || !req.user.id) {
       return res.status(401).json({
         success: false,
@@ -35,11 +33,10 @@ export const getMyAnalysisResultsController = async (req: AuthRequest, res: Resp
 
     const userId = req.user.id;
 
-    // 2. Service call
-    // This query fetches analysis results along with the PDF URLs in the table 'results'
-    const analysisData = await getAnalysisResultsForPatient(userId);
+    
+    const analysisData = await analysisService.getAnalysisResultsForPatient(userId);
 
-  
+    
     res.status(200).json({
       success: true,
       message: 'Analysis results retrieved successfully',
@@ -47,12 +44,11 @@ export const getMyAnalysisResultsController = async (req: AuthRequest, res: Resp
     });
 
   } catch (error: any) {
-    
     if (error instanceof NotFoundError) {
       res.status(404).json({
         success: false,
         error: {
-          code: 'ANALYSIS_NOT_FOUND',
+          code: 'NOT_FOUND',
           message: error.message,
         },
       });
@@ -65,7 +61,6 @@ export const getMyAnalysisResultsController = async (req: AuthRequest, res: Resp
         },
       });
     } else {
-      
       res.status(500).json({
         success: false,
         error: {

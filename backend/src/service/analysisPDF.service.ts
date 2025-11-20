@@ -1,60 +1,44 @@
-import { prisma } from '../util/prisma'; 
 
-/*
- * Formats raw database data into the desired structure for analysis results into frontend
- *
+import * as analysisModel from '../model/analysisPDF.model';  
+
+/**
+ * Transform database result to response format
  */
-const formatAnalysisResults = (dbData: any[]): any[] => {
-  return dbData.map(analysis => {
-    
-    
-    const result = analysis.results; 
-    const analysisInfo = analysis.analysis;
+const transformToResponse = (dbData: any[]): any[] => {
+  return dbData.map((item) => {
+    const result = item.results;
+    const analysisInfo = item.analysis;
 
-    const date = new Date(analysis.analysis_date);
+    const date = new Date(item.analysis_date);
     const formattedDate = date.toLocaleDateString('es-ES', {
       day: '2-digit',
       month: '2-digit',
-      year: 'numeric'
+      year: 'numeric',
     });
 
     return {
-      id: analysis.patient_analysis_id,
-      name: analysisInfo.name, 
+      id: item.patient_analysis_id,
+      name: analysisInfo.name,
       date: formattedDate,
-      pdfUrl: result?.path || null 
+      pdfUrl: result?.path || null, 
     };
   });
 };
 
-
+/**
+ * Get analysis results for a patient
+ */
 export const getAnalysisResultsForPatient = async (userId: string) => {
-  try {
-    
-    const patient = await prisma.patients.findFirst({
-      where: { user_id: userId }
-    });
+  
+  const patient = await analysisModel.findPatientByUserId(userId);
 
-    if (!patient) {
-      return []; 
-    }
-
-    const dbData = await prisma.patient_analysis.findMany({
-      where: { patient_id: patient.patient_id },
-      orderBy: {
-        analysis_date: 'desc' 
-      },
-      include: {
-        analysis: true, 
-       
-        results: true
-      }
-    });
-
-    return formatAnalysisResults(dbData);
-
-  } catch (error) {
-    console.error("Error en el servicio getAnalysisResultsForPatient:", error);
-    throw error;
+  if (!patient) {
+    return [];
   }
+
+  // Call Model to get raw data
+  const rawData = await analysisModel.findAnalysisResultsByPatientId(patient.patient_id);
+
+  
+  return transformToResponse(rawData);
 };
