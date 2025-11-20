@@ -1,10 +1,7 @@
+import * as analysisModel from '../model/analysisPDF.model';
+import { AnalysisResultItem } from '../types/analysisPDF.types';
 
-import * as analysisModel from '../model/analysisPDF.model';  
-
-/**
- * Transform database result to response format
- */
-const transformToResponse = (dbData: any[]): any[] => {
+const transformToResponse = (dbData: any[]): AnalysisResultItem[] => {
   return dbData.map((item) => {
     const result = item.results;
     const analysisInfo = item.analysis;
@@ -25,10 +22,10 @@ const transformToResponse = (dbData: any[]): any[] => {
   });
 };
 
-/**
- * Get analysis results for a patient
- */
-export const getAnalysisResultsForPatient = async (userId: string) => {
+/*
+Get analysis results for a patient
+*/
+export const getAnalysisResultsForPatient = async (userId: string): Promise<AnalysisResultItem[]> => {
   
   const patient = await analysisModel.findPatientByUserId(userId);
 
@@ -38,7 +35,6 @@ export const getAnalysisResultsForPatient = async (userId: string) => {
 
   // Call Model to get raw data
   const rawData = await analysisModel.findAnalysisResultsByPatientId(patient.patient_id);
-
   
   return transformToResponse(rawData);
 };
