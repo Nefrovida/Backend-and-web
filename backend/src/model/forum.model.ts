@@ -356,23 +356,19 @@ export const getUserRole = async (forumId: number, userId: string) => {
 export const isUserMember = async (forumId: number, userId: string) => {
   const member = await prisma.users_forums.findFirst({
     where: {
-      OR: [
-        {
-          user_id: userId,
-          forum_id: forumId,
-        },
-        {
-          forum: {
-            public_status: true,
-          },
-        },
-      ],
+      user_id: userId,
+      forum_id: forumId,
     },
     include: {
       forum: true,
     },
   });
-  return member !== null;
+  const publicForums = await prisma.forums.findMany({
+    where: {
+      public_status: true,
+    },
+  });
+  return member !== null || publicForums !== null;
 };
 
 /**
