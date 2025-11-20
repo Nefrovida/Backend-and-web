@@ -1,15 +1,15 @@
 import { PatientHistoryResponse } from '../types/history.types';
 
-// El puerto 3000 es el estándar del backend
+// Port 3000 is the back-end standard
 const API_URL = 'http://localhost:3000/api'; 
 
 export const getPatientHistory = async (patientId: string): Promise<PatientHistoryResponse> => {
-  // Usamos fetch, igual que auth.service.ts
+  // Use fetch, the same as in auth.service.ts
   const response = await fetch(`${API_URL}/history/${patientId}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      // Aquí necesitarás añadir el token de autenticación del doctor
+      // Add the doctor's auth token
       // 'Authorization': `Bearer ${token}` 
     },
   });
