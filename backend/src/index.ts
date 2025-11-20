@@ -50,11 +50,6 @@ app.use(express.json());
 // Middleware to parse cookies
 app.use(cookieParser());
 
-app.use((req, res, next) => {
-  console.log(req.url);
-  next();
-});
-
 import path from "path";
 import fs from "fs/promises";
 import { raw } from "express";
