@@ -394,12 +394,10 @@ export const addForumAdministrator = async (
     // Verificar que el usuario es admin global
     const isAdmin = await forumModel.isUserAdmin(user_id);
     if (!isAdmin) {
-      res
-        .status(400)
-        .json({
-          error:
-            "Solo los administradores globales pueden ser asignados como administradores de foro",
-        });
+      res.status(400).json({
+        error:
+          "Solo los administradores globales pueden ser asignados como administradores de foro",
+      });
       return;
     }
 
@@ -611,12 +609,10 @@ export const addForumMember = async (
     // Verificar que el usuario no es admin (los admins se manejan en otro endpoint)
     const isAdmin = await forumModel.isUserAdmin(user_id);
     if (isAdmin) {
-      res
-        .status(400)
-        .json({
-          error:
-            "Los administradores deben ser agregados a través del endpoint de administradores",
-        });
+      res.status(400).json({
+        error:
+          "Los administradores deben ser agregados a través del endpoint de administradores",
+      });
       return;
     }
 
@@ -682,12 +678,10 @@ export const removeForumMember = async (
 
     // No permitir remover al OWNER o MODERATOR desde este endpoint
     if (userRole === "OWNER" || userRole === "MODERATOR") {
-      res
-        .status(400)
-        .json({
-          error:
-            "Los administradores deben ser removidos a través del endpoint de administradores",
-        });
+      res.status(400).json({
+        error:
+          "Los administradores deben ser removidos a través del endpoint de administradores",
+      });
       return;
     }
 
@@ -741,6 +735,7 @@ export const replyToMessage = async (
 
     res.status(201).json(result);
   } catch (error: any) {
+    console.log(error);
     if (error instanceof ZodError) {
       const formatted = error.issues.map((issue) => ({
         field: issue.path.join("."),

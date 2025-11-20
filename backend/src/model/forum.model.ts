@@ -695,7 +695,7 @@ export const findMessageInForum = async (
   messageId: number,
   forumId: number
 ) => {
-  console.log(messageId, forumId);
+  console.log("MID", messageId, "FID", forumId);
   const response = await prisma.messages.findFirst({
     where: {
       message_id: messageId,
