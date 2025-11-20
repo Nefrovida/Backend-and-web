@@ -1,4 +1,4 @@
-// backend/src/model/forum.model.ts
+import { users_forums } from "./../../prisma/database/prisma/client";
 import { prisma } from "../util/prisma";
 import { ForumRole } from ".prisma/client";
 
@@ -354,12 +354,22 @@ export const getUserRole = async (forumId: number, userId: string) => {
  * Check if user is member of forum
  */
 export const isUserMember = async (forumId: number, userId: string) => {
-  const member = await prisma.users_forums.findUnique({
+  const member = await prisma.users_forums.findFirst({
     where: {
-      user_id_forum_id: {
-        user_id: userId,
-        forum_id: forumId,
-      },
+      OR: [
+        {
+          user_id: userId,
+          forum_id: forumId,
+        },
+        {
+          forum: {
+            public_status: true,
+          },
+        },
+      ],
+    },
+    include: {
+      forum: true,
     },
   });
   return member !== null;
@@ -685,13 +695,16 @@ export const getForumRegularMembers = async (forumId: number) => {
 /**
  * Check if a message exists and belongs to a specific forum
  */
-export const findMessageInForum = async (messageId: number, forumId: number) => {
+export const findMessageInForum = async (
+  messageId: number,
+  forumId: number
+) => {
   return await prisma.messages.findFirst({
     where: {
       message_id: messageId,
       forum_id: forumId,
-      active: true
-    }
+      active: true,
+    },
   });
 };
 
@@ -710,7 +723,7 @@ export const createReplyToMessage = async (
       user_id: userId,
       parent_message_id: parentMessageId,
       content: content.trim(),
-      active: true
+      active: true,
     },
     include: {
       user: {
@@ -719,15 +732,15 @@ export const createReplyToMessage = async (
           name: true,
           parent_last_name: true,
           maternal_last_name: true,
-          username: true
-        }
+          username: true,
+        },
       },
       _count: {
         select: {
           messages: true,
-          likes: true
-        }
-      }
-    }
+          likes: true,
+        },
+      },
+    },
   });
 };

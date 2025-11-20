@@ -6,12 +6,18 @@ import { requirePrivileges } from "../middleware/rbac.middleware";
 import { Privilege } from "../types/rbac.types";
 import postNewMessage from "src/controller/forum/postNewMessage.controller";
 import getMyForums from "src/controller/forum/getMyForums.controller";
+import { isUserMember } from "../model/forum.model";
 
 const router = express.Router();
 
 // ============================================
 // Forum Routes (Protected)
 // ============================================
+
+router.get("/test", async (req, res) => {
+  const response = await isUserMember(1, "12345678912345678912345678912345");
+  res.status(200).send(response);
+});
 
 /**
  * Get all forums
