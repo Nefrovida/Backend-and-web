@@ -1,13 +1,14 @@
-import {prisma} from '../util/prisma'; 
+import { prisma } from '../util/prisma'; 
 
 /*
-Formats raw data from Prisma into a clean JSON that the frontend (Android) can understand.
-This function ensures that 'pdfUrl' is extracted from 'results.route'.
+ * Formats raw database data into the desired structure for analysis results into frontend
+ *
  */
 const formatAnalysisResults = (dbData: any[]): any[] => {
   return dbData.map(analysis => {
     
-    const result = analysis.results[0]; 
+    
+    const result = analysis.results; 
     const analysisInfo = analysis.analysis;
 
     const date = new Date(analysis.analysis_date);
@@ -21,7 +22,7 @@ const formatAnalysisResults = (dbData: any[]): any[] => {
       id: analysis.patient_analysis_id,
       name: analysisInfo.name, 
       date: formattedDate,
-      pdfUrl: result?.route || null 
+      pdfUrl: result?.path || null 
     };
   });
 };
@@ -35,11 +36,9 @@ export const getAnalysisResultsForPatient = async (userId: string) => {
     });
 
     if (!patient) {
-      
       return []; 
     }
 
-    
     const dbData = await prisma.patient_analysis.findMany({
       where: { patient_id: patient.patient_id },
       orderBy: {
@@ -47,7 +46,7 @@ export const getAnalysisResultsForPatient = async (userId: string) => {
       },
       include: {
         analysis: true, 
-        
+       
         results: true
       }
     });
