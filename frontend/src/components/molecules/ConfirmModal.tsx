@@ -1,6 +1,7 @@
 // frontend/src/components/molecules/ConfirmModal.tsx
 import React from "react";
 import { createPortal } from "react-dom";
+import Button from "@/components/atoms/Button";
 
 interface ConfirmModalProps {
     isOpen: boolean;
@@ -72,20 +73,20 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
                     </div>
 
                     <div className="mt-5 flex justify-end gap-3">
-                        <button
-                            type="button"
+                        <Button
                             onClick={onCancel}
-                            className="px-4 py-2 text-sm rounded-full border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors"
+                            variant="secondary"
+                            className="px-4 py-2 text-sm rounded-full border border-gray-200"
                         >
                             {cancelLabel}
-                        </button>
-                        <button
-                            type="button"
+                        </Button>
+                        <Button
                             onClick={onConfirm}
-                            className={`px-4 py-2 text-sm rounded-full font-semibold transition-colors ${styles.confirmBg} ${styles.confirmText}`}
+                            variant={variant === "danger" ? "danger" : "primary"}
+                            className="px-4 py-2 text-sm rounded-full font-semibold"
                         >
                             {confirmLabel}
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </div>

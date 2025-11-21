@@ -1,6 +1,7 @@
 // frontend/src/components/molecules/FeedbackModal.tsx
 import React from "react";
 import { createPortal } from "react-dom";
+import Button from "@/components/atoms/Button";
 
 interface FeedbackModalProps {
     isOpen: boolean;
@@ -77,13 +78,13 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
                     </div>
 
                     <div className="mt-5 flex justify-end">
-                        <button
-                            type="button"
+                        <Button
                             onClick={onClose}
                             className="px-4 py-2 text-sm rounded-full border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors"
+                            variant="secondary"
                         >
                             Cerrar
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </div>

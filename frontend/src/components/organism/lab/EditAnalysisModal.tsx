@@ -2,6 +2,7 @@
 import ModalBase from "@/components/molecules/AnalysisTypeModal";
 import React, { useEffect, useState } from "react";
 import { AnalysisResponse, UpdateAnalysisData } from "@/types/add.analysis.types";
+import Button from "@/components/atoms/Button";
 
 interface Props {
     isOpen: boolean;
@@ -162,15 +163,20 @@ const EditAnalysisModal: React.FC<Props> = ({
             </div>
 
             <div className="flex justify-center gap-4">
-                <button onClick={onClose} className="px-6 py-2 rounded-lg bg-white">
+                <Button
+                    onClick={onClose}
+                    variant="secondary"
+                    className="px-6 py-2 rounded-lg"
+                >
                     Cancelar
-                </button>
-                <button
+                </Button>
+                <Button
                     onClick={handleConfirm}
-                    className="px-6 py-2 rounded-lg bg-blue-500 text-white"
+                    variant="primary"
+                    className="px-6 py-2 rounded-lg"
                 >
                     Guardar cambios
-                </button>
+                </Button>
             </div>
         </ModalBase>
     );
