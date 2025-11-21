@@ -11,6 +11,7 @@ import {
 } from "@/types/add.analysis.types";
 import FeedbackModal from "@/components/molecules/FeedbackModal";
 import ConfirmModal from "@/components/molecules/ConfirmModal";
+import Button from "@/components/atoms/Button";
 
 // Helper to extract the friendly message from the backend
 const getBackendErrorMessage = (err: any, fallback: string) => {
@@ -98,12 +99,13 @@ const AnalysisManager: React.FC = () => {
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-xl font-bold">Administrar tipos de análisis</h1>
           {currentUser && (
-            <button
-              className="bg-blue-500 text-white px-3 py-1 rounded"
+            <Button
               onClick={() => setIsCreateOpen(true)}
+            variant="primary"
+            className="px-3 py-1 text-sm rounded-lg"
             >
               Crear análisis
-            </button>
+            </Button>
           )}
         </div>
 
@@ -152,21 +154,23 @@ const AnalysisManager: React.FC = () => {
 
                 {currentUser && (
                   <div className="flex flex-col gap-2 shrink-0">
-                    <button
-                      className="border px-3 py-1 rounded text-blue-600 text-sm"
+                    <Button
                       onClick={() => {
                         setEditingAnalysis(a);
                         setIsEditOpen(true);
                       }}
+                      variant="secondary"
+                      className="px-3 py-1 rounded text-sm border border-gray-300"
                     >
                       Editar
-                    </button>
-                    <button
-                      className="border px-3 py-1 rounded text-red-600 text-sm"
+                    </Button>
+                    <Button
                       onClick={() => setDeleteTarget(a)}
+                      variant="danger"
+                      className="px-3 py-1 rounded text-sm"
                     >
                       Eliminar
-                    </button>
+                    </Button>
                   </div>
                 )}
               </div>
