@@ -45,9 +45,20 @@ const EditAnalysisModal: React.FC<Props> = ({
     const handleConfirm = () => {
         setError("");
 
-        if (!name || name.trim().length < 3) return setError("El nombre debe tener al menos 3 caracteres");
-        if (generalCost === "" || Number.isNaN(Number(generalCost))) return setError("Ingresa el costo general");
-        if (communityCost === "" || Number.isNaN(Number(communityCost))) return setError("Ingresa el costo comunitario");
+        if (!name || name.trim().length < 3)
+            return setError("El nombre debe tener al menos 3 caracteres");
+        if (description.trim().length === 0)
+            return setError("La descripción es obligatoria");
+        if (description.trim().length > 500)
+            return setError("La descripción no puede exceder 500 caracteres");
+        if (previousRequirements.trim().length === 0)
+            return setError("Los requisitos previos son obligatorios");
+        if (previousRequirements.trim().length > 500)
+            return setError("Los requisitos previos no pueden exceder 500 caracteres");
+        if (generalCost === "" || Number.isNaN(Number(generalCost)))
+            return setError("Ingresa el costo general");
+        if (communityCost === "" || Number.isNaN(Number(communityCost)))
+            return setError("Ingresa el costo comunitario");
 
         const payload: UpdateAnalysisData = {
             name: name.trim(),

@@ -23,6 +23,13 @@ const getBackendErrorMessage = (err: any, fallback: string) => {
   return err?.message || fallback;
 };
 
+// Truncate text
+const truncate = (text: string, max: number) => {
+  const clean = text.trim();
+  if (clean.length <= max) return clean;
+  return clean.slice(0, max) + "…";
+};
+
 const AnalysisManager: React.FC = () => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -76,27 +83,40 @@ const AnalysisManager: React.FC = () => {
             analyses.map((a) => (
               <div
                 key={a.analysisId}
-                className="flex justify-between items-start border p-3 rounded-lg bg-slate-50"
+                className="flex justify-between items-start border p-3 rounded-lg bg-slate-50 gap-4 w-full overflow-hidden"
               >
-                <div className="max-w-[70%]">
-                  <div className="font-semibold">
+                <div className="max-w-[70%] w-full overflow-hidden">
+                  <div className="font-semibold break-words">
                     {a.name.trim() || "(Sin nombre)"}
                   </div>
-                  <div className="text-xs text-gray-500 whitespace-pre-line">
-                    {a.description.trim()}
+
+                  <div
+                    className="
+                      text-xs text-gray-500 whitespace-pre-line break-words
+                      overflow-hidden mt-1
+                    "
+                  >
+                    {truncate(a.description, 500)}
                   </div>
-                  <div className="text-xs text-gray-500 mt-1">
+
+                  <div
+                    className="
+                      text-xs text-gray-500 mt-1 break-words
+                      overflow-hidden
+                    "
+                  >
                     <span className="font-semibold">Requisitos: </span>
-                    {a.previousRequirements.trim()}
+                    {truncate(a.previousRequirements, 500)}
                   </div>
-                  <div className="text-xs text-gray-600 mt-1 flex gap-4">
+
+                  <div className="text-xs text-gray-600 mt-1 flex flex-wrap gap-4">
                     <span>General: ${a.generalCost}</span>
                     <span>Comunitario: ${a.communityCost}</span>
                   </div>
                 </div>
 
                 {currentUser && (
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-2 shrink-0">
                     <button
                       className="border px-3 py-1 rounded text-blue-600 text-sm"
                       onClick={() => {
