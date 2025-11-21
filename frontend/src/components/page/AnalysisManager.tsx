@@ -43,7 +43,8 @@ const AnalysisManager: React.FC = () => {
   const [editingAnalysis, setEditingAnalysis] =
     useState<AnalysisResponse | null>(null);
   const [loading, setLoading] = useState(false);
-  const [feedback, setFeedback] = useState<FeedbackState>(null); // <— nuevo
+  const [feedback, setFeedback] = useState<FeedbackState>(null);
+  const [deleteTarget, setDeleteTarget] = useState<AnalysisResponse | null>(null);
 
   const load = async () => {
     try {
@@ -65,8 +66,31 @@ const AnalysisManager: React.FC = () => {
     void load();
   }, []);
 
-
   const currentUser = authService.getCurrentUser();
+
+  const handleDeleteConfirmed = async () => {
+    if (!deleteTarget) return;
+
+    try {
+      await analysisService.deleteAnalysis(deleteTarget.analysisId);
+      await load();
+      setDeleteTarget(null);
+      setFeedback({
+        type: "success",
+        message: "Análisis eliminado correctamente.",
+      });
+    } catch (err: any) {
+      const msg = getBackendErrorMessage(
+        err,
+        "Error al eliminar el análisis"
+      );
+      setFeedback({
+        type: "error",
+        message: msg,
+      });
+      setDeleteTarget(null);
+    }
+  };
 
   return (
     <div className="p-6 min-h-screen bg-gray-50">
@@ -139,26 +163,7 @@ const AnalysisManager: React.FC = () => {
                     </button>
                     <button
                       className="border px-3 py-1 rounded text-red-600 text-sm"
-                      onClick={async () => {
-                        if (!confirm(`Eliminar "${a.name.trim()}"?`)) return;
-                        try {
-                          await analysisService.deleteAnalysis(a.analysisId);
-                          await load();
-                          setFeedback({
-                            type: "success",
-                            message: "Análisis eliminado correctamente.",
-                          });
-                        } catch (err: any) {
-                          const msg = getBackendErrorMessage(
-                            err,
-                            "Error al eliminar el análisis"
-                          );
-                          setFeedback({
-                            type: "error",
-                            message: msg,
-                          });
-                        }
-                      }}
+                      onClick={() => setDeleteTarget(a)}
                     >
                       Eliminar
                     </button>
@@ -241,6 +246,20 @@ const AnalysisManager: React.FC = () => {
         }
         message={feedback?.message || ""}
         onClose={() => setFeedback(null)}
+      />
+      <ConfirmModal
+        isOpen={deleteTarget !== null}
+        title="Eliminar análisis"
+        message={
+          deleteTarget
+            ? `¿Seguro que deseas eliminar "${deleteTarget.name.trim() || "(Sin nombre)"}"? Esta acción no se puede deshacer.`
+            : ""
+        }
+        confirmLabel="Eliminar"
+        cancelLabel="Cancelar"
+        variant="danger"
+        onCancel={() => setDeleteTarget(null)}
+        onConfirm={handleDeleteConfirmed}
       />
     </div>
   );
