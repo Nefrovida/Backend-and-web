@@ -1,4 +1,7 @@
+// backend / src / validators / analysis / add.analysis.validator.ts
 import { z } from 'zod';
+
+const MAX_COST = 5000000; // 5 million
 
 export const createAnalysisSchema = z.object({
   name: z
@@ -19,10 +22,12 @@ export const createAnalysisSchema = z.object({
   generalCost: z
     .number()
     .positive('El costo general debe ser mayor que 0')
+    .max(MAX_COST, `El costo general no debe exceder ${MAX_COST}`)
     .finite('El costo general debe ser un número válido'),
   communityCost: z
     .number()
     .positive('El costo comunitario debe ser mayor que 0')
+    .max(MAX_COST, `El costo comunitario no debe exceder ${MAX_COST}`)
     .finite('El costo comunitario debe ser un número válido'),
 });
 
@@ -49,11 +54,13 @@ export const updateAnalysisSchema = z
     generalCost: z
       .number()
       .positive('El costo general debe ser mayor que 0')
+      .max(MAX_COST, `El costo general no debe exceder ${MAX_COST}`)
       .finite('El costo general debe ser un número válido')
       .optional(),
     communityCost: z
       .number()
       .positive('El costo comunitario debe ser mayor que 0')
+      .max(MAX_COST, `El costo comunitario no debe exceder ${MAX_COST}`)
       .finite('El costo comunitario debe ser un número válido')
       .optional(),
   })

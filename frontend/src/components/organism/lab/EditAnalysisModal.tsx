@@ -10,6 +10,7 @@ interface Props {
     onConfirm: (data: UpdateAnalysisData) => void;
     externalError?: string;
 }
+const MAX_COST = 5_000_000;
 
 const EditAnalysisModal: React.FC<Props> = ({
     isOpen,
@@ -57,17 +58,34 @@ const EditAnalysisModal: React.FC<Props> = ({
             return setError("Los requisitos previos son obligatorios");
         if (previousRequirements.trim().length > 500)
             return setError("Los requisitos previos no pueden exceder 500 caracteres");
-        if (generalCost === "" || Number.isNaN(Number(generalCost)))
+
+        const parsedGeneral = Number(generalCost);
+        const parsedCommunity = Number(communityCost);
+
+        if (generalCost === "")
             return setError("Ingresa el costo general");
-        if (communityCost === "" || Number.isNaN(Number(communityCost)))
+        if (Number.isNaN(parsedGeneral))
+            return setError("El costo general debe ser un número válido");
+        if (parsedGeneral <= 0)
+            return setError("El costo general debe ser mayor que 0");
+        if (parsedGeneral > MAX_COST)
+            return setError(`El costo general no puede exceder ${MAX_COST}`);
+
+        if (communityCost === "")
             return setError("Ingresa el costo comunitario");
+        if (Number.isNaN(parsedCommunity))
+            return setError("El costo comunitario debe ser un número válido");
+        if (parsedCommunity <= 0)
+            return setError("El costo comunitario debe ser mayor que 0");
+        if (parsedCommunity > MAX_COST)
+            return setError(`El costo comunitario no puede exceder ${MAX_COST}`);
 
         const payload: UpdateAnalysisData = {
             name: name.trim(),
             description: description.trim(),
             previousRequirements: previousRequirements.trim(),
-            generalCost: Number(generalCost),
-            communityCost: Number(communityCost),
+            generalCost: parsedGeneral,
+            communityCost: parsedCommunity,
         };
 
         onConfirm(payload);
@@ -123,6 +141,8 @@ const EditAnalysisModal: React.FC<Props> = ({
                             setGeneralCost(e.target.value === "" ? "" : Number(e.target.value))
                         }
                         className="w-full p-2 rounded-lg border"
+                        min={0}
+                        max={MAX_COST}
                     />
                 </div>
 
@@ -135,6 +155,8 @@ const EditAnalysisModal: React.FC<Props> = ({
                             setCommunityCost(e.target.value === "" ? "" : Number(e.target.value))
                         }
                         className="w-full p-2 rounded-lg border"
+                        min={0}
+                        max={MAX_COST}
                     />
                 </div>
             </div>
