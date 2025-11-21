@@ -9,6 +9,8 @@ import {
   AnalysisResponse,
   UpdateAnalysisData,
 } from "@/types/add.analysis.types";
+import FeedbackModal from "@/components/molecules/FeedbackModal";
+import ConfirmModal from "@/components/molecules/ConfirmModal";
 
 // Helper to extract the friendly message from the backend
 const getBackendErrorMessage = (err: any, fallback: string) => {
@@ -30,6 +32,10 @@ const truncate = (text: string, max: number) => {
   return clean.slice(0, max) + "…";
 };
 
+type FeedbackState =
+  | { type: "success" | "error"; message: string }
+  | null;
+
 const AnalysisManager: React.FC = () => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -37,6 +43,7 @@ const AnalysisManager: React.FC = () => {
   const [editingAnalysis, setEditingAnalysis] =
     useState<AnalysisResponse | null>(null);
   const [loading, setLoading] = useState(false);
+  const [feedback, setFeedback] = useState<FeedbackState>(null); // <— nuevo
 
   const load = async () => {
     try {
@@ -45,7 +52,10 @@ const AnalysisManager: React.FC = () => {
       setAnalyses(res.data);
     } catch (err) {
       console.error(err);
-      alert("Error al cargar los exámenes");
+      setFeedback({
+        type: "error",
+        message: "Error al cargar los exámenes.",
+      });
     } finally {
       setLoading(false);
     }
@@ -54,6 +64,7 @@ const AnalysisManager: React.FC = () => {
   useEffect(() => {
     void load();
   }, []);
+
 
   const currentUser = authService.getCurrentUser();
 
@@ -133,13 +144,19 @@ const AnalysisManager: React.FC = () => {
                         try {
                           await analysisService.deleteAnalysis(a.analysisId);
                           await load();
-                          alert("Análisis eliminado");
+                          setFeedback({
+                            type: "success",
+                            message: "Análisis eliminado correctamente.",
+                          });
                         } catch (err: any) {
                           const msg = getBackendErrorMessage(
                             err,
                             "Error al eliminar el análisis"
                           );
-                          alert(msg);
+                          setFeedback({
+                            type: "error",
+                            message: msg,
+                          });
                         }
                       }}
                     >
@@ -163,13 +180,19 @@ const AnalysisManager: React.FC = () => {
             await analysisService.createAnalysis(data);
             await load();
             setIsCreateOpen(false);
-            alert("Análisis creado");
+            setFeedback({
+              type: "success",
+              message: "Análisis creado correctamente.",
+            });
           } catch (err: any) {
             const msg = getBackendErrorMessage(
               err,
               "Error al crear análisis"
             );
-            alert(msg);
+            setFeedback({
+              type: "error",
+              message: msg,
+            });
           }
         }}
       />
@@ -192,15 +215,32 @@ const AnalysisManager: React.FC = () => {
             await load();
             setIsEditOpen(false);
             setEditingAnalysis(null);
-            alert("Análisis actualizado");
+            setFeedback({
+              type: "success",
+              message: "Análisis actualizado correctamente.",
+            });
           } catch (err: any) {
             const msg = getBackendErrorMessage(
               err,
               "Error al actualizar análisis"
             );
-            alert(msg);
+            setFeedback({
+              type: "error",
+              message: msg,
+            });
           }
         }}
+      />
+      <FeedbackModal
+        isOpen={feedback !== null}
+        variant={feedback?.type === "error" ? "error" : "success"}
+        title={
+          feedback?.type === "error"
+            ? "Ocurrió un error"
+            : "Operación exitosa"
+        }
+        message={feedback?.message || ""}
+        onClose={() => setFeedback(null)}
       />
     </div>
   );
