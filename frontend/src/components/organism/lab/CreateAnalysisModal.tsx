@@ -23,7 +23,6 @@ const CreateAnalysisModal: React.FC<Props> = ({
   const [communityCost, setCommunityCost] = useState<number | "">("");
   const [error, setError] = useState("");
 
-  // Cada vez que se abre el modal, limpiamos el formulario y errores
   useEffect(() => {
     if (isOpen) {
       setName("");
@@ -44,6 +43,8 @@ const CreateAnalysisModal: React.FC<Props> = ({
 
     if (!name || name.trim().length < 3)
       return setError("El nombre debe tener al menos 3 caracteres");
+    if (name.trim().length > 50)
+      return setError("El nombre no puede exceder 50 caracteres");
     if (description.trim().length === 0)
       return setError("La descripción es obligatoria");
     if (description.trim().length > 500)
@@ -74,7 +75,6 @@ const CreateAnalysisModal: React.FC<Props> = ({
         </div>
       )}
 
-      {/* Campos iguales al modal de editar */}
       <div className="mb-3">
         <label className="block text-sm font-medium">Nombre</label>
         <input
@@ -82,6 +82,7 @@ const CreateAnalysisModal: React.FC<Props> = ({
           onChange={(e) => setName(e.target.value)}
           className="w-full p-2 rounded-lg border"
           placeholder="Ej: Hemograma"
+          maxLength={50}
         />
       </div>
 
@@ -92,6 +93,7 @@ const CreateAnalysisModal: React.FC<Props> = ({
           onChange={(e) => setDescription(e.target.value)}
           className="w-full p-2 rounded-lg border"
           rows={2}
+          maxLength={500}
         ></textarea>
       </div>
 
@@ -102,6 +104,7 @@ const CreateAnalysisModal: React.FC<Props> = ({
           onChange={(e) => setPreviousRequirements(e.target.value)}
           className="w-full p-2 rounded-lg border"
           rows={2}
+          maxLength={500}
         ></textarea>
       </div>
 

@@ -3,7 +3,7 @@ import { z } from 'zod';
 export const createAnalysisSchema = z.object({
   name: z
     .string()
-    .min(1, 'El nombre es obligatorio')
+    .min(3, 'El nombre debe tener al menos 3 caracteres')
     .max(50, 'El nombre no debe exceder 50 caracteres')
     .trim(),
   description: z
@@ -14,6 +14,7 @@ export const createAnalysisSchema = z.object({
   previousRequirements: z
     .string()
     .min(1, 'Los requisitos previos son obligatorios')
+    .max(500, 'Los requisitos previos no deben exceder 500 caracteres')
     .trim(),
   generalCost: z
     .number()
@@ -29,7 +30,7 @@ export const updateAnalysisSchema = z
   .object({
     name: z
       .string()
-      .min(1, 'El nombre no puede estar vacío')
+      .min(3, 'El nombre debe tener al menos 3 caracteres')
       .max(50, 'El nombre no debe exceder 50 caracteres')
       .trim()
       .optional(),
@@ -42,6 +43,7 @@ export const updateAnalysisSchema = z
     previousRequirements: z
       .string()
       .min(1, 'Los requisitos previos no pueden estar vacíos')
+      .max(500, 'Los requisitos previos no deben exceder 500 caracteres')
       .trim()
       .optional(),
     generalCost: z

@@ -47,6 +47,8 @@ const EditAnalysisModal: React.FC<Props> = ({
 
         if (!name || name.trim().length < 3)
             return setError("El nombre debe tener al menos 3 caracteres");
+        if (name.trim().length > 50)
+            return setError("El nombre no puede exceder 50 caracteres");
         if (description.trim().length === 0)
             return setError("La descripción es obligatoria");
         if (description.trim().length > 500)
@@ -79,13 +81,13 @@ const EditAnalysisModal: React.FC<Props> = ({
                 </div>
             )}
 
-            {/* Campos */}
             <div className="mb-3">
                 <label className="block text-sm font-medium">Nombre</label>
                 <input
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="w-full p-2 rounded-lg border"
+                    maxLength={50}
                 />
             </div>
 
@@ -96,6 +98,7 @@ const EditAnalysisModal: React.FC<Props> = ({
                     onChange={(e) => setDescription(e.target.value)}
                     className="w-full p-2 rounded-lg border"
                     rows={2}
+                    maxLength={500}
                 />
             </div>
 
@@ -106,6 +109,7 @@ const EditAnalysisModal: React.FC<Props> = ({
                     onChange={(e) => setPreviousRequirements(e.target.value)}
                     className="w-full p-2 rounded-lg border"
                     rows={2}
+                    maxLength={500}
                 />
             </div>
 
