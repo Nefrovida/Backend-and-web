@@ -8,15 +8,13 @@ import ViewNotesComponent from "../organism/notes/ViewNotesComponent";
 const Notas = ({ className }: { className?: string }) => {
   const { patients, selectedPatientId, handlePatientChange } = useGetPatients();
   const [validationError, setValidationError] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState(false);
 
-  const {
-    showModal,
-    refreshTrigger,
-    error,
-    setNoteData,
-    setShowModal,
-    handleSave,
-  } = usePostNotes(selectedPatientId, setValidationError);
+  const { refreshTrigger, error, setNoteData, handleSave } = usePostNotes(
+    selectedPatientId,
+    setValidationError,
+    setShowModal
+  );
 
   return (
     <div

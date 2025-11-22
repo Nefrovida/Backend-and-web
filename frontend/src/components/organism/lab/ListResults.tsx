@@ -17,7 +17,7 @@ function ListResult() {
   const [name, setName] = useState<string | null>(null);
   const { date, analysisType, status, labFilterUpdate } = useLabFilters();
 
-  const { results, loading, scrollRef, error, handleSearch, handleFilter } =
+  const { results, loading, scrollRef, error, handleFilter } =
     useInfiniteScroll<patientLabResults>(
       "/api/laboratory/results",
       [name, date, analysisType, status],
@@ -28,8 +28,7 @@ function ListResult() {
           end: date.end,
           analysis: analysisType,
           status,
-        }),
-      setName
+        })
     );
 
   return (
@@ -46,7 +45,7 @@ function ListResult() {
             />
           }
         />
-        <Search onChange={handleSearch} />
+        <Search onChange={setName} />
       </div>
       {loading && <div>Cargando análisis...</div>}
       {results.length == 0 && results.length == 0 && (

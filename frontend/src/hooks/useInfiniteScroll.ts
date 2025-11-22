@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 // route = /api/laboratory/results?
-async function fetchLabResults(route: string, params: string) {
+async function fetchResults(route: string, params: string) {
   const res = await fetch(`${route + "?" + params}`, {
     credentials: "include", // Include cookies in request
   });
   if (!res.ok) throw new Error("Fallo al cargar resultados");
-  return res.json();
+  return { data: await res.json(), status: res.status };
 }
 
 // Hook que automáticamente hace consultas de la nueva búsqueda al llegar al
@@ -22,8 +22,7 @@ async function fetchLabResults(route: string, params: string) {
 export default function useInfiniteScroll<T>(
   route: string,
   watch: unknown[],
-  filterFunction: (page: number) => string,
-  setName?: (s: string) => void
+  filterFunction: (page: number) => string
 ) {
   const [results, setResults] = useState<T[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
@@ -38,8 +37,11 @@ export default function useInfiniteScroll<T>(
     if (loading || !hasMore) return;
 
     setLoading(true);
-    fetchLabResults(route, filterFunction(currentPage))
-      .then((data) => {
+    fetchResults(route, filterFunction(currentPage))
+      .then(({ data, status }) => {
+        if (status == 201) {
+          return;
+        }
         setResults((prev) => [...prev, ...data]);
         setHasMore(data.length > 0);
         setCurrentPage((prev) => prev + 1);
@@ -52,7 +54,7 @@ export default function useInfiniteScroll<T>(
       .finally(() => {
         setLoading(false);
       });
-  }, [loading, hasMore, currentPage]);
+  }, [loading, hasMore, currentPage, filterFunction]);
 
   // Fetches new results when getting to the bottom of the list
   const handleScroll = useCallback(() => {
@@ -64,8 +66,7 @@ export default function useInfiniteScroll<T>(
   }, [loading, hasMore, loadMoreResults]);
 
   // Updates context to search with patient name
-  const handleSearch = useCallback((newName: string) => {
-    setName(newName);
+  const handleSearch = useCallback(() => {
     setCurrentPage(0);
     setResults([]);
     setHasMore(true);

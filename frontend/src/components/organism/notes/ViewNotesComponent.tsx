@@ -1,33 +1,39 @@
 import NotesErrorHandling from "@/components/molecules/notes/NotesErrorHandling";
 import NotesList from "@/components/molecules/notes/NotesList";
 import useGetNotes from "@/hooks/notes/useGetNotes";
-import React, { FC, useEffect, useState } from "react";
+import useInfiniteScroll from "@/hooks/useInfiniteScroll";
+import { Note } from "@/types/note";
+import React, { FC, useCallback, useEffect, useState } from "react";
 
 interface Props {
   selectedPatientId: string;
   refreshTrigger: number;
 }
 
-const ViewNotesComponent: FC<Props> = ({
-  selectedPatientId,
-  refreshTrigger,
-}) => {
-  const [notesKey, setNotesKey] = useState(0);
+const ViewNotesComponent: FC<Props> = ({ selectedPatientId }) => {
+  const buildQueryParams = useCallback(
+    (page: number) => {
+      const params = new URLSearchParams();
+      params.append("page", page.toString());
+      params.append("patientId", selectedPatientId);
+      return params.toString();
+    },
+    [selectedPatientId]
+  );
 
   const {
-    notes,
+    results: notes,
     loading,
+    hasMore,
     error: fetchError,
-  } = useGetNotes({
-    patientId: selectedPatientId || undefined,
-    refreshKey: notesKey,
-  });
-
-  useEffect(() => {
-    if (refreshTrigger > 0) {
-      setNotesKey((prev) => prev + 1);
-    }
-  }, [refreshTrigger]);
+    scrollRef,
+    handleSearch,
+    handleFilter,
+  } = useInfiniteScroll<Note>(
+    "/api/notes",
+    [selectedPatientId],
+    buildQueryParams
+  );
 
   return (
     <>

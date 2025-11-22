@@ -1,15 +1,15 @@
 import { CreateNotePayload, NoteContent } from "@/types/note";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 const MAX_GENERAL_NOTES_LENGTH = 1000;
 const MAX_AILMENTS_LENGTH = 1000;
 const MAX_PRESCRIPTION_LENGTH = 2000;
 
 function usePostNotes(
-  selectedPatient: string,
-  setValidationError: (string) => void
+  selectedPatientId: string,
+  setValidationError: (string) => void,
+  setShowModal: (boolean) => void
 ) {
-  const [showModal, setShowModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -51,14 +51,14 @@ function usePostNotes(
     }
   }
 
-  async function save() {
-    if (!selectedPatient) {
+  const save = useCallback(async () => {
+    if (!selectedPatientId) {
       setError("Selecciona un paciente");
       return;
     }
 
     const payload: CreateNotePayload = {
-      patientId: selectedPatient,
+      patientId: selectedPatientId,
       title: "Nota de consulta",
       content: "",
       general_notes: noteData.general_notes || undefined,
@@ -80,7 +80,7 @@ function usePostNotes(
         error instanceof Error ? error.message : "Error al guardar nota"
       );
     }
-  }
+  }, [selectedPatientId]);
 
   const handleSave = async () => {
     setValidationError(null);
@@ -110,13 +110,11 @@ function usePostNotes(
   };
 
   return {
-    showModal,
     isLoading,
     error,
     refreshTrigger,
     handleSave,
     setNoteData,
-    setShowModal,
     postNote,
   };
 }

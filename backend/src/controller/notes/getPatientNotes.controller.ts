@@ -7,9 +7,12 @@ async function getPatientNotes(req: Request, res: Response) {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    const { patientId } = req.query;
+    console.log(req.url);
+
+    const { page, patientId } = req.query;
 
     if (!patientId) {
+      return res.status(201).json({ message: "No patients" });
       return res.status(400).json({
         error: "patientId query parameter is required",
       });
