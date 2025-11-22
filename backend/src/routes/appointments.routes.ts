@@ -26,7 +26,7 @@ router.get(
 
 router.get("/getAllAppointments", appointmentsController.getAllAppointments);
 
-router.get("/user/:id",
+router.get("/user/:user_id",
   authenticate, 
   appointmentController.getUserAppointments);
 

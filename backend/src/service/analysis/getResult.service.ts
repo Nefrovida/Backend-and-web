@@ -70,17 +70,14 @@ export const getResultById = async (patientAnalysisId: number) => {
 };
 
 /**
- * Get all risk questions with options
+ * Get results by patient user ID
  */
-export const getRiskQuestions = async () => {
-  const questions = await Report.getRiskQuestions();
-  return questions.map(transformQuestionToResponse);
-};
+export const getResultsByUserId = async (userId: string) => {
+  const results = await Report.getResultsByUserId(userId);
 
-/**
- * Get all risk options
- */
-export const getRiskOptions = async () => {
-  const options = await Report.getRiskOptions();
-  return options.map(transformOptionToResponse);
+  if (results.length === 0) {
+    return [];
+  }
+
+  return results.map(transformResultToResponse);
 };
