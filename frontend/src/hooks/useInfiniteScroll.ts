@@ -9,7 +9,17 @@ async function fetchLabResults(route: string, params: string) {
   return res.json();
 }
 
-export default function useLabResults<T>(
+// Hook que automáticamente hace consultas de la nueva búsqueda al llegar al
+// final de un scroll
+// @route: ruta base de la API / debe tener un parámetro en page que empieze en 0
+// @watch: variables que pueden ir cambiando en el tiempo y que pueden afectar
+//    cuando se recarga los resultados / volver a page=0
+// @filterFunction: función genérica que recibe la página actual para mantener
+//    el filtro en búsquedas continuas, y regresa el string de la ruta con los
+//    queries
+// @setName: en caso de que se quiera filtrar por nombre, depende de la función
+//    filterFunction
+export default function useInfiniteScroll<T>(
   route: string,
   watch: unknown[],
   filterFunction: (page: number) => string,
