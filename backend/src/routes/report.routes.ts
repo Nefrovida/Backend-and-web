@@ -23,7 +23,7 @@ router.get(
 
 
 router.get(
-    "/get-results-IOS/:user_id",
+    "/get-results-ios/:user_id",
     authenticate,
     requirePrivileges([Privilege.VIEW_ANALYSIS]),
     getResultsByUserId
