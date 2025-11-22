@@ -38,3 +38,7 @@ export const getAllAppointments = async () => {
 export const getAllAppointmentsByUserId = async (req: Request, res: Response,userId: string) => {
   return await appointmentsModel.getAppointmentByUserId(req,res, userId);
 }
+
+export const getAppointmentByName = async (appointmentName: string) => {
+  return await appointmentsModel.getAppointmentByName(appointmentName);
+}
