@@ -1,10 +1,11 @@
+// backend/src/controller/forums.controller.ts
 import { Request, Response } from 'express';
 import { ZodError } from 'zod';
 import { createForumSchema, updateForumSchema, replyToMessageSchema } from '../validators/forum.validator';
 import * as forumsService from '../service/forums.service';
 
 import * as forumModel from '../model/forum.model';
-
+import { BadRequestError, NotFoundError } from '../util/errors.util.js';
 import { DEFAULT_ROLES } from '../config/constants';
 
 
@@ -622,10 +623,8 @@ export const removeForumMember = async (req: Request, res: Response): Promise<vo
 };
 
 
-// Forum responses
-
 /**
- * respond a message in a forum
+ * Reply to a message in a forum
  */
 export const replyToMessage = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -633,31 +632,72 @@ export const replyToMessage = async (req: Request, res: Response): Promise<void>
     const forumId = parseInt(req.params.forumId);
 
     if (isNaN(forumId)) {
-      res.status(400).json({ field: 'forumId', message: 'ID de foro inválido' });
+      res.status(400).json({
+        success: false,
+        error: {
+          code: 'INVALID_FORUM_ID',
+          message: 'El ID del foro debe ser un número válido',
+          field: 'forumId'
+        }
+      });
       return;
     }
 
     const userId = req.user!.userId;
 
-    const reply = await forumsService.replyToMessageService(
+    const result = await forumsService.replyToMessageService(
       forumId,
       userId,
       validatedData.parentMessageId,
       validatedData.content
     );
 
-    res.status(201).json(reply);
+    res.status(201).json(result);
   } catch (error: any) {
     if (error instanceof ZodError) {
       const formatted = error.issues.map((issue) => ({
-        field: issue.path?.[0],
+        field: issue.path.join('.'),
         message: issue.message,
       }));
-      res.status(400).json({ errors: formatted });
+      res.status(400).json({
+        success: false,
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Error de validación en los datos enviados',
+          details: formatted
+        }
+      });
       return;
     }
 
-    res.status(error.statusCode || 500).json({ error: error.message });
+    if (error instanceof NotFoundError) {
+      res.status(404).json({
+        success: false,
+        error: {
+          code: 'NOT_FOUND',
+          message: error.message
+        }
+      });
+      return;
+    }
+
+    if (error instanceof BadRequestError) {
+      res.status(403).json({
+        success: false,
+        error: {
+          code: 'FORBIDDEN',
+          message: error.message
+        }
+      });
+      return;
+    }
+
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Error interno del servidor al procesar la respuesta'
+      }
+    });
   }
 };
-

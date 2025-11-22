@@ -1,4 +1,3 @@
-import { users_forums } from "./../../prisma/database/prisma/browser";
 import { prisma } from "../util/prisma";
 import { ForumRole } from ".prisma/client";
 
@@ -701,4 +700,57 @@ export const getForumRegularMembers = async (forumId: number) => {
     forum_role: item.forum_role,
     role: item.user.role, // Incluir información del rol del usuario
   }));
+};
+
+/**
+ * Check if a message exists and belongs to a specific forum
+ */
+export const findMessageInForum = async (
+  messageId: number,
+  forumId: number
+) => {
+  return await prisma.messages.findFirst({
+    where: {
+      message_id: messageId,
+      forum_id: forumId,
+      active: true,
+    },
+  });
+};
+
+/**
+ * Create a reply to a message
+ */
+export const createReplyToMessage = async (
+  forumId: number,
+  userId: string,
+  parentMessageId: number,
+  content: string
+) => {
+  return await prisma.messages.create({
+    data: {
+      forum_id: forumId,
+      user_id: userId,
+      parent_message_id: parentMessageId,
+      content: content.trim(),
+      active: true,
+    },
+    include: {
+      user: {
+        select: {
+          user_id: true,
+          name: true,
+          parent_last_name: true,
+          maternal_last_name: true,
+          username: true,
+        },
+      },
+      _count: {
+        select: {
+          messages: true,
+          likes: true,
+        },
+      },
+    },
+  });
 };

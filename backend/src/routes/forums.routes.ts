@@ -196,6 +196,13 @@ router.post(
   addPatientToForumController.addPatientToForum
 );
 
+// Allow authenticated patients to join public forums (self-join)
+router.post(
+  "/:forumId/join",
+  authenticate,
+  addPatientToForumController.joinForum
+);
+
 /**
  * Reply to a message in a forum
  *

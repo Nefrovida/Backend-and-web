@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import {Request, Response} from 'express';
 
 const prisma = new PrismaClient();
 
@@ -74,13 +75,22 @@ export const getAllAppointments = async () => {
   const appointments = await prisma.appointments.findMany();
   return appointments;
 };
-  export const getAppointmentByUserId = async (UserId: string) =>{
+  export const getAppointmentByUserId = async (req: Request, res: Response, UserId: string) =>{
+    const patientId  = await prisma.patients.findFirst({
+        where: {
+            user_id: UserId
+        },
+    });
+
+    if (!patientId) {
+        return res.status(404).json({ error: 'Patient not found' });
+    }
       const appointments = await prisma.patient_appointment.findMany({
-          where: { patient_id: UserId },
+          where: { patient_id: patientId.patient_id},
       });
 
       const analysis = await prisma.patient_analysis.findMany({
-          where: { patient_id: UserId },
+          where: { patient_id: patientId.patient_id },
       });
 
       return { appointments, analysis };

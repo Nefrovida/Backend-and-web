@@ -5,28 +5,6 @@ export default class Patients {
 
   }
 
-  static async getAllPatients() {
-    return await prisma.patients.findMany({
-      select: {
-        patient_id: true,
-        curp: true,
-        user_id: true,
-        user: {
-          select: {
-            name: true,
-            parent_last_name: true,
-            maternal_last_name: true,
-          }
-        }
-      },
-      orderBy: {
-        user: {
-          name: 'asc'
-        }
-      }
-    });
-  }
-
   static async getMyPatients(doctorId: string) {
     return await prisma.patient_appointment.findMany({
       where: {
@@ -49,6 +27,30 @@ export default class Patients {
               }
             }
           }
+        }
+      }
+    })
+  }
+
+  static async getAllPatients() {
+    return await prisma.patients.findMany({
+      select: {
+        patient_id: true,
+        user: {
+          select: {
+            user_id: true,
+            name: true,
+            parent_last_name: true,
+            maternal_last_name: true,
+            phone_number: true,
+            birthday: true,
+            gender: true,
+          }
+        }
+      },
+      orderBy: {
+        user: {
+          name: 'asc'
         }
       }
     })

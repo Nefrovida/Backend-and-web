@@ -50,10 +50,17 @@ function Register() {
         return;
       }
 
-      if (formData.role_id === ROLE_IDS.DOCTOR && (!formData.specialty || !formData.license)) {
-        setError("La especialidad y cédula son requeridas para doctores");
-        setLoading(false);
-        return;
+      if (formData.role_id === ROLE_IDS.DOCTOR) {
+        if (!formData.specialty || !formData.license) {
+          setError("La especialidad y cédula son requeridas para doctores");
+          setLoading(false);
+          return;
+        }
+        if (formData.license.length < 7) {
+          setError("La cédula debe tener al menos 7 caracteres");
+          setLoading(false);
+          return;
+        }
       }
 
       if (formData.role_id === ROLE_IDS.FAMILIAR && !formData.patient_curp) {
@@ -68,7 +75,7 @@ function Register() {
       localStorage.setItem("user", JSON.stringify(response.user));
 
       // Redirect to home
-      navigate("/");
+      navigate("/dashboard");
     } catch (err: any) {
       setError(err.message || "Error en el registro");
     } finally {
@@ -276,6 +283,9 @@ function Register() {
               maxLength={20}
               required
             />
+            <p className="text-xs text-gray-500 mt-2 ml-1">
+              Debe tener al menos 7 caracteres
+            </p>
           </div>
         </>
       )}

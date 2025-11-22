@@ -20,3 +20,9 @@ export interface CreateNotePayload {
   prescription?: string;
   visibility?: boolean;
 }
+
+export interface NoteContent {
+  general_notes: string;
+  ailments: string;
+  prescription: string;
+}

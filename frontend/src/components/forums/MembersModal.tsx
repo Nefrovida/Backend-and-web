@@ -82,7 +82,7 @@ export const MembersModal: React.FC<MembersModalProps> = ({
       setIsLoading(true);
       setError('');
       
-      const response = await fetch(`http://localhost:3000/api/forums/regular-users?page=${currentPage}&limit=10`, {
+      const response = await fetch(`/api/forums/regular-users?page=${currentPage}&limit=10`, {
         credentials: 'include',
       });
 
@@ -109,7 +109,7 @@ export const MembersModal: React.FC<MembersModalProps> = ({
       setIsLoadingForum(true);
       setError('');
       
-      const response = await fetch(`http://localhost:3000/api/forums/${forum.forum_id}/members`, {
+      const response = await fetch(`/api/forums/${forum.forum_id}/members`, {
         credentials: 'include',
       });
 
@@ -136,7 +136,7 @@ export const MembersModal: React.FC<MembersModalProps> = ({
     try {
       setError('');
       
-      const response = await fetch(`http://localhost:3000/api/forums/${forum.forum_id}/members`, {
+      const response = await fetch(`/api/forums/${forum.forum_id}/members`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -169,7 +169,7 @@ export const MembersModal: React.FC<MembersModalProps> = ({
     try {
       setError('');
       
-      const response = await fetch(`http://localhost:3000/api/forums/${forum.forum_id}/members/${userId}`, {
+      const response = await fetch(`/api/forums/${forum.forum_id}/members/${userId}`, {
         method: 'DELETE',
         credentials: 'include',
       });

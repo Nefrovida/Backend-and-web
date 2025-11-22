@@ -4,7 +4,7 @@ import { RouteObject } from "react-router-dom";
 
 const forumRoutes: RouteObject[] = [
   {
-    path: "/foro",
+    path: "foro",
     element: <Forums />,
     children: [
       {

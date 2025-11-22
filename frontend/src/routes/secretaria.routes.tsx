@@ -3,7 +3,7 @@ import AgendarCitaPage from "../components/page/AgendarCitaPage";
 
 const secretariaRoutes: RouteObject[] = [
   {
-    path: "/secretaria/agendar",
+    path: "secretaria/agendar",
     element: <AgendarCitaPage />,
   },
 ];

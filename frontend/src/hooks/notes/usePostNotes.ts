@@ -1,49 +1,22 @@
-import { CreateNotePayload } from "@/types/note";
-import patient from "@/types/patient";
-import { useEffect, useState } from "react";
+import { CreateNotePayload, NoteContent } from "@/types/note";
+import { useCallback, useState } from "react";
 
-function usePostNotes() {
-  const [showModal, setShowModal] = useState(false);
-  const [patients, setPatients] = useState<patient[]>([]);
-  const [selectedPatient, setSelectedPatient] = useState<string>("");
+const MAX_GENERAL_NOTES_LENGTH = 1000;
+const MAX_AILMENTS_LENGTH = 1000;
+const MAX_PRESCRIPTION_LENGTH = 2000;
+
+function usePostNotes(
+  selectedPatientId: string,
+  setValidationError: (string) => void,
+  setShowModal: (boolean) => void
+) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const [noteData, setNoteData] = useState({
+  const [noteData, setNoteData] = useState<NoteContent>({
     general_notes: "",
     ailments: "",
     prescription: "",
   });
-
-  useEffect(() => {
-    fetch("/api/patients/doctorPatients", {
-      credentials: "include",
-    })
-      .then(async (res) => {
-        const data = await res.json();
-
-        if (!res.ok) {
-          throw new Error(data.error || "Error desconocido");
-        }
-
-        return data;
-      })
-      .then((data) => {
-        const patientsInfo: patient[] = data.map((d) => {
-          const name = d.user.name;
-          const parentalLastName = d.user.parent_last_name;
-          const maternalLastName = d.user.maternal_last_name;
-          const userId = d.patient_id;
-
-          return { name, parentalLastName, maternalLastName, userId };
-        });
-
-        setPatients(patientsInfo);
-      })
-      .catch((error) => {
-        setError(error.message || "Error al cargar pacientes");
-      });
-  }, []);
 
   async function postNote(payload: CreateNotePayload) {
     setIsLoading(true);
@@ -65,7 +38,6 @@ function usePostNotes() {
       }
 
       const data = await response.json();
-      setRefreshTrigger((prev) => prev + 1);
       return data;
     } catch (err) {
       const errorMessage =
@@ -77,14 +49,14 @@ function usePostNotes() {
     }
   }
 
-  async function save() {
-    if (!selectedPatient) {
+  const save = useCallback(async () => {
+    if (!selectedPatientId) {
       setError("Selecciona un paciente");
       return;
     }
 
     const payload: CreateNotePayload = {
-      patientId: selectedPatient,
+      patientId: selectedPatientId,
       title: "Nota de consulta",
       content: "",
       general_notes: noteData.general_notes || undefined,
@@ -106,20 +78,41 @@ function usePostNotes() {
         error instanceof Error ? error.message : "Error al guardar nota"
       );
     }
-  }
+  }, [selectedPatientId, noteData]);
+
+  const handleSave = async () => {
+    setValidationError(null);
+
+    if (noteData.general_notes.length > MAX_GENERAL_NOTES_LENGTH) {
+      setValidationError(
+        `Las notas generales no pueden exceder ${MAX_GENERAL_NOTES_LENGTH} caracteres`
+      );
+      return;
+    }
+
+    if (noteData.ailments.length > MAX_AILMENTS_LENGTH) {
+      setValidationError(
+        `Los padecimientos no pueden exceder ${MAX_AILMENTS_LENGTH} caracteres`
+      );
+      return;
+    }
+
+    if (noteData.prescription.length > MAX_PRESCRIPTION_LENGTH) {
+      setValidationError(
+        `La receta no puede exceder ${MAX_PRESCRIPTION_LENGTH} caracteres`
+      );
+      return;
+    }
+
+    await save();
+  };
 
   return {
-    showModal,
-    patients,
-    noteData,
-    setNoteData,
-    setShowModal,
-    setSelectedPatient,
-    save,
-    postNote,
     isLoading,
     error,
-    refreshTrigger,
+    handleSave,
+    setNoteData,
+    postNote,
   };
 }
 

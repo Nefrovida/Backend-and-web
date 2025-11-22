@@ -11,7 +11,7 @@ const router = express.Router()
 
 router.get("/health", (_req, res) => {
   res.status(200).json({ status: "OK" });
-});1
+});
 
 
 // ============================================
@@ -23,8 +23,8 @@ router.get("/profile", authenticate, usersController.getProfile);
 
 router.get(
   "/",
-  // authenticate,
-  // requirePrivileges([Privilege.VIEW_USERS]),
+  authenticate,
+  requirePrivileges([Privilege.VIEW_USERS]),
   usersController.getAllUsers
 );
 
