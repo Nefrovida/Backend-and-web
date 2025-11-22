@@ -4,6 +4,7 @@ const router = express.Router();
 import getAppointmentsPerDaySec from "../controller/agenda/getAppointmentsPerDaySec.controller";
 import getAppointmentsPerDay from "../controller/agenda/getAppointmentsPerDay.controller";
 import getAppointmentsInRangeC from "../controller/agenda/getAppointmentsInRange.controller";
+import getAppointmentDateAvailability from "../controller/agenda/getAppointmentDateAvailability.controller";
 
 import cancelAppointment from "src/controller/agenda/cancelAppointment.controller";
 import * as secretariaController from "../controller/agenda/secretaria.controller";
@@ -61,6 +62,13 @@ router.get(
   requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
   secretariaController.getPendingAppointmentRequests
 );
+
+router.get(
+  "/appointments/date-availability",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
+  getAppointmentDateAvailability
+)
 
 router.get(
   "/doctors",

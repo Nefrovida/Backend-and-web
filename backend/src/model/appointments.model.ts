@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import {Request, Response} from 'express';
+import { ZodError } from 'zod';
 
 const prisma = new PrismaClient();
 
@@ -75,7 +76,8 @@ export const getAllAppointments = async () => {
   const appointments = await prisma.appointments.findMany();
   return appointments;
 };
-  export const getAppointmentByUserId = async (req: Request, res: Response, UserId: string) =>{
+
+export const getAppointmentByUserId = async (req: Request, res: Response, UserId: string) =>{
     const patientId  = await prisma.patients.findFirst({
         where: {
             user_id: UserId
@@ -94,4 +96,19 @@ export const getAllAppointments = async () => {
       });
 
       return { appointments, analysis };
+}
+
+export const getAppointmentByName = async (appointmentName: string) => {
+  try {
+    const appointment = await prisma.appointments.findFirst({
+      where: { name: appointmentName },
+    });
+    if (!appointment) {
+      throw new Error("Appointment not found");
+    }
+    return appointment;
+  } catch (error) {
+    console.error('Error fetching appointment by name:', error);
+    throw new Error('Failed to fetch appointment by name');
+  }
 }
