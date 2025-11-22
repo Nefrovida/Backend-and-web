@@ -2,7 +2,7 @@
 import express, { Request, Response } from "express";
 const router = express.Router()
 
-import getResult, { getResultV2, getResultByUserId } from "../controller/analysis/report_controller";
+import getResult, { getResultV2, getResultsByUserId } from "../controller/analysis/report_controller";
 import { authenticate } from "../middleware/auth.middleware";
 import { requirePrivileges } from "../middleware/rbac.middleware";
 import { Privilege } from "../types/rbac.types";
@@ -23,10 +23,10 @@ router.get(
 
 
 router.get(
-    "/get-result-IOS/:user_id",
-    //authenticate,
-    //requirePrivileges([Privilege.VIEW_ANALYSIS]),
-    getResultByUserId
+    "/get-results-IOS/:user_id",
+    authenticate,
+    requirePrivileges([Privilege.VIEW_ANALYSIS]),
+    getResultsByUserId
 );
 
 export default router;

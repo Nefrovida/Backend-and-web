@@ -63,16 +63,16 @@ export const getResultV2 = async (req: Request, res: Response) => {
 };
 
 // ======================
-// Endpoint for Android
+// Endpoint for IOS
 // ======================
-export const getResultByUserId = async (req: Request, res: Response) => {
+export const getResultsByUserId = async (req: Request, res: Response) => {
   try {
     const userId = req.params.user_id;
-    const result = await getResultsService.getResultByUserId(userId);
+    const result = await getResultsService.getResultsByUserId(userId);
 
     res.status(200).json({
       success: true,
-      message: "Result retrieved successfully",
+      message: "Results retrieved successfully",
       data: result,
     });
   } catch (error) {

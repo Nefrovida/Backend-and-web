@@ -18,7 +18,7 @@ export default class Report {
     });
   }
 
-  static async getResultByUserId(userId: string) {
+  static async getResultsByUserId(userId: string) {
   // 1. Buscar el paciente por el user_id
   const patient = await prisma.patients.findFirst({
     where: { user_id: userId },

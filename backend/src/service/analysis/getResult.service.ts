@@ -70,10 +70,10 @@ export const getResultById = async (patientAnalysisId: number) => {
 };
 
 /**
- * Get result by patient user ID
+ * Get results by patient user ID
  */
-export const getResultByUserId = async (userId: string) => {
-  const results = await Report.getResultByUserId(userId);
+export const getResultsByUserId = async (userId: string) => {
+  const results = await Report.getResultsByUserId(userId);
 
   if (results.length === 0) {
     return [];
