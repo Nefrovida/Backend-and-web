@@ -29,32 +29,43 @@ export default function useInfiniteScroll<T>(
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
   const scrollRef = useRef<HTMLUListElement>(null);
 
-  // Fetches new results, and handle error
-  const loadMoreResults = useCallback(async () => {
-    if (loading || !hasMore) return;
+  // Use refs to avoid stale closures
+  const filterFunctionRef = useRef(filterFunction);
+  const routeRef = useRef(route);
 
-    setLoading(true);
-    fetchResults(route, filterFunction(currentPage))
-      .then(({ data, status }) => {
-        if (status == 201) {
-          return;
-        }
-        setResults((prev) => [...prev, ...data]);
-        setHasMore(data.length > 0);
-        setCurrentPage((prev) => prev + 1);
-      })
-      .catch((err) => {
-        console.error(err);
-        setError(err);
-        setHasMore(false);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [loading, hasMore, currentPage, filterFunction]);
+  useEffect(() => {
+    filterFunctionRef.current = filterFunction;
+    routeRef.current = route;
+  }, [filterFunction, route]);
+
+  // Fetches new results, and handle error
+  const loadMoreResults = useCallback(
+    async (page: number) => {
+      if (loading) return;
+
+      setLoading(true);
+      fetchResults(routeRef.current, filterFunctionRef.current(page))
+        .then(({ data, status }) => {
+          if (status == 201) {
+            return;
+          }
+          setResults((prev) => [...prev, ...data]);
+          setHasMore(data.length > 0);
+          setCurrentPage((prev) => prev + 1);
+        })
+        .catch((err) => {
+          console.error(err);
+          setError(err);
+          setHasMore(false);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    },
+    [loading, currentPage, filterFunction]
+  );
 
   // Fetches new results when getting to the bottom of the list
   const handleScroll = useCallback(() => {
@@ -62,8 +73,8 @@ export default function useInfiniteScroll<T>(
     if (!el || loading || !hasMore) return;
 
     const isBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 10;
-    if (isBottom) loadMoreResults();
-  }, [loading, hasMore, loadMoreResults]);
+    if (isBottom) loadMoreResults(currentPage);
+  }, [loading, hasMore, loadMoreResults, currentPage]);
 
   // Updates context to search with patient name
   const handleSearch = useCallback(() => {
@@ -91,7 +102,7 @@ export default function useInfiniteScroll<T>(
     setCurrentPage(0);
     setResults([]);
     setHasMore(true);
-    loadMoreResults();
+    loadMoreResults(0);
   }, [...watch]);
 
   return {

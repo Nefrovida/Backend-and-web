@@ -16,7 +16,7 @@ const NotesErrorHandling: FC<Props> = ({
 }) => {
   return (
     <>
-      {loading && (
+      {loading && notes.length <= 0 && (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
           <p className="text-gray-600">Cargando notas...</p>
         </div>

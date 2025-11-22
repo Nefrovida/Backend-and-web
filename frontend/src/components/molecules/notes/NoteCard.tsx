@@ -10,7 +10,7 @@ interface Props {
 
 const NoteCard: FC<Props> = ({ note }) => {
   return (
-    <div
+    <li
       key={note.note_id}
       className="bg-gray-50 rounded-lg border border-gray-200 p-4 hover:bg-gray-100 transition-colors"
     >
@@ -23,7 +23,7 @@ const NoteCard: FC<Props> = ({ note }) => {
       </div>
 
       <NoteVisibility visibility={note.visibility} />
-    </div>
+    </li>
   );
 };
 
