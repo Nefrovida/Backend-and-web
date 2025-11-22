@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import Title from "../atoms/Title";
 import NewNoteModal from "../molecules/notes/NewNoteModal";
 import CancelNoteButton from "../atoms/notes/CancelNoteButton";
 import SaveNoteButton from "../atoms/notes/SaveNoteButton";
@@ -11,7 +10,7 @@ const MAX_GENERAL_NOTES_LENGTH = 1000;
 const MAX_AILMENTS_LENGTH = 1000;
 const MAX_PRESCRIPTION_LENGTH = 2000;
 
-const Notas = ({ className }: { className: string }) => {
+const Notas = ({ className }: { className?: string }) => {
   const {
     showModal,
     patients,
@@ -78,11 +77,10 @@ const Notas = ({ className }: { className: string }) => {
 
   return (
     <div
-      className={`absolute top-0 left-14 bg-gray-200 w-[45vw] h-screen flex flex-col z-50 p-4 overflow-hidden ${className}`}
+      className={` bg-gray-200 w-[45vw] h-screen flex flex-col z-50 p-4 overflow-hidden ${className}`}
     >
       <div className="max-w-3xl mx-auto w-full flex flex-col h-full">
-        <div className="mb-4 flex-shrink-0">
-        </div>
+        <div className="mb-4 flex-shrink-0"></div>
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4 flex-shrink-0">
           <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
