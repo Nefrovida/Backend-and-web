@@ -1,8 +1,8 @@
 import { type Request, type Response } from "express";
-import { ZodError } from 'zod';
-import { createNoteSchema } from '../../validators/notes.validator';
-import * as notesService from '../../service/notes.service';
-import { prisma } from '../../util/prisma';
+import { ZodError } from "zod";
+import { createNoteSchema } from "../../validators/notes.validator";
+import * as notesService from "../../service/notes.service";
+import { prisma } from "../../util/prisma";
 
 /**
  * Controller to create a new clinical note
@@ -28,7 +28,9 @@ async function postNote(req: Request, res: Response) {
     });
 
     if (!patientBelongsToDoctor) {
-      return res.status(403).json({ error: "Forbidden: patient does not belong to this doctor" });
+      return res
+        .status(403)
+        .json({ error: "Forbidden: patient does not belong to this doctor" });
     }
 
     // Create the note using the service
@@ -39,7 +41,7 @@ async function postNote(req: Request, res: Response) {
       general_notes: validatedData.general_notes,
       ailments: validatedData.ailments,
       prescription: validatedData.prescription,
-      visibility: validatedData.visibility
+      visibility: validatedData.visibility,
     });
 
     return res.status(201).json(note);
@@ -49,7 +51,7 @@ async function postNote(req: Request, res: Response) {
     }
     console.error("Error creating note:", error);
     return res.status(500).json({
-      error: "Error creating note"
+      error: "Error creating note",
     });
   }
 }

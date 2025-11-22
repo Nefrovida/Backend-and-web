@@ -1,15 +1,21 @@
-import React, { FC } from 'react'
-import Pill from '../Pill'
-import {BsPlus} from "react-icons/bs"
+import React, { FC } from "react";
 
 interface Props {
-  openModal: () => void,
+  setShowModal: (x: boolean) => void;
 }
 
-const NewNoteButton: FC<Props> = ({openModal}) =>  {
+const NewNoteButton: FC<Props> = ({ setShowModal }) => {
   return (
-    <Pill text='Nueva nota' icon={<BsPlus/>} className='bg-green-300 hover:bg-green-400' onClick={openModal}/>
-  )
-}
+    <div className="mt-4 sm:mt-6">
+      <button
+        onClick={() => setShowModal(true)}
+        className="inline-flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 transition-colors shadow-sm"
+      >
+        <span className="text-xl">+</span>
+        Nueva nota
+      </button>
+    </div>
+  );
+};
 
-export default NewNoteButton
+export default NewNoteButton;
