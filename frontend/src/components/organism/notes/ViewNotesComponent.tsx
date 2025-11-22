@@ -6,7 +6,6 @@ import React, { FC, useCallback } from "react";
 
 interface Props {
   selectedPatientId: string;
-  refreshTrigger: number;
 }
 
 const ViewNotesComponent: FC<Props> = ({ selectedPatientId }) => {

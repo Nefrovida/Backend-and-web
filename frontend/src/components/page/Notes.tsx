@@ -5,12 +5,12 @@ import NotesTopController from "../organism/notes/NotesTopController";
 import NewNoteComponent from "../organism/notes/NewNoteComponent";
 import ViewNotesComponent from "../organism/notes/ViewNotesComponent";
 
-const Notas = ({ className }: { className?: string }) => {
+const Notes = ({ className }: { className?: string }) => {
   const { patients, selectedPatientId, handlePatientChange } = useGetPatients();
   const [validationError, setValidationError] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
 
-  const { refreshTrigger, error, setNoteData, handleSave } = usePostNotes(
+  const { isLoading, error, setNoteData, handleSave } = usePostNotes(
     selectedPatientId,
     setValidationError,
     setShowModal
@@ -35,15 +35,13 @@ const Notas = ({ className }: { className?: string }) => {
             <NewNoteComponent
               validationError={validationError}
               error={error}
+              isLoading={isLoading}
               setShowModal={setShowModal}
               handleSave={handleSave}
               setNoteData={setNoteData}
             />
           ) : (
-            <ViewNotesComponent
-              selectedPatientId={selectedPatientId}
-              refreshTrigger={refreshTrigger}
-            />
+            <ViewNotesComponent selectedPatientId={selectedPatientId} />
           )}
         </div>
       </div>
@@ -51,4 +49,4 @@ const Notas = ({ className }: { className?: string }) => {
   );
 };
 
-export default Notas;
+export default Notes;

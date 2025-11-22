@@ -12,7 +12,6 @@ function usePostNotes(
 ) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [noteData, setNoteData] = useState<NoteContent>({
     general_notes: "",
     ailments: "",
@@ -39,7 +38,6 @@ function usePostNotes(
       }
 
       const data = await response.json();
-      setRefreshTrigger((prev) => prev + 1);
       return data;
     } catch (err) {
       const errorMessage =
@@ -80,7 +78,7 @@ function usePostNotes(
         error instanceof Error ? error.message : "Error al guardar nota"
       );
     }
-  }, [selectedPatientId]);
+  }, [selectedPatientId, noteData]);
 
   const handleSave = async () => {
     setValidationError(null);
@@ -112,7 +110,6 @@ function usePostNotes(
   return {
     isLoading,
     error,
-    refreshTrigger,
     handleSave,
     setNoteData,
     postNote,

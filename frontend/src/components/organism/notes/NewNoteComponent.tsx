@@ -6,6 +6,7 @@ import { FC } from "react";
 interface Props {
   validationError: string | null;
   error: string | null;
+  isLoading: boolean;
   setShowModal: (b: boolean) => void;
   handleSave: () => void;
   setNoteData: (x: NoteContent) => void;
@@ -14,6 +15,7 @@ interface Props {
 const NewNoteComponent: FC<Props> = ({
   validationError,
   error,
+  isLoading,
   setShowModal,
   handleSave,
   setNoteData,
@@ -21,6 +23,7 @@ const NewNoteComponent: FC<Props> = ({
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col h-full">
       <NewNoteFunctionButtons
+        isLoading={isLoading}
         setShowModal={setShowModal}
         handleSave={handleSave}
       />

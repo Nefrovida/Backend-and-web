@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import { NavLink, useNavigate } from "react-router-dom";
-import Notas from "../page/Notas";
+import Notes from "../page/Notes";
 import {
   BsPerson,
   BsFillPersonFill,
@@ -390,7 +390,7 @@ function Navbar({ children }: Props) {
           </div>
 
           <div className="flex-1 overflow-y-auto p-0 bg-white relative">
-            <Notas />
+            <Notes />
           </div>
         </div>
       </div>
