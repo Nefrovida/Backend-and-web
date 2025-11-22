@@ -73,11 +73,11 @@ export const getResultById = async (patientAnalysisId: number) => {
  * Get result by patient user ID
  */
 export const getResultByUserId = async (userId: string) => {
-  const result = await Report.getResultByUserId(userId);
+  const results = await Report.getResultByUserId(userId);
 
-  if (!result || result === null) {
-    throw new NotFoundError(`No result found for the user id: ${userId}`);
+  if (results.length === 0) {
+    return [];
   }
 
-  return transformResultToResponse(result);
+  return results.map(transformResultToResponse);
 };
