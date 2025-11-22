@@ -70,17 +70,14 @@ export const getResultById = async (patientAnalysisId: number) => {
 };
 
 /**
- * Get all risk questions with options
+ * Get result by patient user ID
  */
-export const getRiskQuestions = async () => {
-  const questions = await Report.getRiskQuestions();
-  return questions.map(transformQuestionToResponse);
-};
+export const getResultByUserId = async (userId: string) => {
+  const result = await Report.getResultByUserId(userId);
 
-/**
- * Get all risk options
- */
-export const getRiskOptions = async () => {
-  const options = await Report.getRiskOptions();
-  return options.map(transformOptionToResponse);
+  if (!result || result === null) {
+    throw new NotFoundError(`No result found for the user id: ${userId}`);
+  }
+
+  return transformResultToResponse(result);
 };

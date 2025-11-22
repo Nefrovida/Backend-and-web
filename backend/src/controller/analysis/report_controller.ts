@@ -62,13 +62,47 @@ export const getResultV2 = async (req: Request, res: Response) => {
   }
 };
 
-export const getRiskQuestions = async (req: Request, res: Response) => {
+// ======================
+// Endpoint for Android
+// ======================
+export const getResultByUserId = async (req: Request, res: Response) => {
   try {
-    const questions = await getResultsService.getRiskQuestions();
-    res.status(200).json(questions);
+    const userId = req.params.user_id;
+    const result = await getResultsService.getResultByUserId(userId);
+
+    res.status(200).json({
+      success: true,
+      message: "Result retrieved successfully",
+      data: result,
+    });
   } catch (error) {
-    console.error('Error fetching risk questions:', error);
-    res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Internal Server Error' } });
+    if (error instanceof ZodError) {
+      res.status(400).json({
+        success: false,
+        error: {
+          code: "VALIDATION_ERROR",
+          message: "Invalid patient_analysis_id",
+          details: error.errors,
+        },
+      });
+    } else if (error instanceof NotFoundError) {
+      res.status(404).json({
+        success: false,
+        error: {
+          code: "RESULT_NOT_FOUND",
+          message: error.message,
+        },
+      });
+    } else {
+      console.error(error);
+      res.status(500).json({
+        success: false,
+        error: {
+          code: "INTERNAL_ERROR",
+          message: "An unexpected error occurred",
+        },
+      });
+    }
   }
 };
 
