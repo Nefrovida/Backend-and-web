@@ -7,6 +7,7 @@ import { ForumConfigModal } from '../../components/forums/ForumConfigModal';
 import { AdministratorsModal } from '../../components/forums/AdministratorsModal';
 import { MembersModal } from '../../components/forums/MembersModal';
 import { DeleteForumModal } from '../../components/forums/DeleteForumModal';
+import { Toast } from '../../components/forums/Toast';
 
 const API_BASE = (import.meta as any).env?.VITE_APP_API_URL || 'http://localhost:3001/api';
 
@@ -43,6 +44,7 @@ export const ForumsPage = () => {
   const [isAdministratorsModalOpen, setIsAdministratorsModalOpen] = useState(false);
   const [isMembersModalOpen, setIsMembersModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
 
   // Fetch forums on component mount
   useEffect(() => {
@@ -74,7 +76,7 @@ export const ForumsPage = () => {
   const handleCreateForum = async (data: CreateForumData) => {
     try {
       setModalError(''); // Clear previous modal errors
-      
+
       const response = await fetch(`${API_BASE}/forums`, {
         method: 'POST',
         credentials: 'include',
@@ -86,14 +88,14 @@ export const ForumsPage = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        
+
         // Handle validation errors from Zod
         if (errorData.errors && Array.isArray(errorData.errors)) {
           const firstError = errorData.errors[0];
           setModalError(firstError.message);
           return; // Don't close modal, show error
         }
-        
+
         // Handle other errors
         setModalError(errorData.error || 'Error al crear el foro');
         return; // Don't close modal, show error
@@ -103,7 +105,7 @@ export const ForumsPage = () => {
       setForums([newForum, ...forums]);
       setIsModalOpen(false);
       setModalError(''); // Clear error on success
-      alert('Foro creado exitosamente');
+      setToast({ message: 'Foro creado exitosamente', type: 'success' });
     } catch (err: any) {
       setModalError(err.message || 'Error al crear el foro');
       console.error('Error creating forum:', err);
@@ -113,7 +115,7 @@ export const ForumsPage = () => {
   const handleUpdateForum = async (forumId: number, publicStatus: boolean) => {
     try {
       setModalError(''); // Clear previous modal errors
-      
+
       const response = await fetch(`${API_BASE}/forums/${forumId}`, {
         method: 'PUT',
         credentials: 'include',
@@ -125,27 +127,27 @@ export const ForumsPage = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        
+
         // Handle validation errors from Zod
         if (errorData.errors && Array.isArray(errorData.errors)) {
           const firstError = errorData.errors[0];
           setModalError(firstError.message);
           return; // Don't close modal, show error
         }
-        
+
         // Handle other errors
         setModalError(errorData.error || 'Error al actualizar el foro');
         return; // Don't close modal, show error
       }
 
       const updatedForum = await response.json();
-      setForums(forums.map(forum => 
+      setForums(forums.map(forum =>
         forum.forum_id === forumId ? updatedForum : forum
       ));
       setIsUpdateModalOpen(false);
       setSelectedForum(null);
       setModalError(''); // Clear error on success
-      alert('Visibilidad del foro actualizada exitosamente');
+      setToast({ message: 'Visibilidad del foro actualizada exitosamente', type: 'success' });
     } catch (err: any) {
       setModalError(err.message || 'Error al actualizar el foro');
       console.error('Error updating forum:', err);
@@ -189,7 +191,7 @@ export const ForumsPage = () => {
   const handleDeleteForum = async (forumId: number) => {
     try {
       setModalError(''); // Clear previous modal errors
-      
+
       const response = await fetch(`${API_BASE}/forums/${forumId}`, {
         method: 'DELETE',
         credentials: 'include',
@@ -197,14 +199,14 @@ export const ForumsPage = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        
+
         // Handle validation errors from Zod
         if (errorData.errors && Array.isArray(errorData.errors)) {
           const firstError = errorData.errors[0];
           setModalError(firstError.message);
           return; // Don't close modal, show error
         }
-        
+
         // Handle other errors
         setModalError(errorData.error || 'Error al eliminar el foro');
         return; // Don't close modal, show error
@@ -215,7 +217,7 @@ export const ForumsPage = () => {
       setIsDeleteModalOpen(false);
       setSelectedForum(null);
       setModalError(''); // Clear error on success
-      alert('Foro eliminado exitosamente');
+      setToast({ message: 'Foro eliminado exitosamente', type: 'success' });
     } catch (err: any) {
       setModalError(err.message || 'Error al eliminar el foro');
       console.error('Error deleting forum:', err);
@@ -393,6 +395,15 @@ export const ForumsPage = () => {
         forum={selectedForum}
         externalError={modalError}
       />
+
+      {/* Toast Notification */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 };

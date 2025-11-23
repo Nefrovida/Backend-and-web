@@ -118,9 +118,12 @@ export const ForumConfigModal: React.FC<ForumConfigModalProps> = ({
   ];
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      onClick={onClose}
+    >
       <div
-        className="bg-[#CFE6ED] rounded-3xl shadow-2xl p-6 w-full max-w-sm mx-4"
+        className="bg-[#CFE6ED] rounded-3xl shadow-2xl p-6 w-full max-w-md mx-4"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -165,11 +168,10 @@ export const ForumConfigModal: React.FC<ForumConfigModalProps> = ({
                 onClose();
                 item.onClick();
               }}
-              className={`w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-left ${
-                item.isDestructive
+              className={`w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-left ${item.isDestructive
                   ? 'bg-white hover:bg-red-50 text-red-600 hover:text-red-700'
                   : 'bg-white hover:bg-gray-50 text-gray-800'
-              }`}
+                }`}
             >
               <span className={`font-medium ${item.isDestructive ? 'text-red-600' : 'text-gray-800'}`}>
                 {item.label}
