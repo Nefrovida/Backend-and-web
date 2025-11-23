@@ -47,6 +47,8 @@ const router = express.Router();
  */
 router.get("/myForums", authenticate, getMyForums);
 
+router.get("/feed", authenticate, getForumFeed);
+
 router.get(
   "/",
   authenticate,
@@ -106,8 +108,6 @@ router.post(
 );
 
 router.post("/:forumId", authenticate, postNewMessage);
-
-router.get("/feed", authenticate, getForumFeed);
 
 /**
  * Update a forum

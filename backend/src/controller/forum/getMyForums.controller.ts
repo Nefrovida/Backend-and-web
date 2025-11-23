@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { getAll } from "../forums.controller";
 import Forum from "src/model/forum.model";
 
+// Get public and joined forums: max 10
 async function getMyForums(req: Request, res: Response) {
   try {
     const userId = req.user!.userId;

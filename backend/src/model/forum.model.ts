@@ -1,5 +1,7 @@
+import { messages } from "./../../prisma/database/prisma/client";
 import { prisma } from "../util/prisma";
 import { ForumRole } from ".prisma/client";
+import { Message } from "../types/forum.types";
 
 export default class Forum {
   Forum() {}
@@ -28,6 +30,7 @@ export default class Forum {
         forum_id: true,
         name: true,
       },
+      take: 5,
     });
   }
 
@@ -44,6 +47,7 @@ export default class Forum {
           },
         },
       },
+      take: 5,
     });
 
     const publicForums = await this.getPublicForums();
@@ -51,8 +55,49 @@ export default class Forum {
     return [...myForums, ...publicForums];
   }
 
-  static async getForumFeed(userId: string) {
-    return await prisma.users_forums;
+  static async getForumFeed(page: number, userId: string): Promise<Message[]> {
+    const pagination = 6;
+    return await prisma.messages.findMany({
+      take: pagination,
+      skip: pagination * page,
+      where: {
+        forum: {
+          OR: [
+            { public_status: true },
+            {
+              users_forums: {
+                some: {
+                  user_id: userId,
+                },
+              },
+            },
+          ],
+        },
+        parent_message_id: null,
+        active: true,
+      },
+      select: {
+        message_id: true,
+        content: true,
+        publication_timestamp: true,
+        _count: {
+          select: {
+            likes: true,
+            messages: true,
+          },
+        },
+        forum: {
+          select: {
+            forum_id: true,
+            name: true,
+          },
+        },
+      },
+
+      orderBy: {
+        publication_timestamp: "desc",
+      },
+    });
   }
 }
 
