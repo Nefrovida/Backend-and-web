@@ -77,7 +77,7 @@ const MedicalRecordFormPage = () => {
       }
 
       // Note: PDFs are uploaded individually using the "Subir PDF" button on each analysis
-      navigate(`/expediente/${patientId}`);
+      navigate(`/dashboard/expediente/${patientId}`);
     } catch (error) {
       console.error("Error:", error);
       alert("Error al guardar el historial clínico");
