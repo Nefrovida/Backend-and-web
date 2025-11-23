@@ -59,7 +59,10 @@ export const DeleteForumModal: React.FC<DeleteForumModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]">
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]"
+      onClick={handleCancel}
+    >
       <div
         className="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-md mx-4"
         onClick={(e) => e.stopPropagation()}
@@ -114,7 +117,7 @@ export const DeleteForumModal: React.FC<DeleteForumModalProps> = ({
         </h2>
 
         <p className="text-gray-600 mb-6 text-center">
-          Esta acción eliminará permanentemente el foro <strong>"{forum.name}"</strong> y todo su contenido. 
+          Esta acción eliminará permanentemente el foro <strong>"{forum.name}"</strong> y todo su contenido.
           Esta acción no se puede deshacer.
         </p>
 
@@ -150,11 +153,10 @@ export const DeleteForumModal: React.FC<DeleteForumModalProps> = ({
           <button
             onClick={handleConfirm}
             disabled={!isConfirmValid}
-            className={`px-6 py-2 font-medium rounded-lg transition-colors shadow-sm ${
-              isConfirmValid
+            className={`px-6 py-2 font-medium rounded-lg transition-colors shadow-sm ${isConfirmValid
                 ? 'bg-red-500 text-white hover:bg-red-600'
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            }`}
+              }`}
           >
             Eliminar Foro
           </button>
