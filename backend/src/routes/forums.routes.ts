@@ -62,6 +62,7 @@ router.get(
   requirePrivileges([Privilege.VIEW_FORUMS]),
   forumsController.getById
 );
+router.get("/myForums", authenticate, getMyForums);
 
 router.get(
   "/me",
@@ -107,19 +108,6 @@ router.post(
   forumsController.create
 );
 
-router.post("/:forumId", authenticate, postNewMessage);
-
-/**
- * Update a forum
- *
- */
-router.put(
-  "/:forumId",
-  authenticate,
-  requirePrivileges([Privilege.UPDATE_FORUMS]),
-  forumsController.update
-);
-
 // Admin routes - Get admin users with pagination
 router.get(
   "/admin-users",
@@ -142,6 +130,26 @@ router.get(
   authenticate,
   requirePrivileges([Privilege.VIEW_USERS]),
   forumsController.checkAdminStatus
+);
+
+router.get(
+  "/:forumId",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_FORUMS]),
+  forumsController.getById
+);
+
+router.post("/:forumId", authenticate, postNewMessage);
+
+/**
+ * Update a forum
+ *
+ */
+router.put(
+  "/:forumId",
+  authenticate,
+  requirePrivileges([Privilege.UPDATE_FORUMS]),
+  forumsController.update
 );
 
 // Forum administrators routes

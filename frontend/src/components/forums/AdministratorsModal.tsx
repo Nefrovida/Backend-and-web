@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Forum } from '../../types/forum.types';
 
+const API_BASE = (import.meta as any).env?.VITE_APP_API_URL || 'http://localhost:3001/api';
+
 interface Administrator {
   user_id: string;
   name: string;
@@ -80,7 +82,7 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
       setIsLoading(true);
       setError('');
       
-      const response = await fetch(`/api/forums/admin-users?page=${currentPage}&limit=10`, {
+      const response = await fetch(`${API_BASE}/forums/admin-users?page=${currentPage}&limit=10`, {
         credentials: 'include',
       });
 
@@ -107,7 +109,7 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
       setIsLoadingForum(true);
       setError('');
       
-      const response = await fetch(`/api/forums/${forum.forum_id}/administrators`, {
+      const response = await fetch(`${API_BASE}/forums/${forum.forum_id}/administrators`, {
         credentials: 'include',
       });
 
@@ -134,7 +136,7 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
     try {
       setError('');
       
-      const response = await fetch(`/api/forums/${forum.forum_id}/administrators`, {
+      const response = await fetch(`${API_BASE}/forums/${forum.forum_id}/administrators`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -174,7 +176,7 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
     try {
       setError('');
       
-      const response = await fetch(`/api/forums/${forum.forum_id}/administrators/${userId}`, {
+      const response = await fetch(`${API_BASE}/forums/${forum.forum_id}/administrators/${userId}`, {
         method: 'DELETE',
         credentials: 'include',
       });

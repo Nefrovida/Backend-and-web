@@ -53,9 +53,9 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 20;
     const search = req.query.search as string | undefined;
-    let isPublic = req.query.isPublic === 'true' ? true : 
-                   req.query.isPublic === 'false' ? false : 
-                   undefined;
+    let isPublic = req.query.isPublic === 'true' ? true :
+      req.query.isPublic === 'false' ? false :
+        undefined;
 
     // If the user is a Patient and did not specify a visibility filter, default to public-only forums
     if (req.query.isPublic === undefined && req.user?.roleId === DEFAULT_ROLES.PATIENT) {
@@ -87,7 +87,7 @@ export const getById = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-  const forum = await forumsService.getForumById(forumId);
+    const forum = await forumsService.getForumById(forumId);
 
     if (!forum) {
       res.status(404).json({ error: 'Foro no encontrado' });
@@ -241,7 +241,7 @@ export const getAdminUsers = async (req: Request, res: Response): Promise<void> 
     res.status(200).json(response);
   } catch (error: any) {
     console.error('Error fetching admin users:', error);
-    res.status(error.statusCode || 500).json({ 
+    res.status(error.statusCode || 500).json({
       error: error.message || 'Error interno del servidor al obtener administradores'
     });
   }
@@ -258,7 +258,7 @@ export const getAdminUsers = async (req: Request, res: Response): Promise<void> 
 export const checkAdminStatus = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = req.params.userId;
-    
+
     if (!userId) {
       res.status(400).json({ error: 'ID de usuario requerido' });
       return;
@@ -266,14 +266,14 @@ export const checkAdminStatus = async (req: Request, res: Response): Promise<voi
 
     const isAdmin = await forumModel.isUserAdmin(userId);
 
-    res.status(200).json({ 
+    res.status(200).json({
       userId,
       isAdmin,
       message: isAdmin ? 'El usuario es administrador' : 'El usuario no es administrador'
     });
   } catch (error: any) {
     console.error('Error checking admin status:', error);
-    res.status(error.statusCode || 500).json({ 
+    res.status(error.statusCode || 500).json({
       error: error.message || 'Error interno del servidor al verificar estado de administrador'
     });
   }
@@ -285,7 +285,7 @@ export const checkAdminStatus = async (req: Request, res: Response): Promise<voi
 export const getForumAdministrators = async (req: Request, res: Response): Promise<void> => {
   try {
     const forumId = parseInt(req.params.forumId);
-    
+
     if (isNaN(forumId)) {
       res.status(400).json({ error: 'ID de foro inválido' });
       return;
@@ -301,7 +301,7 @@ export const getForumAdministrators = async (req: Request, res: Response): Promi
     // Obtener administradores del foro (OWNER y MODERATOR)
     const administrators = await forumModel.getForumAdministrators(forumId);
 
-    res.status(200).json({ 
+    res.status(200).json({
       data: administrators,
       forum: {
         forum_id: forum.forum_id,
@@ -310,7 +310,7 @@ export const getForumAdministrators = async (req: Request, res: Response): Promi
     });
   } catch (error: any) {
     console.error('Error fetching forum administrators:', error);
-    res.status(error.statusCode || 500).json({ 
+    res.status(error.statusCode || 500).json({
       error: error.message || 'Error interno del servidor'
     });
   }
@@ -323,7 +323,7 @@ export const addForumAdministrator = async (req: Request, res: Response): Promis
   try {
     const forumId = parseInt(req.params.forumId);
     const { user_id } = req.body;
-    
+
     if (isNaN(forumId)) {
       res.status(400).json({ error: 'ID de foro inválido' });
       return;
@@ -350,7 +350,7 @@ export const addForumAdministrator = async (req: Request, res: Response): Promis
 
     // Verificar si ya está en el foro
     const existingRole = await forumModel.getUserRole(forumId, user_id);
-    
+
     if (existingRole) {
       // Si ya está en el foro, actualizar a MODERATOR
       await forumModel.updateUserRole(forumId, user_id, 'MODERATOR');
@@ -359,7 +359,7 @@ export const addForumAdministrator = async (req: Request, res: Response): Promis
       await forumModel.addUserToForum(forumId, user_id, 'MODERATOR');
     }
 
-    res.status(200).json({ 
+    res.status(200).json({
       message: 'Usuario asignado como administrador del foro exitosamente',
       user_id,
       forum_id: forumId,
@@ -367,7 +367,7 @@ export const addForumAdministrator = async (req: Request, res: Response): Promis
     });
   } catch (error: any) {
     console.error('Error adding forum administrator:', error);
-    res.status(error.statusCode || 500).json({ 
+    res.status(error.statusCode || 500).json({
       error: error.message || 'Error interno del servidor'
     });
   }
@@ -380,7 +380,7 @@ export const removeForumAdministrator = async (req: Request, res: Response): Pro
   try {
     const forumId = parseInt(req.params.forumId);
     const userId = req.params.userId;
-    
+
     if (isNaN(forumId)) {
       res.status(400).json({ error: 'ID de foro inválido' });
       return;
@@ -414,14 +414,14 @@ export const removeForumAdministrator = async (req: Request, res: Response): Pro
     // Remover del foro completamente
     await forumModel.removeUserFromForum(forumId, userId);
 
-    res.status(200).json({ 
+    res.status(200).json({
       message: 'Administrador removido del foro exitosamente',
       user_id: userId,
       forum_id: forumId
     });
   } catch (error: any) {
     console.error('Error removing forum administrator:', error);
-    res.status(error.statusCode || 500).json({ 
+    res.status(error.statusCode || 500).json({
       error: error.message || 'Error interno del servidor'
     });
   }
@@ -468,7 +468,7 @@ export const getRegularUsers = async (req: Request, res: Response): Promise<void
     res.status(200).json(response);
   } catch (error: any) {
     console.error('Error fetching regular users:', error);
-    res.status(error.statusCode || 500).json({ 
+    res.status(error.statusCode || 500).json({
       error: error.message || 'Error interno del servidor al obtener usuarios'
     });
   }
@@ -480,7 +480,7 @@ export const getRegularUsers = async (req: Request, res: Response): Promise<void
 export const getForumMembers = async (req: Request, res: Response): Promise<void> => {
   try {
     const forumId = parseInt(req.params.forumId);
-    
+
     if (isNaN(forumId)) {
       res.status(400).json({ error: 'ID de foro inválido' });
       return;
@@ -496,7 +496,7 @@ export const getForumMembers = async (req: Request, res: Response): Promise<void
     // Obtener miembros regulares del foro (MEMBER y VIEWER)
     const members = await forumModel.getForumRegularMembers(forumId);
 
-    res.status(200).json({ 
+    res.status(200).json({
       data: members,
       forum: {
         forum_id: forum.forum_id,
@@ -505,7 +505,7 @@ export const getForumMembers = async (req: Request, res: Response): Promise<void
     });
   } catch (error: any) {
     console.error('Error fetching forum members:', error);
-    res.status(error.statusCode || 500).json({ 
+    res.status(error.statusCode || 500).json({
       error: error.message || 'Error interno del servidor'
     });
   }
@@ -518,7 +518,7 @@ export const addForumMember = async (req: Request, res: Response): Promise<void>
   try {
     const forumId = parseInt(req.params.forumId);
     const { user_id } = req.body;
-    
+
     if (isNaN(forumId)) {
       res.status(400).json({ error: 'ID de foro inválido' });
       return;
@@ -545,7 +545,7 @@ export const addForumMember = async (req: Request, res: Response): Promise<void>
 
     // Verificar si ya está en el foro
     const existingRole = await forumModel.getUserRole(forumId, user_id);
-    
+
     if (existingRole) {
       res.status(400).json({ error: 'El usuario ya es miembro de este foro' });
       return;
@@ -554,7 +554,7 @@ export const addForumMember = async (req: Request, res: Response): Promise<void>
     // Agregar como MEMBER
     await forumModel.addUserToForum(forumId, user_id, 'MEMBER');
 
-    res.status(200).json({ 
+    res.status(200).json({
       message: 'Usuario agregado como miembro del foro exitosamente',
       user_id,
       forum_id: forumId,
@@ -562,7 +562,7 @@ export const addForumMember = async (req: Request, res: Response): Promise<void>
     });
   } catch (error: any) {
     console.error('Error adding forum member:', error);
-    res.status(error.statusCode || 500).json({ 
+    res.status(error.statusCode || 500).json({
       error: error.message || 'Error interno del servidor'
     });
   }
@@ -575,7 +575,7 @@ export const removeForumMember = async (req: Request, res: Response): Promise<vo
   try {
     const forumId = parseInt(req.params.forumId);
     const userId = req.params.userId;
-    
+
     if (isNaN(forumId)) {
       res.status(400).json({ error: 'ID de foro inválido' });
       return;
@@ -609,14 +609,14 @@ export const removeForumMember = async (req: Request, res: Response): Promise<vo
     // Remover del foro completamente
     await forumModel.removeUserFromForum(forumId, userId);
 
-    res.status(200).json({ 
+    res.status(200).json({
       message: 'Miembro removido del foro exitosamente',
       user_id: userId,
       forum_id: forumId
     });
   } catch (error: any) {
     console.error('Error removing forum member:', error);
-    res.status(error.statusCode || 500).json({ 
+    res.status(error.statusCode || 500).json({
       error: error.message || 'Error interno del servidor'
     });
   }
