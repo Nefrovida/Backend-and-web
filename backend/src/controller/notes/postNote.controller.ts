@@ -3,29 +3,26 @@ import { ZodError } from "zod";
 import { createNoteSchema } from "../../validators/notes.validator";
 import * as notesService from "../../service/notes.service";
 import { prisma } from "../../util/prisma";
+import Notes from "#/src/model/notes.model";
 
 /**
  * Controller to create a new clinical note
  */
 async function postNote(req: Request, res: Response) {
   try {
-    if (!req.user) {
+    const userId = req.user!.userId;
+
+    if (!userId) {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
     const validatedData = createNoteSchema.parse(req.body);
 
     // Verify that the patient belongs to the authenticated doctor
-    const patientBelongsToDoctor = await prisma.patient_appointment.findFirst({
-      where: {
-        patient_id: validatedData.patientId,
-        appointment: {
-          doctor: {
-            user_id: req.user.userId,
-          },
-        },
-      },
-    });
+    const patientBelongsToDoctor = Notes.patientBelogsToDoctor(
+      userId,
+      validatedData.patientId
+    );
 
     if (!patientBelongsToDoctor) {
       return res

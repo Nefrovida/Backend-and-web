@@ -40,4 +40,17 @@ export default class Notes {
 
     return notes;
   }
+
+  static async patientBelogsToDoctor(patientId: string, userId: string) {
+    await prisma.patient_appointment.findFirst({
+      where: {
+        patient_id: patientId,
+        appointment: {
+          doctor: {
+            user_id: userId,
+          },
+        },
+      },
+    });
+  }
 }
