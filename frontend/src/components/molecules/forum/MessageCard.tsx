@@ -22,7 +22,7 @@ const MessageCard: FC<Props> = ({ f, content, likes, comments }) => {
         >
           {f.name}
         </Link>
-        <HiDotsHorizontal />
+        <HiDotsHorizontal className="hover:text-blue-600" />
       </section>
       <section className="w-full text-lg my-2">{content}</section>
       <section className="flex gap-4 items-center">

@@ -19,8 +19,7 @@ const FeedList = () => {
 
   return (
     <ul
-      className="flex flex-col items-center gap-4 overflow-scroll h-[95%] "
-      style={{ overflowAnchor: "auto" }}
+      className="flex flex-col items-center gap-4 overflow-scroll h-[95%]"
       ref={scrollRef}
     >
       {messages.length > 0 &&
