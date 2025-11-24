@@ -6,7 +6,7 @@ async function fetchResults(route: string, params: string) {
     credentials: "include", // Include cookies in request
   });
   if (!res.ok) {
-    console.error(`Error: Cargando resultados: ${res}`);
+    console.error(`Error: Cargando resultados en InfinityScroll: ${res}`);
     return { data: [], status: res.status };
   }
   return { data: await res.json(), status: res.status };
