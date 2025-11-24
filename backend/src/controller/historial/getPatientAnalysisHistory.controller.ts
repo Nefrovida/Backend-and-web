@@ -46,7 +46,13 @@ async function getPatientAnalysisHistory(req: Request, res: Response) {
       patient.patient_id,
       page,
       { start, end, analysisType, status }
-    );
+    ).then(d => d).map((record) => ({
+      id: record.patient_analysis_id,
+      date: record.analysis_date,
+      name: record.analysis.name,
+      recommendations: record.results.interpretation,
+      download_url: record.results.path,
+      }));
 
     res.json(patientAnalysisHistory);
   } catch (error) {

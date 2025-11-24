@@ -52,36 +52,13 @@ export default class Historial {
       select: {
         patient_analysis_id: true,
         analysis_date: true,
-        results_date: true,
-        analysis_status: true,
-        place: true,
-        duration: true,
         analysis: {
           select: {
-            analysis_id: true,
             name: true,
-            description: true,
-            previous_requirements: true,
-            general_cost: true,
-            community_cost: true,
-          },
-        },
-        laboratorist: {
-          select: {
-            laboratorist_id: true,
-            user: {
-              select: {
-                name: true,
-                parent_last_name: true,
-                maternal_last_name: true,
-              },
-            },
           },
         },
         results: {
           select: {
-            result_id: true,
-            date: true,
             path: true,
             interpretation: true,
           },
