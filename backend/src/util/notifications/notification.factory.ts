@@ -92,45 +92,51 @@ export const NotificationFactory = {
             const targetList: NotificationTarget[] = [];
 
             const doctorUserId = appointment.appointment.doctor.user_id;
-            const doctorDeviceToken = await devicesService.getDeviceIdByUserId(doctorUserId);
-            targetList.push({
-                user_id: doctorUserId,
-                device_token: doctorDeviceToken,
-                user_type: "doctor",
-                sendTime: new Date()
-            });
-            targetList.push({
-                user_id: doctorUserId,
-                device_token: doctorDeviceToken,
-                user_type: "doctor",
-                sendTime: NotificationFactory.getSendTime(appointment.date_hour, 1)
-            });
+            const doctorDeviceToken = await devicesService.getDeviceTokenByUserId(doctorUserId);
+            if (doctorDeviceToken) {
+                targetList.push({
+                    user_id: doctorUserId,
+                    device_token: doctorDeviceToken,
+                    user_type: "doctor",
+                    sendTime: new Date()
+                });
+                targetList.push({
+                    user_id: doctorUserId,
+                    device_token: doctorDeviceToken,
+                    user_type: "doctor",
+                    sendTime: NotificationFactory.getSendTime(appointment.date_hour, 1)
+                });
+            }
 
             const patientUserId = appointment.patient.user_id;
-            const patientDeviceToken = await devicesService.getDeviceIdByUserId(patientUserId);
-            targetList.push({
-                user_id: patientUserId,
-                device_token: patientDeviceToken,
-                user_type: "patient",
-                sendTime: new Date()
-            });
-            targetList.push({
-                user_id: patientUserId,
-                device_token: patientDeviceToken,
-                user_type: "patient",
-                sendTime: NotificationFactory.getSendTime(appointment.date_hour, 24)
-            });
+            const patientDeviceToken = await devicesService.getDeviceTokenByUserId(patientUserId);
+            if (patientDeviceToken) {
+                targetList.push({
+                    user_id: patientUserId,
+                    device_token: patientDeviceToken,
+                    user_type: "patient",
+                    sendTime: new Date()
+                });
+                targetList.push({
+                    user_id: patientUserId,
+                    device_token: patientDeviceToken,
+                    user_type: "patient",
+                    sendTime: NotificationFactory.getSendTime(appointment.date_hour, 24)
+                });
+            }
 
             const secretaryIds = await User.getAllSecretaryIds();
 
             for (const secretary of secretaryIds) {
-                const secretaryDeviceToken = await devicesService.getDeviceIdByUserId(secretary.user_id);
-                targetList.push({
-                    user_id: secretary.user_id,
-                    device_token: secretaryDeviceToken,
-                    user_type: "secretary",
-                    sendTime: new Date()
-                });
+                const secretaryDeviceToken = await devicesService.getDeviceTokenByUserId(secretary.user_id);
+                if (secretaryDeviceToken) {
+                    targetList.push({
+                        user_id: secretary.user_id,
+                        device_token: secretaryDeviceToken,
+                        user_type: "secretary",
+                        sendTime: new Date()
+                    });
+                }
             }
 
             return targetList;

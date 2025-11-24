@@ -65,12 +65,12 @@ export const updateDeviceToken = async (deviceToken: string, userId: string) => 
     }
 }
 
-export const getDeviceIdByUserId = async (userId: string) => {
+export const getDeviceTokenByUserId = async (userId: string) => {
     try {
         const device = await prisma.devices.findUnique({
             where: { user_id: userId },
         });
-        return device?.id;
+        return device?.device_token;
     } catch (error) {
         throw new Error("Error getting device id by user id");
     }

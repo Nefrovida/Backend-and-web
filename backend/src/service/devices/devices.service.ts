@@ -29,6 +29,6 @@ export const registerDevice = async (deviceToken: string, userId: string) => {
   }
 }
 
-export const getDeviceIdByUserId = async (userId: string) => {
-  return await deviceModel.getDeviceIdByUserId(userId);
+export const getDeviceTokenByUserId = async (userId: string) => {
+  return await deviceModel.getDeviceTokenByUserId(userId);
 }
