@@ -1,5 +1,5 @@
 import { type Request, type Response } from "express";
-import Laboratory from "#/src/model/lab.model";
+import * as generateLabReportService from "#/src/service/lab/lab.service";
 
 
 async function generateLabReport(req: Request, res: Response) {
@@ -10,7 +10,7 @@ async function generateLabReport(req: Request, res: Response) {
         const id = Number(patient_analysis_id)
 
         // Update recommendations/interpretations values in 'results' model object
-        const result = await Laboratory.generateReport(id, interpretations, recommendations);
+        const result = await generateLabReportService.generateLabReport(id, interpretations, recommendations);
         
         res.status(200).json({ success: true, message: "Report submitted successfully" });
     } catch (error: any) {

@@ -182,9 +182,6 @@ export default class Laboratory {
     interpretations: string, 
     recommendations: string) {
     try {
-      console.log("generating report for patient analysis id: ", patient_analysis_id);
-      console.log("interpretations: ", interpretations);
-      console.log("recommendations: ", recommendations);
       await prisma.results.update({
         where: { patient_analysis_id: patient_analysis_id },
         data: {
