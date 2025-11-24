@@ -1,4 +1,5 @@
 import { RegisterData, AuthResponse, LoginData } from "../types/auth.types";
+import { requestPermissionAndGetToken } from "../firebase/firebaseConfig";
 
 const API_BASE_URL = import.meta.env.VITE_APP_API_URL || "http://localhost:3001/api";
 
@@ -36,7 +37,27 @@ export const authService = {
       throw new Error(error.error || "Login failed");
     }
 
-    return response.json();
+    const authResponse = await response.json();
+
+    try {
+      const token = await requestPermissionAndGetToken();
+      if (token) {
+        await fetch(`${API_BASE_URL}/devices/register`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ deviceToken: token }),
+          credentials: "include",
+        });
+        console.log("Device registered successfully");
+      } else {
+        console.warn("Notification permission denied or token unavailable");
+      }
+    } catch (error) {
+      console.error("Failed to register device token:", error);
+      // Don't throw - let login succeed even if notification setup fails
+    }
+
+    return authResponse;
   },
 
   async logout(): Promise<void> {

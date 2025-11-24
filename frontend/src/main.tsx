@@ -12,3 +12,7 @@ root.render(
     <RouterProvider router={router} />
   </React.StrictMode>
 )
+
+navigator.serviceWorker
+  .register("/firebase-messaging-sw.js")
+  .then(() => console.log("Firebase SW registered"));
