@@ -249,9 +249,9 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
             </button>
           )}
           <h2 className="text-lg font-semibold text-gray-800">
-            Administradores
-          </h2>
-          <div className="w-8"> {/* Spacer for centering */}</div>
+          Administradores
+        </h2>
+        <div className="w-8"></div>
         </div>
 
         {/* Error Message */}
@@ -477,15 +477,28 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
         </div>
 
         {/* Date Footer */}
-        <div className="mt-6 text-center">
-          <p className="text-xs text-gray-500">
-            {new Date().toLocaleDateString('es-ES', {
-              day: '2-digit',
-              month: '2-digit',
-              year: 'numeric',
-            })}
-          </p>
+        {/* Action Buttons */}
+        <div className="flex gap-4 justify-center mt-6">
+          <button
+            onClick={() => {
+              setError("");
+              onClose();
+            }}
+            className="px-6 py-2 bg-white text-gray-700 font-medium rounded-lg hover:bg-gray-100 transition-colors shadow-sm"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={() => {
+              setError("");
+              onClose();
+            }}
+            className="px-6 py-2 bg-blue-500 text-white font-medium rounded-lg hover:bg-blue-600 transition-colors shadow-sm"
+          >
+            Actualizar
+          </button>
         </div>
+
       </div>
     </div>
   );

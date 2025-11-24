@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { CreateForumData } from '../../types/forum.types';
+import { CreateForumData, Forum } from '../../types/forum.types';
 
 interface CreateForumModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: (data: CreateForumData) => void;
   externalError?: string; // Error from parent component
+  existingForums?: Forum[]; // optional list to check duplicates
 }
 
 /**
@@ -26,14 +27,20 @@ export const CreateForumModal: React.FC<CreateForumModalProps> = ({
   onClose,
   onConfirm,
   externalError,
+  existingForums,
 }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [publicStatus, setPublicStatus] = useState(true);
   const [error, setError] = useState<string>('');
+  const [nameError, setNameError] = useState<string>('');
 
-  const MAX_NAME_LENGTH = 100;
+  const MAX_NAME_LENGTH = 50;
   const MAX_DESCRIPTION_LENGTH = 255;
+  const MIN_NAME_LENGTH = 3;
+  // Allow only ASCII letters, numbers, spaces, hyphen and underscore.
+  const ALLOWED_NAME_REGEX = /^[A-Za-z0-9\s\-_]+$/;
+  const INVALID_CHARS_REGEX = /[^A-Za-z0-9\s\-_]/g;
 
   // Update local error when external error changes
   useEffect(() => {
@@ -46,20 +53,42 @@ export const CreateForumModal: React.FC<CreateForumModalProps> = ({
 
   const handleConfirm = () => {
     setError(''); // Clear previous errors
+    setNameError('');
 
-    if (!name.trim()) {
-      setError('Por favor ingresa un nombre para el foro');
+    const trimmedName = name.trim();
+    const trimmedDescription = description.trim();
+
+    if (!trimmedName) {
+      setNameError('Por favor ingresa un nombre para el foro');
       return;
     }
 
-    if (name.length < 3) {
-      setError('El nombre debe tener al menos 3 caracteres');
+    if (trimmedName.length < MIN_NAME_LENGTH) {
+      setNameError(`El nombre debe tener al menos ${MIN_NAME_LENGTH} caracteres`);
+      return;
+    }
+
+    if (trimmedName.length > MAX_NAME_LENGTH) {
+      setNameError(`El nombre no puede exceder ${MAX_NAME_LENGTH} caracteres`);
+      return;
+    }
+
+    // Final check for invalid characters
+    if (!ALLOWED_NAME_REGEX.test(trimmedName)) {
+      setNameError('El nombre contiene caracteres no válidos. Usa letras, números, espacios, guiones o guiones bajos.');
+      return;
+    }
+
+    // Check duplicate name (case-insensitive, trimmed)
+    const normalized = trimmedName.toLowerCase();
+    if (existingForums && existingForums.some(f => f.name.trim().toLowerCase() === normalized)) {
+      setNameError('Ese nombre ya está en uso por otro foro');
       return;
     }
 
     onConfirm({
-      name: name.trim(),
-      description: description.trim(),
+      name: trimmedName,
+      description: trimmedDescription,
       public_status: publicStatus,
     });
 
@@ -68,6 +97,7 @@ export const CreateForumModal: React.FC<CreateForumModalProps> = ({
     setDescription('');
     setPublicStatus(true);
     setError('');
+    setNameError('');
   };
 
   const handleCancel = () => {
@@ -108,19 +138,28 @@ export const CreateForumModal: React.FC<CreateForumModalProps> = ({
             type="text"
             value={name}
             onChange={(e) => {
-              const value = e.target.value;
-              if (value.length <= MAX_NAME_LENGTH) {
-                setName(value);
-                setError(''); // Clear error on input
+              let value = e.target.value;
+              const sanitized = value.replace(INVALID_CHARS_REGEX, '');
+              // enforce max length
+              const limited = sanitized.slice(0, MAX_NAME_LENGTH);
+              setName(limited);
+              setError(''); // Clear error on input
+              if (sanitized !== value) {
+                setNameError('Solo puedes usar letras, números, espacios, guiones o guiones bajos.');
+              } else {
+                setNameError('');
               }
             }}
             maxLength={MAX_NAME_LENGTH}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+            className={`w-full px-4 py-2 rounded-lg focus:ring-2 focus:border-transparent ${nameError ? 'border-red-400 ring-1 ring-red-200 focus:ring-red-300' : 'border-gray-300 focus:ring-blue-400'}`}
             placeholder="Ej: Foro de Nutrición"
           />
-          <div className="text-xs text-gray-500 mt-1 text-right">
-            {name.length}/{MAX_NAME_LENGTH} caracteres
+          <div className={`text-xs mt-1 text-right ${nameError ? 'text-red-600' : 'text-gray-500'}`}>
+            {name.length}/{MAX_NAME_LENGTH} caracteres (mínimo {MIN_NAME_LENGTH})
           </div>
+          {nameError && (
+            <div className="mt-2 text-sm text-red-700">{nameError}</div>
+          )}
         </div>
 
         {/* Forum Description Input */}
