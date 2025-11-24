@@ -62,7 +62,6 @@ router.get(
   requirePrivileges([Privilege.VIEW_FORUMS]),
   forumsController.getById
 );
-router.get("/myForums", authenticate, getMyForums);
 
 router.get(
   "/me",

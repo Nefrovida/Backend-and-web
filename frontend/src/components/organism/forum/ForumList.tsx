@@ -1,5 +1,5 @@
 import Title from "@/components/atoms/Title";
-import SelectForumCard from "@/components/molecules/forum/SelectForumCard";
+import SelectForumCard from "@/components/atoms/forum/SelectForumCard";
 import Loading from "@/components/molecules/Loading";
 import { BasicForumInfo } from "@/types/forum.types";
 import React, { useEffect, useState } from "react";
@@ -18,9 +18,9 @@ const ForumList = () => {
         return res.json();
       })
       .then((data) => {
-        data = data.map((d: BasicForumInfo) => ({
-          forumId: d.forumId,
-          name: d.name.split(" -")[0],
+        data = data.map(({ forum_id, name }) => ({
+          forumId: forum_id,
+          name: name.split(" -")[0],
         }));
         setForums(data);
       })

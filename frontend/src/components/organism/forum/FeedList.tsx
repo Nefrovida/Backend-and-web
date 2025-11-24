@@ -1,22 +1,23 @@
 import MessageCard from "@/components/molecules/forum/MessageCard";
-import useInfiniteScroll from "@/hooks/useInfiniteScroll";
 import { Message } from "@/types/forum.types";
-import React, { memo } from "react";
+import React, { FC, memo, RefObject } from "react";
+
+interface Props {
+  messageInfo: {
+    results: Message[];
+    loading: boolean;
+    hasMore: boolean;
+    error: string;
+    scrollRef: RefObject<HTMLUListElement>;
+    handleSearch: () => void;
+    handleFilter: () => void;
+  };
+}
 
 const MemoizedMessageCard = memo(MessageCard);
 
-const FeedList = () => {
-  const {
-    results: messages,
-    loading,
-    scrollRef,
-    error,
-  } = useInfiniteScroll<Message>("/api/forums/feed", [], (page: number) => {
-    const params = new URLSearchParams();
-    params.append("page", page.toString());
-    return params.toString();
-  });
-
+const FeedList: FC<Props> = ({ messageInfo }) => {
+  const { results: messages, loading, scrollRef, error } = messageInfo;
   return (
     <ul
       className="flex flex-col items-center gap-4 overflow-scroll h-[95%]"

@@ -55,7 +55,12 @@ export default class Forum {
     return [...myForums, ...publicForums];
   }
 
-  static async getForumFeed(page: number, userId: string): Promise<Message[]> {
+  static async getForumFeed(
+    page: number,
+    userId: string,
+    forumId?: number
+  ): Promise<Message[]> {
+    console.log(forumId);
     const pagination = 6;
     return await prisma.messages.findMany({
       take: pagination,
@@ -72,6 +77,7 @@ export default class Forum {
               },
             },
           ],
+          ...(forumId ? { AND: { forum_id: forumId } } : {}),
         },
         parent_message_id: null,
         active: true,
