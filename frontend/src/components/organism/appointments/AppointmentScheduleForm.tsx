@@ -21,7 +21,12 @@ const AppointmentScheduleForm: React.FC<Props> = ({ selectedRequest, onScheduleC
 
   useEffect(() => {
     loadDoctors();
-  }, []);
+    if (selectedRequest) {
+      const requestDate = new Date(selectedRequest.requested_date);
+      const dateStr = requestDate.toISOString().split('T')[0];
+      setSelectedDate(dateStr);
+    }
+  }, [selectedRequest]);
 
   useEffect(() => {
     if (selectedDoctor && selectedDate) {
@@ -49,7 +54,29 @@ const AppointmentScheduleForm: React.FC<Props> = ({ selectedRequest, onScheduleC
     setError("");
     try {
       const slots = await agendaService.getDoctorAvailability(selectedDoctor, selectedDate);
-      setAvailableSlots(slots);
+      
+      // If the selected date is the same as the requested date, sort slots by proximity to requested time
+      let sortedSlots = slots;
+      if (selectedRequest) {
+        const requestDate = new Date(selectedRequest.requested_date);
+        const requestDateStr = requestDate.toISOString().split('T')[0];
+        if (selectedDate === requestDateStr) {
+          const requestedTime = `${requestDate.getHours().toString().padStart(2, '0')}:${requestDate.getMinutes().toString().padStart(2, '0')}`;
+          
+          sortedSlots = slots.sort((a, b) => {
+            const timeA = a.split(':').map(Number);
+            const timeB = b.split(':').map(Number);
+            const reqTime = requestedTime.split(':').map(Number);
+            
+            const diffA = Math.abs((timeA[0] * 60 + timeA[1]) - (reqTime[0] * 60 + reqTime[1]));
+            const diffB = Math.abs((timeB[0] * 60 + timeB[1]) - (reqTime[0] * 60 + reqTime[1]));
+            
+            return diffA - diffB;
+          });
+        }
+      }
+      
+      setAvailableSlots(sortedSlots);
       setSelectedTime("");
     } catch (error) {
       console.error("Error loading availability:", error);
@@ -141,6 +168,9 @@ const AppointmentScheduleForm: React.FC<Props> = ({ selectedRequest, onScheduleC
         </h2>
         <p className="text-gray-600">
           {selectedRequest.appointment_name} - {selectedRequest.appointment_type}
+        </p>
+        <p className="text-gray-600">
+          Fecha y hora solicitada: {new Date(selectedRequest.requested_date).toLocaleString('es-MX')}
         </p>
       </div>
 
