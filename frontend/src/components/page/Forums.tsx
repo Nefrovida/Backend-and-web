@@ -16,7 +16,7 @@ const Forums = () => {
 
   const messageInfo = useInfiniteScroll<Message>(
     `/api/forums/feed`,
-    [],
+    [fId],
     (page: number) => {
       const params = new URLSearchParams();
       params.append("page", page.toString());
