@@ -257,25 +257,26 @@ model user_reports {
 
 model devices {
   id             Int @id @default(autoincrement())
-  user_id        @db.Uuid
+  user_id        String @db.Uuid
   device_token   String
   updated        DateTime
   user           users    @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
 }
 
 model notifications {
-  id     Int      @id @default(autoincrement())
-  user_id       String   @db.Uuid
-  device_token  String
-  type          NotificationType
-  answer        String
-  title         String
-  content       String
-  status        NotifcationStatus @default(PENDING)
-  created       DateTime
-  sendTime      DateTime
-  sent          DateTime
-  user          users    @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  id              Int      @id @default(autoincrement())
+  user_id         String   @db.Uuid
+  device_token    String
+  appointment_id  Int?
+  type            NotificationType
+  answer          String
+  title           String
+  content         String
+  status          NotificationStatus @default(PENDING)
+  created         DateTime
+  sendTime        DateTime
+  sent            DateTime?
+  user            users    @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
 }
 
 enum Gender {
@@ -312,14 +313,14 @@ enum ForumRole {
 }
 
 enum NotificationType {
-  APPOINMENT_CREATION
+  APPOINTMENT_CREATION
   APPOINTMENT_CANCELLATION
   APPOINTMENT_RESCHEDULE
   COMMUNITY
   OTHER
 }
 
-enum NotifcationStatus {
+enum NotificationStatus {
   PENDING
   SENT
 }
