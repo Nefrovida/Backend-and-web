@@ -1,20 +1,21 @@
 export enum NotificationType {
-    APPOINTMENT_CREATION = "appointment_creation",
-    APPOINTMENT_CANCELLATION = "appointment_cancellation",
-    APPOINTMENT_RESCHEDULE = "appointment_rescheduled",
-    COMMUNITY = "community",
-    OTHER = "other",
+    APPOINTMENT_CREATION = "APPOINTMENT_CREATION",
+    APPOINTMENT_CANCELLATION = "APPOINTMENT_CANCELLATION",
+    APPOINTMENT_RESCHEDULE = "APPOINTMENT_RESCHEDULE",
+    COMMUNITY = "COMMUNITY",
+    OTHER = "OTHER",
 }
 
 export enum NotificationStatus {
-    PENDING = "pending",
-    SENT = "sent",
+    PENDING = "PENDING",
+    SENT = "SENT",
 }
 
 export interface Notification {
-    id: number;
-    userId: string;
-    deviceToken: string;
+    id?: number;
+    user_id: string;
+    device_token: string;
+    appointment_id?: number;
     type: NotificationType;
     answer: string;
     title: string;
@@ -22,5 +23,12 @@ export interface Notification {
     status: NotificationStatus;
     created: Date;
     sendTime: Date;
-    sent: Date;
+    sent?: Date | null;
+}
+
+export interface NotificationTarget {
+    user_id: string;
+    device_token: string;
+    user_type: "doctor" | "patient" | "secretary";
+    sendTime: Date;
 }
