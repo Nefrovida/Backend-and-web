@@ -57,13 +57,9 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
       req.query.isPublic === 'false' ? false :
         undefined;
 
-    // If the user is a Patient and did not specify a visibility filter, default to public-only forums
-    if (req.query.isPublic === undefined && req.user?.roleId === DEFAULT_ROLES.PATIENT) {
-      isPublic = true;
-    }
-
     // Call service to get forums
-    const forums = await forumsService.getAllForums(page, limit, { search, isPublic });
+    const userId = req.user?.userId;
+    const forums = await forumsService.getAllForums(page, limit, { search, isPublic }, userId);
     res.status(200).json(forums);
   } catch (error: any) {
     res.status(error.statusCode || 500).json({ error: error.message });

@@ -3,7 +3,7 @@ import { prisma } from "../util/prisma";
 import { ForumRole } from ".prisma/client";
 
 export default class Forum {
-  Forum() {}
+  Forum() { }
 
   static async postNewMessage(
     userId: string,
@@ -104,7 +104,8 @@ export const findAll = async (
     isPublic?: boolean;
     active?: boolean;
     createdBy?: string;
-  }
+  },
+  userId?: string
 ) => {
   const whereClause: any = {};
 
@@ -116,11 +117,6 @@ export const findAll = async (
     };
   }
 
-  // Filter by public status
-  if (filters?.isPublic !== undefined) {
-    whereClause.public_status = filters.isPublic;
-  }
-
   // Filter by active status
   if (filters?.active !== undefined) {
     whereClause.active = filters.active;
@@ -129,6 +125,40 @@ export const findAll = async (
   // Filter by creator
   if (filters?.createdBy) {
     whereClause.created_by = filters.createdBy;
+  }
+
+  // Complex visibility logic
+  if (filters?.isPublic !== undefined) {
+    // Explicit public filter requested
+    whereClause.public_status = filters.isPublic;
+
+    // If requesting private forums (isPublic=false) and userId is provided,
+    // ensure user only sees private forums they are a member of
+    if (filters.isPublic === false && userId) {
+      whereClause.users_forums = {
+        some: {
+          user_id: userId
+        }
+      };
+    }
+  } else if (userId) {
+    // No explicit public filter, but user is logged in
+    // Show: Public forums OR Private forums where user is a member
+    whereClause.OR = [
+      { public_status: true },
+      {
+        AND: [
+          { public_status: false },
+          {
+            users_forums: {
+              some: {
+                user_id: userId
+              }
+            }
+          }
+        ]
+      }
+    ];
   }
 
   return await prisma.forums.findMany({
@@ -143,6 +173,15 @@ export const findAll = async (
           username: true,
         },
       },
+      // Include users_forums to check membership status if needed
+      users_forums: userId ? {
+        where: {
+          user_id: userId
+        },
+        select: {
+          forum_role: true
+        }
+      } : false
     },
     orderBy: {
       creation_date: "desc",

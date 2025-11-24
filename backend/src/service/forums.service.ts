@@ -63,7 +63,8 @@ export const getAllForums = async (
   filters?: {
     search?: string;
     isPublic?: boolean;
-  }
+  },
+  userId?: string
 ): Promise<ForumEntity[]> => {
   const skip = (page - 1) * limit;
 
@@ -71,7 +72,7 @@ export const getAllForums = async (
     search: filters?.search,
     isPublic: filters?.isPublic,
     active: true,
-  });
+  }, userId);
 
   return forums;
 };
