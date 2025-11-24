@@ -208,7 +208,7 @@ function LabAppointmentUpload() {
         }
     }
 
-    // Cerrar el modal de feedback
+    // Close the feedback modal
     const handleFeedbackClose = () => {
         if (feedback?.type === "success") {
             setFeedback(null);

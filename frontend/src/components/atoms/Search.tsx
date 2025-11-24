@@ -12,12 +12,12 @@ const Search: FC<Props> = ({ onChange }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setQuery(value);
-    onChange(value); // el padre filtra por nombre/fecha/etc con este string
+    onChange(value);
   };
 
   const handleClear = () => {
     setQuery("");
-    onChange(""); // reset de resultados
+    onChange("");
     inputRef.current?.focus();
   };
 
