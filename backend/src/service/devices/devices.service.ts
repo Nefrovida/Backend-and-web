@@ -1,23 +1,22 @@
-import { prisma } from "#/src/util/prisma";
-import { checkIfDeviceIsRegistered, checkIfUserIsRegistered, registerDeviceToUser, updateDeviceToken } from "#/src/model/devices/device.model";
+import * as deviceModel from "#/src/model/devices/device.model";
 
 export const registerDevice = async (deviceToken: string, userId: string) => {
   try {
     // Check if device is already registered
-    const existingDevice = await checkIfDeviceIsRegistered(deviceToken);
+    const existingDevice = await deviceModel.checkIfDeviceIsRegistered(deviceToken);
     if (existingDevice) {
       throw new Error("Device already registered");
     }
 
     // Check if user is already registered
-    const existingUser = await checkIfUserIsRegistered(userId);
+    const existingUser = await deviceModel.checkIfUserIsRegistered(userId);
     
     // If user is already registered, update the device token
     // If user is not registered, register and assign the new device
     if (!existingUser) {
-        await registerDeviceToUser(deviceToken, userId);
+        await deviceModel.registerDeviceToUser(deviceToken, userId);
     } else {
-        await updateDeviceToken(deviceToken, userId);
+        await deviceModel.updateDeviceToken(deviceToken, userId);
     }
 
     return {
@@ -28,4 +27,8 @@ export const registerDevice = async (deviceToken: string, userId: string) => {
     console.error("Error registering device:", error);
     throw new Error("Failed to register device");
   }
+}
+
+export const getDeviceIdByUserId = async (userId: string) => {
+  return await deviceModel.getDeviceIdByUserId(userId);
 }

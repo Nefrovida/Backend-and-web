@@ -273,6 +273,7 @@ model notifications {
   content       String
   status        NotifcationStatus @default(PENDING)
   created       DateTime
+  sendTime      DateTime
   sent          DateTime
   user          users    @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
 }

@@ -43,4 +43,20 @@ export default class User {
             throw new Error("Request to db for user with patient id failed");
         }
     }
+
+    static async getAllSecretaryIds() {
+        try {
+            const secretaryIds = await prisma.users.findMany({
+                where: {
+                    role_id: 6,
+                },
+                select: {
+                    user_id: true,
+                }
+            });
+            return secretaryIds;
+        } catch (error) {
+            throw new Error("Error getting all secretary ids");
+        }
+    }
 }
