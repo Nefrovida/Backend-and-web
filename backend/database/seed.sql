@@ -1,7 +1,7 @@
 -- ========================
 --  CLEAR EXISTING DATA
 -- ========================
-TRUNCATE TABLE role_privilege, patient_history, results, patient_analysis, patient_appointment, notes, appointments, forums, familiars, doctors, laboratorists, patients, users, privileges, roles, analysis, questions_history, options, user_reports, notifications, messages, likes, users_forums RESTART IDENTITY CASCADE;
+TRUNCATE TABLE role_privilege, patient_history, results, patient_analysis, patient_appointment, notes, appointments, forums, familiars, doctors, laboratorists, patients, users, privileges, roles, analysis, questions_history, options, user_reports, notifications, devices, messages, likes, users_forums RESTART IDENTITY CASCADE;
 
 -- ========================
 -- 🧩 ROLES
@@ -452,23 +452,41 @@ VALUES
 ('e2eebc99-9c0b-4ef8-bb6d-6bb9bd380ccc', 10, 'Contenido inapropiado para el foro', '2025-11-07 09:00:00', true);
 
 -- ========================
--- 🔔 NOTIFICACIONES
+-- 📱 DEVICES
 -- ========================
+-- Note: In production, devices are registered when users log in via the frontend
+-- These are sample device tokens for testing purposes
 
-INSERT INTO notifications (user_id, answer, date, title, content, seen)
+INSERT INTO devices (user_id, device_token, updated)
 VALUES 
-('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'Aceptada', '2025-11-25 08:00:00', 'Cita Confirmada', 'Su cita con la Dra. María López ha sido confirmada para el 25 de noviembre a las 10:00 AM', false),
-('c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', 'Recordatorio', '2025-11-22 09:00:00', 'Recordatorio de Cita', 'Recuerde su cita virtual mañana 23 de noviembre a las 9:00 AM con el Dr. José García', false),
-('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'Disponible', '2025-10-16 14:30:00', 'Resultados Disponibles', 'Sus resultados de Biometría Hemática ya están disponibles. Puede consultarlos en su perfil.', true),
-('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'Disponible', '2025-10-16 16:30:00', 'Resultados Disponibles', 'Sus resultados de Química Sanguínea ya están disponibles. Puede consultarlos en su perfil.', true),
-('c3eebc99-9c0b-4ef8-bb6d-6bb9bd380a77', 'Disponible', '2025-10-21 12:30:00', 'Resultados Disponibles', 'Sus resultados de Examen General de Orina ya están disponibles.', true),
-('c4eebc99-9c0b-4ef8-bb6d-6bb9bd380a88', 'Recordatorio', '2025-11-27 10:00:00', 'Recordatorio de Cita', 'Recuerde su cita con la Dra. Ana Rodríguez mañana 28 de noviembre a las 11:00 AM', false),
-('c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', 'Pendiente', '2025-11-20 08:00:00', 'Análisis Programado', 'Su Perfil Lipídico está programado para hoy a las 7:30 AM en el Laboratorio del Sur', true),
-('c4eebc99-9c0b-4ef8-bb6d-6bb9bd380a88', 'Pendiente', '2025-11-22 07:00:00', 'Análisis Programado', 'Su Biometría Hemática está programada para hoy a las 8:00 AM en el Laboratorio del Sur', false),
-('d1eebc99-9c0b-4ef8-bb6d-6bb9bd380a99', 'Acción Requerida', '2025-11-22 08:30:00', 'Nuevo Análisis Asignado', 'Se le ha asignado un nuevo análisis: Biometría Hemática para la paciente Sofia Torres', false),
-('b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22', 'Información', '2025-10-16 17:00:00', 'Resultados Cargados', 'Se han cargado los resultados de análisis para su paciente Pedro Fernández', true),
-('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'Respuesta', '2025-11-01 14:35:00', 'Nueva Respuesta en Foro', 'Laura Martínez ha respondido a tu mensaje en el foro "Diabetes y Nutrición"', true),
-('c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', 'Respuesta', '2025-11-02 11:05:00', 'Nueva Respuesta en Foro', 'Pedro Fernández ha respondido a tu comentario en el foro "Diabetes y Nutrición"', true),
-('b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22', 'Respuesta', '2025-10-28 10:35:00', 'Nueva Respuesta en Foro', 'Pedro Fernández ha respondido a tu mensaje en el foro "Ejercicio y Salud Cardiovascular"', true),
-('e1eebc99-9c0b-4ef8-bb6d-6bb9bd380bbb', 'Información', '2025-10-15 15:00:00', 'Acceso a Expediente', 'Ahora tienes acceso al expediente médico de Pedro Fernández como familiar autorizado', true),
-('f1eebc99-9c0b-4ef8-bb6d-6bb9bd380ddd', 'Tarea', '2025-11-22 09:00:00', 'Actualizar Catálogo', 'Se requiere actualizar los costos del catálogo de análisis para el próximo mes', false);
+('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'sample_device_token_patient1_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', NOW()),
+('c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', 'sample_device_token_patient2_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', NOW()),
+('c3eebc99-9c0b-4ef8-bb6d-6bb9bd380a77', 'sample_device_token_patient3_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', NOW()),
+('c4eebc99-9c0b-4ef8-bb6d-6bb9bd380a88', 'sample_device_token_patient4_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', NOW()),
+('b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22', 'sample_device_token_doctor1_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', NOW()),
+('d1eebc99-9c0b-4ef8-bb6d-6bb9bd380a99', 'sample_device_token_lab1_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', NOW()),
+('e1eebc99-9c0b-4ef8-bb6d-6bb9bd380bbb', 'sample_device_token_familiar1_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', NOW()),
+('f1eebc99-9c0b-4ef8-bb6d-6bb9bd380ddd', 'sample_device_token_secretary1_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', NOW());
+
+-- ========================
+-- 📬 NOTIFICACIONES
+-- ========================
+-- New schema: user_id, device_token, appointment_id (nullable), type, answer, title, content, status, created, sendTime, sent (nullable)
+
+INSERT INTO notifications (user_id, device_token, appointment_id, type, answer, title, content, status, created, "sendTime", sent)
+VALUES 
+('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'sample_device_token_patient1_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', 1, 'APPOINTMENT_CREATION', '', 'Cita Confirmada', 'Su cita con la Dra. María López ha sido confirmada para el 25 de noviembre a las 10:00 AM', 'SENT', '2025-11-24 08:00:00', '2025-11-24 08:00:00', '2025-11-24 08:00:01'),
+('c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', 'sample_device_token_patient2_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', 2, 'APPOINTMENT_CREATION', '', 'Recordatorio de Cita', 'Recuerde su cita virtual mañana 23 de noviembre a las 9:00 AM con el Dr. José García', 'SENT', '2025-11-21 09:00:00', '2025-11-21 09:00:00', '2025-11-21 09:00:01'),
+('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'sample_device_token_patient1_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', NULL, 'OTHER', '', 'Resultados Disponibles', 'Sus resultados de Biometría Hemática ya están disponibles. Puede consultarlos en su perfil.', 'SENT', '2025-10-16 14:30:00', '2025-10-16 14:30:00', '2025-10-16 14:30:01'),
+('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'sample_device_token_patient1_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', NULL, 'OTHER', '', 'Resultados Disponibles', 'Sus resultados de Química Sanguínea ya están disponibles. Puede consultarlos en su perfil.', 'SENT', '2025-10-16 16:30:00', '2025-10-16 16:30:00', '2025-10-16 16:30:01'),
+('c3eebc99-9c0b-4ef8-bb6d-6bb9bd380a77', 'sample_device_token_patient3_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', NULL, 'OTHER', '', 'Resultados Disponibles', 'Sus resultados de Examen General de Orina ya están disponibles.', 'SENT', '2025-10-21 12:30:00', '2025-10-21 12:30:00', '2025-10-21 12:30:01'),
+('c4eebc99-9c0b-4ef8-bb6d-6bb9bd380a88', 'sample_device_token_patient4_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', 4, 'APPOINTMENT_CREATION', '', 'Recordatorio de Cita', 'Recuerde su cita con la Dra. Ana Rodríguez mañana 28 de noviembre a las 11:00 AM', 'PENDING', '2025-11-27 10:00:00', '2025-11-27 10:00:00', NULL),
+('c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', 'sample_device_token_patient2_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', NULL, 'OTHER', '', 'Análisis Programado', 'Su Perfil Lipídico está programado para hoy a las 7:30 AM en el Laboratorio del Sur', 'SENT', '2025-11-20 08:00:00', '2025-11-20 08:00:00', '2025-11-20 08:00:01'),
+('c4eebc99-9c0b-4ef8-bb6d-6bb9bd380a88', 'sample_device_token_patient4_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', NULL, 'OTHER', '', 'Análisis Programado', 'Su Biometría Hemática está programada para hoy a las 8:00 AM en el Laboratorio del Sur', 'PENDING', '2025-11-22 07:00:00', '2025-11-22 07:00:00', NULL),
+('d1eebc99-9c0b-4ef8-bb6d-6bb9bd380a99', 'sample_device_token_lab1_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', NULL, 'OTHER', '', 'Nuevo Análisis Asignado', 'Se le ha asignado un nuevo análisis: Biometría Hemática para la paciente Sofia Torres', 'PENDING', '2025-11-22 08:30:00', '2025-11-22 08:30:00', NULL),
+('b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22', 'sample_device_token_doctor1_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', NULL, 'OTHER', '', 'Resultados Cargados', 'Se han cargado los resultados de análisis para su paciente Pedro Fernández', 'SENT', '2025-10-16 17:00:00', '2025-10-16 17:00:00', '2025-10-16 17:00:01'),
+('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'sample_device_token_patient1_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', NULL, 'COMMUNITY', '', 'Nueva Respuesta en Foro', 'Laura Martínez ha respondido a tu mensaje en el foro "Diabetes y Nutrición"', 'SENT', '2025-11-01 14:35:00', '2025-11-01 14:35:00', '2025-11-01 14:35:01'),
+('c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', 'sample_device_token_patient2_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', NULL, 'COMMUNITY', '', 'Nueva Respuesta en Foro', 'Pedro Fernández ha respondido a tu comentario en el foro "Diabetes y Nutrición"', 'SENT', '2025-11-02 11:05:00', '2025-11-02 11:05:00', '2025-11-02 11:05:01'),
+('b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22', 'sample_device_token_doctor1_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', NULL, 'COMMUNITY', '', 'Nueva Respuesta en Foro', 'Pedro Fernández ha respondido a tu mensaje en el foro "Ejercicio y Salud Cardiovascular"', 'SENT', '2025-10-28 10:35:00', '2025-10-28 10:35:00', '2025-10-28 10:35:01'),
+('e1eebc99-9c0b-4ef8-bb6d-6bb9bd380bbb', 'sample_device_token_familiar1_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', NULL, 'OTHER', '', 'Acceso a Expediente', 'Ahora tienes acceso al expediente médico de Pedro Fernández como familiar autorizado', 'SENT', '2025-10-15 15:00:00', '2025-10-15 15:00:00', '2025-10-15 15:00:01'),
+('f1eebc99-9c0b-4ef8-bb6d-6bb9bd380ddd', 'sample_device_token_secretary1_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', NULL, 'OTHER', '', 'Actualizar Catálogo', 'Se requiere actualizar los costos del catálogo de análisis para el próximo mes', 'PENDING', '2025-11-22 09:00:00', '2025-11-22 09:00:00', NULL);
