@@ -22,36 +22,75 @@ function LabResults() {
   const [recommendations, setRecommendations] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false)
+  const [feedbackVariant, setFeedbackVariant] = useState<"success" | "error" | "info">("info")
+  const [feedbackTitle, setFeedbackTitle] = useState("")
+  const [feedbackMessage, setFeedbackMessage] = useState("")
+  const [changeDetected, setChangeDetected] = useState(false)
 
   const handleInterpretations = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInterpretations(e.target.value);
+    setChangeDetected(true);
   };
 
   const handleRecommendations = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setRecommendations(e.target.value);
+    setChangeDetected(true);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true)
+    // Show confirmation modal instead of submitting directly
+    setShowConfirmModal(true);
+  }
+
+  const handleConfirmSubmit = async () => {
+    setShowConfirmModal(false);
+    setIsSubmitting(true);
+    
     try {
       const id = analysis?.patient_analysis_id;
       const response = await generateReport(
         id, interpretations, recommendations
       );
+      
       if ('status' in response && response.status === 200) {
-        refresh()
-        setHadResults(true)
+        // Success
+        setFeedbackVariant("success");
+        setFeedbackTitle("Reporte Generado");
+        setFeedbackMessage(hadResults 
+          ? "El reporte ha sido actualizado exitosamente."
+          : "El reporte ha sido generado exitosamente."
+        );
+        setShowFeedbackModal(true);
+        refresh();
+        setHadResults(true);
       } else if ('status' in response) {
+        // Server error
         const err = await response.json();
+        setFeedbackVariant("error");
+        setFeedbackTitle("Error al Generar Reporte");
+        setFeedbackMessage(err.error || err.message || "Ocurrió un error al generar el reporte. Por favor, intente nuevamente.");
+        setShowFeedbackModal(true);
         console.error("Server error:", err);
       } else {
+        // Validation error
+        setFeedbackVariant("error");
+        setFeedbackTitle("Error de Validación");
+        setFeedbackMessage(response.message || "Por favor, verifique los datos ingresados.");
+        setShowFeedbackModal(true);
         console.error("Validation error:", response.message);
       }
     } catch (error: any) {
-      console.error("Submit report was unsuccessful: ", error.message)
+      // Network or unexpected error
+      setFeedbackVariant("error");
+      setFeedbackTitle("Error de Conexión");
+      setFeedbackMessage(error.message || "No se pudo conectar con el servidor. Por favor, verifique su conexión e intente nuevamente.");
+      setShowFeedbackModal(true);
+      console.error("Submit report was unsuccessful: ", error.message);
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
 
@@ -69,6 +108,7 @@ function LabResults() {
       setInterpretations("")
       setRecommendations("")
     }
+    setChangeDetected(false);
   }, [results, resultadoId])
 
   if (!resultadoId) 
@@ -111,7 +151,7 @@ function LabResults() {
                 className="bg-[#fff]" 
                 type="submit" 
                 variant="filled" 
-                isDisabled={isSubmitting || !interpretations || !pdf}>
+                isDisabled={isSubmitting || !interpretations || !pdf || !changeDetected}>
                   {isSubmitting
                   ? "Enviando"
                   : hadResults
@@ -165,9 +205,32 @@ function LabResults() {
         </form>
       )}
 
+      {/* Confirmation Modal */}
+      <ConfirmModal
+        isOpen={showConfirmModal}
+        title={hadResults ? "Confirmar Edición de Reporte" : "Confirmar Generación de Reporte"}
+        message={hadResults 
+          ? "¿Está seguro que desea actualizar este reporte? Los cambios serán guardados permanentemente."
+          : "¿Está seguro que desea generar este reporte? Una vez generado, podrá editarlo más tarde."
+        }
+        confirmLabel="Confirmar"
+        cancelLabel="Cancelar"
+        variant="primary"
+        onConfirm={handleConfirmSubmit}
+        onCancel={() => setShowConfirmModal(false)}
+      />
+
+      {/* Feedback Modal */}
+      <FeedbackModal
+        isOpen={showFeedbackModal}
+        variant={feedbackVariant}
+        title={feedbackTitle}
+        message={feedbackMessage}
+        onClose={() => setShowFeedbackModal(false)}
+      />
+
     </div>
   )
-  // return <div>LabResults {params.resultadoId}</div>;
 }
 
 export default LabResults;
