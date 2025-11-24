@@ -25,16 +25,15 @@ const Filter: FC<Props> = ({show}) => {
   }, [])
 
 
-  return (<>
+  return (<div ref={wrapperRef}>
     <div 
-      ref={wrapperRef}
       className={`w-24 rounded-full bg-white flex justify-between items-center px-2 cursor-pointer ${modal ? 'bg-red-600 hover:bg-red-500' : 'hover:bg-gray-100'}`}
       onClick={() => setModal(prev => !prev)}>
         <p>Filter</p>
         {modal ? <BsX/> : <BsFilter />}
     </div>
     {modal && show}
-    </>
+    </div>
   )
 }
 
