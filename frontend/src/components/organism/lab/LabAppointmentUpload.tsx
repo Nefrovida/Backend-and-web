@@ -62,7 +62,7 @@ function LabAppointmentUpload() {
         const f = e.target.files?.[0];
         if (!f) return;
 
-        // Reset estados
+        // Reset states
         setInlineError(null);
         setFeedback(null);
         setSuccess(false);
@@ -88,7 +88,7 @@ function LabAppointmentUpload() {
     async function handleUpload() {
         if (!appointment || !file || !id) return;
 
-        // Solo permitir subir cuando el estudio está en laboratorio (LAB)
+        // Only allow uploading results when the study is already in the laboratory (LAB)
         if (appointment.status !== ANALYSIS_STATUS.LAB) {
             setFeedback({
                 type: "error",
@@ -104,7 +104,7 @@ function LabAppointmentUpload() {
             setFeedback(null);
             setSuccess(false);
 
-            // 1) Pedir presign al backend
+            // 1) Request presign from the backend
             const presignRes = await fetch(
                 `/api/laboratory/lab-appointments/${id}/presign`,
                 {
@@ -127,7 +127,7 @@ function LabAppointmentUpload() {
                     message =
                         body?.error?.message || body?.message || body?.error || message;
                 } catch {
-                    // ignoramos si no hay JSON
+                    // ignore if no JSON
                 }
                 throw new Error(message);
             }
@@ -135,7 +135,7 @@ function LabAppointmentUpload() {
             const presignData: PresignResponse = await presignRes.json();
             const uploadUrl = presignData.url; // DO NOT CHANGE url TO UploadURL OR uploadUrl
 
-            // 2) Subir archivo al servidor de archivos
+            // 2) Upload file to the file server
             const putRes = await fetch(uploadUrl, {
                 method: "PUT",
                 body: file,
@@ -150,7 +150,7 @@ function LabAppointmentUpload() {
                 );
             }
 
-            // 3) Confirmar subida en el backend
+            // 3) Confirm upload in the backend
             const confirmRes = await fetch(
                 `/api/laboratory/lab-appointments/${id}/result`,
                 {
@@ -172,16 +172,16 @@ function LabAppointmentUpload() {
                     message =
                         body?.error?.message || body?.message || body?.error || message;
                 } catch {
-                    // ignoramos si no hay JSON
+                    // ignore if no JSON
                 }
                 throw new Error(message);
             }
 
-            // Éxito
+            // Success
             setSuccess(true);
             setFile(null);
 
-            // Actualizamos el appointment en memoria para reflejar que ya se envió
+            // Update appointment in memory to reflect that it has been sent
             setAppointment((prev) =>
                 prev
                     ? {
@@ -243,7 +243,7 @@ function LabAppointmentUpload() {
             )}
 
             {canUpload ? (
-                // === CARD PARA SUBIR RESULTADOS ===
+                // === CARD for uploading results ===
                 <div className="rounded-2xl bg-white p-4 shadow-sm border border-slate-100 flex flex-col gap-3 max-w-md">
                     <p className="text-sm font-semibold text-slate-900">
                         Subir resultados (PDF)
@@ -285,32 +285,30 @@ function LabAppointmentUpload() {
                 </div>
             ) : appointment ? (
                 appointment.status === ANALYSIS_STATUS.SENT ? (
-                    // === CARD PARA ENVIADOS ===
+                    // === CARD for sent ===
                     <div className="rounded-2xl bg-white p-4 shadow-sm border border-slate-100 max-w-md">
                         <p className="text-sm font-semibold text-slate-900">
                             Resultados ya enviados
                         </p>
                         <p className="text-xs text-slate-600 mt-1">
                             Este estudio ya cuenta con un archivo de resultados registrado. Si
-                            necesitas corregirlo, solicita apoyo de un administrador o médico
-                            responsable.
+                            necesitas corregirlo, solicita apoyo de un administrador.
                         </p>
                     </div>
                 ) : (
-                    // === CARD PARA PENDIENTES (PENDING / REQUESTED / OTROS) ===
+                    // === CARD for pending (PENDING / REQUESTED / OTROS) ===
                     <div className="rounded-2xl bg-white p-4 shadow-sm border border-slate-100 max-w-md">
                         <p className="text-sm font-semibold text-slate-900">
                             Resultados aún no disponibles
                         </p>
                         <p className="text-xs text-slate-600 mt-1">
                             Este estudio todavía no está listo para subir resultados desde el
-                            laboratorio. Verifica que la muestra haya sido tomada y procesada.
+                            laboratorio.
                         </p>
                     </div>
                 )
             ) : null}
 
-            {/* Feedback global en card modal (como en otros módulos) */}
             <FeedbackModal
                 isOpen={feedback !== null}
                 variant={feedback?.type === "error" ? "error" : "success"}
