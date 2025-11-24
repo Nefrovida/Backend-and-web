@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import { DoctorRegistrationService } from "../service/doctor.registration.service";
 import { IAccount } from "../model/account.model";
 import { DoctorSchema } from "../validators/doctor.validator";
+import { ZodError } from "zod";
+import { log } from "console";
 
 export const createDoctor = async (req: Request, res: Response) => {
   try {
@@ -19,6 +21,24 @@ export const createDoctor = async (req: Request, res: Response) => {
       result,
     });
   } catch (error: any) {
+    
+    // ZOD VALIDATION ERROR
+    if (error instanceof ZodError) {
+
+      const formattedErrors: Record<string, string> = {};
+
+      error.errors.forEach((e) => {
+        const field = e.path?.[0] ?? "_root";
+        formattedErrors[String(field)] = e.message;
+      });
+
+      return res.status(400).json({
+        errors: formattedErrors,
+        raw: error.errors,
+      });
+    }
+
+
     const status = error?.statusCode ?? 500;
     res.status(status).json({
       message: error?.message ?? "Internal server error",

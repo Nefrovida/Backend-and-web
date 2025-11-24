@@ -4,11 +4,11 @@ import { RouteObject } from "react-router-dom";
 
 const doctorsRoutes: RouteObject[] = [
   {
-    path: "register-doctor",
+    path: "registrar-doctor",
     element: <RegisterDoctorPage />,
   },
   {
-    path: "doctors",
+    path: "doctores",
     element: <DoctorsListPage />,
   },
 ];
