@@ -18,6 +18,6 @@
     "resolveJsonModule": true,
     "types": ["node"]
   },
-  "include": ["src/**/*", "util/**/*", "prisma.config.ts", "database/**/*"],
+  "include": ["src/**/*", "util/**/*", "prisma.config.ts", "database/**/*", "services/**/*"],
   "exclude": ["node_modules", "dist"]
 }

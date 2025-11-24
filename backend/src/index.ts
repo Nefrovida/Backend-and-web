@@ -101,6 +101,9 @@ app.put(
 
 import router from "./routes/routes";
 
+// Import and start cron jobs
+import "../services/cron/cron.job.js";
+
 // Routes
 app.use("/api", router);
 
@@ -110,4 +113,5 @@ app.use(errorHandler);
 // Start server
 app.listen(port, () => {
     console.log(`The server is running at http://localhost:${port}`);
+    console.log("📅 Notification cron job started");
 });

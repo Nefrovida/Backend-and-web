@@ -258,7 +258,7 @@ model user_reports {
 
 model devices {
   id             Int @id @default(autoincrement())
-  user_id        String @db.Uuid
+  user_id        String @db.Uuid @unique
   device_token   String
   updated        DateTime
   user           users    @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
