@@ -18,12 +18,15 @@ import historyRoutes from "./history.routes";
 import agendaRoutes from "./agenda.routes"
 import appointmentRoutes from "./appointment.routes";
 import expedienteRoutes from "./expediente.routes";
+import * as analysisPDFController from "../controller/analysisPDF.controller";
 
 import { authenticate } from "../middleware/auth.middleware";
 import { requirePrivileges } from "../middleware/rbac.middleware";
 import { Privilege } from "../types/rbac.types";
 
 const router = express.Router();
+
+
 
 
 // ============================================
@@ -151,6 +154,14 @@ router.delete(
   authenticate,
   requirePrivileges([Privilege.MANAGE_ANALYSIS_TYPES]),
   analysisController.deleteAnalysis
+);
+
+//AnalysisPDF Routes
+router.get(
+  "/analysis/my-results",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_ANALYSIS]),
+  analysisPDFController.getMyAnalysisResultsController as express.RequestHandler
 );
 
 export default router;

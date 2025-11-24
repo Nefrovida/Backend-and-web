@@ -18,6 +18,7 @@ import {
   FaRegClock,
   FaClock,
 } from "react-icons/fa";
+import ConfirmModal from "../molecules/ConfirmModal";
 
 import { ROLE_IDS } from "../../types/auth.types";
 import { authService } from "../../services/auth.service";
@@ -348,41 +349,16 @@ function Navbar({ children }: Props) {
       </div>
 
       {/* Logout Modal */}
-      {showLogoutModal && (
-        <>
-          <div
-            className="fixed inset-0 bg-black/30 backdrop-blur-[2px] z-[90]"
-            onClick={() => setShowLogoutModal(false)}
-          />
-          <div className="fixed inset-0 z-[91] flex items-center justify-center px-4">
-            <div className="w-full max-w-sm bg-white rounded-2xl shadow-2xl border border-gray-100 p-6 animate-in fade-in zoom-in-95 duration-200">
-              <h2 className="text-lg font-semibold text-gray-900">
-                ¿Cerrar sesión?
-              </h2>
-              <p className="mt-2 text-sm text-gray-600">
-                Se cerrará tu sesión actual y tendrás que volver a iniciar sesión para acceder de nuevo al sistema.
-              </p>
-
-              <div className="mt-5 flex justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setShowLogoutModal(false)}
-                  className="px-4 py-2 text-sm rounded-full border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="px-4 py-2 text-sm rounded-full bg-red-600 text-white font-semibold hover:bg-red-700 transition-colors"
-                >
-                  Sí, cerrar sesión
-                </button>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
+      <ConfirmModal
+        isOpen={showLogoutModal}
+        variant="danger"
+        title="¿Cerrar sesión?"
+        message="Se cerrará tu sesión actual y tendrás que volver a iniciar sesión para acceder de nuevo al sistema."
+        confirmLabel="Sí, cerrar sesión"
+        cancelLabel="Cancelar"
+        onCancel={() => setShowLogoutModal(false)}
+        onConfirm={handleLogout}
+      />
 
       {/* Main Content */}
       <main className="flex-1 h-screen p-4 transition-all duration-300 relative z-10 overflow-auto">

@@ -1,7 +1,7 @@
 -- ========================
 --  CLEAR EXISTING DATA
 -- ========================
-TRUNCATE TABLE role_privilege, patient_history, results, patient_analysis, patient_appointment, notes, appointments, forums, familiars, doctors, laboratorists, patients, users, privileges, roles, analysis, questions_history RESTART IDENTITY CASCADE;
+TRUNCATE TABLE role_privilege, patient_history, results, patient_analysis, patient_appointment, notes, appointments, forums, familiars, doctors, laboratorists, patients, users, privileges, roles, analysis, questions_history, options, user_reports, notifications, messages, likes, users_forums RESTART IDENTITY CASCADE;
 
 -- ========================
 -- 🧩 ROLES
@@ -60,7 +60,9 @@ VALUES
 ('VIEW_LAB_APPOINTMENTS'),
 ('UPLOAD_LAB_RESULTS'),
 ('VIEW_LAB_RESULTS'),
-('EDIT_LAB_RESULTS');
+('EDIT_LAB_RESULTS'),
+('CREATE_NOTES'),
+('VIEW_NOTES');
 
 -- ========================
 -- 🧩 ROLES - PRIVILEGIOS
@@ -95,28 +97,15 @@ WHERE description IN (
   'UPDATE_CLINICAL_HISTORY',
   'VIEW_MEDICAL_RECORD',
   'VIEW_LAB_RESULTS',
-  'EDIT_LAB_RESULTS'
+  'EDIT_LAB_RESULTS',
+  'CREATE_NOTES',
+  'VIEW_NOTES'
 );
-
--- Give permission to edit lab results to Doctor
-INSERT INTO role_privilege (role_id, privilege_id)
-SELECT 2, privilege_id
-FROM privileges
-WHERE description = 'EDIT_LAB_RESULTS'
-  AND NOT EXISTS (
-    SELECT 1 FROM role_privilege rp
-    JOIN privileges p ON rp.privilege_id = p.privilege_id
-    WHERE rp.role_id = 2 AND p.description = 'EDIT_LAB_RESULTS'
-  );
 
 -- Admin (role_id = 1): full privileges
 INSERT INTO role_privilege (role_id, privilege_id)
 SELECT 1, privilege_id 
-FROM privileges 
-WHERE NOT EXISTS (
-  SELECT 1 FROM role_privilege 
-  WHERE role_id = 1 AND role_privilege.privilege_id = privileges.privilege_id
-);
+FROM privileges;
 
 -- Laboratorista (role_id = 4)
 INSERT INTO role_privilege (role_id, privilege_id)
@@ -125,271 +114,361 @@ FROM privileges
 WHERE description IN (
   'VIEW_APPOINTMENTS',
   'UPDATE_APPOINTMENTS',
-  'VIEW_ANALYSIS',  -- only catalogue viewing
+  'VIEW_ANALYSIS',
   'VIEW_LAB_APPOINTMENTS',
-  'UPLOAD_LAB_RESULTS'
+  'UPLOAD_LAB_RESULTS',
+  'VIEW_PATIENTS'
 );
 
-
--- Paciente
+-- Paciente (role_id = 3)
 INSERT INTO role_privilege (role_id, privilege_id)
 SELECT 3, privilege_id
 FROM privileges
-WHERE description IN ('VIEW_FORUMS',
-'VIEW_APPOINTMENTS',
-'CREATE_APPOINTMENTS');
-
+WHERE description IN (
+  'VIEW_FORUMS',
+  'VIEW_APPOINTMENTS',
+  'CREATE_APPOINTMENTS'
+);
 
 -- Secretaria (role_id = 6)
 INSERT INTO role_privilege (role_id, privilege_id)
-SELECT 6, privilege_id FROM privileges 
+SELECT 6, privilege_id 
+FROM privileges 
 WHERE description IN (
     'VIEW_ANALYSIS', 
     'CREATE_ANALYSIS', 
     'UPDATE_ANALYSIS', 
     'DELETE_ANALYSIS',
-    'MANAGE_ANALYSIS_TYPES'
+    'MANAGE_ANALYSIS_TYPES',
+    'VIEW_APPOINTMENTS',
+    'CREATE_APPOINTMENTS',
+    'UPDATE_APPOINTMENTS',
+    'DELETE_APPOINTMENTS',
+    'VIEW_FORUMS',
+    'VIEW_PATIENTS'
 );
 
 -- ========================
--- 👥 USERS (DEVELOP VERSION — hashed passwords)
+-- 👥 USUARIOS
 -- ========================
+
+-- Admin
 INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
-VALUES -- passwd: 1234567890
-(gen_random_uuid(), 'Carlos', 'Ramírez', 'López', true, '5551112222', 'carlosr', '$2b$10$78gwUI8tNJDco7uqgAzAlulip8F.J3PmP5OSj72gaIhbjIO9pZOcS', '1980-05-12', 'MALE', false, 6),
-(gen_random_uuid(), 'María', 'Hernández', 'Gómez', true, '5552223333', 'mariah', '$2b$10$78gwUI8tNJDco7uqgAzAlulip8F.J3PmP5OSj72gaIhbjIO9pZOcS', '1992-08-22', 'FEMALE', false, 2),
-(gen_random_uuid(), 'José', 'Martínez', 'Soto', true, '5553334444', 'josem', '$2b$10$78gwUI8tNJDco7uqgAzAlulip8F.J3PmP5OSj72gaIhbjIO9pZOcS', '1990-03-10', 'MALE', false, 4),
-(gen_random_uuid(), 'Ana', 'García', 'Torres', true, '5554445555', 'anag', '$2b$10$78gwUI8tNJDco7uqgAzAlulip8F.J3PmP5OSj72gaIhbjIO9pZOcS', '1987-12-01', 'FEMALE', false, 5),
-(gen_random_uuid(), 'Lucía', 'Pérez', 'Núñez', true, '5555556666', 'luciap', '$2b$10$78gwUI8tNJDco7uqgAzAlulip8F.J3PmP5OSj72gaIhbjIO9pZOcS', '1995-07-19', 'FEMALE', false, 3);
+VALUES 
+('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Carlos', 'Ramírez', 'González', true, '7711234567', 'testAdmin1', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1985-03-15', 'MALE', false, 1);
 
--- Admin user
+-- Doctores
 INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
-VALUES -- passwd: 1234567890
-(gen_random_uuid(), 'Administrador', 'Sistema', 'Admin', true, '5550000000', 'admin', '$2b$10$/aYCozNwvUh8qt41J1diPOwDqeW50wg8nWf76NvAQ9plWjngrj4yS', '1980-01-01', 'MALE', false, 1),
-(gen_random_uuid(), 'Ian', 'Hernández', 'Díaz', true, '5550000001', 'ian', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '1990-01-15', 'MALE', false, 1),
-(gen_random_uuid(), 'Leonardo', 'García', 'Martínez', true, '5550000002', 'leonardo', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '1988-03-20', 'MALE', false, 1),
-(gen_random_uuid(), 'Mateo', 'López', 'Rodríguez', true, '5550000003', 'mateo', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '1992-07-10', 'MALE', false, 1);
+VALUES 
+('b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22', 'María', 'López', 'Hernández', true, '7712345678', 'testDoctor1', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1980-06-20', 'FEMALE', false, 2),
+('b2eebc99-9c0b-4ef8-bb6d-6bb9bd380a33', 'José', 'García', 'Martínez', true, '7713456789', 'testDoctor2', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1975-11-10', 'MALE', false, 2),
+('b3eebc99-9c0b-4ef8-bb6d-6bb9bd380a44', 'Ana', 'Rodríguez', 'Sánchez', true, '7714567890', 'testDoctor3', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1988-02-28', 'FEMALE', false, 2);
 
+-- Pacientes
+INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
+VALUES 
+('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'Pedro', 'Fernández', 'Morales', true, '7715678901', 'testPaciente1', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1990-05-12', 'MALE', false, 3),
+('c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', 'Laura', 'Martínez', 'Cruz', true, '7716789012', 'testPaciente2', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1995-08-25', 'FEMALE', false, 3),
+('c3eebc99-9c0b-4ef8-bb6d-6bb9bd380a77', 'Roberto', 'Sánchez', 'Flores', true, '7717890123', 'testPaciente3', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1982-12-05', 'MALE', false, 3),
+('c4eebc99-9c0b-4ef8-bb6d-6bb9bd380a88', 'Sofia', 'Torres', 'Ramírez', true, '7718901234', 'testPaciente4', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '2000-01-30', 'FEMALE', true, 3);
+
+-- Laboratoristas
+INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
+VALUES 
+('d1eebc99-9c0b-4ef8-bb6d-6bb9bd380a99', 'Luis', 'Méndez', 'Castro', true, '7719012345', 'testLaboratorista1', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1987-07-18', 'MALE', false, 4),
+('d2eebc99-9c0b-4ef8-bb6d-6bb9bd380aaa', 'Carmen', 'Vargas', 'Ortiz', true, '7710123456', 'testLaboratorista2', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1992-04-22', 'FEMALE', false, 4);
+
+-- Familiares
+INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
+VALUES 
+('e1eebc99-9c0b-4ef8-bb6d-6bb9bd380bbb', 'Juan', 'Fernández', 'López', true, '7721234567', 'testFamiliar1', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1988-09-15', 'MALE', false, 5),
+('e2eebc99-9c0b-4ef8-bb6d-6bb9bd380ccc', 'Patricia', 'Martínez', 'Díaz', true, '7722345678', 'testFamiliar2', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1993-11-20', 'FEMALE', false, 5);
+
+-- Secretaria
+INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
+VALUES 
+('f1eebc99-9c0b-4ef8-bb6d-6bb9bd380ddd', 'Rosa', 'Jiménez', 'Ruiz', true, '7723456789', 'testSecretaria1', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1991-03-08', 'FEMALE', false, 6);
 
 -- ========================
--- 👨‍⚕️ DOCTORS
+-- 🩺 DOCTORES
 -- ========================
+
 INSERT INTO doctors (doctor_id, user_id, specialty, license)
-SELECT gen_random_uuid(), u.user_id, 'Cardiología', 'LIC-' || floor(random()*10000)::text
-FROM users u WHERE u.role_id = 2;  -- DOCTOR
+VALUES 
+('b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22', 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22', 'Cardiología', '12345678901234567890'),
+('b2eebc99-9c0b-4ef8-bb6d-6bb9bd380a33', 'b2eebc99-9c0b-4ef8-bb6d-6bb9bd380a33', 'Medicina General', '23456789012345678901'),
+('b3eebc99-9c0b-4ef8-bb6d-6bb9bd380a44', 'b3eebc99-9c0b-4ef8-bb6d-6bb9bd380a44', 'Pediatría', '34567890123456789012');
 
 -- ========================
 -- 🧪 LABORATORISTAS
 -- ========================
+
 INSERT INTO laboratorists (laboratorist_id, user_id)
-SELECT gen_random_uuid(), u.user_id
-FROM users u WHERE u.role_id = 4;  -- LABORATORISTA
+VALUES 
+('d1eebc99-9c0b-4ef8-bb6d-6bb9bd380a99', 'd1eebc99-9c0b-4ef8-bb6d-6bb9bd380a99'),
+('d2eebc99-9c0b-4ef8-bb6d-6bb9bd380aaa', 'd2eebc99-9c0b-4ef8-bb6d-6bb9bd380aaa');
 
 -- ========================
--- 🧍 PACIENTES
+-- 🏥 PACIENTES
 -- ========================
+
 INSERT INTO patients (patient_id, user_id, curp)
-SELECT gen_random_uuid(), u.user_id, 'CURP' || floor(random()*1000000)::text
-FROM users u WHERE u.role_id = 3;  -- PACIENTE
+VALUES 
+('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'FEMP900512HHGRNR01'),
+('c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', 'c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', 'MACL950825MHGRZR02'),
+('c3eebc99-9c0b-4ef8-bb6d-6bb9bd380a77', 'c3eebc99-9c0b-4ef8-bb6d-6bb9bd380a77', 'SAFR821205HHGNLR03'),
+('c4eebc99-9c0b-4ef8-bb6d-6bb9bd380a88', 'c4eebc99-9c0b-4ef8-bb6d-6bb9bd380a88', 'TORS000130MHGRRF04');
 
 -- ========================
--- 👪 FAMILIARES
+-- 👨‍👩‍👧 FAMILIARES
 -- ========================
+
 INSERT INTO familiars (familiar_id, user_id, patient_id)
-SELECT gen_random_uuid(), f.user_id, p.patient_id
-FROM users f
-JOIN patients p ON p.user_id <> f.user_id
-WHERE f.role_id = 5  -- FAMILIAR
-LIMIT 2;
+VALUES 
+('e1eebc99-9c0b-4ef8-bb6d-6bb9bd380bbb', 'e1eebc99-9c0b-4ef8-bb6d-6bb9bd380bbb', 'c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55'),
+('e2eebc99-9c0b-4ef8-bb6d-6bb9bd380ccc', 'e2eebc99-9c0b-4ef8-bb6d-6bb9bd380ccc', 'c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66');
+
+-- ========================
+-- 📅 CITAS (APPOINTMENTS)
+-- ========================
+
+INSERT INTO appointments (doctor_id, name, general_cost, community_cost, image_url)
+VALUES 
+('b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22', 'Consulta Cardiológica', 800.00, 500.00, 'https://example.com/cardio.jpg'),
+('b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22', 'Electrocardiograma', 600.00, 400.00, 'https://example.com/ecg.jpg'),
+('b2eebc99-9c0b-4ef8-bb6d-6bb9bd380a33', 'Consulta General', 500.00, 300.00, 'https://example.com/general.jpg'),
+('b3eebc99-9c0b-4ef8-bb6d-6bb9bd380a44', 'Consulta Pediátrica', 600.00, 350.00, 'https://example.com/pediatria.jpg'),
+('b3eebc99-9c0b-4ef8-bb6d-6bb9bd380a44', 'Control de Niño Sano', 400.00, 250.00, 'https://example.com/control.jpg');
+
+-- ========================
+-- 📋 CITAS DE PACIENTES
+-- ========================
+
+INSERT INTO patient_appointment (patient_id, appointment_id, date_hour, duration, appointment_type, link, place, appointment_status)
+VALUES 
+('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 1, '2025-11-25 10:00:00', 60, 'PRESENCIAL', NULL, 'Consultorio 101, Hospital Central', 'PROGRAMMED'),
+('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 2, '2025-10-15 14:00:00', 30, 'PRESENCIAL', NULL, 'Consultorio 101, Hospital Central', 'FINISHED'),
+('c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', 3, '2025-11-23 09:00:00', 45, 'VIRTUAL', 'https://meet.google.com/abc-defg-hij', NULL, 'PROGRAMMED'),
+('c3eebc99-9c0b-4ef8-bb6d-6bb9bd380a77', 3, '2025-10-20 16:00:00', 45, 'PRESENCIAL', NULL, 'Consultorio 205, Clínica del Sur', 'FINISHED'),
+('c4eebc99-9c0b-4ef8-bb6d-6bb9bd380a88', 4, '2025-11-28 11:00:00', 45, 'PRESENCIAL', NULL, 'Consultorio 302, Hospital Infantil', 'PROGRAMMED'),
+('c4eebc99-9c0b-4ef8-bb6d-6bb9bd380a88', 5, '2025-10-10 10:00:00', 30, 'PRESENCIAL', NULL, 'Consultorio 302, Hospital Infantil', 'FINISHED');
+
+-- ========================
+-- 📝 NOTAS MÉDICAS
+-- ========================
+
+INSERT INTO notes (patient_id, patient_appointment_id, title, content, general_notes, ailments, prescription, visibility)
+VALUES 
+('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 2, 'Revisión Cardiológica', 'Paciente presenta ritmo cardiaco regular.', 'Presión arterial: 120/80. Frecuencia cardiaca: 72 lpm.', 'Ninguna anormalidad detectada', 'Continuar con ejercicio moderado 30 min diarios', true),
+('c3eebc99-9c0b-4ef8-bb6d-6bb9bd380a77', 4, 'Consulta de Rutina', 'Paciente refiere molestias estomacales leves.', 'Temperatura: 36.5°C. Peso: 75 kg.', 'Gastritis leve', 'Omeprazol 20mg, 1 cada 24 hrs por 14 días', true),
+('c4eebc99-9c0b-4ef8-bb6d-6bb9bd380a88', 6, 'Control Pediátrico', 'Desarrollo adecuado para la edad.', 'Peso: 18 kg. Talla: 110 cm.', 'Ninguna', 'Ninguna', true);
+
+-- ========================
+-- 🔬 ANÁLISIS (CATÁLOGO)
+-- ========================
+
+INSERT INTO analysis (name, description, previous_requirements, general_cost, community_cost, image_url)
+VALUES 
+('Biometría Hemática', 'Estudio de los elementos celulares de la sangre', 'Ayuno de 8 horas', 250.00, 150.00, 'https://example.com/biometria.jpg'),
+('Química Sanguínea', 'Análisis de glucosa, urea, creatinina, ácido úrico', 'Ayuno de 10-12 horas', 300.00, 180.00, 'https://example.com/quimica.jpg'),
+('Perfil Lipídico', 'Medición de colesterol total, HDL, LDL y triglicéridos', 'Ayuno de 12 horas', 350.00, 200.00, 'https://example.com/lipidos.jpg'),
+('Examen General de Orina', 'Análisis físico, químico y microscópico de orina', 'Primera orina de la mañana', 150.00, 100.00, 'https://example.com/orina.jpg'),
+('Pruebas de Función Hepática', 'TGO, TGP, bilirrubinas, fosfatasa alcalina', 'Ayuno de 8 horas', 400.00, 250.00, 'https://example.com/hepatico.jpg');
+
+-- ========================
+-- 🧪 ANÁLISIS DE PACIENTES
+-- ========================
+
+INSERT INTO patient_analysis (laboratorist_id, analysis_id, patient_id, analysis_date, results_date, place, duration, analysis_status)
+VALUES 
+('d1eebc99-9c0b-4ef8-bb6d-6bb9bd380a99', 1, 'c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', '2025-10-16 08:00:00', '2025-10-16 14:00:00', 'Laboratorio Central', 15, 'SENT'),
+('d1eebc99-9c0b-4ef8-bb6d-6bb9bd380a99', 2, 'c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', '2025-10-16 08:15:00', '2025-10-16 16:00:00', 'Laboratorio Central', 15, 'SENT'),
+('d2eebc99-9c0b-4ef8-bb6d-6bb9bd380aaa', 3, 'c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', '2025-11-20 07:30:00', '2025-11-21 10:00:00', 'Laboratorio del Sur', 20, 'LAB'),
+('d1eebc99-9c0b-4ef8-bb6d-6bb9bd380a99', 4, 'c3eebc99-9c0b-4ef8-bb6d-6bb9bd380a77', '2025-10-21 09:00:00', '2025-10-21 12:00:00', 'Laboratorio Central', 10, 'SENT'),
+('d2eebc99-9c0b-4ef8-bb6d-6bb9bd380aaa', 1, 'c4eebc99-9c0b-4ef8-bb6d-6bb9bd380a88', '2025-11-22 08:00:00', '2025-11-23 14:00:00', 'Laboratorio del Sur', 15, 'PENDING');
+
+-- ========================
+-- 📊 RESULTADOS DE ANÁLISIS
+-- ========================
+
+INSERT INTO results (patient_analysis_id, date, path, interpretation, recommendation)
+VALUES 
+(1, '2025-10-16 14:00:00', '/uploads/biometria_20251016.pdf', 'Valores dentro de parámetros normales. Hemoglobina: 14.5 g/dL, Leucocitos: 7,200/mm³, Plaquetas: 250,000/mm³', 'Mantener dieta balanceada y hábitos saludables'),
+(2, '2025-10-16 16:00:00', '/uploads/quimica_20251016.pdf', 'Glucosa en ayuno: 95 mg/dL (normal). Creatinina: 0.9 mg/dL (normal). Urea: 28 mg/dL (normal)', 'Resultados satisfactorios, continuar con controles anuales'),
+(4, '2025-10-21 12:00:00', '/uploads/orina_20251021.pdf', 'pH: 6.0, Densidad: 1.020, Sin presencia de proteínas, glucosa ni sangre', 'Examen normal, buena hidratación');
+
+-- ========================
+-- ❓ PREGUNTAS DE HISTORIAL CLÍNICO
+-- ========================
+
+INSERT INTO questions_history (description, type)
+VALUES 
+('¿Ha sido diagnosticado con diabetes?', 'boolean'),
+('¿Ha sido diagnosticado con hipertensión?', 'boolean'),
+('¿Tiene alergias a medicamentos?', 'text'),
+('¿Qué tipo de sangre tiene?', 'select'),
+('¿Fuma?', 'select'),
+('¿Con qué frecuencia realiza ejercicio?', 'select'),
+('¿Ha tenido cirugías previas?', 'text'),
+('¿Tiene antecedentes familiares de enfermedades cardiacas?', 'boolean');
+
+-- ========================
+-- 📋 OPCIONES DE PREGUNTAS
+-- ========================
+
+INSERT INTO options (question_id, description)
+VALUES 
+(4, 'O+'),
+(4, 'O-'),
+(4, 'A+'),
+(4, 'A-'),
+(4, 'B+'),
+(4, 'B-'),
+(4, 'AB+'),
+(4, 'AB-'),
+(5, 'Sí, diariamente'),
+(5, 'Ocasionalmente'),
+(5, 'No fumo'),
+(6, 'Diariamente'),
+(6, '3-4 veces por semana'),
+(6, '1-2 veces por semana'),
+(6, 'Raramente'),
+(6, 'Nunca');
+
+-- ========================
+-- 📝 HISTORIAL DE PACIENTES
+-- ========================
+
+INSERT INTO patient_history (question_id, patient_id, answer)
+VALUES 
+(1, 'c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'No'),
+(2, 'c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'Sí'),
+(3, 'c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'Penicilina'),
+(4, 'c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'O+'),
+(5, 'c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'No fumo'),
+(6, 'c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', '3-4 veces por semana'),
+(7, 'c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'Apendicectomía en 2015'),
+(8, 'c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'Sí'),
+(1, 'c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', 'No'),
+(2, 'c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', 'No'),
+(3, 'c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', 'Ninguna'),
+(4, 'c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', 'A+'),
+(5, 'c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', 'No fumo'),
+(6, 'c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', 'Diariamente'),
+(1, 'c3eebc99-9c0b-4ef8-bb6d-6bb9bd380a77', 'No'),
+(2, 'c3eebc99-9c0b-4ef8-bb6d-6bb9bd380a77', 'Sí'),
+(3, 'c3eebc99-9c0b-4ef8-bb6d-6bb9bd380a77', 'Aspirina'),
+(4, 'c3eebc99-9c0b-4ef8-bb6d-6bb9bd380a77', 'B+'),
+(5, 'c3eebc99-9c0b-4ef8-bb6d-6bb9bd380a77', 'Ocasionalmente'),
+(6, 'c3eebc99-9c0b-4ef8-bb6d-6bb9bd380a77', '1-2 veces por semana');
 
 -- ========================
 -- 💬 FOROS
 -- ========================
-INSERT INTO forums (name, description, public_status, created_by)
-SELECT 
-  'Foro de salud ' || i,
-  'Discusión general sobre temas médicos ' || i,
-  true,
-  u.user_id
-FROM generate_series(1, 3) i
-CROSS JOIN (SELECT user_id FROM users WHERE role_id = 3 LIMIT 1) u;
+
+INSERT INTO forums (name, description, public_status, created_by, active)
+VALUES 
+('Diabetes y Nutrición', 'Espacio para compartir experiencias sobre el manejo de la diabetes', true, 'c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', true),
+('Ejercicio y Salud Cardiovascular', 'Tips y rutinas para mantener un corazón saludable', true, 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22', true),
+('Apoyo para Padres', 'Comunidad de padres compartiendo experiencias sobre salud infantil', true, 'c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', true),
+('Foro Privado Cardiología', 'Discusión entre profesionales sobre casos cardiológicos', false, 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22', true);
 
 -- ========================
--- 📅 CITAS MÉDICAS
+-- 👥 USUARIOS EN FOROS
 -- ========================
-INSERT INTO appointments (doctor_id, name, general_cost, community_cost, image_url)
-SELECT 
-  d.doctor_id, 
-  'Consulta general',
-  '500',
-  '300',
-  '/images/default.png'
-FROM doctors d;
+
+INSERT INTO users_forums (user_id, forum_id, forum_role)
+VALUES 
+('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 1, 'OWNER'),
+('c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', 1, 'MEMBER'),
+('c3eebc99-9c0b-4ef8-bb6d-6bb9bd380a77', 1, 'MEMBER'),
+('b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22', 2, 'OWNER'),
+('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 2, 'MEMBER'),
+('b2eebc99-9c0b-4ef8-bb6d-6bb9bd380a33', 2, 'MODERATOR'),
+('c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', 3, 'OWNER'),
+('e2eebc99-9c0b-4ef8-bb6d-6bb9bd380ccc', 3, 'MEMBER'),
+('b3eebc99-9c0b-4ef8-bb6d-6bb9bd380a44', 3, 'MODERATOR'),
+('b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22', 4, 'OWNER'),
+('b2eebc99-9c0b-4ef8-bb6d-6bb9bd380a33', 4, 'MEMBER'),
+('b3eebc99-9c0b-4ef8-bb6d-6bb9bd380a44', 4, 'MEMBER');
 
 -- ========================
--- 🤝 RELACIÓN PACIENTE-CITA
+-- 💬 MENSAJES EN FOROS
 -- ========================
-INSERT INTO patient_appointment (patient_id, appointment_id, date_hour, duration, appointment_type, appointment_status)
-SELECT 
-  p.patient_id,
-  a.appointment_id,
-  NOW() + (random() * (interval '30 days')),
-  45,
-  'PRESENCIAL'::"Type",
-  'PROGRAMMED'::"Status"
-FROM (
-  SELECT patient_id, ROW_NUMBER() OVER () AS rn FROM patients
-) p
-JOIN (
-  SELECT appointment_id, ROW_NUMBER() OVER () AS rn FROM appointments
-) a ON p.rn = a.rn
-LIMIT 2;
 
--- Solicitudes de citas pendientes (REQUESTED)
-INSERT INTO patient_appointment (patient_id, appointment_id, date_hour, duration, appointment_type, appointment_status)
-SELECT 
-  p.patient_id,
-  a.appointment_id,
-  NOW() + (interval '1 day'),
-  CASE 
-    WHEN (ROW_NUMBER() OVER ()) % 3 = 0 THEN 30
-    WHEN (ROW_NUMBER() OVER ()) % 3 = 1 THEN 45
-    ELSE 60
-  END,
-  CASE 
-    WHEN (ROW_NUMBER() OVER ()) % 2 = 0 THEN 'PRESENCIAL'::"Type"
-    ELSE 'VIRTUAL'::"Type"
-  END,
-  'REQUESTED'::"Status"
-FROM (
-  SELECT patient_id FROM patients ORDER BY patient_id
-) p
-CROSS JOIN (
-  SELECT appointment_id FROM appointments LIMIT 1
-) a
-LIMIT 5;
+INSERT INTO messages (forum_id, user_id, content, publication_timestamp, parent_message_id, active)
+VALUES 
+-- Foro 1: Diabetes y Nutrición
+(1, 'c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', '¡Hola a todos! Acabo de crear este foro para compartir experiencias sobre el manejo de la diabetes. ¿Qué tips de alimentación les han funcionado?', '2025-11-01 10:00:00', NULL, true),
+(1, 'c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', 'Hola Pedro! A mí me ha ayudado mucho reducir los carbohidratos refinados y aumentar el consumo de verduras. También medir la glucosa regularmente.', '2025-11-01 14:30:00', 1, true),
+(1, 'c3eebc99-9c0b-4ef8-bb6d-6bb9bd380a77', 'Excelente iniciativa! Yo recomiendo llevar un diario de alimentos para identificar qué comidas afectan más los niveles de glucosa.', '2025-11-02 09:15:00', 1, true),
+(1, 'c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'Gracias Laura! Eso de medir regularmente es clave. ¿Cada cuánto lo haces?', '2025-11-02 11:00:00', 2, true),
+
+-- Foro 2: Ejercicio y Salud Cardiovascular
+(2, 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22', 'Bienvenidos al foro de salud cardiovascular. Recuerden que el ejercicio moderado es fundamental. ¿Qué rutinas siguen ustedes?', '2025-10-28 08:00:00', NULL, true),
+(2, 'c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'Buenos días doctora! Yo hago caminata rápida 30 minutos al día, 5 días a la semana. ¿Es suficiente?', '2025-10-28 10:30:00', 5, true),
+(2, 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22', 'Excelente Pedro! Esa es una rutina muy adecuada. Lo importante es la constancia y que tu frecuencia cardíaca llegue a la zona objetivo.', '2025-10-28 12:00:00', 6, true),
+(2, 'b2eebc99-9c0b-4ef8-bb6d-6bb9bd380a33', 'Yo también recomiendo agregar ejercicios de fuerza 2-3 veces por semana. No necesariamente pesas, pueden ser ejercicios con peso corporal.', '2025-10-29 09:00:00', 5, true),
+
+-- Foro 3: Apoyo para Padres
+(3, 'c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', '¡Hola papás y mamás! Este es un espacio para compartir nuestras experiencias. ¿Cómo manejan las visitas al doctor con sus hijos?', '2025-11-05 16:00:00', NULL, true),
+(3, 'e2eebc99-9c0b-4ef8-bb6d-6bb9bd380ccc', 'Hola Laura! Yo trato de hacerlo divertido, le explico a mi hija que vamos a ver cómo está creciendo fuerte y sana.', '2025-11-06 10:00:00', 9, true),
+(3, 'b3eebc99-9c0b-4ef8-bb6d-6bb9bd380a44', 'Excelente estrategia Patricia! Como pediatra, recomiendo siempre ser honestos pero positivos. Nunca usar la visita al doctor como amenaza.', '2025-11-06 14:30:00', 10, true),
+
+-- Foro 4: Foro Privado Cardiología
+(4, 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22', 'Colegas, quiero compartir un caso interesante de arritmia que atendí esta semana.', '2025-11-10 11:00:00', NULL, true),
+(4, 'b2eebc99-9c0b-4ef8-bb6d-6bb9bd380a33', 'Adelante María, nos interesa conocer el caso.', '2025-11-10 13:00:00', 12, true),
+(4, 'b3eebc99-9c0b-4ef8-bb6d-6bb9bd380a44', 'Sí, por favor comparte. Siempre es útil aprender de las experiencias de otros colegas.', '2025-11-10 14:00:00', 12, true);
 
 -- ========================
--- 🧾 NOTAS DE CITAS
+-- ❤️ LIKES EN MENSAJES
 -- ========================
-INSERT INTO notes (patient_appointment_id, title, content)
-SELECT 
-  pa.patient_appointment_id,
-  'Nota de consulta',
-  'El paciente presenta mejora significativa.'
-FROM patient_appointment pa
-LIMIT 3;
+
+INSERT INTO likes (message_id, user_id, date)
+VALUES 
+(1, 'c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', '2025-11-01 14:25:00'),
+(1, 'c3eebc99-9c0b-4ef8-bb6d-6bb9bd380a77', '2025-11-02 09:10:00'),
+(2, 'c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', '2025-11-02 10:55:00'),
+(2, 'c3eebc99-9c0b-4ef8-bb6d-6bb9bd380a77', '2025-11-02 09:20:00'),
+(3, 'c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', '2025-11-02 11:05:00'),
+(5, 'c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', '2025-10-28 10:25:00'),
+(5, 'b2eebc99-9c0b-4ef8-bb6d-6bb9bd380a33', '2025-10-29 08:55:00'),
+(7, 'c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', '2025-10-28 12:30:00'),
+(8, 'c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', '2025-10-29 15:00:00'),
+(9, 'e2eebc99-9c0b-4ef8-bb6d-6bb9bd380ccc', '2025-11-06 09:55:00'),
+(9, 'b3eebc99-9c0b-4ef8-bb6d-6bb9bd380a44', '2025-11-06 14:25:00'),
+(10, 'c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', '2025-11-06 11:00:00'),
+(11, 'c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', '2025-11-06 15:00:00'),
+(12, 'b2eebc99-9c0b-4ef8-bb6d-6bb9bd380a33', '2025-11-10 12:55:00'),
+(12, 'b3eebc99-9c0b-4ef8-bb6d-6bb9bd380a44', '2025-11-10 13:55:00');
 
 -- ========================
--- 🔬 ANÁLISIS
+-- 🚨 REPORTES DE USUARIOS
 -- ========================
-INSERT INTO analysis (name, description, previous_requirements, general_cost, community_cost)
-VALUES
-('Biometría Hemática', 'Análisis general de sangre', 'Ayuno de 8 horas', '250', '150'),
-('Examen de orina', 'Análisis de orina general', 'Recolectar muestra matutina', '200', '120');
+
+INSERT INTO user_reports (user_id, reported_message, cause, date, status)
+VALUES 
+('c3eebc99-9c0b-4ef8-bb6d-6bb9bd380a77', 4, 'Información médica incorrecta o engañosa', '2025-11-03 10:00:00', false),
+('e2eebc99-9c0b-4ef8-bb6d-6bb9bd380ccc', 10, 'Contenido inapropiado para el foro', '2025-11-07 09:00:00', true);
 
 -- ========================
--- 📊 PACIENTE - ANÁLISIS
+-- 🔔 NOTIFICACIONES
 -- ========================
-INSERT INTO patient_analysis (laboratorist_id, analysis_id, patient_id, analysis_date, results_date, place, duration)
-SELECT 
-  l.laboratorist_id,
-  a.analysis_id,
-  p.patient_id,
-  NOW() - interval '5 days',
-  NOW() - interval '1 days',
-  'Laboratorio Central',
-  60
-FROM laboratorists l, analysis a, patients p;
 
--- ========================
--- 🧾 RESULTADOS
--- ========================
-INSERT INTO results (patient_analysis_id, date, path)
-SELECT pa.patient_analysis_id, NOW(), '/results/analysis_' || pa.patient_analysis_id || '.pdf'
-FROM patient_analysis pa;
-
--- ========================
--- 🧠 HISTORIAL DE PACIENTE
--- ========================
-INSERT INTO questions_history (description, type) VALUES
--- DATOS GENERALES
-('Nombre', 'text'),
-('Teléfono', 'text'),
-('Género', 'choice'),
-('Edad', 'number'),
-('Fecha de nacimiento', 'date'),
-('Estado de nacimiento', 'text'),
-('Fecha del cuestionario', 'date'),
-
--- PREGUNTAS CLÍNICAS DEL CUESTIONARIO
-('¿Sus padres o hermanos padecen enfermedades crónicas?', 'choice'),
-('¿Padece diabetes mellitus?', 'choice'),
-('¿Ha tenido cifras de glucosa mayores que 140 en ayunas?', 'choice'),
-('¿Está en tratamiento por presión alta?', 'choice'),
-('¿Cifras de presión arterial mayores que 130/80?', 'choice'),
-('¿Familiar con enfermedad renal crónica (ERC), es decir 
-con tratamientos de dialisis peritoneal o hemodiálisis?', 'choice'),
-('¿Regularmente se auto medica con analgésicos de venta libre como ibuprofeno, 
-naproxeno, aspirinas, etc?', 'choice'),
-('¿Ha padecido de litiasis renal (piedras en los riñones)?', 'choice'),
-('¿Tiene sobrepeso u obesidad?', 'choice'),
-('¿Consume refrescos?', 'choice'),
-('¿Cuántos refrescos por semana (600 ml)?', 'choice'),
-('¿Agrega sal a sus alimentos?', 'choice'),
-('¿Fuma o ha fumado más de 10 años?', 'choice'),
-('¿Ingiere bebidas alcohólicas con frecuencia?', 'choice'),
-('¿Ha tenido episodios de depresión?', 'choice');
-
-INSERT INTO options (question_id, description)
-SELECT q.question_id, v.description
-FROM questions_history q
-CROSS JOIN (
-    VALUES ('Masculino'), ('Femenino'), ('Otro')
-) v(description)
-WHERE q.description = 'Género';
-
-INSERT INTO options (question_id, description)
-SELECT q.question_id, opt.description
-FROM questions_history q
-CROSS JOIN (
-    VALUES ('Sí'), ('No'), ('Lo desconoce')
-) AS opt(description)
-WHERE q.description IN (
-    '¿Sus padres o hermanos padecen enfermedades crónicas?',
-    '¿Padece diabetes mellitus?',
-    '¿Ha tenido cifras de glucosa mayores que 140 en ayunas?',
-    '¿Está en tratamiento por presión alta?',
-    '¿Cifras de presión arterial mayores que 130/80?',
-    '¿Familiar con enfermedad renal crónica (ERC), es decir 
-con tratamientos de dialisis peritoneal o hemodiálisis?',
-    '¿Regularmente se auto medica con analgésicos de venta libre como ibuprofeno, 
-naproxeno, aspirinas, etc?',
-    '¿Ha padecido de litiasis renal (piedras en los riñones)?',
-    '¿Tiene sobrepeso u obesidad?',
-    '¿Consume refrescos?',
-    '¿Agrega sal a sus alimentos?',
-    '¿Fuma o ha fumado más de 10 años?',
-    '¿Ingiere bebidas alcohólicas con frecuencia?',
-    '¿Ha tenido episodios de depresión?'
-);
-
-INSERT INTO options (question_id, description)
-SELECT q.question_id, v.description
-FROM questions_history q
-CROSS JOIN (
-    VALUES 
-        ('1-2 por semana'),
-        ('3-5 por semana'),
-        ('Más de 5 por semana')
-) v(description)
-WHERE q.description = '¿Cuántos refrescos por semana (600 ml)?';
-
-INSERT INTO patient_history (question_id, patient_id, answer)
-SELECT q.question_id, p.patient_id, 'Sí'
-FROM questions_history q, patients p
-LIMIT 3;
-
--- ========================
--- ✅ FIN DEL SEED
--- ========================
+INSERT INTO notifications (user_id, answer, date, title, content, seen)
+VALUES 
+('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'Aceptada', '2025-11-25 08:00:00', 'Cita Confirmada', 'Su cita con la Dra. María López ha sido confirmada para el 25 de noviembre a las 10:00 AM', false),
+('c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', 'Recordatorio', '2025-11-22 09:00:00', 'Recordatorio de Cita', 'Recuerde su cita virtual mañana 23 de noviembre a las 9:00 AM con el Dr. José García', false),
+('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'Disponible', '2025-10-16 14:30:00', 'Resultados Disponibles', 'Sus resultados de Biometría Hemática ya están disponibles. Puede consultarlos en su perfil.', true),
+('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'Disponible', '2025-10-16 16:30:00', 'Resultados Disponibles', 'Sus resultados de Química Sanguínea ya están disponibles. Puede consultarlos en su perfil.', true),
+('c3eebc99-9c0b-4ef8-bb6d-6bb9bd380a77', 'Disponible', '2025-10-21 12:30:00', 'Resultados Disponibles', 'Sus resultados de Examen General de Orina ya están disponibles.', true),
+('c4eebc99-9c0b-4ef8-bb6d-6bb9bd380a88', 'Recordatorio', '2025-11-27 10:00:00', 'Recordatorio de Cita', 'Recuerde su cita con la Dra. Ana Rodríguez mañana 28 de noviembre a las 11:00 AM', false),
+('c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', 'Pendiente', '2025-11-20 08:00:00', 'Análisis Programado', 'Su Perfil Lipídico está programado para hoy a las 7:30 AM en el Laboratorio del Sur', true),
+('c4eebc99-9c0b-4ef8-bb6d-6bb9bd380a88', 'Pendiente', '2025-11-22 07:00:00', 'Análisis Programado', 'Su Biometría Hemática está programada para hoy a las 8:00 AM en el Laboratorio del Sur', false),
+('d1eebc99-9c0b-4ef8-bb6d-6bb9bd380a99', 'Acción Requerida', '2025-11-22 08:30:00', 'Nuevo Análisis Asignado', 'Se le ha asignado un nuevo análisis: Biometría Hemática para la paciente Sofia Torres', false),
+('b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22', 'Información', '2025-10-16 17:00:00', 'Resultados Cargados', 'Se han cargado los resultados de análisis para su paciente Pedro Fernández', true),
+('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'Respuesta', '2025-11-01 14:35:00', 'Nueva Respuesta en Foro', 'Laura Martínez ha respondido a tu mensaje en el foro "Diabetes y Nutrición"', true),
+('c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', 'Respuesta', '2025-11-02 11:05:00', 'Nueva Respuesta en Foro', 'Pedro Fernández ha respondido a tu comentario en el foro "Diabetes y Nutrición"', true),
+('b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22', 'Respuesta', '2025-10-28 10:35:00', 'Nueva Respuesta en Foro', 'Pedro Fernández ha respondido a tu mensaje en el foro "Ejercicio y Salud Cardiovascular"', true),
+('e1eebc99-9c0b-4ef8-bb6d-6bb9bd380bbb', 'Información', '2025-10-15 15:00:00', 'Acceso a Expediente', 'Ahora tienes acceso al expediente médico de Pedro Fernández como familiar autorizado', true),
+('f1eebc99-9c0b-4ef8-bb6d-6bb9bd380ddd', 'Tarea', '2025-11-22 09:00:00', 'Actualizar Catálogo', 'Se requiere actualizar los costos del catálogo de análisis para el próximo mes', false);

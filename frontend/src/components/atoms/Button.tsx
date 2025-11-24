@@ -19,7 +19,7 @@ const Button: React.FC<ButtonProps> = ({
   
   const variantStyles = {
     primary: 'bg-blue-600 text-white hover:bg-blue-700',
-    secondary: 'bg-gray-200 text-gray-800 hover:bg-gray-300',
+    secondary: 'bg-white text-gray-800 border border-gray-300 hover:bg-gray-50',
     danger: 'bg-red-600 text-white hover:bg-red-700',
     warning: 'bg-amber-400 text-gray-800 hover:bg-amber-500'
   };
