@@ -8,11 +8,6 @@ const auth = new GoogleAuth({
 const PROJECT_ID = "nefrovida-f25f3"; // Your Firebase project ID
 
 export async function sendFirebaseMessage(deviceToken: string, payload: any) {
-    console.log("📤 Sending Firebase message (HTTP v1)...");
-    console.log(`   Device token: ${deviceToken.substring(0, 30)}...`);
-    console.log(`   Title: ${payload.title}`);
-    console.log(`   Body: ${payload.body}`);
-    
     try {
         // Get OAuth 2.0 access token
         const client = await auth.getClient();
@@ -21,9 +16,7 @@ export async function sendFirebaseMessage(deviceToken: string, payload: any) {
         if (!accessToken.token) {
             throw new Error("Failed to obtain access token");
         }
-        
-        console.log(`   ✓ Access token obtained: ${accessToken.token.substring(0, 20)}...`);
-        
+                
         const url = `https://fcm.googleapis.com/v1/projects/${PROJECT_ID}/messages:send`;
         
         // HTTP v1 payload structure
@@ -45,9 +38,6 @@ export async function sendFirebaseMessage(deviceToken: string, payload: any) {
                 "Content-Type": "application/json"
             }
         });
-        
-        console.log("✅ Firebase message sent successfully!");
-        console.log(`   Response:`, response.data);
         
         return response;
     } catch (error: any) {

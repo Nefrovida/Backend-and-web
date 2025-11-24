@@ -7,33 +7,27 @@ import { Status } from "@prisma/client";
 import type { patient_appointment } from "@prisma/client";
 
 
-export const NotificationFactory = {
+const NotificationFactory = {
     // Master function to send a notification
     sendNotification: async (appointmentId: number) => {
          try {
             // first find the appointment
             const appointment = await NotificationFactory.findAppointment(appointmentId);
-            console.log("Appointment found:", appointment);
 
             // then infer the alert, aka what happened
             const notificationType = await NotificationFactory.inferNotificationType(appointment);
-            console.log("Notification type:", notificationType);
 
             // find the devices of the user we need to send the notification to
             const targetList = await NotificationFactory.buildTargetList(appointment);
-            console.log("Target list:", targetList);
 
             // delete previous associated notifications
             await NotificationFactory.deletePreviousAssociatedNotifications(appointmentId);
-            console.log("Previous notifications deleted");
 
             // build the notification list
             const notificationList = await NotificationFactory.buildNotificationList(appointmentId, notificationType, targetList, appointment);
-            console.log("Notification list:", notificationList);
 
             // execute the notifications
             await NotificationFactory.executeNotifications(notificationList);
-            console.log("Notifications executed");
 
          } catch (error) {
             console.error("Error sending notification:", error);
@@ -242,3 +236,5 @@ export const NotificationFactory = {
         }
     },
 }
+
+export default NotificationFactory;

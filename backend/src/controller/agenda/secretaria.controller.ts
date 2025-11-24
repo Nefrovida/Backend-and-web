@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import * as agendaService from '../../service/agenda.service';
+import NotificationFactory from '#/src/util/notifications/notification.factory';
 
 /**
  * Get all pending appointment requests (patient_appointments waiting to be scheduled)
@@ -71,6 +72,8 @@ export const scheduleAppointment = async (req: Request, res: Response) => {
       appointmentType: appointmentType || 'PRESENCIAL',
       place: place || 'Consultorio'
     });
+
+    NotificationFactory.sendNotification(patientAppointmentId);
 
     res.json(scheduledAppointment);
   } catch (error) {
