@@ -248,7 +248,7 @@ function Navbar({ children }: Props) {
           {isAdmin && (
             <CustomLink
               label="Registrar Doctor"
-              to="/dashboard/register-doctor"
+              to="/dashboard/registrar-doctor"
               icon={<FaUserMd />}
               activeIcon={<FaUserMd />}
               end

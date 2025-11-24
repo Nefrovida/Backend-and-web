@@ -51,7 +51,7 @@ export default function useInfiniteScroll<T>(
       setLoading(true);
       fetchResults(routeRef.current, filterFunctionRef.current(page))
         .then(({ data, status }) => {
-          if (status == 201) {
+          if (status == 400) {
             return;
           }
           setResults((prev) => [...prev, ...data]);
