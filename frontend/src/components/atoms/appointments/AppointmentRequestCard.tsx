@@ -11,6 +11,7 @@ interface Props {
 const AppointmentRequestCard: React.FC<Props> = ({ request, isSelected, onSelect }) => {
   const requestDate = new Date(request.requested_date);
   const formattedDate = `${requestDate.getDate()}/${requestDate.getMonth() + 1}/${requestDate.getFullYear()}`;
+  const formattedTime = `${requestDate.getHours().toString().padStart(2, '0')}:${requestDate.getMinutes().toString().padStart(2, '0')}`;
 
   return (
     <div
@@ -44,7 +45,7 @@ const AppointmentRequestCard: React.FC<Props> = ({ request, isSelected, onSelect
         </div>
         <div className="flex justify-between">
           <span className="text-gray-600">Fecha solicitada:</span>
-          <span className="font-medium">{formattedDate}</span>
+          <span className="font-medium">{formattedDate} {formattedTime}</span>
         </div>
       </div>
 
