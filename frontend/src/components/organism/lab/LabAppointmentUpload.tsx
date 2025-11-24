@@ -208,6 +208,16 @@ function LabAppointmentUpload() {
         }
     }
 
+    // Cerrar el modal de feedback
+    const handleFeedbackClose = () => {
+        if (feedback?.type === "success") {
+            setFeedback(null);
+            window.location.reload();
+        } else {
+            setFeedback(null);
+        }
+    };
+
     if (!appointment && !inlineError) {
         return (
             <div className="flex-1 flex items-center justify-center">
@@ -318,7 +328,7 @@ function LabAppointmentUpload() {
                         : "Resultados cargados"
                 }
                 message={feedback?.message || ""}
-                onClose={() => setFeedback(null)}
+                onClose={handleFeedbackClose}
             />
         </div>
     );
