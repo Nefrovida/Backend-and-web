@@ -30,11 +30,17 @@ function LabResults() {
   const [changeDetected, setChangeDetected] = useState(false)
 
   const handleInterpretations = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    if (e.target.value.length > 400) {
+      return
+    }
     setInterpretations(e.target.value);
     setChangeDetected(true);
   };
 
   const handleRecommendations = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    if (e.target.value.length > 400) {
+      return
+    }
     setRecommendations(e.target.value);
     setChangeDetected(true);
   };
