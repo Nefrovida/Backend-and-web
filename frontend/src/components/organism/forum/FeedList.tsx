@@ -17,24 +17,21 @@ interface Props {
 const MemoizedMessageCard = memo(MessageCard);
 
 const FeedList: FC<Props> = ({ messageInfo }) => {
-  const { results: messages, loading, scrollRef, error } = messageInfo;
+  const { results: messages, scrollRef } = messageInfo;
   return (
     <ul
       className="flex flex-col items-center gap-4 overflow-scroll h-[95%]"
       ref={scrollRef}
     >
-      {messages.length > 0 &&
-        !loading &&
-        !error &&
-        messages.map((m) => (
-          <MemoizedMessageCard
-            f={m.forums}
-            content={m.content}
-            likes={m.likes}
-            comments={m.replies}
-            key={m.messageId}
-          />
-        ))}
+      {messages.map((m) => (
+        <MemoizedMessageCard
+          f={m.forums}
+          content={m.content}
+          likes={m.likes}
+          comments={m.replies}
+          key={m.messageId}
+        />
+      ))}
     </ul>
   );
 };
