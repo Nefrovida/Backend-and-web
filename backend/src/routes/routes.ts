@@ -18,6 +18,7 @@ import historyRoutes from "./history.routes";
 import agendaRoutes from "./agenda.routes"
 import appointmentRoutes from "./appointment.routes";
 import expedienteRoutes from "./expediente.routes";
+import devicesRoutes from "./devices.routes";
 import * as analysisPDFController from "../controller/analysisPDF.controller";
 
 import { authenticate } from "../middleware/auth.middleware";
@@ -115,6 +116,8 @@ router.use("/appointments", appointmentsRoutes);
 // Doctors Routes (Protected)
 // ============================================
 router.use("/doctors", doctorRoutes);
+
+router.use("/devices", devicesRoutes);
 
 // ============================================
 // Analysis Routes (Secretary: creates / views / updates / deletes analysis types)
