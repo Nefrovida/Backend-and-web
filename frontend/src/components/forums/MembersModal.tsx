@@ -251,27 +251,9 @@ export const MembersModal: React.FC<MembersModalProps> = ({
             </button>
           )}
           <h2 className="text-lg font-semibold text-gray-800">
-            Gestionar Miembros
-          </h2>
-          <button
-            onClick={onClose}
-            className="p-1 hover:bg-gray-200 rounded-full transition-colors"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 text-gray-600"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
+          Gestionar Miembros
+        </h2>
+        <div className="w-8"></div>
         </div>
 
         {/* Error Message */}
@@ -538,16 +520,28 @@ export const MembersModal: React.FC<MembersModalProps> = ({
         )}
 
         {/* Footer */}
-        <div className="mt-6 text-center">
-          <p className="text-xs text-gray-500">
-            {forum ? `Foro: ${forum.name}` : 'Sin foro seleccionado'} • {' '}
-            {new Date().toLocaleDateString('es-ES', {
-              day: '2-digit',
-              month: '2-digit',
-              year: 'numeric',
-            })}
-          </p>
+        {/* Action Buttons */}
+        <div className="flex gap-4 justify-center mt-6">
+          <button
+            onClick={() => {
+              setError("");
+              onClose();
+            }}
+            className="px-6 py-2 bg-white text-gray-700 font-medium rounded-lg hover:bg-gray-100 transition-colors shadow-sm"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={() => {
+              setError("");
+              onClose();
+            }}
+            className="px-6 py-2 bg-blue-500 text-white font-medium rounded-lg hover:bg-blue-600 transition-colors shadow-sm"
+          >
+            Actualizar
+          </button>
         </div>
+
       </div>
     </div>
   );
