@@ -9,10 +9,9 @@ export const checkIfDeviceIsRegistered = async (deviceToken: string) => {
             },
         });
         if (device) {
-            return true;
-        } else {
-            return false;
+            return device;
         }
+        throw new Error("Device not found");
     } catch (error) {
         throw new Error("Error querying database for device");
     }

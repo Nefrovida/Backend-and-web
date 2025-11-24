@@ -3,9 +3,12 @@ import * as deviceModel from "#/src/model/devices/device.model";
 export const registerDevice = async (deviceToken: string, userId: string) => {
   try {
     // Check if device is already registered
-    const existingDevice = await deviceModel.checkIfDeviceIsRegistered(deviceToken);
-    if (existingDevice) {
-      throw new Error("Device already registered");
+    const existingUserDevice = await deviceModel.checkIfDeviceIsRegistered(deviceToken);
+    if (existingUserDevice && existingUserDevice.device_token === deviceToken) {
+      return {
+        success: true,
+        message: "Device already registered",
+      };
     }
 
     // Check if user is already registered
