@@ -110,3 +110,18 @@ export const getDoctorAppointments = async (doctorId: string) => {
 
       return { appointments, analysis };
 }
+
+export const getAppointmentById = async (appointmentId: number) => {
+  try {
+    const appointment = await prisma.patient_appointment.findUnique({
+      where: { patient_appointment_id: appointmentId },
+    });
+    if (!appointment) {
+      throw new Error("Appointment not found");
+    }
+    return appointment;
+  } catch (error) {
+    console.error("Error finding appointment by id:", error);
+    throw new Error("Failed to find appointment by id");
+  }
+}

@@ -264,7 +264,7 @@ model devices {
 }
 
 model notifications {
-  report_id     Int      @id @default(autoincrement())
+  id     Int      @id @default(autoincrement())
   user_id       String   @db.Uuid
   device_token  String
   type          NotificationType
@@ -313,7 +313,7 @@ enum ForumRole {
 enum NotificationType {
   APPOINMENT_CREATION
   APPOINTMENT_CANCELLATION
-  APPOINTMENT_UPDATE
+  APPOINTMENT_RESCHEDULE
   COMMUNITY
   OTHER
 }
