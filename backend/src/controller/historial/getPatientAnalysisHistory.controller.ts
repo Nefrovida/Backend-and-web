@@ -1,3 +1,4 @@
+import { analysisHistory } from "./../../types/analysis/analysisHistory.type";
 import { type Request, type Response } from "express";
 import Historial from "../../model/historial.model";
 import { ANALYSIS_STATUS } from "@prisma/client";
@@ -19,11 +20,13 @@ async function getPatientAnalysisHistory(req: Request, res: Response) {
     const { prisma } = await import("../../util/prisma.js");
     const patient = await prisma.patients.findFirst({
       where: { user_id: userId },
-      select: { patient_id: true }
+      select: { patient_id: true },
     });
 
     if (!patient) {
-      return res.status(404).json({ error: "Patient profile not found for this user" });
+      return res
+        .status(404)
+        .json({ error: "Patient profile not found for this user" });
     }
 
     // Parse query parameters
@@ -46,19 +49,26 @@ async function getPatientAnalysisHistory(req: Request, res: Response) {
       patient.patient_id,
       page,
       { start, end, analysisType, status }
-    ).then(d => d).map((record) => ({
-      id: record.patient_analysis_id,
-      date: record.analysis_date,
-      name: record.analysis.name,
-      recommendations: record.results.interpretation,
-      download_url: record.results.path,
-      }));
+    );
 
-    res.json(patientAnalysisHistory);
+    // @ts-ignore
+    const pAnalysisHistory = mapData(patientAnalysisHistory);
+
+    res.json(pAnalysisHistory);
   } catch (error) {
     console.error("Error fetching patient analysis history:", error);
     res.status(500).json({ error: "Failed to fetch analysis history" });
   }
+}
+
+function mapData(record: analysisHistory[]) {
+  return record.map((rec: analysisHistory) => ({
+    id: rec.patient_analysis_id,
+    date: rec.analysis_date,
+    name: rec.analysis.name,
+    download_url: rec.results.path,
+    recommendations: rec.results.interpretation,
+  }));
 }
 
 export default getPatientAnalysisHistory;

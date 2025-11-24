@@ -45,10 +45,7 @@ export default class Historial {
             }
           : {}),
       },
-      orderBy: [
-        { analysis_status: "desc" },
-        { analysis_date: "desc" },
-      ],
+      orderBy: [{ analysis_status: "desc" }, { analysis_date: "desc" }],
       select: {
         patient_analysis_id: true,
         analysis_date: true,
@@ -77,10 +74,7 @@ export default class Historial {
    * @param analysisId - The patient_analysis_id
    * @returns Single patient analysis record with full details
    */
-  static async getPatientAnalysisById(
-    patientId: string,
-    analysisId: number
-  ) {
+  static async getPatientAnalysisById(patientId: string, analysisId: number) {
     const analysisRecord = await prisma.patient_analysis.findFirst({
       where: {
         patient_analysis_id: analysisId,
