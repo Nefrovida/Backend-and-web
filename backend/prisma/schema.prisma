@@ -54,6 +54,7 @@ model users {
   user_reports       user_reports[]
   role               roles           @relation(fields: [role_id], references: [role_id], onDelete: SetDefault)
   usersForums        users_forums[]
+  devices            devices[]
 }
 
 model patients {
