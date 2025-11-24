@@ -9,8 +9,6 @@ import * as agendaService from '../../service/agenda.service';
 const getAppointmentDateAvailability = async (req: Request, res: Response) => {
     try {
       const { appointmentName, date } = req.query;
-      console.log("appointmentName: ", appointmentName);
-      console.log("date: ", date);
 
       if (!appointmentName || !date) {
         return res.status(400).json({ error: 'appointmentName and date are required' });
@@ -28,7 +26,6 @@ const getAppointmentDateAvailability = async (req: Request, res: Response) => {
         doctorId as string,
         date as string
       );
-      console.log("availability: ", availability);
   
       res.json(availability);
     } catch (error) {
