@@ -34,7 +34,7 @@ function ListResult() {
 
   return (
     <div className="w-1/3 p-2 h-screen overflow-hidden">
-      <Title>Resultados de laboratorio</Title>
+      <Title size={"medium"}>Resultados de laboratorio</Title>
       <div className="w-full flex items-end justify-end gap-5 pb-2">
         <Filter
           show={

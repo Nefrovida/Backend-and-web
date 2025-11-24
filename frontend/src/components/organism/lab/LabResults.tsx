@@ -170,7 +170,18 @@ function LabResults() {
           <Divider className="my-4" />
 
           <div className="h-[80vh] overflow-y-auto mx-2">
-            <Title size={"medium"}>Resultados de Laboratorio</Title>
+            <div className="flex items-center justify-between mb-2">
+              <Title size={"medium"}>Analisis de Laboratorio</Title>
+              <div>
+                {analysis?.analysis_status === "SENT" ? (
+                  <Status status="positive" message="Lab Enviado" />
+                ) : analysis?.analysis_status === "PENDING" ? (
+                  <Status status="neutral" message="Lab Pendiente" />
+                ) : (
+                  <Status status="default" message="Lab sin enviar" />
+                )}
+              </div>
+            </div>
 
             <LabResultsPdf 
               pdf={pdf} 
@@ -183,9 +194,9 @@ function LabResults() {
               <Title size={"medium"}>Notas de Reporte</Title>
               <div>
                 {(results?.interpretation || results?.recommendation) ? (
-                  <Status status="positive" message={`Enviado: ${new Date(results?.updated).toLocaleDateString()}`} />
+                  <Status status="positive" message={`Reporte Enviado: ${new Date(results?.updated).toLocaleDateString()}`} />
                 ) : (
-                  <Status status="neutral" message="Sin enviar" />
+                  <Status status="neutral" message="Reporte sin enviar" />
                 )}
               </div>
             </div>
