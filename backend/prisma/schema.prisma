@@ -255,15 +255,25 @@ model user_reports {
   user             users    @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
 }
 
+model devices {
+  id             Int @id @default(autoincrement())
+  user_id        @db.Uuid
+  device_token   String
+  updated        DateTime
+  user           users    @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+}
+
 model notifications {
-  report_id Int      @id @default(autoincrement())
-  user_id   String   @db.Uuid
-  answer    String
-  date      DateTime
-  title     String
-  content   String
-  seen      Boolean  @default(false)
-  user      users    @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  report_id     Int      @id @default(autoincrement())
+  user_id       String   @db.Uuid
+  device_token  String
+  answer        String
+  title         String
+  content       String
+  status        NotifcationStatus @default(PENDING)
+  created       DateTime
+  sent          DateTime
+  user          users    @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
 }
 
 enum Gender {
@@ -297,4 +307,9 @@ enum ForumRole {
   MODERATOR
   MEMBER
   VIEWER
+}
+
+enum NotifcationStatus {
+  PENDING
+  SENT
 }
