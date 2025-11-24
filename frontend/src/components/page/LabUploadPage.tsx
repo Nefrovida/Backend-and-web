@@ -1,14 +1,15 @@
-// src/components/page/LabUploadPage.tsx
-import { Outlet } from "react-router";
-import PendingLabAppointmentsList from "../organism/lab/PendingLabAppointmentsList";
+import PendingLabAppointmentsList from "@/components/organism/lab/PendingLabAppointmentsList";
+import LabAppointmentUpload from "@/components/organism/lab/LabAppointmentUpload";
 
-function LabUploadPage() {
+function LabAppointmentPage() {
     return (
-        <section className="flex w-full">
+        <div className="flex h-[calc(100vh-4rem)] overflow-hidden">
             <PendingLabAppointmentsList />
-            <Outlet />
-        </section>
+            <div className="flex-1 h-full overflow-y-auto">
+                <LabAppointmentUpload />
+            </div>
+        </div>
     );
 }
 
-export default LabUploadPage;
+export default LabAppointmentPage;
