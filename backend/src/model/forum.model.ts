@@ -60,7 +60,6 @@ export default class Forum {
     userId: string,
     forumId?: number
   ): Promise<Message[]> {
-    console.log(forumId);
     const pagination = 6;
     return await prisma.messages.findMany({
       take: pagination,
