@@ -33,7 +33,22 @@ const EditAnalysisModal: React.FC<Props> = ({
     const autoResize = (el: HTMLTextAreaElement | null) => {
         if (!el) return;
         el.style.height = "auto";
-        el.style.height = `${el.scrollHeight}px`;
+
+        const style = window.getComputedStyle(el);
+        const lineHeight = parseFloat(style.lineHeight) || 20;
+
+        const minRows = 2;
+        const maxRows = 6;
+
+        const minHeight = lineHeight * minRows;
+        const maxHeight = lineHeight * maxRows;
+
+        const contentHeight = el.scrollHeight;
+
+        const newHeight = Math.min(Math.max(contentHeight, minHeight), maxHeight);
+
+        el.style.height = `${newHeight}px`;
+        el.style.overflowY = contentHeight > maxHeight ? "auto" : "hidden";
     };
     useEffect(() => {
         if (analysis) {
