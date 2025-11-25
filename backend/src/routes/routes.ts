@@ -158,10 +158,10 @@ router.delete(
 
 //AnalysisPDF Routes
 router.get(
-  "/analysis/my-results",
+  '/analysis/download-report',
   authenticate,
   requirePrivileges([Privilege.VIEW_ANALYSIS]),
-  analysisPDFController.getMyAnalysisResultsController as express.RequestHandler
+  analysisPDFController.getMyAnalysisResultsController
 );
 
 export default router;
