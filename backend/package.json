@@ -5,7 +5,6 @@
   "main": "index.ts",
   "type": "module",
   "scripts": {
-    "test": "jest",
     "dev": "npx tsx --env-file=../.env --watch src/index.ts",
     "start": "npx tsx --env-file=../.env src/index.ts",
     "build": "tsc",
@@ -36,13 +35,8 @@
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
-    "@types/jest": "^30.0.0",
     "@types/node": "^24.9.1",
-    "@types/supertest": "^6.0.3",
-    "jest": "^30.2.0",
     "prisma": "^6.19.0",
-    "supertest": "^7.1.4",
-    "ts-jest": "^29.4.5",
     "ts-node": "^10.9.2",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3"
