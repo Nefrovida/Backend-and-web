@@ -133,19 +133,33 @@ export const replyToMessageService = async (
   // 1. Validate that the forum exists and is active
   const forumExists = await existsAndActive(forumId);
   if (!forumExists) {
+
     throw new NotFoundError('El foro no existe o está inactivo');
   }
 
   // 2. Validate that the user is a member of the forum
   const isMember = await isUserMember(forumId, userId);
   if (!isMember) {
+
     throw new BadRequestError('El usuario no es miembro del foro');
   }
 
   // 3. Validate that the parent message exists, is active, and belongs to the forum
-  const parentMessage = await forumModel.findMessageInForum(parentMessageId, forumId);
+  // 3. Validate that the parent message exists
+  const parentMessage = await forumModel.findMessageById(parentMessageId);
   if (!parentMessage) {
-    throw new NotFoundError('El mensaje padre no existe, está inactivo o no pertenece a este foro');
+
+    throw new NotFoundError(`El mensaje padre con ID ${parentMessageId} no existe`);
+  }
+
+  if (!parentMessage.active) {
+
+    throw new NotFoundError('El mensaje padre ha sido eliminado o está inactivo');
+  }
+
+  if (parentMessage.forum_id !== forumId) {
+
+    throw new BadRequestError(`El mensaje padre pertenece al foro ${parentMessage.forum_id}, no al foro actual ${forumId}`);
   }
 
   // 4. Create the reply
@@ -156,11 +170,13 @@ export const replyToMessageService = async (
     success: true,
     message: 'Respuesta creada exitosamente',
     data: {
-      messageId: reply.message_id,
+      id: reply.message_id,
       forumId: reply.forum_id,
+      createdBy: reply.user_id,
       userId: reply.user_id,
       content: reply.content,
       parentMessageId: reply.parent_message_id,
+      createdAt: reply.publication_timestamp,
       publicationTimestamp: reply.publication_timestamp,
       active: reply.active,
       author: {
@@ -176,4 +192,67 @@ export const replyToMessageService = async (
       }
     }
   };
+};
+
+/**
+ * Get messages for a forum with pagination
+ */
+export const getForumMessages = async (
+  forumId: number,
+  userId: string,
+  page: number = 1,
+  limit: number = 20
+) => {
+  // 1. Validate that the forum exists and is active
+  const forum = await forumModel.findById(forumId);
+  if (!forum || !forum.active) {
+    throw new NotFoundError('Foro no encontrado');
+  }
+
+  // 2. Check access rights
+  // If forum is private, user must be a member
+  if (!forum.public_status) {
+    const isMember = await isUserMember(forumId, userId);
+    if (!isMember) {
+      throw new BadRequestError('No tienes permiso para ver los mensajes de este foro privado');
+    }
+  }
+
+  // 3. Calculate pagination
+  const skip = (page - 1) * limit;
+
+  // 4. Get messages and total count
+  const [messages, totalCount] = await Promise.all([
+    forumModel.findMessagesByForumId(forumId, skip, limit),
+    forumModel.countForumMessages(forumId)
+  ]);
+
+  // 5. Calculate pagination metadata
+  const totalPages = Math.ceil(totalCount / limit);
+  const hasNext = page < totalPages;
+  const hasPrevious = page > 1;
+
+  // 6. Transform response
+  const formattedMessages = messages.map(msg => ({
+    id: msg.message_id,
+    forumId: msg.forum_id,
+    createdBy: msg.user_id, // Map user_id to createdBy for frontend compatibility
+    userId: msg.user_id,
+    content: msg.content,
+    createdAt: msg.publication_timestamp, // Map publication_timestamp to createdAt
+    publicationTimestamp: msg.publication_timestamp,
+    author: {
+      userId: msg.user.user_id,
+      name: msg.user.name,
+      parentLastName: msg.user.parent_last_name,
+      maternalLastName: msg.user.maternal_last_name,
+      username: msg.user.username
+    },
+    stats: {
+      repliesCount: msg._count.messages,
+      likesCount: msg._count.likes
+    }
+  }));
+
+  return formattedMessages;
 };

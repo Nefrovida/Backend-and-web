@@ -722,6 +722,17 @@ export const getForumRegularMembers = async (forumId: number) => {
 };
 
 /**
+ * Find message by ID (ignoring forum context)
+ */
+export const findMessageById = async (messageId: number) => {
+  return await prisma.messages.findUnique({
+    where: {
+      message_id: messageId
+    }
+  });
+};
+
+/**
  * Check if a message exists and belongs to a specific forum
  */
 export const findMessageInForum = async (messageId: number, forumId: number) => {
@@ -767,6 +778,58 @@ export const createReplyToMessage = async (
           likes: true
         }
       }
+    }
+  });
+};
+
+/**
+ * Find messages by forum ID with pagination
+ */
+export const findMessagesByForumId = async (
+  forumId: number,
+  skip: number,
+  take: number
+) => {
+  return await prisma.messages.findMany({
+    where: {
+      forum_id: forumId,
+      active: true,
+      parent_message_id: null // Only root messages (threads)
+    },
+    include: {
+      user: {
+        select: {
+          user_id: true,
+          name: true,
+          parent_last_name: true,
+          maternal_last_name: true,
+          username: true
+        }
+      },
+      _count: {
+        select: {
+          messages: true, // Count of replies
+          likes: true
+        }
+      }
+    },
+    orderBy: {
+      publication_timestamp: 'desc'
+    },
+    skip,
+    take
+  });
+};
+
+/**
+ * Count root messages in a forum
+ */
+export const countForumMessages = async (forumId: number) => {
+  return await prisma.messages.count({
+    where: {
+      forum_id: forumId,
+      active: true,
+      parent_message_id: null
     }
   });
 };

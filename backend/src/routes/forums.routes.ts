@@ -201,6 +201,18 @@ router.post(
 );
 
 /**
+ * Get messages for a forum
+ *
+ * GET /api/forums/:forumId/messages
+ */
+router.get(
+  "/:forumId/messages",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_FORUMS]),
+  forumsController.getMessages
+);
+
+/**
  * Reply to a message in a forum
  *
  * POST /api/forums/:forumId/replies
