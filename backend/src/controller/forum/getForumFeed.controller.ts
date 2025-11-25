@@ -1,4 +1,4 @@
-import { likes } from "./../../../prisma/database/prisma/client";
+
 import Forum from "#/src/model/forum.model";
 import { Request, Response } from "express";
 import { Message, ParsedMessage } from "#/src/types/forum.types";

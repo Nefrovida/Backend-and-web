@@ -17,7 +17,7 @@ router.get(
 router.post(
     "/analysis-appointment",
     authenticate,
-    requirePrivileges([Privilege.CREATE_ANALYSIS]),
+    requirePrivileges([Privilege.CREATE_APPOINTMENTS]),
     createAnalysisAppointment
 );
 
