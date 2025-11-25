@@ -59,6 +59,44 @@ const Home: React.FC = () => {
             )}
           </div>
         </div>
+
+        {/* Compact header for mobile: location + phone + CTA */}
+        <div className="md:hidden border-t border-slate-200">
+          <div className="max-w-6xl mx-auto px-4 py-3 flex flex-col gap-3 text-[11px] text-slate-700">
+            <div className="flex flex-col">
+              <span className="font-medium">
+                San Juan del Río, Querétaro
+              </span>
+              <span>
+                Contáctanos:{" "}
+                <span className="font-semibold">(01 427) 101-34-35</span>
+              </span>
+            </div>
+
+            <div className="flex flex-col xs:flex-row gap-2">
+              {!isLoggedIn ? (
+                <>
+                  <Link to="/login" className="flex-1">
+                    <button className="w-full px-4 py-2 rounded-full text-xs font-semibold bg-blue-900 text-white hover:bg-blue-800 transition-colors">
+                      Iniciar sesión
+                    </button>
+                  </Link>
+                  <Link to="/register" className="flex-1">
+                    <button className="w-full px-4 py-2 rounded-full text-xs font-semibold border border-blue-900 text-blue-900 bg-white hover:bg-blue-50 transition-colors">
+                      Registrarse
+                    </button>
+                  </Link>
+                </>
+              ) : (
+                <Link to="/dashboard" className="flex-1">
+                  <button className="w-full px-4 py-2 rounded-full text-xs font-semibold bg-blue-900 text-white hover:bg-blue-800 transition-colors">
+                    Ir a dashboard
+                  </button>
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
       </header>
 
       {/* Main */}
