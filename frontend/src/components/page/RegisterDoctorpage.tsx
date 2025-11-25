@@ -60,92 +60,167 @@ const RegisterDoctorPage: React.FC = () => {
   return (
     <ProtectedRoute allowedRoles={[ROLE_IDS.ADMIN]}>
       <div className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-md">
-        <Title>Registrar Doctor</Title>
+        <div className="mb-8">
+          <Title size="large">Registrar Doctor</Title>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="text"
-            name="name"
-            placeholder="Nombre"
-            value={formData.name}
-            onChange={handleInputChange}
-            className="w-full border p-2 rounded"
-          />
-          <input
-            type="text"
-            name="parent_last_name"
-            placeholder="Apellido paterno"
-            value={formData.parent_last_name}
-            onChange={handleInputChange}
-            className="w-full border p-2 rounded"
-          />
-          <input
-            type="text"
-            name="maternal_last_name"
-            placeholder="Apellido materno"
-            value={formData.maternal_last_name}
-            onChange={handleInputChange}
-            className="w-full border p-2 rounded"
-          />
-          <input
-            type="text"
-            name="username"
-            placeholder="Usuario"
-            value={formData.username}
-            onChange={handleInputChange}
-            className="w-full border p-2 rounded"
-          />
-          <input
-            type="password"
-            name="password"
-            placeholder="Contraseña"
-            value={formData.password}
-            onChange={handleInputChange}
-            className="w-full border p-2 rounded"
-          />
-          <input
-            type="text"
-            name="phone_number"
-            placeholder="Teléfono"
-            value={formData.phone_number}
-            onChange={handleInputChange}
-            className="w-full border p-2 rounded"
-          />
-          <input
-            type="date"
-            name="birthday"
-            value={formData.birthday}
-            onChange={handleInputChange}
-            className="w-full border p-2 rounded"
-          />
+          <div>
+            <label htmlFor="name" className="block text-sm font-semibold mb-2">
+              Nombre <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="name"
+              type="text"
+              name="name"
+              placeholder="Nombre"
+              value={formData.name}
+              onChange={handleInputChange}
+              className="w-full border p-2 rounded"
+              required
+            />
+          </div>
 
-          <select
-            name="gender"
-            value={formData.gender}
-            onChange={handleSelectChange}
-            className="w-full border p-2 rounded"
-          >
-            <option value={Gender.MALE}>Masculino</option>
-            <option value={Gender.FEMALE}>Femenino</option>
-            <option value={Gender.OTHER}>Otro</option>
-          </select>
+          <div>
+            <label htmlFor="parent_last_name" className="block text-sm font-semibold mb-2">
+              Apellido Paterno <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="parent_last_name"
+              type="text"
+              name="parent_last_name"
+              placeholder="Apellido paterno"
+              value={formData.parent_last_name}
+              onChange={handleInputChange}
+              className="w-full border p-2 rounded"
+              required
+            />
+          </div>
 
-          <input
-            type="text"
-            name="specialty"
-            placeholder="Especialidad"
-            value={formData.specialty}
-            onChange={handleInputChange}
-            className="w-full border p-2 rounded"
-          />
-          <input
-            type="text"
-            name="license"
-            placeholder="Licencia"
-            value={formData.license}
-            onChange={handleInputChange}
-            className="w-full border p-2 rounded"
-          />
+          <div>
+            <label htmlFor="maternal_last_name" className="block text-sm font-semibold mb-2">
+              Apellido Materno
+            </label>
+            <input
+              id="maternal_last_name"
+              type="text"
+              name="maternal_last_name"
+              placeholder="Apellido materno"
+              value={formData.maternal_last_name}
+              onChange={handleInputChange}
+              className="w-full border p-2 rounded"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="username" className="block text-sm font-semibold mb-2">
+              Usuario <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="username"
+              type="text"
+              name="username"
+              placeholder="Usuario"
+              value={formData.username}
+              onChange={handleInputChange}
+              className="w-full border p-2 rounded"
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="password" className="block text-sm font-semibold mb-2">
+              Contraseña <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="password"
+              type="password"
+              name="password"
+              placeholder="Contraseña"
+              value={formData.password}
+              onChange={handleInputChange}
+              className="w-full border p-2 rounded"
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="phone_number" className="block text-sm font-semibold mb-2">
+              Teléfono
+            </label>
+            <input
+              id="phone_number"
+              type="text"
+              name="phone_number"
+              placeholder="Teléfono"
+              value={formData.phone_number}
+              onChange={handleInputChange}
+              className="w-full border p-2 rounded"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="birthday" className="block text-sm font-semibold mb-2">
+              Fecha de Nacimiento
+            </label>
+            <input
+              id="birthday"
+              type="date"
+              name="birthday"
+              value={formData.birthday}
+              onChange={handleInputChange}
+              className="w-full border p-2 rounded"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="gender" className="block text-sm font-semibold mb-2">
+              Género
+            </label>
+            <select
+              id="gender"
+              name="gender"
+              value={formData.gender}
+              onChange={handleSelectChange}
+              className="w-full border p-2 rounded"
+            >
+              <option value={Gender.MALE}>Masculino</option>
+              <option value={Gender.FEMALE}>Femenino</option>
+              <option value={Gender.OTHER}>Otro</option>
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="specialty" className="block text-sm font-semibold mb-2">
+              Especialidad <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="specialty"
+              type="text"
+              name="specialty"
+              placeholder="Especialidad"
+              value={formData.specialty}
+              onChange={handleInputChange}
+              className="w-full border p-2 rounded"
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="license" className="block text-sm font-semibold mb-2">
+              Licencia <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="license"
+              type="text"
+              name="license"
+              placeholder="Licencia"
+              value={formData.license}
+              onChange={handleInputChange}
+              className="w-full border p-2 rounded"
+              required
+            />
+          </div>
 
           <button
             type="submit"
