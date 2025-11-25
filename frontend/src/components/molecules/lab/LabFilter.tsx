@@ -104,6 +104,19 @@ const LabFilter: FC<Props> = ({ onChange }) => {
 
       <h2 className="mt-2 text-lg">Estatus</h2>
       <div>
+        <label htmlFor="requested" className="flex gap-1 items-center">
+          <input
+            className="flex items-center hover:underline"
+            onChange={handleChangeStatus}
+            type="checkbox"
+            name="requested"
+            value="requested"
+            id="requested"
+          />
+          <MdPendingActions className="text-yellow-400" />
+          Agendado
+        </label>
+
         <label htmlFor="lab" className="flex gap-1 items-center">
           <input
             className="flex items-center hover:underline"
@@ -115,19 +128,6 @@ const LabFilter: FC<Props> = ({ onChange }) => {
           />
           <PiFlaskLight className="text-red-600" />
           En laboratorio
-        </label>
-
-        <label htmlFor="requested" className="flex gap-1 items-center">
-          <input
-            className="flex items-center hover:underline"
-            onChange={handleChangeStatus}
-            type="checkbox"
-            name="requested"
-            value="requested"
-            id="requested"
-          />
-          <MdPendingActions className="text-yellow-400" />
-          Enviado
         </label>
 
         <label htmlFor="pending" className="flex gap-1 items-center">

@@ -47,8 +47,8 @@ function ListResult() {
         />
         <Search onChange={setName} />
       </div>
-      {loading && <div>Cargando análisis...</div>}
-      {results.length == 0 && results.length == 0 && (
+      {loading && <Loading />}
+      {results.length == 0 && error && !loading && (
         <div className="text-center text-lg">
           No se encuentra ningún análisis de este tipo
         </div>
