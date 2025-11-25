@@ -58,13 +58,9 @@ const AppointmentRequestsList: React.FC<Props> = ({
     }
   };
 
-  // const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   setSearchTerm(e.target.value);
-  // };
-
   return (
     <div className="w-1/3 p-4 h-screen overflow-hidden border-r-2 border-gray-200 bg-gray-50">
-      <Title>Solicitudes de Citas</Title>
+      <Title size={"medium"}>Solicitudes de Citas</Title>
 
       <div className="w-full flex items-end justify-end pb-4 pt-2">
         <Search onChange={setSearchTerm} />
