@@ -4,6 +4,7 @@ import { GoVerified } from "react-icons/go";
 import { PiFlaskLight } from "react-icons/pi";
 import { FiAlertTriangle } from "react-icons/fi";
 import { MdPendingActions } from "react-icons/md";
+import LabStatusOption from "@/components/atoms/labs/LabStatusOption";
 
 interface Props {
   onChange: (
@@ -73,11 +74,11 @@ const LabFilter: FC<Props> = ({ onChange }) => {
   return (
     <div className="absolute top-[6.2rem] -translate-x-28 bg-white rounded-md h-[30rem] w-80 z-10 drop-shadow-xl shadow-lg p-2">
       <div className="flex justify-between items-center mb-2">
-        <h1 className="text-lg font-semibold">Filtro</h1>
+        <h1 className="text-2xl font-semibold">Filtro</h1>
       </div>
 
-      <h2 className="text-lg">Rango de fechas</h2>
-      <div className="flex gap-2 w-fit flex-wrap my-1">
+      <h2 className="text-xl">Rango de fechas</h2>
+      <div className="flex gap-2 w-fit flex-wrap my-1 text-lg">
         <span>De</span>
         <input
           type="date"
@@ -102,63 +103,36 @@ const LabFilter: FC<Props> = ({ onChange }) => {
         />
       </div>
 
-      <h2 className="mt-2 text-lg">Estatus</h2>
-      <div>
-        <label htmlFor="pending" className="flex gap-1 items-center">
-          <input
-            className="flex items-center hover:underline"
-            onChange={handleChangeStatus}
-            type="checkbox"
-            name="pending"
-            value="pending"
-            id="pending"
-          />
-          <FiAlertTriangle className="text-orange-400" />
-          Agendado
-        </label>
-
-        <label htmlFor="lab" className="flex gap-1 items-center">
-          <input
-            className="flex items-center hover:underline"
-            onChange={handleChangeStatus}
-            type="checkbox"
-            name="lab"
-            value="lab"
-            id="lab"
-          />
-          <PiFlaskLight className="text-red-600" />
-          En laboratorio
-        </label>
-
-        <label htmlFor="requested" className="flex gap-1 items-center">
-          <input
-            className="flex items-center hover:underline"
-            onChange={handleChangeStatus}
-            type="checkbox"
-            name="requested"
-            value="requested"
-            id="requested"
-          />
-          <MdPendingActions className="text-yellow-400" />
-          Enviado
-        </label>
-
-        <label htmlFor="sent" className="flex gap-1 items-center">
-          <input
-            className="flex items-center hover:underline"
-            onChange={handleChangeStatus}
-            type="checkbox"
-            name="sent"
-            value="sent"
-            id="sent"
-          />
-          <GoVerified className="text-green-600" />
-          Enviado
-        </label>
+      <h2 className="mt-2 text-xl">Estatus</h2>
+      <div className="text-lg">
+        <LabStatusOption
+          id={"requested"}
+          icon={<MdPendingActions className="text-yellow-400" />}
+          label={"Agendado"}
+          changeStatus={handleChangeStatus}
+        />
+        <LabStatusOption
+          id={"lab"}
+          icon={<PiFlaskLight className="text-red-600" />}
+          label={"En laboratorio"}
+          changeStatus={handleChangeStatus}
+        />
+        <LabStatusOption
+          id={"pending"}
+          icon={<FiAlertTriangle className="text-orange-400" />}
+          label={"Pendiente"}
+          changeStatus={handleChangeStatus}
+        />
+        <LabStatusOption
+          id={"sent"}
+          icon={<GoVerified className="text-green-600" />}
+          label={"Enviado"}
+          changeStatus={handleChangeStatus}
+        />
       </div>
 
-      <h2 className="mt-2 text-lg">Tipo de examen</h2>
-      <div className="flex flex-col overflow-scroll h-40">
+      <h2 className="mt-2 text-xl">Tipo de examen</h2>
+      <div className="flex flex-col overflow-scroll h-40 text-lg">
         {analysis.map((a, idx) => (
           <label
             htmlFor={"analysis_" + a.analysis_id}
@@ -177,7 +151,7 @@ const LabFilter: FC<Props> = ({ onChange }) => {
         ))}
       </div>
 
-      <div className="flex gap-2">
+      <div className="relative bottom-2  flex gap-2">
         <button
           className="bg-gray-300 hover:bg-gray-200 rounded-md w-1/2 py-1"
           onClick={deleteFilter}
