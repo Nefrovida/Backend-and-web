@@ -760,3 +760,63 @@ export const getMessages = async (req: Request, res: Response): Promise<void> =>
     });
   }
 };
+
+/**
+ * Get replies for a message
+ */
+export const getReplies = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const forumId = parseInt(req.params.forumId);
+    const messageId = parseInt(req.params.messageId);
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 20;
+
+    if (isNaN(forumId) || isNaN(messageId)) {
+      res.status(400).json({
+        success: false,
+        error: {
+          code: 'INVALID_ID',
+          message: 'Los IDs deben ser números válidos'
+        }
+      });
+      return;
+    }
+
+    const userId = req.user!.userId;
+
+    const result = await forumsService.getMessageReplies(forumId, messageId, userId, page, limit);
+
+    res.status(200).json(result);
+  } catch (error: any) {
+    if (error instanceof NotFoundError) {
+      res.status(404).json({
+        success: false,
+        error: {
+          code: 'NOT_FOUND',
+          message: error.message
+        }
+      });
+      return;
+    }
+
+    if (error instanceof BadRequestError) {
+      res.status(403).json({
+        success: false,
+        error: {
+          code: 'FORBIDDEN',
+          message: error.message
+        }
+      });
+      return;
+    }
+
+    console.error('Error fetching message replies:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Error interno del servidor al obtener respuestas'
+      }
+    });
+  }
+};

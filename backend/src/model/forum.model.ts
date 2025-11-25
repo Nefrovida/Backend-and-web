@@ -833,3 +833,53 @@ export const countForumMessages = async (forumId: number) => {
     }
   });
 };
+
+/**
+ * Find replies to a message with pagination
+ */
+export const findRepliesByMessageId = async (
+  parentMessageId: number,
+  skip: number,
+  take: number
+) => {
+  return await prisma.messages.findMany({
+    where: {
+      parent_message_id: parentMessageId,
+      active: true
+    },
+    include: {
+      user: {
+        select: {
+          user_id: true,
+          name: true,
+          parent_last_name: true,
+          maternal_last_name: true,
+          username: true
+        }
+      },
+      _count: {
+        select: {
+          messages: true, // Count of nested replies (if any, though usually 1 level deep)
+          likes: true
+        }
+      }
+    },
+    orderBy: {
+      publication_timestamp: 'asc' // Replies usually shown oldest to newest
+    },
+    skip,
+    take
+  });
+};
+
+/**
+ * Count replies to a message
+ */
+export const countReplies = async (parentMessageId: number) => {
+  return await prisma.messages.count({
+    where: {
+      parent_message_id: parentMessageId,
+      active: true
+    }
+  });
+};

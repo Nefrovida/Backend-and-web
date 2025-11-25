@@ -256,3 +256,87 @@ export const getForumMessages = async (
 
   return formattedMessages;
 };
+
+/**
+ * Get replies for a message with pagination
+ */
+export const getMessageReplies = async (
+  forumId: number,
+  messageId: number,
+  userId: string,
+  page: number = 1,
+  limit: number = 20
+) => {
+  // 1. Validate that the forum exists and is active
+  const forum = await forumModel.findById(forumId);
+  if (!forum || !forum.active) {
+    throw new NotFoundError('Foro no encontrado');
+  }
+
+  // 2. Check access rights
+  if (!forum.public_status) {
+    const isMember = await isUserMember(forumId, userId);
+    if (!isMember) {
+      throw new BadRequestError('No tienes permiso para ver los mensajes de este foro privado');
+    }
+  }
+
+  // 3. Validate parent message
+  const parentMessage = await forumModel.findMessageById(messageId);
+  if (!parentMessage || !parentMessage.active) {
+    throw new NotFoundError('Mensaje no encontrado');
+  }
+
+  if (parentMessage.forum_id !== forumId) {
+    throw new BadRequestError('El mensaje no pertenece al foro especificado');
+  }
+
+  // 4. Calculate pagination
+  const skip = (page - 1) * limit;
+
+  // 5. Get replies and total count
+  const [replies, totalCount] = await Promise.all([
+    forumModel.findRepliesByMessageId(messageId, skip, limit),
+    forumModel.countReplies(messageId)
+  ]);
+
+  // 6. Calculate pagination metadata
+  const totalPages = Math.ceil(totalCount / limit);
+  const hasNext = page < totalPages;
+  const hasPrevious = page > 1;
+
+  // 7. Transform response
+  const formattedReplies = replies.map(reply => ({
+    id: reply.message_id,
+    forumId: reply.forum_id,
+    createdBy: reply.user_id,
+    userId: reply.user_id,
+    content: reply.content,
+    createdAt: reply.publication_timestamp,
+    publicationTimestamp: reply.publication_timestamp,
+    parentMessageId: reply.parent_message_id,
+    author: {
+      userId: reply.user.user_id,
+      name: reply.user.name,
+      parentLastName: reply.user.parent_last_name,
+      maternalLastName: reply.user.maternal_last_name,
+      username: reply.user.username
+    },
+    stats: {
+      repliesCount: reply._count.messages,
+      likesCount: reply._count.likes
+    }
+  }));
+
+  return {
+    data: formattedReplies,
+    pagination: {
+      currentPage: page,
+      pageSize: limit,
+      totalRecords: totalCount,
+      totalPages,
+      hasNext,
+      hasPrevious
+    }
+  };
+};
