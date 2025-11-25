@@ -40,19 +40,19 @@ const Home: React.FC = () => {
             {!isLoggedIn ? (
               <>
                 <Link to="/login">
-                  <button className="px-4 py-1.5 rounded-full text-xs font-semibold bg-blue-900 text-white hover:bg-blue-800 transition-colors">
+                  <button className="px-5 py-2 rounded-full text-sm font-semibold bg-blue-900 text-white hover:bg-blue-800 transition-colors">
                     Iniciar sesión
                   </button>
                 </Link>
                 <Link to="/register">
-                  <button className="px-4 py-1.5 rounded-full text-xs font-semibold border border-blue-900 text-blue-900 bg-white hover:bg-blue-50 transition-colors">
+                  <button className="px-5 py-2 rounded-full text-sm font-semibold border border-blue-900 text-blue-900 bg-white hover:bg-blue-50 transition-colors">
                     Registrarse
                   </button>
                 </Link>
               </>
             ) : (
               <Link to="/dashboard">
-                <button className="px-4 py-1.5 rounded-full text-xs font-semibold bg-blue-900 text-white hover:bg-blue-800 transition-colors">
+                <button className="px-5 py-2 rounded-full text-sm font-semibold bg-blue-900 text-white hover:bg-blue-800 transition-colors">
                   Ir a dashboard
                 </button>
               </Link>
@@ -63,45 +63,24 @@ const Home: React.FC = () => {
 
       {/* Main */}
       <main className="flex-1">
-        <section className="bg-gradient-to-b from-sky-200/40 via-slate-50 to-slate-50">
+        <section className="bg-gradient-to-b from-sky-200/50 via-sky-100/30 to-slate-50">
           <div className="max-w-6xl mx-auto px-4 py-10 md:py-14">
             <div className="grid gap-10 md:grid-cols-2 items-center">
               {/* Left column: text + CTA */}
               <div>
                 <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 leading-tight">
-                  Cuida tu salud renal.
-                  <span className="block text-blue-900">
-                    Acompañamos cada paso de tu tratamiento.
-                  </span>
+                  <span className="text-blue-900">NEFR</span>
+                  <span className="text-red-600">O</span>
+                  <span className="text-lime-500">Vida</span>
                 </h1>
 
-                <p className="mt-4 text-base md:text-lg text-slate-700 max-w-xl">                  NefroVida A.C. es una asociación dedicada a la detección, prevención
-                  y tratamiento de la Enfermedad Renal Crónica, con enfoque humano y
-                  cuotas de recuperación accesibles. Con tu donativo también apoyas a
-                  pacientes en tratamiento sustitutivo.
+                <p className="mt-4 text-base md:text-lg text-slate-700 max-w-xl">
+                  En NefroVida A.C. estamos comprometidos con la salud de nuestros pacientes.
+                  Ofrecemos servicios especializados en la detección, prevención y tratamiento
+                  de la Enfermedad Renal Crónica, diseñados para proteger tu salud renal y mejorar
+                  tu calidad de vida.
                 </p>
 
-                {/* Three pillars, in small cards */}
-                <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-lg text-center text-xs text-slate-600">
-                  <div className="rounded-2xl bg-white border border-slate-100 p-3">
-                    <p className="font-semibold text-slate-900">Tamizaje ERC</p>
-                    <p className="mt-1">
-                      Detección temprana en niños, adultos y embarazadas.
-                    </p>
-                  </div>
-                  <div className="rounded-2xl bg-white border border-slate-100 p-3">
-                    <p className="font-semibold text-slate-900">Consultas</p>
-                    <p className="mt-1">
-                      Nefrología, nefro pediatra, nutrición, psicología y más.
-                    </p>
-                  </div>
-                  <div className="rounded-2xl bg-white border border-slate-100 p-3">
-                    <p className="font-semibold text-slate-900">Laboratorio</p>
-                    <p className="mt-1">
-                      Estudios de laboratorio y ultrasonidos con cuotas accesibles.
-                    </p>
-                  </div>
-                </div>
               </div>
 
               {/* Right column: info cards of services */}
@@ -150,13 +129,12 @@ const Home: React.FC = () => {
                         blandos, hernias, testicular, mama y más.
                       </p>
                       <p className="mt-1 text-slate-500 text-[11px]">
-                        Realizados por un médico certificado, con enfoque en
-                        diagnóstico oportuno.
+                        Realizados por un médico certificado.
                       </p>
                     </div>
                   </div>
                 </div>
-
+{/* 
                 <div className="rounded-3xl bg-blue-900 text-white p-5 md:p-6 text-sm">
                   <p className="font-semibold">Tu donativo transforma vidas</p>
                   <p className="mt-2 text-xs md:text-sm text-blue-50">
@@ -165,7 +143,7 @@ const Home: React.FC = () => {
                     continuar realizando prevención de Enfermedad Renal a
                     personas en situación vulnerable.
                   </p>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
@@ -229,11 +207,11 @@ const Home: React.FC = () => {
                 <h2 className="text-lg md:text-xl font-semibold text-slate-900">
                   Conoce más sobre NefroVida A.C.
                 </h2>
-                <p className="mt-2 text-sm text-slate-600 max-w-xl">
+                {/* <p className="mt-2 text-sm text-slate-600 max-w-xl">
                   Nuestra labor está guiada por principios humanos, atención interdisciplinaria
-                  y un profundo compromiso con la prevención, detección y tratamiento de la Enfermedad Renal Crónica
+                  y un compromiso con la prevención, detección y tratamiento de la Enfermedad Renal Crónica
                   en personas en situación vulnerable.
-                </p>
+                </p> */}
               </div>
 
               <a
@@ -334,7 +312,7 @@ const Home: React.FC = () => {
               © {new Date().getFullYear()} NefroVida A.C. Todos los derechos reservados.
             </p>
             <p className="text-slate-400">
-              Vitalsoft.
+              Creado porVitalsoft.
             </p>
           </div>
         </div>
