@@ -18,7 +18,7 @@ export const DoctorRegistrationService = {
     adminAccount: { role_id: number },
     data: RegisterDoctorInput
   ) => {
-    // Only allow admins (adjust role_id according to your roles table)
+    // Only allow admins
     if (!adminAccount || adminAccount.role_id !== 1) {
       const err = new Error("Only admins can register doctors");
       (err as any).statusCode = 403;
@@ -28,7 +28,7 @@ export const DoctorRegistrationService = {
     // Parse birthday or default to now
     const birthdayDate = data.birthday ? new Date(data.birthday) : new Date();
 
-    // 1. Create user with doctor role (role_id = 2, adjust if needed)
+    // 1. Create user with doctor role
     const user: IUser = await createUser({
       name: data.name,
       parent_last_name: data.parent_last_name,

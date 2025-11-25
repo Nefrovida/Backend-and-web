@@ -53,13 +53,13 @@ export const createDoctor = async (req: Request, res: Response) => {
     // Handle both formats: { doctor: {...} } and direct {...}
     let doctorPayload = req.body.doctor || req.body;
 
-    // Remove loggedUser from payload if it exists (legacy support)
+    // Remove loggedUser from payload if it exists
     if (doctorPayload && typeof doctorPayload === 'object') {
       const { loggedUser, ...cleanPayload } = doctorPayload;
       doctorPayload = cleanPayload;
     }
 
-    // Validate doctor input using Zod schema (using parseAsync for async validations)
+    // Validate doctor input using Zod schema
     const doctorData = await DoctorSchema.parseAsync(doctorPayload);
 
     // Call service to register doctor
