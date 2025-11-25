@@ -12,6 +12,10 @@ body {
 }
 
 @layer utilities {
+  .landing-text {
+      font-size: 1.05rem;
+    }
+
   /* Hide scrollbar for Chrome, Safari, and Opera */
   .no-scrollbar::-webkit-scrollbar {
     display: none;
