@@ -169,4 +169,13 @@ export default class AppointmentModel {
       };
     });
   }
+  static async deleteAppointment(appointmentId: number){
+    const appoinmentDeleted = await prisma.patient_appointment.update({
+      where : {patient_appointment_id: appointmentId},
+      data: {
+        appointment_status: "CANCELED",
+      },
+    })
+    return;
+  }
 }

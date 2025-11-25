@@ -91,4 +91,29 @@ export default class AppointmentController {
       res.status(500).json({ error: 'Error al reagendar cita' });
     }
   }
+  static async deleteAppointment(req: Request, res: Response){
+    try{
+      const {id} = req.params;
+
+      // Validaciones
+
+      const appointmentId = parseInt(id);
+      if(isNaN(appointmentId)){
+        return res.status(400).json({error: 'ID inválido'});
+      }
+      const existing = await AppointmentModel.getAppointmentById(appointmentId);
+      if(!existing){
+        return res.status(404).json({error: 'Cita no encontrada'});
+      }
+      //Eliminar
+      const deleteAppointment = await AppointmentModel.deleteAppointment(
+        appointmentId
+      );
+      return res.status(200).json({message: 'Success'});
+    }
+    catch(error){
+      console.error('Error deleting appointment:', error);
+      res.status(500).json({error: 'Error al eliminar cita'})
+    }
+  }
 }

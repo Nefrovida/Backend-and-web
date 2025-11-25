@@ -100,11 +100,6 @@ router.use("/agenda", agendaRoutes);
 router.use("/appointments", appointmentRoutes); 
 
 // ============================================
-// Appointments Routes (Protected)
-// ============================================
-router.use("/appointments", appointmentRoutes); 
-
-// ============================================
 // Historial Routes (Patient Analysis History)
 // ============================================
 router.use("/historial", historialRoutes);

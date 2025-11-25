@@ -6,6 +6,8 @@ import { Privilege } from '../types/rbac.types';
 
 const router = express.Router();
 
+
+
 // GET /api/appointments
 router.get(
   '/',
@@ -29,5 +31,13 @@ router.put(
   requirePrivileges([Privilege.UPDATE_APPOINTMENTS]),
   AppointmentController.rescheduleAppointment
 );
+
+router.delete(
+  '/:id/delete',
+  //authenticate,
+  //requirePrivileges([Privilege.DELETE_APPOINTMENTS]),
+  AppointmentController.deleteAppointment
+)
+
 
 export default router;
