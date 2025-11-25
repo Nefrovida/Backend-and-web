@@ -102,7 +102,7 @@ export type UpdateForumInputValidated = z.infer<typeof updateForumSchema>;
  * Schema for replying to a message in a forum
  */
 export const replyToMessageSchema = z.object({
-  parentMessageId: z.number().int().positive({
+  parent_message_id: z.coerce.number().int().positive({
     message: 'El ID del mensaje padre debe ser un número entero positivo'
   }),
   content: z.string()

@@ -57,13 +57,9 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
       req.query.isPublic === 'false' ? false :
         undefined;
 
-    // If the user is a Patient and did not specify a visibility filter, default to public-only forums
-    if (req.query.isPublic === undefined && req.user?.roleId === DEFAULT_ROLES.PATIENT) {
-      isPublic = true;
-    }
-
     // Call service to get forums
-    const forums = await forumsService.getAllForums(page, limit, { search, isPublic });
+    const userId = req.user?.userId;
+    const forums = await forumsService.getAllForums(page, limit, { search, isPublic }, userId);
     res.status(200).json(forums);
   } catch (error: any) {
     res.status(error.statusCode || 500).json({ error: error.message });
@@ -628,6 +624,8 @@ export const removeForumMember = async (req: Request, res: Response): Promise<vo
  */
 export const replyToMessage = async (req: Request, res: Response): Promise<void> => {
   try {
+
+
     const validatedData = replyToMessageSchema.parse(req.body);
     const forumId = parseInt(req.params.forumId);
 
@@ -645,10 +643,12 @@ export const replyToMessage = async (req: Request, res: Response): Promise<void>
 
     const userId = req.user!.userId;
 
+
+
     const result = await forumsService.replyToMessageService(
       forumId,
       userId,
-      validatedData.parentMessageId,
+      validatedData.parent_message_id,
       validatedData.content
     );
 
@@ -697,6 +697,125 @@ export const replyToMessage = async (req: Request, res: Response): Promise<void>
       error: {
         code: 'INTERNAL_SERVER_ERROR',
         message: 'Error interno del servidor al procesar la respuesta'
+      }
+    });
+  }
+};
+
+/**
+ * Get messages for a forum
+ */
+export const getMessages = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const forumId = parseInt(req.params.forumId);
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 20;
+
+    if (isNaN(forumId)) {
+      res.status(400).json({
+        success: false,
+        error: {
+          code: 'INVALID_FORUM_ID',
+          message: 'El ID del foro debe ser un número válido'
+        }
+      });
+      return;
+    }
+
+    const userId = req.user!.userId;
+
+    const result = await forumsService.getForumMessages(forumId, userId, page, limit);
+
+    res.status(200).json(result);
+  } catch (error: any) {
+    if (error instanceof NotFoundError) {
+      res.status(404).json({
+        success: false,
+        error: {
+          code: 'NOT_FOUND',
+          message: error.message
+        }
+      });
+      return;
+    }
+
+    if (error instanceof BadRequestError) {
+      res.status(403).json({
+        success: false,
+        error: {
+          code: 'FORBIDDEN',
+          message: error.message
+        }
+      });
+      return;
+    }
+
+    console.error('Error fetching forum messages:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Error interno del servidor al obtener mensajes'
+      }
+    });
+  }
+};
+
+/**
+ * Get replies for a message
+ */
+export const getReplies = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const forumId = parseInt(req.params.forumId);
+    const messageId = parseInt(req.params.messageId);
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 20;
+
+    if (isNaN(forumId) || isNaN(messageId)) {
+      res.status(400).json({
+        success: false,
+        error: {
+          code: 'INVALID_ID',
+          message: 'Los IDs deben ser números válidos'
+        }
+      });
+      return;
+    }
+
+    const userId = req.user!.userId;
+
+    const result = await forumsService.getMessageReplies(forumId, messageId, userId, page, limit);
+
+    res.status(200).json(result);
+  } catch (error: any) {
+    if (error instanceof NotFoundError) {
+      res.status(404).json({
+        success: false,
+        error: {
+          code: 'NOT_FOUND',
+          message: error.message
+        }
+      });
+      return;
+    }
+
+    if (error instanceof BadRequestError) {
+      res.status(403).json({
+        success: false,
+        error: {
+          code: 'FORBIDDEN',
+          message: error.message
+        }
+      });
+      return;
+    }
+
+    console.error('Error fetching message replies:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Error interno del servidor al obtener respuestas'
       }
     });
   }

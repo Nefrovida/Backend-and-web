@@ -211,6 +211,18 @@ router.post(
 );
 
 /**
+ * Get messages for a forum
+ *
+ * GET /api/forums/:forumId/messages
+ */
+router.get(
+  "/:forumId/messages",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_FORUMS]),
+  forumsController.getMessages
+);
+
+/**
  * Reply to a message in a forum
  *
  * POST /api/forums/:forumId/replies
@@ -238,5 +250,17 @@ router.post(
  * }
  */
 router.post("/:forumId/replies", authenticate, forumsController.replyToMessage);
+
+/**
+ * Get replies for a message
+ *
+ * GET /api/forums/:forumId/messages/:messageId/replies
+ */
+router.get(
+  "/:forumId/messages/:messageId/replies",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_FORUMS]),
+  forumsController.getReplies
+);
 
 export default router;
