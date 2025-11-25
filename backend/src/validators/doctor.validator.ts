@@ -16,7 +16,7 @@ export const DoctorSchema = z.object({
     .regex(/^[a-zA-ZÁÉÍÓÚáéíóúÑñ ]+$/, "Maternal last name can only contain letters and spaces")
     .optional(),
   username: z.string()
-    .regex(/^[a-zA-Z0-9_.]+$/, "Username can only contain letters, numbers, underscores, and dots")
+    .regex(/^[a-zA-Z0-9_]+$/, "Username can only contain letters, numbers, underscores")
     .min(3, "Username must have at least 3 characters")
     .max(20, "Username max length is 20")
     .refine(
@@ -37,7 +37,14 @@ export const DoctorSchema = z.object({
   birthday: 
     z.string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, "Birthday must be in YYYY-MM-DD format")
-    .optional(),
+    .optional()
+    .refine((value) => {
+       if (!value) return true;
+       const year = parseInt(value.split("-")[0], 10);
+       return year >= 1910 && year < 2100;
+      }, {
+        message: "Birthday must be from year 1910 or later and before year 2100"
+      }),
   gender: 
     z.enum(["MALE", "FEMALE", "OTHER"])
     .optional(),
