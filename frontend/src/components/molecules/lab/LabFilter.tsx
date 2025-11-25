@@ -140,7 +140,7 @@ const LabFilter: FC<Props> = ({ onChange }) => {
             id="requested"
           />
           <MdPendingActions className="text-yellow-400" />
-          Enviado
+          Pendiente
         </label>
 
         <label htmlFor="sent" className="flex gap-1 items-center">
