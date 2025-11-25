@@ -4,7 +4,7 @@ function Title({
   size = "medium",
   children,
 }: {
-  size: string;
+  size?: string;
   children: ReactElement | string;
 }) {
   if (size == "large") {
