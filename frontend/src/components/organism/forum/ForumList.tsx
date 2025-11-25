@@ -20,7 +20,7 @@ const ForumList = () => {
       .then((data) => {
         data = data.map(({ forum_id, name }) => ({
           forumId: forum_id,
-          name: name.split(" -")[0],
+          name: name,
         }));
         setForums(data);
       })

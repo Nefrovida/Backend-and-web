@@ -36,7 +36,7 @@ function parseMessages(m: Message): ParsedMessage {
     replies: m._count.messages,
     forums: {
       forumId: m.forum.forum_id,
-      name: m.forum.name.split(" -")[0],
+      name: m.forum.name,
     },
   };
 }

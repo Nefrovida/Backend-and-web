@@ -21,7 +21,7 @@ export default function useSendMessage(
       .then((data) => {
         const dataInfo = data.map((d) => {
           const { forumId, name } = d;
-          return { forumId, name: name.split(" -")[0] };
+          return { forumId, name: name };
         });
         setForums(dataInfo);
       })
