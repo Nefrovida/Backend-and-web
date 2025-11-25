@@ -27,6 +27,7 @@ import ConfirmModal from "../molecules/ConfirmModal";
 
 import { ROLE_IDS } from "../../types/auth.types";
 import { authService } from "../../services/auth.service";
+import { PiFlaskFill, PiFlaskLight } from "react-icons/pi";
 
 interface Props {
   children: React.ReactNode;
@@ -230,14 +231,16 @@ function Navbar({ children }: Props) {
             activeIcon={<BsFillPersonFill />}
             end
           />
-          <NavButton
-            label={showNotes ? "Cerrar Notas" : "Notas"}
-            isActive={showNotes}
-            onClick={() => setShowNotes(!showNotes)}
-            icon={<LuNotebook />}
-            activeIcon={<LuNotebookPen />}
-            activeClass="bg-green-50 text-green-600 scale-105 shadow-sm ring-1 ring-green-100"
-          />
+          {isDoctor && (
+            <NavButton
+              label={showNotes ? "Cerrar Notas" : "Notas"}
+              isActive={showNotes}
+              onClick={() => setShowNotes(!showNotes)}
+              icon={<LuNotebook />}
+              activeIcon={<LuNotebookPen />}
+              activeClass="bg-green-50 text-green-600 scale-105 shadow-sm ring-1 ring-green-100"
+            />
+          )}
 
           <div className="w-8 h-0.5 bg-gray-200/60 rounded-full mt-1"></div>
         </div>
@@ -256,7 +259,7 @@ function Navbar({ children }: Props) {
           )}
 
           {/* Upload Results, only Laboratorist */}
-          {(isLaboratorist || isAdmin) && (
+          {isLaboratorist && (
             <CustomLink
               label="Subir Resultados"
               to="/dashboard/laboratorio/subir"
@@ -267,13 +270,15 @@ function Navbar({ children }: Props) {
           )}
 
           {/* Expedientes */}
-          <CustomLink
-            label="Expedientes"
-            to="/dashboard/expedientes"
-            icon={<FaRegFolder />}
-            activeIcon={<FaFolderOpen />}
-            end
-          />
+          {isDoctor && (
+            <CustomLink
+              label="Expedientes"
+              to="/dashboard/expedientes"
+              icon={<FaRegFolder />}
+              activeIcon={<FaFolderOpen />}
+              end
+            />
+          )}
 
           {/* Forum access EVERYONE */}
           <CustomLink
@@ -306,12 +311,23 @@ function Navbar({ children }: Props) {
           )}
 
           {/* Laboratory results, Doctor */}
-          {(isDoctor || isAdmin) && (
+          {isDoctor && (
             <CustomLink
               label="Laboratorio"
               to="/dashboard/laboratorio"
               icon={<IoFlaskOutline />}
               activeIcon={<IoFlaskSharp />}
+              end
+            />
+          )}
+
+          {/* Laboratorista analysis */}
+          {isLaboratorist && (
+            <CustomLink
+              label="Agenda"
+              to="/dashboard/analisis-dia"
+              icon={<PiFlaskLight />}
+              activeIcon={<PiFlaskFill />}
               end
             />
           )}
