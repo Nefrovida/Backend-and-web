@@ -22,6 +22,7 @@ const RegisterDoctorPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const currentUser: AuthResponse["user"] = JSON.parse(
     localStorage.getItem("user") || "{}"
@@ -46,12 +47,35 @@ const RegisterDoctorPage: React.FC = () => {
     setLoading(true);
     setError(null);
     setSuccess(null);
+    setFieldErrors({});
 
     try {
       await registerDoctor(currentUser, formData);
       setSuccess("Doctor registrado correctamente");
+      setFormData({
+        name: "",
+        parent_last_name: "",
+        maternal_last_name: "",
+        username: "",
+        password: "",
+        phone_number: "",
+        birthday: "",
+        gender: Gender.OTHER,
+        specialty: "",
+        license: "",
+      });
     } catch (err: any) {
-      setError(err.message || "Error al registrar doctor");
+      // Check if error has field-specific errors
+      if (err.response?.data?.errors) {
+        setFieldErrors(err.response.data.errors);
+        setError("Por favor corrige los errores en el formulario");
+      } else if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else if (err.message) {
+        setError(err.message);
+      } else {
+        setError("Error al registrar doctor");
+      }
     } finally {
       setLoading(false);
     }
@@ -76,9 +100,10 @@ const RegisterDoctorPage: React.FC = () => {
               placeholder="Nombre"
               value={formData.name}
               onChange={handleInputChange}
-              className="w-full border p-2 rounded"
+              className={`w-full border p-2 rounded ${fieldErrors.name ? "border-red-500" : ""}`}
               required
             />
+            {fieldErrors.name && <p className="text-red-500 text-sm mt-1">{fieldErrors.name}</p>}
           </div>
 
           <div>
@@ -92,9 +117,10 @@ const RegisterDoctorPage: React.FC = () => {
               placeholder="Apellido paterno"
               value={formData.parent_last_name}
               onChange={handleInputChange}
-              className="w-full border p-2 rounded"
+              className={`w-full border p-2 rounded ${fieldErrors.parent_last_name ? "border-red-500" : ""}`}
               required
             />
+            {fieldErrors.parent_last_name && <p className="text-red-500 text-sm mt-1">{fieldErrors.parent_last_name}</p>}
           </div>
 
           <div>
@@ -108,8 +134,9 @@ const RegisterDoctorPage: React.FC = () => {
               placeholder="Apellido materno"
               value={formData.maternal_last_name}
               onChange={handleInputChange}
-              className="w-full border p-2 rounded"
+              className={`w-full border p-2 rounded ${fieldErrors.maternal_last_name ? "border-red-500" : ""}`}
             />
+            {fieldErrors.maternal_last_name && <p className="text-red-500 text-sm mt-1">{fieldErrors.maternal_last_name}</p>}
           </div>
 
           <div>
@@ -123,9 +150,10 @@ const RegisterDoctorPage: React.FC = () => {
               placeholder="Usuario"
               value={formData.username}
               onChange={handleInputChange}
-              className="w-full border p-2 rounded"
+              className={`w-full border p-2 rounded ${fieldErrors.username ? "border-red-500" : ""}`}
               required
             />
+            {fieldErrors.username && <p className="text-red-500 text-sm mt-1">{fieldErrors.username}</p>}
           </div>
 
           <div>
@@ -139,9 +167,10 @@ const RegisterDoctorPage: React.FC = () => {
               placeholder="Contraseña"
               value={formData.password}
               onChange={handleInputChange}
-              className="w-full border p-2 rounded"
+              className={`w-full border p-2 rounded ${fieldErrors.password ? "border-red-500" : ""}`}
               required
             />
+            {fieldErrors.password && <p className="text-red-500 text-sm mt-1">{fieldErrors.password}</p>}
           </div>
 
           <div>
@@ -155,8 +184,9 @@ const RegisterDoctorPage: React.FC = () => {
               placeholder="Teléfono"
               value={formData.phone_number}
               onChange={handleInputChange}
-              className="w-full border p-2 rounded"
+              className={`w-full border p-2 rounded ${fieldErrors.phone_number ? "border-red-500" : ""}`}
             />
+            {fieldErrors.phone_number && <p className="text-red-500 text-sm mt-1">{fieldErrors.phone_number}</p>}
           </div>
 
           <div>
@@ -169,8 +199,9 @@ const RegisterDoctorPage: React.FC = () => {
               name="birthday"
               value={formData.birthday}
               onChange={handleInputChange}
-              className="w-full border p-2 rounded"
+              className={`w-full border p-2 rounded ${fieldErrors.birthday ? "border-red-500" : ""}`}
             />
+            {fieldErrors.birthday && <p className="text-red-500 text-sm mt-1">{fieldErrors.birthday}</p>}
           </div>
 
           <div>
@@ -182,12 +213,13 @@ const RegisterDoctorPage: React.FC = () => {
               name="gender"
               value={formData.gender}
               onChange={handleSelectChange}
-              className="w-full border p-2 rounded"
+              className={`w-full border p-2 rounded ${fieldErrors.gender ? "border-red-500" : ""}`}
             >
               <option value={Gender.MALE}>Masculino</option>
               <option value={Gender.FEMALE}>Femenino</option>
               <option value={Gender.OTHER}>Otro</option>
             </select>
+            {fieldErrors.gender && <p className="text-red-500 text-sm mt-1">{fieldErrors.gender}</p>}
           </div>
 
           <div>
@@ -201,14 +233,15 @@ const RegisterDoctorPage: React.FC = () => {
               placeholder="Especialidad"
               value={formData.specialty}
               onChange={handleInputChange}
-              className="w-full border p-2 rounded"
+              className={`w-full border p-2 rounded ${fieldErrors.specialty ? "border-red-500" : ""}`}
               required
             />
+            {fieldErrors.specialty && <p className="text-red-500 text-sm mt-1">{fieldErrors.specialty}</p>}
           </div>
 
           <div>
             <label htmlFor="license" className="block text-sm font-semibold mb-2">
-              Licencia <span className="text-red-500">*</span>
+              Cédula Profesional <span className="text-red-500">*</span>
             </label>
             <input
               id="license"
@@ -217,9 +250,10 @@ const RegisterDoctorPage: React.FC = () => {
               placeholder="Licencia"
               value={formData.license}
               onChange={handleInputChange}
-              className="w-full border p-2 rounded"
+              className={`w-full border p-2 rounded ${fieldErrors.license ? "border-red-500" : ""}`}
               required
             />
+            {fieldErrors.license && <p className="text-red-500 text-sm mt-1">{fieldErrors.license}</p>}
           </div>
 
           <button
@@ -231,8 +265,8 @@ const RegisterDoctorPage: React.FC = () => {
           </button>
         </form>
 
-        {error && <p className="text-red-500 mt-4">{error}</p>}
-        {success && <p className="text-green-500 mt-4">{success}</p>}
+        {error && <p className="text-red-500 mt-4 text-center font-semibold">{error}</p>}
+        {success && <p className="text-green-500 mt-4 text-center font-semibold">{success}</p>}
       </div>
     </ProtectedRoute>
   );
