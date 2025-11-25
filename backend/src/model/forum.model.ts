@@ -1,6 +1,7 @@
-// backend/src/model/forum.model.ts
+import { messages } from "./../../prisma/database/prisma/client";
 import { prisma } from "../util/prisma";
 import { ForumRole } from ".prisma/client";
+import { Message } from "../types/forum.types";
 
 export default class Forum {
   Forum() {}
@@ -19,8 +20,22 @@ export default class Forum {
     });
   }
 
+  private static async getPublicForums() {
+    return await prisma.forums.findMany({
+      where: {
+        public_status: true,
+        active: true,
+      },
+      select: {
+        forum_id: true,
+        name: true,
+      },
+      take: 5,
+    });
+  }
+
   static async getMyForums(userId: string) {
-    return await prisma.users_forums.findMany({
+    const myForums = await prisma.users_forums.findMany({
       where: {
         user_id: userId,
       },
@@ -31,6 +46,61 @@ export default class Forum {
             name: true,
           },
         },
+      },
+      take: 5,
+    });
+
+    const publicForums = await this.getPublicForums();
+
+    return [...myForums, ...publicForums];
+  }
+
+  static async getForumFeed(
+    page: number,
+    userId: string,
+    forumId?: number
+  ): Promise<Message[]> {
+    const pagination = 6;
+    return await prisma.messages.findMany({
+      take: pagination,
+      skip: pagination * page,
+      where: {
+        forum: {
+          OR: [
+            { public_status: true },
+            {
+              users_forums: {
+                some: {
+                  user_id: userId,
+                },
+              },
+            },
+          ],
+          ...(forumId ? { AND: { forum_id: forumId } } : {}),
+        },
+        parent_message_id: null,
+        active: true,
+      },
+      select: {
+        message_id: true,
+        content: true,
+        publication_timestamp: true,
+        _count: {
+          select: {
+            likes: true,
+            messages: true,
+          },
+        },
+        forum: {
+          select: {
+            forum_id: true,
+            name: true,
+          },
+        },
+      },
+
+      orderBy: {
+        publication_timestamp: "desc",
       },
     });
   }
@@ -685,13 +755,16 @@ export const getForumRegularMembers = async (forumId: number) => {
 /**
  * Check if a message exists and belongs to a specific forum
  */
-export const findMessageInForum = async (messageId: number, forumId: number) => {
+export const findMessageInForum = async (
+  messageId: number,
+  forumId: number
+) => {
   return await prisma.messages.findFirst({
     where: {
       message_id: messageId,
       forum_id: forumId,
-      active: true
-    }
+      active: true,
+    },
   });
 };
 
@@ -710,7 +783,7 @@ export const createReplyToMessage = async (
       user_id: userId,
       parent_message_id: parentMessageId,
       content: content.trim(),
-      active: true
+      active: true,
     },
     include: {
       user: {
@@ -719,15 +792,15 @@ export const createReplyToMessage = async (
           name: true,
           parent_last_name: true,
           maternal_last_name: true,
-          username: true
-        }
+          username: true,
+        },
       },
       _count: {
         select: {
           messages: true,
-          likes: true
-        }
-      }
-    }
+          likes: true,
+        },
+      },
+    },
   });
 };
