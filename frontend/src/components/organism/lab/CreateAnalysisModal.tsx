@@ -1,5 +1,5 @@
 // frontend/src/components/organism/lab/CreateAnalysisModal.tsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import ModalBase from "@/components/molecules/AnalysisTypeModal";
 import { CreateAnalysisData } from "@/types/add.analysis.types";
 import Button from "@/components/atoms/Button";
@@ -26,6 +26,15 @@ const CreateAnalysisModal: React.FC<Props> = ({
   const [communityCost, setCommunityCost] = useState<number | "">("");
   const [error, setError] = useState("");
 
+  const descriptionRef = useRef<HTMLTextAreaElement | null>(null);
+  const previousReqRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const autoResize = (el: HTMLTextAreaElement | null) => {
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight}px`;
+  };
+
   useEffect(() => {
     if (isOpen) {
       setName("");
@@ -34,12 +43,23 @@ const CreateAnalysisModal: React.FC<Props> = ({
       setGeneralCost("");
       setCommunityCost("");
       setError("");
+
+      autoResize(descriptionRef.current);
+      autoResize(previousReqRef.current);
     }
   }, [isOpen]);
 
   useEffect(() => {
     if (externalError) setError(externalError);
   }, [externalError]);
+
+  useEffect(() => {
+    autoResize(descriptionRef.current);
+  }, [description]);
+
+  useEffect(() => {
+    autoResize(previousReqRef.current);
+  }, [previousRequirements]);
 
   const handleConfirm = () => {
     setError("");
@@ -109,9 +129,13 @@ const CreateAnalysisModal: React.FC<Props> = ({
       <div className="mb-3">
         <label className="block text-sm font-medium">Descripción</label>
         <textarea
+          ref={descriptionRef}
           value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          className="w-full p-2 rounded-lg border"
+          onChange={(e) => {
+            setDescription(e.target.value);
+            autoResize(e.target);
+          }}
+          className="w-full p-2 rounded-lg border resize-none overflow-hidden"
           rows={2}
           maxLength={500}
         ></textarea>
@@ -120,9 +144,13 @@ const CreateAnalysisModal: React.FC<Props> = ({
       <div className="mb-3">
         <label className="block text-sm font-medium">Requisitos previos</label>
         <textarea
+        ref={previousReqRef}
           value={previousRequirements}
-          onChange={(e) => setPreviousRequirements(e.target.value)}
-          className="w-full p-2 rounded-lg border"
+          onChange={(e) => {
+            setPreviousRequirements(e.target.value);
+            autoResize(e.target);
+          }}
+          className="w-full p-2 rounded-lg border resize-none overflow-hidden"
           rows={2}
           maxLength={500}
         ></textarea>
