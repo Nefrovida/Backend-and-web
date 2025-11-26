@@ -77,18 +77,61 @@ function Register() {
       // Redirect to home
       navigate("/dashboard");
     } catch (err: any) {
-      const errorMessage = err.message || "Error en el registro";
+      const errorMessage = err.message || "";
+      const errorLower = errorMessage.toLowerCase();
       
-      // Check if the error is about duplicate username
-      if (errorMessage.toLowerCase().includes("user already exists") || 
-          errorMessage.toLowerCase().includes("usuario ya existe") ||
-          errorMessage.toLowerCase().includes("username already") ||
-          errorMessage.toLowerCase().includes("duplicate")) {
-        setError("El nombre de usuario ya está registrado. Por favor elige otro.");
+      // Translate technical/Prisma errors to user-friendly Spanish messages
+      let friendlyMessage = "";
+      
+      // Check for duplicate username
+      if (errorLower.includes("user already exists") || 
+          errorLower.includes("usuario ya existe") ||
+          errorLower.includes("username already") ||
+          errorLower.includes("unique constraint") && errorLower.includes("username") ||
+          errorLower.includes("duplicate") && errorLower.includes("username")) {
+        friendlyMessage = "El nombre de usuario ya está registrado. Por favor elige otro.";
+        setError(friendlyMessage);
         setStep(1); // Return to step 1 where username field is
-      } else {
-        setError(errorMessage);
+        return;
       }
+      
+      // Check for duplicate CURP
+      if (errorLower.includes("curp") && (errorLower.includes("duplicate") || errorLower.includes("unique"))) {
+        friendlyMessage = "El CURP ingresado ya está registrado en el sistema.";
+      }
+      // Check for duplicate phone number
+      else if (errorLower.includes("phone") && (errorLower.includes("duplicate") || errorLower.includes("unique"))) {
+        friendlyMessage = "El número de teléfono ya está registrado. Por favor usa otro número.";
+        setError(friendlyMessage);
+        setStep(1);
+        return;
+      }
+      // Check for invalid CURP format
+      else if (errorLower.includes("curp") && errorLower.includes("invalid")) {
+        friendlyMessage = "El formato del CURP no es válido. Verifica que tenga 18 caracteres.";
+      }
+      // Check for patient not found (for familiar registration)
+      else if (errorLower.includes("patient not found") || errorLower.includes("paciente no encontrado")) {
+        friendlyMessage = "No se encontró un paciente con el CURP proporcionado. Verifica que sea correcto.";
+      }
+      // Check for invalid license
+      else if (errorLower.includes("license") || errorLower.includes("cédula")) {
+        friendlyMessage = "La cédula profesional no es válida. Debe tener al menos 7 caracteres.";
+      }
+      // Check for connection errors
+      else if (errorLower.includes("network") || errorLower.includes("fetch") || errorLower.includes("connection")) {
+        friendlyMessage = "Error de conexión. Por favor verifica tu internet e intenta nuevamente.";
+      }
+      // Check for validation errors
+      else if (errorLower.includes("validation") || errorLower.includes("required")) {
+        friendlyMessage = "Algunos campos no son válidos. Por favor revisa la información ingresada.";
+      }
+      // Default friendly message for any other error
+      else {
+        friendlyMessage = "Ocurrió un error al registrar tu cuenta. Por favor intenta nuevamente.";
+      }
+      
+      setError(friendlyMessage);
     } finally {
       setLoading(false);
     }
