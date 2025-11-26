@@ -92,6 +92,7 @@ function Register() {
           value={formData.name || ""}
           onChange={(e) => updateFormData({ name: e.target.value })}
           className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-900 transition-colors"
+          maxLength={50}
           required
         />
       </div>
@@ -103,6 +104,7 @@ function Register() {
           value={formData.parent_last_name || ""}
           onChange={(e) => updateFormData({ parent_last_name: e.target.value })}
           className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-900 transition-colors"
+          maxLength={50}
           required
         />
       </div>
@@ -114,6 +116,7 @@ function Register() {
           value={formData.maternal_last_name || ""}
           onChange={(e) => updateFormData({ maternal_last_name: e.target.value })}
           className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-900 transition-colors"
+          maxLength={50}
         />
       </div>
 
@@ -122,8 +125,15 @@ function Register() {
         <input
           type="tel"
           value={formData.phone_number || ""}
-          onChange={(e) => updateFormData({ phone_number: e.target.value })}
+          onChange={(e) => {
+            const value = e.target.value.replace(/\D/g, '');
+            if (value.length <= 10) {
+              updateFormData({ phone_number: value });
+            }
+          }}
           className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-900 transition-colors"
+          pattern="[0-9]{10}"
+          maxLength={10}
           required
         />
       </div>
@@ -160,6 +170,7 @@ function Register() {
           value={formData.username || ""}
           onChange={(e) => updateFormData({ username: e.target.value })}
           className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-900 transition-colors"
+          maxLength={30}
           required
         />
       </div>
@@ -171,6 +182,7 @@ function Register() {
           value={formData.password || ""}
           onChange={(e) => updateFormData({ password: e.target.value })}
           className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-900 transition-colors"
+          maxLength={100}
           required
         />
       </div>
