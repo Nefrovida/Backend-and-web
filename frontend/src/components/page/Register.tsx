@@ -77,7 +77,18 @@ function Register() {
       // Redirect to home
       navigate("/dashboard");
     } catch (err: any) {
-      setError(err.message || "Error en el registro");
+      const errorMessage = err.message || "Error en el registro";
+      
+      // Check if the error is about duplicate username
+      if (errorMessage.toLowerCase().includes("user already exists") || 
+          errorMessage.toLowerCase().includes("usuario ya existe") ||
+          errorMessage.toLowerCase().includes("username already") ||
+          errorMessage.toLowerCase().includes("duplicate")) {
+        setError("El nombre de usuario ya está registrado. Por favor elige otro.");
+        setStep(1); // Return to step 1 where username field is
+      } else {
+        setError(errorMessage);
+      }
     } finally {
       setLoading(false);
     }
