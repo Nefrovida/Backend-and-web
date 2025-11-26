@@ -52,14 +52,11 @@ import { raw } from "express";
 
 // Dir for PDF storage
 const uploadDir = path.join(process.cwd(), "uploads");
-const resultsDir = path.join(process.cwd(), "results");
-
 fs.mkdir(uploadDir, { recursive: true }).catch(console.error);
-fs.mkdir(resultsDir, { recursive: true }).catch(console.error);
 
 // Serve static files
 app.use("/uploads", express.static(uploadDir));
-app.use("/results", express.static(resultsDir));
+
 
 // Endpoint to receibe new binary (presigned URL PUT)
 app.put(
