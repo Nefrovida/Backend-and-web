@@ -171,7 +171,18 @@ export default class AppointmentModel {
   }
   static async deleteAppointment(appointmentId: number){
     const appoinmentDeleted = await prisma.patient_appointment.update({
-      where : {patient_appointment_id: appointmentId},
+      where : {
+        patient_appointment_id: appointmentId,
+        AND: {
+          OR: [{
+            appointment_status : "REQUESTED"
+          },
+          {
+            appointment_status : "PROGRAMMED"
+          }
+        ]
+        } 
+      },
       data: {
         appointment_status: "CANCELED",
       },

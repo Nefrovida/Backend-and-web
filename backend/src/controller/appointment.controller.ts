@@ -92,7 +92,6 @@ export default class AppointmentController {
     }
   }
   static async deleteAppointment(req: Request, res: Response){
-    res.status(500).send("hola")
     console.log("probando")
     try{
       const {id} = req.params;

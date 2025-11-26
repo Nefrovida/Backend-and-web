@@ -2,6 +2,7 @@ import { RouteObject } from "react-router-dom";
 import ProtectedRoute from "../components/common/ProtectedRoute";
 import DoctorAppointments from "../components/page/DoctorAppointments";
 import DeleteAppoinmentButton from "../components/atoms/appointments/DeleteAppoinmentButton"
+import AppointmentModal from "@/components/molecules/appointments/AppointmentModal";
 
 const appointmentsRoutes: RouteObject[] = [
   {
@@ -16,7 +17,7 @@ const appointmentsRoutes: RouteObject[] = [
   {
     path: 'eliminar-cita',
     element: (
-      <DeleteAppoinmentButton appointmentId={2} />
+      <AppointmentModal  modalStatus={false}/>
     )
   },
 ];

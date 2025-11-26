@@ -21,7 +21,6 @@ app.use(
 
 const port = process.env.SERVER_PORT || 3000;
 
-app.use ((request, response)=> {console.log(request.url)})
 
 // CORS configuration
 // CORS: allow a configurable list of frontend origins. FRONTEND_URL may be a
