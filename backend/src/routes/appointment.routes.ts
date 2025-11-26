@@ -34,8 +34,8 @@ router.put(
 
 router.delete(
   '/:id/delete',
-  //authenticate,
-  //requirePrivileges([Privilege.DELETE_APPOINTMENTS]),
+  authenticate,
+  requirePrivileges([Privilege.DELETE_APPOINTMENTS]),
   AppointmentController.deleteAppointment
 )
 

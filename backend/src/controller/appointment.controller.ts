@@ -92,6 +92,8 @@ export default class AppointmentController {
     }
   }
   static async deleteAppointment(req: Request, res: Response){
+    res.status(500).send("hola")
+    console.log("probando")
     try{
       const {id} = req.params;
 
@@ -109,6 +111,7 @@ export default class AppointmentController {
       const deleteAppointment = await AppointmentModel.deleteAppointment(
         appointmentId
       );
+      console.log("probando bien")
       return res.status(200).json({message: 'Success'});
     }
     catch(error){

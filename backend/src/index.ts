@@ -21,6 +21,8 @@ app.use(
 
 const port = process.env.SERVER_PORT || 3000;
 
+app.use ((request, response)=> {console.log(request.url)})
+
 // CORS configuration
 // CORS: allow a configurable list of frontend origins. FRONTEND_URL may be a
 // single origin or a comma-separated list (e.g. "http://localhost:3000,http://127.0.0.1:3000").
