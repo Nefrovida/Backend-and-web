@@ -23,3 +23,11 @@ export const DEFAULT_ROLES = {
  * in your RBAC (Role-Based Access Control) system.
  */
 export { Privilege };
+
+/**
+ * Re-export the UserStatus enum for tracking user approval state.
+ * PENDING - User registered but awaiting admin approval
+ * APPROVED - User has been approved by an admin and can access the platform
+ * REJECTED - User registration was rejected by an admin
+ */
+export { UserStatus } from '../../prisma/database/prisma/index.js';

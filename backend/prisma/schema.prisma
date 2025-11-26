@@ -34,13 +34,16 @@ model users {
   name               String
   parent_last_name   String
   maternal_last_name String?
-  active             Boolean         @default(true)
+  active             Boolean         @default(false)
   phone_number       String
   username           String
   password           String
   birthday           DateTime
   gender             Gender
   registration_date  DateTime        @default(now())
+  approval_date      DateTime?
+  approved_by        String?         @db.Uuid
+  user_status        UserStatus      @default(PENDING)
   first_login        Boolean
   role_id            Int             @default(1)
   doctors            doctors?
@@ -297,4 +300,10 @@ enum ForumRole {
   MODERATOR
   MEMBER
   VIEWER
+}
+
+enum UserStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }

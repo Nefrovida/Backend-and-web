@@ -80,6 +80,9 @@ export enum Privilege {
 
   VIEW_MEDICAL_RECORD = "VIEW_MEDICAL_RECORD",
   CREATE_DOCTOR = "CREATE_DOCTOR",
+  
+  // User approval management
+  APPROVE_USERS = "APPROVE_USERS",
 }
 
 /**
