@@ -9,7 +9,7 @@ interface Props {
 const NewMessageButton: FC<Props> = ({ onClick, className }) => {
   return (
     <button
-      className={`bg-green-400 hover:bg-green-500 rounded-full ${className}`}
+      className={`bg-blue-600 hover:bg-blue-500 rounded-full ${className}`}
       onClick={onClick}
     >
       <BsPlus className="size-10" />

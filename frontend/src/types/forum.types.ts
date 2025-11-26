@@ -21,6 +21,14 @@ export interface CreateForumData {
 }
 
 export type BasicForumInfo = {
-  forumId: string;
+  forumId: number;
   name: string;
+};
+
+export type Message = {
+  messageId: number;
+  content: string;
+  likes: number;
+  replies: number;
+  forums: { forumId: number; name: string };
 };

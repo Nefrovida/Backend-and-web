@@ -62,7 +62,11 @@ VALUES
 ('VIEW_LAB_RESULTS'),
 ('EDIT_LAB_RESULTS'),
 ('CREATE_NOTES'),
-('VIEW_NOTES');
+('VIEW_NOTES'),
+('REMOVE_USER_FROM_FORUM'),
+('VIEW_FORUM_USERS'),
+('UPDATE_NOTES'),
+('DELETE_NOTES');
 
 -- ========================
 -- 🧩 ROLES - PRIVILEGIOS
@@ -99,7 +103,11 @@ WHERE description IN (
   'VIEW_LAB_RESULTS',
   'EDIT_LAB_RESULTS',
   'CREATE_NOTES',
-  'VIEW_NOTES'
+  'VIEW_NOTES',
+  'UPDATE_NOTES',
+  'DELETE_NOTES',
+  'REMOVE_USER_FROM_FORUM',
+  'VIEW_FORUM_USERS'
 );
 
 -- Admin (role_id = 1): full privileges
@@ -127,7 +135,13 @@ FROM privileges
 WHERE description IN (
   'VIEW_FORUMS',
   'VIEW_APPOINTMENTS',
-  'CREATE_APPOINTMENTS'
+  'CREATE_APPOINTMENTS',
+  'VIEW_ANALYSIS',
+  'VIEW_LAB_RESULTS',
+  'VIEW_NOTES',
+  'VIEW_CLINICAL_HISTORY',
+  'VIEW_MEDICAL_RECORD',
+  'VIEW_FORUM_USERS'
 );
 
 -- Secretaria (role_id = 6)
@@ -252,16 +266,6 @@ VALUES
 ('c3eebc99-9c0b-4ef8-bb6d-6bb9bd380a77', 3, '2025-10-20 16:00:00', 60, 'PRESENCIAL', NULL, 'Consultorio 205, Clínica del Sur', 'FINISHED'),
 ('c4eebc99-9c0b-4ef8-bb6d-6bb9bd380a88', 4, '2025-11-28 11:00:00', 60, 'PRESENCIAL', NULL, 'Consultorio 302, Hospital Infantil', 'PROGRAMMED'),
 ('c4eebc99-9c0b-4ef8-bb6d-6bb9bd380a88', 5, '2025-10-10 10:00:00', 30, 'PRESENCIAL', NULL, 'Consultorio 302, Hospital Infantil', 'FINISHED');
-
--- Insert patient appointment requests (status REQUESTED)
-INSERT INTO patient_appointment (patient_id, appointment_id, date_hour, duration, appointment_type, link, place, appointment_status)
-VALUES 
-('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 1, '2025-11-26 14:30:00', 60, 'PRESENCIAL', NULL, 'Consultorio 101, Hospital Central', 'REQUESTED'),
-('c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', 3, '2025-11-27 10:00:00', 60, 'VIRTUAL', NULL, NULL, 'REQUESTED'),
-('c3eebc99-9c0b-4ef8-bb6d-6bb9bd380a77', 2, '2025-11-28 16:00:00', 30, 'PRESENCIAL', NULL, 'Consultorio 101, Hospital Central', 'REQUESTED'),
-('c4eebc99-9c0b-4ef8-bb6d-6bb9bd380a88', 4, '2025-11-29 09:30:00', 60, 'PRESENCIAL', NULL, 'Consultorio 302, Hospital Infantil', 'REQUESTED'),
-('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 1, '2025-12-01 11:00:00', 60, 'VIRTUAL', NULL, NULL, 'REQUESTED'),
-('c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', 5, '2025-12-02 15:00:00', 30, 'PRESENCIAL', NULL, 'Consultorio 302, Hospital Infantil', 'REQUESTED');
 
 -- ========================
 -- 📝 NOTAS MÉDICAS

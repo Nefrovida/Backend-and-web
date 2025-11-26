@@ -5,3 +5,5 @@ node_modules/
 ./backend/prisma/database/prisma
 */package-lock.json
 ./backend/prisma/migrations
+
+frontend/tsconfig.tsbuildinfo

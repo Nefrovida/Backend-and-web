@@ -20,7 +20,13 @@ export const registerDoctor = async (
 
   if (!response.ok) {
     const error = await response.json();
-    throw new Error(error.message || "Doctor registration failed");
+    // Create an error with the response data attached
+    const err = new Error(error.message || "Doctor registration failed");
+    (err as any).response = {
+      data: error,
+      status: response.status,
+    };
+    throw err;
   }
 
   return response.json();
@@ -35,7 +41,13 @@ export const getDoctors = async () => {
 
   if (!response.ok) {
     const error = await response.json();
-    throw new Error(error.message || "Failed to fetch doctors");
+    // Create an error with the response data attached
+    const err = new Error(error.message || "Failed to fetch doctors");
+    (err as any).response = {
+      data: error,
+      status: response.status,
+    };
+    throw err;
   }
 
   return response.json();
