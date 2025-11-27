@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Forum } from '../../types/forum.types';
 
+const API_BASE = (import.meta as any).env?.VITE_APP_API_URL || 'http://localhost:3001/api';
+
 interface Administrator {
   user_id: string;
   name: string;
@@ -79,9 +81,8 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
     try {
       setIsLoading(true);
       setError('');
-      
-      // Backend está en el puerto 3000 según index.ts
-      const response = await fetch(`http://localhost:3000/api/forums/admin-users?page=${currentPage}&limit=10`, {
+
+      const response = await fetch(`${API_BASE}/forums/admin-users?page=${currentPage}&limit=10`, {
         credentials: 'include',
       });
 
@@ -103,12 +104,12 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
 
   const fetchForumAdministrators = async () => {
     if (!forum?.forum_id) return;
-    
+
     try {
       setIsLoadingForum(true);
       setError('');
-      
-      const response = await fetch(`http://localhost:3000/api/forums/${forum.forum_id}/administrators`, {
+
+      const response = await fetch(`${API_BASE}/forums/${forum.forum_id}/administrators`, {
         credentials: 'include',
       });
 
@@ -134,8 +135,8 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
 
     try {
       setError('');
-      
-      const response = await fetch(`http://localhost:3000/api/forums/${forum.forum_id}/administrators`, {
+
+      const response = await fetch(`${API_BASE}/forums/${forum.forum_id}/administrators`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -154,7 +155,7 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
         fetchForumAdministrators(),
         fetchAdministrators()
       ]);
-      
+
       console.log('Administrador agregado exitosamente');
     } catch (err: any) {
       setError(err.message);
@@ -171,11 +172,11 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
 
   const handleRemoveForumAdministrator = async (userId: string) => {
     if (!forum?.forum_id) return;
-    
+
     try {
       setError('');
-      
-      const response = await fetch(`http://localhost:3000/api/forums/${forum.forum_id}/administrators/${userId}`, {
+
+      const response = await fetch(`${API_BASE}/forums/${forum.forum_id}/administrators/${userId}`, {
         method: 'DELETE',
         credentials: 'include',
       });
@@ -190,7 +191,7 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
         fetchForumAdministrators(),
         fetchAdministrators()
       ]);
-      
+
       console.log('Administrador removido exitosamente');
     } catch (err: any) {
       setError(err.message);
@@ -206,17 +207,20 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
     const matchesSearch = admin.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
       admin.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       `${admin.name} ${admin.parent_last_name}`.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     // Then exclude administrators who are already in the forum
-    const isNotInForum = !forumAdministrators.some(forumAdmin => 
+    const isNotInForum = !forumAdministrators.some(forumAdmin =>
       forumAdmin.user_id === admin.user_id
     );
-    
+
     return matchesSearch && isNotInForum;
   });
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]">
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]"
+      onClick={onClose}
+    >
       <div
         className="bg-[#CFE6ED] rounded-3xl shadow-2xl p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
@@ -245,9 +249,9 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
             </button>
           )}
           <h2 className="text-lg font-semibold text-gray-800">
-            Administradores
-          </h2>
-          <div className="w-8"> {/* Spacer for centering */}</div>
+          Administradores
+        </h2>
+        <div className="w-8"></div>
         </div>
 
         {/* Error Message */}
@@ -264,7 +268,7 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
               <h3 className="text-sm font-semibold text-gray-800 mb-3">
                 Administradores de "{forum.name}"
               </h3>
-              
+
               {isLoadingForum ? (
                 <div className="text-center py-2">
                   <p className="text-gray-600 text-sm">Cargando administradores del foro...</p>
@@ -291,7 +295,7 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
                           </p>
                         </div>
                       </div>
-                      
+
                       {/* Remove Forum Admin button */}
                       <button
                         onClick={() => handleRemoveForumAdministrator(admin.user_id)}
@@ -341,16 +345,16 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
               <button
                 onClick={() => {
                   // Buscar usuario por username en la lista de administradores (incluyendo los ya asignados)
-                  const userToAdd = administrators.find(admin => 
+                  const userToAdd = administrators.find(admin =>
                     admin.username.toLowerCase() === searchTerm.toLowerCase()
                   );
-                  
+
                   if (userToAdd) {
                     // Verificar si ya está en el foro
-                    const isAlreadyInForum = forumAdministrators.some(forumAdmin => 
+                    const isAlreadyInForum = forumAdministrators.some(forumAdmin =>
                       forumAdmin.user_id === userToAdd.user_id
                     );
-                    
+
                     if (isAlreadyInForum) {
                       setError(`El usuario "${searchTerm}" ya es administrador de este foro`);
                     } else {
@@ -400,7 +404,7 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
               </div>
             )}
           </div>
-          
+
           {isLoading ? (
             <div className="text-center py-4">
               <p className="text-gray-600 text-sm">Cargando administradores...</p>
@@ -408,8 +412,8 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
           ) : filteredAdministrators.length === 0 ? (
             <div className="text-center py-4">
               <p className="text-gray-600 text-sm">
-                {searchTerm 
-                  ? 'No se encontraron administradores que coincidan con la búsqueda' 
+                {searchTerm
+                  ? 'No se encontraron administradores que coincidan con la búsqueda'
                   : 'Todos los administradores ya están asignados a este foro'}
               </p>
             </div>
@@ -432,7 +436,7 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
                       <p className="text-xs text-blue-500">{admin.role.role_name}</p>
                     </div>
                   </div>
-                  
+
                   {/* Action buttons */}
                   <div className="flex items-center space-x-2">
                     {/* Make Admin button */}
@@ -443,10 +447,10 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
                     >
                       Admin
                     </button>
-                    
+
                     {/* Message button */}
                     <button
-                      onClick={() => {/* TODO: Send message */}}
+                      onClick={() => {/* TODO: Send message */ }}
                       className="p-1 hover:bg-gray-100 rounded transition-colors"
                       title="Enviar mensaje"
                     >
@@ -473,15 +477,28 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
         </div>
 
         {/* Date Footer */}
-        <div className="mt-6 text-center">
-          <p className="text-xs text-gray-500">
-            {new Date().toLocaleDateString('es-ES', {
-              day: '2-digit',
-              month: '2-digit',
-              year: 'numeric',
-            })}
-          </p>
+        {/* Action Buttons */}
+        <div className="flex gap-4 justify-center mt-6">
+          <button
+            onClick={() => {
+              setError("");
+              onClose();
+            }}
+            className="px-6 py-2 bg-white text-gray-700 font-medium rounded-lg hover:bg-gray-100 transition-colors shadow-sm"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={() => {
+              setError("");
+              onClose();
+            }}
+            className="px-6 py-2 bg-blue-500 text-white font-medium rounded-lg hover:bg-blue-600 transition-colors shadow-sm"
+          >
+            Actualizar
+          </button>
         </div>
+
       </div>
     </div>
   );

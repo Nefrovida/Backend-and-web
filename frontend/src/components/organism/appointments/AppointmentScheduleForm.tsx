@@ -21,7 +21,12 @@ const AppointmentScheduleForm: React.FC<Props> = ({ selectedRequest, onScheduleC
 
   useEffect(() => {
     loadDoctors();
-  }, []);
+    if (selectedRequest) {
+      const requestDate = new Date(selectedRequest.requested_date);
+      const dateStr = requestDate.toISOString().split('T')[0];
+      setSelectedDate(dateStr);
+    }
+  }, [selectedRequest]);
 
   useEffect(() => {
     if (selectedDoctor && selectedDate) {
@@ -49,7 +54,29 @@ const AppointmentScheduleForm: React.FC<Props> = ({ selectedRequest, onScheduleC
     setError("");
     try {
       const slots = await agendaService.getDoctorAvailability(selectedDoctor, selectedDate);
-      setAvailableSlots(slots);
+      
+      // If the selected date is the same as the requested date, sort slots by proximity to requested time
+      let sortedSlots = slots;
+      if (selectedRequest) {
+        const requestDate = new Date(selectedRequest.requested_date);
+        const requestDateStr = requestDate.toISOString().split('T')[0];
+        if (selectedDate === requestDateStr) {
+          const requestedTime = `${requestDate.getHours().toString().padStart(2, '0')}:${requestDate.getMinutes().toString().padStart(2, '0')}`;
+          
+          sortedSlots = slots.sort((a, b) => {
+            const timeA = a.split(':').map(Number);
+            const timeB = b.split(':').map(Number);
+            const reqTime = requestedTime.split(':').map(Number);
+            
+            const diffA = Math.abs((timeA[0] * 60 + timeA[1]) - (reqTime[0] * 60 + reqTime[1]));
+            const diffB = Math.abs((timeB[0] * 60 + timeB[1]) - (reqTime[0] * 60 + reqTime[1]));
+            
+            return diffA - diffB;
+          });
+        }
+      }
+      
+      setAvailableSlots(sortedSlots);
       setSelectedTime("");
     } catch (error) {
       console.error("Error loading availability:", error);
@@ -142,6 +169,15 @@ const AppointmentScheduleForm: React.FC<Props> = ({ selectedRequest, onScheduleC
         <p className="text-gray-600">
           {selectedRequest.appointment_name} - {selectedRequest.appointment_type}
         </p>
+        {/* Prominent Requested Date Banner */}
+        <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
+          <div className="flex items-center text-blue-800">
+            <span className="font-semibold text-sm mr-2">FECHA SOLICITADA:</span>
+            <span className="font-medium text-base">
+              {new Date(selectedRequest.requested_date).toLocaleString('es-MX')}
+            </span>
+          </div>
+        </div>
       </div>
 
       {!showConfirmation ? (
@@ -177,6 +213,13 @@ const AppointmentScheduleForm: React.FC<Props> = ({ selectedRequest, onScheduleC
               min={new Date().toISOString().split("T")[0]}
               className="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-primary focus:outline-none"
             />
+            {selectedDate && selectedRequest && selectedDate !== new Date(selectedRequest.requested_date).toISOString().split('T')[0] && (
+              <div className="mt-2 p-2 bg-orange-100 border border-orange-300 rounded-md">
+                <p className="text-orange-800 text-sm">
+                  ⚠️ La fecha seleccionada es diferente a la solicitada por el paciente
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Time Slots */}
@@ -250,7 +293,11 @@ const AppointmentScheduleForm: React.FC<Props> = ({ selectedRequest, onScheduleC
                 <span>{selectedDoctorInfo?.specialty}</span>
               </div>
               <div className="flex justify-between">
-                <span className="font-medium text-gray-700">Fecha:</span>
+                <span className="font-medium text-gray-700">Fecha solicitada:</span>
+                <span className="text-blue-600 font-semibold">{new Date(selectedRequest.requested_date).toLocaleString('es-MX')}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-medium text-gray-700">Fecha agendada:</span>
                 <span>{new Date(selectedDate).toLocaleDateString("es-MX")}</span>
               </div>
               <div className="flex justify-between">

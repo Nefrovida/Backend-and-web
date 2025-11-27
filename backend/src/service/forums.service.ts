@@ -1,9 +1,8 @@
+// backend/src/service/forums.service.ts
 import { CreateForumInputValidated, UpdateForumInputValidated } from '../validators/forum.validator';
 import { ForumEntity } from '../types/forum.types';
 import { existsAndActive, isUserMember } from '../model/forum.model'
 import * as forumModel from '../model/forum.model';
-import { createReply } from '../model/messages.model';
-import { prisma } from '../util/prisma';
 import { ConflictError, NotFoundError, BadRequestError } from '../util/errors.util';
 
 /**
@@ -64,7 +63,8 @@ export const getAllForums = async (
   filters?: {
     search?: string;
     isPublic?: boolean;
-  }
+  },
+  userId?: string
 ): Promise<ForumEntity[]> => {
   const skip = (page - 1) * limit;
 
@@ -72,7 +72,7 @@ export const getAllForums = async (
     search: filters?.search,
     isPublic: filters?.isPublic,
     active: true,
-  });
+  }, userId);
 
   return forums;
 };
@@ -122,7 +122,7 @@ export const updateForum = async (
 
 
 /**
- * Service: respond text in a forum
+ * Service: Reply to a message in a forum
  */
 export const replyToMessageService = async (
   forumId: number,
@@ -130,33 +130,213 @@ export const replyToMessageService = async (
   parentMessageId: number,
   content: string
 ) => {
-  // 1. Validte that the forum exists and is active
+  // 1. Validate that the forum exists and is active
   const forumExists = await existsAndActive(forumId);
   if (!forumExists) {
+
     throw new NotFoundError('El foro no existe o está inactivo');
   }
 
-  // 2. Validate that the user is a member
+  // 2. Validate that the user is a member of the forum
   const isMember = await isUserMember(forumId, userId);
   if (!isMember) {
+
     throw new BadRequestError('El usuario no es miembro del foro');
   }
 
-  // 3. Validate that the message exists and is part of the forum
-  const parentMessage = await prisma.messages.findUnique({
-    where: { message_id: parentMessageId },
-  });
-  if (!parentMessage || parentMessage.forum_id !== forumId) {
-    throw new NotFoundError('El mensaje padre no existe en este foro');
+  // 3. Validate that the parent message exists, is active, and belongs to the forum
+  // 3. Validate that the parent message exists
+  const parentMessage = await forumModel.findMessageById(parentMessageId);
+  if (!parentMessage) {
+
+    throw new NotFoundError(`El mensaje padre con ID ${parentMessageId} no existe`);
   }
 
-  // 4. Validate content
-  if (!content || content.trim().length === 0) {
-    throw new BadRequestError('El contenido de la respuesta no puede estar vacío');
+  if (!parentMessage.active) {
+
+    throw new NotFoundError('El mensaje padre ha sido eliminado o está inactivo');
   }
 
-  // 5. Create response
-  const reply = await createReply(forumId, userId, parentMessageId, content);
+  if (parentMessage.forum_id !== forumId) {
 
-  return reply;
+    throw new BadRequestError(`El mensaje padre pertenece al foro ${parentMessage.forum_id}, no al foro actual ${forumId}`);
+  }
+
+  // 4. Create the reply
+  const reply = await forumModel.createReplyToMessage(forumId, userId, parentMessageId, content);
+
+  // 5. Transform the response to match the expected format
+  return {
+    success: true,
+    message: 'Respuesta creada exitosamente',
+    data: {
+      id: reply.message_id,
+      forumId: reply.forum_id,
+      createdBy: reply.user_id,
+      userId: reply.user_id,
+      content: reply.content,
+      parentMessageId: reply.parent_message_id,
+      createdAt: reply.publication_timestamp,
+      publicationTimestamp: reply.publication_timestamp,
+      active: reply.active,
+      author: {
+        userId: reply.user.user_id,
+        name: reply.user.name,
+        parentLastName: reply.user.parent_last_name,
+        maternalLastName: reply.user.maternal_last_name,
+        username: reply.user.username
+      },
+      stats: {
+        repliesCount: reply._count.messages,
+        likesCount: reply._count.likes
+      }
+    }
+  };
+};
+
+/**
+ * Get messages for a forum with pagination
+ */
+export const getForumMessages = async (
+  forumId: number,
+  userId: string,
+  page: number = 1,
+  limit: number = 20
+) => {
+  // 1. Validate that the forum exists and is active
+  const forum = await forumModel.findById(forumId);
+  if (!forum || !forum.active) {
+    throw new NotFoundError('Foro no encontrado');
+  }
+
+  // 2. Check access rights
+  // If forum is private, user must be a member
+  if (!forum.public_status) {
+    const isMember = await isUserMember(forumId, userId);
+    if (!isMember) {
+      throw new BadRequestError('No tienes permiso para ver los mensajes de este foro privado');
+    }
+  }
+
+  // 3. Calculate pagination
+  const skip = (page - 1) * limit;
+
+  // 4. Get messages and total count
+  const [messages, totalCount] = await Promise.all([
+    forumModel.findMessagesByForumId(forumId, skip, limit),
+    forumModel.countForumMessages(forumId)
+  ]);
+
+  // 5. Calculate pagination metadata
+  const totalPages = Math.ceil(totalCount / limit);
+  const hasNext = page < totalPages;
+  const hasPrevious = page > 1;
+
+  // 6. Transform response
+  const formattedMessages = messages.map(msg => ({
+    id: msg.message_id,
+    forumId: msg.forum_id,
+    createdBy: msg.user_id, // Map user_id to createdBy for frontend compatibility
+    userId: msg.user_id,
+    content: msg.content,
+    createdAt: msg.publication_timestamp, // Map publication_timestamp to createdAt
+    publicationTimestamp: msg.publication_timestamp,
+    author: {
+      userId: msg.user.user_id,
+      name: msg.user.name,
+      parentLastName: msg.user.parent_last_name,
+      maternalLastName: msg.user.maternal_last_name,
+      username: msg.user.username
+    },
+    stats: {
+      repliesCount: msg._count.messages,
+      likesCount: msg._count.likes
+    }
+  }));
+
+  return formattedMessages;
+};
+
+/**
+ * Get replies for a message with pagination
+ */
+export const getMessageReplies = async (
+  forumId: number,
+  messageId: number,
+  userId: string,
+  page: number = 1,
+  limit: number = 20
+) => {
+  // 1. Validate that the forum exists and is active
+  const forum = await forumModel.findById(forumId);
+  if (!forum || !forum.active) {
+    throw new NotFoundError('Foro no encontrado');
+  }
+
+  // 2. Check access rights
+  if (!forum.public_status) {
+    const isMember = await isUserMember(forumId, userId);
+    if (!isMember) {
+      throw new BadRequestError('No tienes permiso para ver los mensajes de este foro privado');
+    }
+  }
+
+  // 3. Validate parent message
+  const parentMessage = await forumModel.findMessageById(messageId);
+  if (!parentMessage || !parentMessage.active) {
+    throw new NotFoundError('Mensaje no encontrado');
+  }
+
+  if (parentMessage.forum_id !== forumId) {
+    throw new BadRequestError('El mensaje no pertenece al foro especificado');
+  }
+
+  // 4. Calculate pagination
+  const skip = (page - 1) * limit;
+
+  // 5. Get replies and total count
+  const [replies, totalCount] = await Promise.all([
+    forumModel.findRepliesByMessageId(messageId, skip, limit),
+    forumModel.countReplies(messageId)
+  ]);
+
+  // 6. Calculate pagination metadata
+  const totalPages = Math.ceil(totalCount / limit);
+  const hasNext = page < totalPages;
+  const hasPrevious = page > 1;
+
+  // 7. Transform response
+  const formattedReplies = replies.map(reply => ({
+    id: reply.message_id,
+    forumId: reply.forum_id,
+    createdBy: reply.user_id,
+    userId: reply.user_id,
+    content: reply.content,
+    createdAt: reply.publication_timestamp,
+    publicationTimestamp: reply.publication_timestamp,
+    parentMessageId: reply.parent_message_id,
+    author: {
+      userId: reply.user.user_id,
+      name: reply.user.name,
+      parentLastName: reply.user.parent_last_name,
+      maternalLastName: reply.user.maternal_last_name,
+      username: reply.user.username
+    },
+    stats: {
+      repliesCount: reply._count.messages,
+      likesCount: reply._count.likes
+    }
+  }));
+
+  return {
+    data: formattedReplies,
+    pagination: {
+      currentPage: page,
+      pageSize: limit,
+      totalRecords: totalCount,
+      totalPages,
+      hasNext,
+      hasPrevious
+    }
+  };
 };

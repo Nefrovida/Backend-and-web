@@ -60,7 +60,10 @@ export const UpdateForumModal: React.FC<UpdateForumModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]">
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]"
+      onClick={handleCancel}
+    >
       <div
         className="bg-[#CFE6ED] rounded-3xl shadow-2xl p-6 w-full max-w-md mx-4"
         onClick={(e) => e.stopPropagation()}
@@ -119,7 +122,7 @@ export const UpdateForumModal: React.FC<UpdateForumModalProps> = ({
               name="visibility"
               checked={publicStatus === true}
               onChange={() => setPublicStatus(true)}
-              className="w-5 h-5 text-blue-600"
+              className="w-5 h-5 text-blue-600 accent-blue-600 cursor-pointer"
             />
           </label>
 
@@ -131,7 +134,7 @@ export const UpdateForumModal: React.FC<UpdateForumModalProps> = ({
               name="visibility"
               checked={publicStatus === false}
               onChange={() => setPublicStatus(false)}
-              className="w-5 h-5 text-blue-600"
+              className="w-5 h-5 text-blue-600 accent-blue-600 cursor-pointer"
             />
           </label>
         </div>

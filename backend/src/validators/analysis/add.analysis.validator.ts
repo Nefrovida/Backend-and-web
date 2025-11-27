@@ -1,9 +1,12 @@
+// backend / src / validators / analysis / add.analysis.validator.ts
 import { z } from 'zod';
+
+const MAX_COST = 5000000; // 5 million
 
 export const createAnalysisSchema = z.object({
   name: z
     .string()
-    .min(1, 'El nombre es obligatorio')
+    .min(3, 'El nombre debe tener al menos 3 caracteres')
     .max(50, 'El nombre no debe exceder 50 caracteres')
     .trim(),
   description: z
@@ -14,14 +17,17 @@ export const createAnalysisSchema = z.object({
   previousRequirements: z
     .string()
     .min(1, 'Los requisitos previos son obligatorios')
+    .max(500, 'Los requisitos previos no deben exceder 500 caracteres')
     .trim(),
   generalCost: z
     .number()
     .positive('El costo general debe ser mayor que 0')
+    .max(MAX_COST, `El costo general no debe exceder ${MAX_COST}`)
     .finite('El costo general debe ser un número válido'),
   communityCost: z
     .number()
     .positive('El costo comunitario debe ser mayor que 0')
+    .max(MAX_COST, `El costo comunitario no debe exceder ${MAX_COST}`)
     .finite('El costo comunitario debe ser un número válido'),
 });
 
@@ -29,7 +35,7 @@ export const updateAnalysisSchema = z
   .object({
     name: z
       .string()
-      .min(1, 'El nombre no puede estar vacío')
+      .min(3, 'El nombre debe tener al menos 3 caracteres')
       .max(50, 'El nombre no debe exceder 50 caracteres')
       .trim()
       .optional(),
@@ -42,16 +48,19 @@ export const updateAnalysisSchema = z
     previousRequirements: z
       .string()
       .min(1, 'Los requisitos previos no pueden estar vacíos')
+      .max(500, 'Los requisitos previos no deben exceder 500 caracteres')
       .trim()
       .optional(),
     generalCost: z
       .number()
       .positive('El costo general debe ser mayor que 0')
+      .max(MAX_COST, `El costo general no debe exceder ${MAX_COST}`)
       .finite('El costo general debe ser un número válido')
       .optional(),
     communityCost: z
       .number()
       .positive('El costo comunitario debe ser mayor que 0')
+      .max(MAX_COST, `El costo comunitario no debe exceder ${MAX_COST}`)
       .finite('El costo comunitario debe ser un número válido')
       .optional(),
   })

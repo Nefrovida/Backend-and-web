@@ -67,7 +67,7 @@ const MedicalRecordViewPage = () => {
         <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8 text-center max-w-md">
           <p className="text-gray-600 text-lg">No se encontró el expediente</p>
           <button
-            onClick={() => navigate("/expedientes")}
+            onClick={() => navigate("/dashboard/expedientes")}
             className="mt-4 px-6 py-2 bg-primary text-white rounded-lg hover:bg-opacity-90 transition-all"
           >
             Volver a la lista
@@ -120,7 +120,7 @@ const MedicalRecordViewPage = () => {
             <p className="text-gray-500 mt-1">Visualiza y gestiona la información del paciente</p>
           </div>
           <button
-            onClick={() => navigate(`/expediente/${patientId}/edit`)}
+            onClick={() => navigate(`/dashboard/expediente/${patientId}/edit`)}
             className="flex items-center justify-center gap-2 px-5 py-2.5 bg-primary text-white rounded-lg hover:bg-opacity-90 transition-all shadow-sm hover:shadow-md font-medium"
           >
             <FaEdit />

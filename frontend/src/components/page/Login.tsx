@@ -22,7 +22,7 @@ function Login() {
       localStorage.setItem("user", JSON.stringify(response.user));
 
       // Redirect to home
-      navigate("/");
+      navigate("/dashboard");
     } catch (err: any) {
       setError(err.message || "Error en el inicio de sesión");
     } finally {

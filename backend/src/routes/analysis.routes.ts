@@ -22,6 +22,7 @@ router.get(
     downloadReport
 );
 
+
 router.post(
     "/analysis-appointment",
     authenticate,
