@@ -25,13 +25,31 @@ export default class Notes {
     });
   }
 
-  static async getNotesByPatient(patientId: string) {
-    return await prisma.notes.findMany({
+  static async getNotesByPatient(page: number, patientId: string) {
+    const pagination = 10;
+    const notes = await prisma.notes.findMany({
       where: {
         patient_id: patientId,
       },
       orderBy: {
         creation_date: "desc",
+      },
+      take: pagination,
+      skip: pagination * page,
+    });
+
+    return notes;
+  }
+
+  static async patientBelogsToDoctor(patientId: string, userId: string) {
+    await prisma.patient_appointment.findFirst({
+      where: {
+        patient_id: patientId,
+        appointment: {
+          doctor: {
+            user_id: userId,
+          },
+        },
       },
     });
   }

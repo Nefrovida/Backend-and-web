@@ -6,6 +6,7 @@ import { requirePrivileges } from "../middleware/rbac.middleware";
 import { Privilege } from "../types/rbac.types";
 import postNewMessage from "src/controller/forum/postNewMessage.controller";
 import getMyForums from "src/controller/forum/getMyForums.controller";
+import getForumFeed from "src/controller/forum/getForumFeed.controller";
 
 const router = express.Router();
 
@@ -44,6 +45,10 @@ const router = express.Router();
  *   }
  * ]
  */
+router.get("/myForums", authenticate, getMyForums);
+
+router.get("/feed", authenticate, getForumFeed);
+
 router.get(
   "/",
   authenticate,
@@ -51,7 +56,12 @@ router.get(
   forumsController.getAll
 );
 
-router.get("/myForums", authenticate, getMyForums);
+router.get(
+  "/:forumId",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_FORUMS]),
+  forumsController.getById
+);
 
 router.get(
   "/me",
@@ -201,6 +211,18 @@ router.post(
 );
 
 /**
+ * Get messages for a forum
+ *
+ * GET /api/forums/:forumId/messages
+ */
+router.get(
+  "/:forumId/messages",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_FORUMS]),
+  forumsController.getMessages
+);
+
+/**
  * Reply to a message in a forum
  *
  * POST /api/forums/:forumId/replies
@@ -228,5 +250,17 @@ router.post(
  * }
  */
 router.post("/:forumId/replies", authenticate, forumsController.replyToMessage);
+
+/**
+ * Get replies for a message
+ *
+ * GET /api/forums/:forumId/messages/:messageId/replies
+ */
+router.get(
+  "/:forumId/messages/:messageId/replies",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_FORUMS]),
+  forumsController.getReplies
+);
 
 export default router;

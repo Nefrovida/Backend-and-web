@@ -41,31 +41,22 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
     const styles = variantStyles[variant];
 
     return createPortal(
-        <>
+        <div
+            className="fixed inset-0 bg-black/40 z-[95] flex items-center justify-center px-4"
+            onClick={onClose}
+        >
             <div
-                className="fixed inset-0 bg-black/40 z-[95]"
-                onClick={onClose}
-            />
-
-            {/* Modal content */}
-            <div
-                className="fixed inset-0 z-[96] flex items-center justify-center px-4"
+                className={`w-full max-w-sm bg-white rounded-2xl shadow-2xl border p-6 animate-in fade-in zoom-in-95 duration-200 ${styles.border}`}
                 onClick={(e) => e.stopPropagation()}
             >
-                <div
-                    className={`
-            w-full max-w-sm bg-white rounded-2xl shadow-2xl 
-            border p-6 animate-in fade-in zoom-in-95 duration-200
-            ${styles.border}`}
-                >
-                    <div className="flex items-start gap-3">
-                        <div
-                            className={`w-10 h-10 rounded-2xl flex items-center justify-center ${styles.iconBg}`}
-                        >
-                            {variant === "success" && "✓"}
-                            {variant === "error" && "!"}
-                            {variant === "info" && "i"}
-                        </div>
+                <div className="flex items-start gap-3">
+                    <div
+                        className={`w-10 h-10 rounded-2xl flex items-center justify-center ${styles.iconBg}`}
+                    >
+                        {variant === "success" && "✓"}
+                        {variant === "error" && "!"}
+                        {variant === "info" && "i"}
+                    </div>
 
                         <div className="flex-1">
                             <h2 className={`text-base font-semibold ${styles.title}`}>
@@ -87,8 +78,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
                         </Button>
                     </div>
                 </div>
-            </div>
-        </>,
+            </div>,
         document.body
     );
 };

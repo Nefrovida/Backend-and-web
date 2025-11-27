@@ -9,9 +9,9 @@ import {
   BadRequestError,
   ConflictError
 } from '../../util/errors.util.js';
-import type { 
+import type {
   AddPatientToForumResponse,
-  ForumRole 
+  ForumRole
 } from '../../types/forums/add_patient_to_forum.types';
 import { FORUM_ROLES } from '../../types/forums/add_patient_to_forum.types';
 
@@ -23,7 +23,7 @@ export async function addPatientToForumService(
   userId: string,
   forumRole: ForumRole
 ): Promise<AddPatientToForumResponse> {
-  
+
   // 1. Verify that forum exists
   const forum = await findForumById(forumId);
   if (!forum) {
@@ -99,7 +99,16 @@ export async function joinForumService(
   // 5. Verify that user is not already in forum
   const existingMembership = await findUserInForum(userId, forumId);
   if (existingMembership) {
-    throw new ConflictError('User is already a member of this forum');
+    // Return success if already a member (idempotent)
+    return {
+      success: true,
+      message: 'User is already a member of this forum',
+      data: {
+        userId: existingMembership.user_id,
+        forumId: existingMembership.forum_id,
+        forumRole: existingMembership.forum_role,
+      }
+    };
   }
 
   // 6. Add user to forum with default MEMBER role

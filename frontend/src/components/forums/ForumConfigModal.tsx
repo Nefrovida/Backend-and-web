@@ -127,13 +127,14 @@ export const ForumConfigModal: React.FC<ForumConfigModalProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold text-gray-800">
+        <div className="flex items-center justify-center mb-6 relative">
+          <h1 className="text-lg font-semibold text-gray-800 text-center w-full">
             Configuración
-          </h2>
+          </h1>
           <button
             onClick={onClose}
-            className="p-1 hover:bg-gray-200 rounded-full transition-colors"
+            className="absolute right-0 top-1 p-1 hover:bg-gray-200 rounded-full transition-colors"
+            aria-label="Cerrar"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -152,15 +153,10 @@ export const ForumConfigModal: React.FC<ForumConfigModalProps> = ({
           </button>
         </div>
 
-        {/* Forum Name */}
-        <div className="mb-6">
-          <p className="text-sm text-gray-600 text-center">
-            <strong>{forum.name}</strong>
-          </p>
-        </div>
 
         {/* Menu Items */}
         <div className="space-y-2">
+          <p className="text-sm text-gray-600 mb-2 text-center">{forum.name}</p>
           {menuItems.map((item, index) => (
             <button
               key={index}

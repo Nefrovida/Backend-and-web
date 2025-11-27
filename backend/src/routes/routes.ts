@@ -19,6 +19,7 @@ import agendaRoutes from "./agenda.routes"
 import appointmentRoutes from "./appointment.routes";
 import expedienteRoutes from "./expediente.routes";
 import * as analysisPDFController from "../controller/analysisPDF.controller";
+import analysisRoutes from "./analysis.routes";
 
 import { authenticate } from "../middleware/auth.middleware";
 import { requirePrivileges } from "../middleware/rbac.middleware";
@@ -111,6 +112,10 @@ router.use("/historial", historialRoutes);
 // Appointments Routes (Protected)
 // ============================================
 router.use("/appointments", appointmentsRoutes);
+
+// Analysis Routes (Protected)
+// ============================================
+router.use("/analysis", analysisRoutes);
 
 // Doctors Routes (Protected)
 // ============================================
