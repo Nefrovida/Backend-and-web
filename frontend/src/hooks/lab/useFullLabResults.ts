@@ -7,6 +7,7 @@ export default function useFullLabResults(
 ) {
   // variables for full results and user
   const [results, setResults] = useState<any>(null);
+  // const [hadResults, setHadResults] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [analysis, setAnalysis] = useState<any>(null);
   const [error, setError] = useState("");
@@ -21,15 +22,16 @@ export default function useFullLabResults(
       // console.log("attempting to get full lab restuls:")
       setIsLoading(true);
       setError("");
+      // Clear PDF when loading new results
+      setPdf(null);
+      setPdfError("");
+      
       const res = await patientFullResultsApi(Number(id));
       
       if (res.success && res.data) {
         setResults(res.data.results);
         setUser(res.data.user);
         setAnalysis(res.data.analysis);
-        // console.log("results: ", res.data.results);
-        // console.log("user: ", res.data.user);
-        // console.log("analysis: ", res.data.analysis);
         setError("");
       } else {
         setError("Request for patient results failed");
@@ -46,6 +48,7 @@ export default function useFullLabResults(
     try {
       setPdfIsLoading(true);
       setPdfError("");
+      setPdf(null);
       
       const pdfUrl = await resultsPDFApi(results_id);
       setPdf(pdfUrl);
@@ -58,9 +61,14 @@ export default function useFullLabResults(
     }
   }, []);
 
+  // Clear PDF when patient_analysis_id changes
+  useEffect(() => {
+    setPdf(null);
+    setPdfError("");
+  }, [patient_analysis_id]);
+
   // Load patient full results on mount and when patient_analysis_id changes
   useEffect(() => {
-    console.log("hook useEffect triggered, going to attempt to load full patient results")
     if (patient_analysis_id) {
       loadPatientFullResults(patient_analysis_id);
     }
@@ -84,6 +92,7 @@ export default function useFullLabResults(
 
   return {
     results,
+    // hadResults,
     user,
     analysis,
     error,
