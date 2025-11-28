@@ -7,7 +7,6 @@ import { LoginRequest, RegisterRequest } from '../types/auth.types';
  */
 export const login = async (req: Request, res: Response): Promise<void> => {
   try {
-    console.log("Trying to log in")
     const loginData: LoginRequest = req.body;
     const result = await authService.login(loginData);
     
@@ -48,7 +47,6 @@ export const login = async (req: Request, res: Response): Promise<void> => {
  */
 export const loginMobile = async (req: Request, res: Response): Promise<void> => {
   try {
-    console.log("Trying to log in from mobile")
     const loginData: LoginRequest = req.body;
     const result = await authService.login(loginData);
 
