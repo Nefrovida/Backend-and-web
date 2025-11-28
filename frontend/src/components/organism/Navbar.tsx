@@ -22,7 +22,9 @@ import {
   FaRegClipboard,
   FaRegClock,
   FaClock,
+  FaUserCheck,
 } from "react-icons/fa";
+import { HiOutlineUserGroup, HiUserGroup } from "react-icons/hi";
 import ConfirmModal from "../molecules/ConfirmModal";
 
 import { ROLE_IDS } from "../../types/auth.types";
@@ -249,13 +251,22 @@ function Navbar({ children }: Props) {
         <div className="flex flex-col gap-3 items-center w-full justify-center flex-1 py-4 overflow-y-auto scrollbar-hide px-2">
           {/* Only Admins can see this icons */}
           {isAdmin && (
-            <CustomLink
-              label="Registrar Doctor"
-              to="/dashboard/registrar-doctor"
-              icon={<FaUserMd />}
-              activeIcon={<FaUserMd />}
-              end
-            />
+            <>
+              <CustomLink
+                label="Usuarios Pendientes"
+                to="/dashboard/pending-users"
+                icon={<HiOutlineUserGroup />}
+                activeIcon={<HiUserGroup />}
+                end
+              />
+              <CustomLink
+                label="Registrar Doctor"
+                to="/dashboard/registrar-doctor"
+                icon={<FaUserMd />}
+                activeIcon={<FaUserMd />}
+                end
+              />
+            </>
           )}
 
           {/* Upload Results, only Laboratorist */}
