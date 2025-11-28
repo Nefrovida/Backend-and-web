@@ -13,6 +13,8 @@ function Register() {
   });
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string>("");
 
   const updateFormData = (data: Partial<RegisterData>) => {
     setFormData((prev) => ({ ...prev, ...data }));
@@ -73,9 +75,13 @@ function Register() {
       
       // Check if registration is pending approval
       if (response.pending) {
-        // Show success message and redirect to login
-        alert("¡Registro exitoso! Tu cuenta está pendiente de aprobación por un administrador. Te notificaremos cuando puedas acceder.");
-        navigate("/login");
+        // Show success message in UI
+        setSuccess(true);
+        setSuccessMessage(response.message || "¡Registro exitoso! Tu cuenta está pendiente de aprobación por un administrador. Te notificaremos cuando puedas acceder.");
+        // Redirect to login after 5 seconds
+        setTimeout(() => {
+          navigate("/login");
+        }, 5000);
       } else {
         // Fallback for backward compatibility (shouldn't happen with new flow)
         localStorage.setItem("user", JSON.stringify(response.user));
@@ -367,34 +373,77 @@ function Register() {
           </div>
         </div>
 
-        {/* Welcome message - only on step 1 */}
-        {step === 1 && (
-          <h2 className="text-2xl font-semibold text-center mb-6 text-gray-800">
-            ¡Bienvenid@!
-          </h2>
-        )}
+        {/* Success Message */}
+        {success ? (
+          <div className="space-y-6 text-center">
+            <div className="flex justify-center">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                <svg className="w-10 h-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+            </div>
+            
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-3">
+                ¡Registro Exitoso!
+              </h2>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-left">
+                <p className="text-sm text-gray-700">
+                  {successMessage}
+                </p>
+              </div>
+            </div>
 
-        {/* Progress indicator */}
-        <div className="flex justify-center mb-6">
-          <div className="flex items-center space-x-2">
-            {[1, 2, 3].map((s) => (
-              <React.Fragment key={s}>
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold transition-colors ${
-                    step >= s ? "bg-blue-900 text-white" : "bg-gray-300 text-gray-600"
-                  }`}
-                >
-                  {s}
-                </div>
-                {s < 3 && <div className={`w-8 h-1 transition-colors ${step > s ? "bg-blue-900" : "bg-gray-300"}`} />}
-              </React.Fragment>
-            ))}
+            <div className="space-y-2">
+              <div className="flex items-center justify-center text-sm text-gray-600">
+                <svg className="animate-spin h-4 w-4 mr-2 text-blue-900" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Redirigiendo al inicio de sesión en unos segundos...
+              </div>
+              
+              <button
+                onClick={() => navigate("/login")}
+                className="w-full bg-blue-900 text-white py-3 rounded-full font-semibold hover:bg-blue-800 transition-colors shadow-lg"
+              >
+                Ir al Inicio de Sesión
+              </button>
+            </div>
           </div>
-        </div>
+        ) : (
+          <>
+            {/* Welcome message - only on step 1 */}
+            {step === 1 && (
+              <h2 className="text-2xl font-semibold text-center mb-6 text-gray-800">
+                ¡Bienvenid@!
+              </h2>
+            )}
 
-        {step === 1 && renderStep1()}
-        {step === 2 && renderStep2()}
-        {step === 3 && renderStep3()}
+            {/* Progress indicator */}
+            <div className="flex justify-center mb-6">
+              <div className="flex items-center space-x-2">
+                {[1, 2, 3].map((s) => (
+                  <React.Fragment key={s}>
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold transition-colors ${
+                        step >= s ? "bg-blue-900 text-white" : "bg-gray-300 text-gray-600"
+                      }`}
+                    >
+                      {s}
+                    </div>
+                    {s < 3 && <div className={`w-8 h-1 transition-colors ${step > s ? "bg-blue-900" : "bg-gray-300"}`} />}
+                  </React.Fragment>
+                ))}
+              </div>
+            </div>
+
+            {step === 1 && renderStep1()}
+            {step === 2 && renderStep2()}
+            {step === 3 && renderStep3()}
+          </>
+        )}
       </div>
     </div>
   );
