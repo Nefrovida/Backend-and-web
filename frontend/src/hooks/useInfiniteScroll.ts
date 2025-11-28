@@ -5,10 +5,13 @@ async function fetchResults(route: string, params: string) {
   const res = await fetch(`${route + "?" + params}`, {
     credentials: "include", // Include cookies in request
   });
+  if (res.status != 200) {
+    return { data: [], status: res.status };
+  }
   if (!res.ok) {
-    console.error(
-      `Error: Cargando resultados en InfinityScroll: \n${route}\n${res}`
-    );
+    // console.error(
+    //   `Error: Cargando resultados en InfinityScroll: \n${route}\n${res}`
+    // );
     return { data: [], status: res.status };
   }
   return { data: await res.json(), status: res.status };
