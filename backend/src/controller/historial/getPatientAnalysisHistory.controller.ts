@@ -9,7 +9,6 @@ import { ANALYSIS_STATUS } from "@prisma/client";
 async function getPatientAnalysisHistory(req: Request, res: Response) {
   try {
     // Extract patient_id from session/authenticated user
-    console.log("hit analysis history endpoint");
     const userId = req.user?.userId;
 
     if (!userId) {
