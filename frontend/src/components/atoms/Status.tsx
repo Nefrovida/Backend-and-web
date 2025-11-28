@@ -1,7 +1,7 @@
 import React from 'react'
 
 interface Props {
-    status: "positive" | "neutral" | "negative";
+    status: "positive" | "neutral" | "negative" | "default";
     message: string;
 }
 
@@ -14,6 +14,8 @@ export default function Status(props: Props) {
                 return "text-yellow-500 border-yellow-500 bg-yellow-50";
             case "negative":
                 return "text-red-500 border-red-500 bg-red-50";
+            case "default":
+                return "text-gray-500 border-gray-500 bg-gray-50";
             default:
                 return "text-gray-500 border-gray-500 bg-gray-50";
         }
