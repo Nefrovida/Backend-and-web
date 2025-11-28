@@ -9,6 +9,7 @@ const router = express.Router();
 // ============================================
 router.post("/register", authController.register);
 router.post("/login", authController.login);
+router.post("/login/mobile", authController.loginMobile);
 router.post("/refresh", authController.refreshToken); // Public - uses refresh token from cookie
 
 // Protected auth routes

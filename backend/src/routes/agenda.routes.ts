@@ -43,7 +43,7 @@ router.get(
 router.post(
   "/appointments/:id/cancel",
   authenticate,
-  requirePrivileges([Privilege.UPDATE_APPOINTMENTS]),
+  requirePrivileges([Privilege.CREATE_APPOINTMENTS]),
   cancelAppointment
 );
 

@@ -7,6 +7,10 @@ import Historial from "../../model/historial.model";
  */
 async function getPatientAnalysisById(req: Request, res: Response) {
   try {
+    console.log("--------------------------------");
+    console.log("hit analysis by id endpoint");
+    console.log("--------------------------------");
+
     // Extract patient_id from session/authenticated user
     const userId = req.user?.userId;
 
@@ -38,11 +42,25 @@ async function getPatientAnalysisById(req: Request, res: Response) {
       analysisId
     );
 
+    console.log("Analysis record:", analysisRecord);
+
     if (!analysisRecord) {
       return res.status(404).json({ error: "Analysis record not found" });
     }
 
-    res.json(analysisRecord);
+    const newResult = {
+      "id": analysisRecord.patient_analysis_id,
+      "name": analysisRecord.analysis.name,
+      "date": analysisRecord.analysis_date,
+      "interpretations": analysisRecord.results?.interpretation,
+      "recommendations": analysisRecord.results?.recommendation,
+      "download_url": analysisRecord.results?.path,
+    }
+
+    console.log("New result single history record:", newResult);
+
+    // res.json(analysisRecord);
+    res.json(newResult);
   } catch (error) {
     console.error("Error fetching patient analysis by ID:", error);
     res.status(500).json({ error: "Failed to fetch analysis record" });

@@ -9,6 +9,7 @@ import { ANALYSIS_STATUS } from "@prisma/client";
 async function getPatientAnalysisHistory(req: Request, res: Response) {
   try {
     // Extract patient_id from session/authenticated user
+    console.log("hit analysis history endpoint");
     const userId = req.user?.userId;
 
     if (!userId) {
@@ -48,7 +49,23 @@ async function getPatientAnalysisHistory(req: Request, res: Response) {
       { start, end, analysisType, status }
     );
 
-    res.json(patientAnalysisHistory);
+    console.log("Patient analysis history:", patientAnalysisHistory);
+
+    const newResult = [];
+    for (const item of patientAnalysisHistory) {
+      newResult.push({
+        "id": item.patient_analysis_id,
+        "name": item.analysis.name,
+        "date": item.analysis_date,
+        "recommendations": item.results?.recommendation,
+        "download_url": item.results?.path,
+      });
+    }
+
+    console.log("New result:", newResult);
+
+    // res.json(patientAnalysisHistory);
+    res.json(newResult);
   } catch (error) {
     console.error("Error fetching patient analysis history:", error);
     res.status(500).json({ error: "Failed to fetch analysis history" });
