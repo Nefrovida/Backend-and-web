@@ -16,13 +16,12 @@ module.exports = {
     },
     {
       name: "Nefrovida-Frontend",
-      script: "serve",
-      watch: ["src"],
+      script: "./node_modules/vite/bin/vite.js",
+      args: "--host",
+      cwd: "./frontend",
+      watch: false,
       env: {
-        PM2_SERVE_PATH: "frontend/dist",
-        PM2_SERVE_PORT: 3000,
-        PM2_SERVE_SPA: "true",
-        VITE_APP_API_URL: "http://localhost:3001/api",
+        // VITE_APP_API_URL: "http://localhost:3001/api",
         NODE_ENV: "production",
       },
       env_production: {
