@@ -126,8 +126,29 @@ export default class Laboratory {
     }));
   }
 
-  static async confirmLabAppointmentResult(patientAnalysisId: number, fileUri: string) {
-    await prisma.$transaction(async (tx: any) => {
+  static async confirmLabAppointmentResult(
+    patientAnalysisId: number,
+    fileUri: string
+  ) {
+    await prisma.$transaction(async (tx) => {
+      // Verify it exists and that it is in REQUESTED status
+      const existing = await tx.patient_analysis.findUnique({
+        where: { patient_analysis_id: patientAnalysisId },
+        select: { analysis_status: true },
+      });
+
+      if (!existing) {
+        throw new Error("La cita de laboratorio no existe.");
+      }
+
+      // Only allow uploading results when the study is already in the laboratory (LAB)
+      if (existing.analysis_status !== ANALYSIS_STATUS.LAB) {
+        throw new Error(
+          "Solo se pueden subir resultados para estudios que ya están en laboratorio (estado LAB)."
+        );
+      }
+
+      // Save/update result
       await tx.results.upsert({
         where: { patient_analysis_id: patientAnalysisId },
         update: {
@@ -142,10 +163,11 @@ export default class Laboratory {
         },
       });
 
+      // Update appointment status
       await tx.patient_analysis.update({
         where: { patient_analysis_id: patientAnalysisId },
         data: {
-          analysis_status: "SENT",
+          analysis_status: ANALYSIS_STATUS.SENT,
           results_date: new Date(),
         },
       });
@@ -182,9 +204,6 @@ export default class Laboratory {
     interpretations: string, 
     recommendations: string) {
     try {
-      console.log("generating report for patient analysis id: ", patient_analysis_id);
-      console.log("interpretations: ", interpretations);
-      console.log("recommendations: ", recommendations);
       await prisma.results.update({
         where: { patient_analysis_id: patient_analysis_id },
         data: {

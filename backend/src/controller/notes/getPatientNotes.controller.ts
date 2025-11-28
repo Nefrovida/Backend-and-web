@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import * as notesService from "../../service/notes.service";
+import z from "zod";
 
 async function getPatientNotes(req: Request, res: Response) {
   try {
@@ -7,12 +8,24 @@ async function getPatientNotes(req: Request, res: Response) {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    const { patientId } = req.query;
+    const querySchema = z.object({
+      patientId: z.string().uuid(),
+      page: z.preprocess(
+        (v) => Number(v ?? 0),
+        z.number().int().nonnegative().default(0)
+      ),
+    });
+
+    const parsed = querySchema.safeParse(req.query);
+    if (!parsed.success)
+      return res.status(400).json({
+        errors: parsed.error.flatten(),
+      });
+
+    const { page: pageNum, patientId } = parsed.data;
 
     if (!patientId) {
-      return res.status(400).json({
-        error: "patientId query parameter is required",
-      });
+      return res.status(200).json([]);
     }
 
     const uuidRegex =
@@ -23,7 +36,10 @@ async function getPatientNotes(req: Request, res: Response) {
       });
     }
 
-    const notes = await notesService.getNotesByPatient(patientId as string);
+    const notes = await notesService.getNotesByPatient(
+      pageNum,
+      patientId as string
+    );
 
     return res.status(200).json(notes || []);
   } catch (error) {

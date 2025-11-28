@@ -325,6 +325,7 @@ export const ForumsPage = () => {
         }}
         onConfirm={handleCreateForum}
         externalError={modalError}
+        existingForums={forums}
       />
 
       {/* Update Forum Modal */}

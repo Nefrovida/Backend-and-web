@@ -1,5 +1,6 @@
 // frontend/src/components/molecules/AnalysisTypeModal.tsx
 import React from "react";
+import { createPortal } from "react-dom";
 
 interface AnalysisTypeModalProps {
     isOpen: boolean;
@@ -17,19 +18,17 @@ const AnalysisTypeModal: React.FC<AnalysisTypeModalProps> = ({
     if (!isOpen) return null;
 
     const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
-        // Cualquier click en el fondo cierra el modal
         e.stopPropagation();
         onClose();
     };
 
     const handleContentClick = (e: React.MouseEvent<HTMLDivElement>) => {
-        // Evita que el click dentro cierre el modal
         e.stopPropagation();
     };
 
-    return (
+    return createPortal(
         <div
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[90]"
             onClick={handleBackdropClick}
             role="dialog"
             aria-modal="true"
@@ -44,7 +43,8 @@ const AnalysisTypeModal: React.FC<AnalysisTypeModalProps> = ({
 
                 {children}
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 
