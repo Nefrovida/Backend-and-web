@@ -22,6 +22,7 @@ module.exports = {
         PM2_SERVE_PATH: "frontend/dist",
         PM2_SERVE_PORT: 3000,
         PM2_SERVE_SPA: "true",
+        VITE_APP_API_URL: "http://localhost:3001/api",
         NODE_ENV: "production",
       },
       env_production: {
