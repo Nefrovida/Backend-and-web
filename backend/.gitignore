@@ -4,5 +4,5 @@ node_modules
 .env
 /prisma/database/prisma
 uploads/
-
+/dist
 package-lock.json

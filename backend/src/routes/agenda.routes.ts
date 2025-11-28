@@ -17,42 +17,42 @@ import createAppointment from "../controller/agenda/createAppointment.controller
 
 // Secretaria – day appointments (secretary view, with patient names)
 router.get(
-    "/appointments-per-day-sec",
-    authenticate,
-    requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
-    getAppointmentsPerDaySec
+  "/appointments-per-day-sec",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
+  getAppointmentsPerDaySec
 );
 
 // Doctor / mobile – daily appointments (doctor's name)
 router.get(
-    "/appointments-per-day",
-    authenticate,
-    requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
-    getAppointmentsPerDay
+  "/appointments-per-day",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
+  getAppointmentsPerDay
 );
 
 // Appointment detail by id
 router.get(
-    "/appointment/:id",
-    authenticate,
-    requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
-    getAppointmentById
+  "/appointment/:id",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
+  getAppointmentById
 );
 
 // Cancel appointment
 router.post(
-    "/appointments/:id/cancel",
-    authenticate,
-    requirePrivileges([Privilege.UPDATE_APPOINTMENTS]),
-    cancelAppointment
+  "/appointments/:id/cancel",
+  authenticate,
+  requirePrivileges([Privilege.UPDATE_APPOINTMENTS]),
+  cancelAppointment
 );
 
 // Secretaria – appointments in date range (calendar view / filter)
 router.get(
-    "/appointments/range",
-    authenticate,
-    requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
-    getAppointmentsInRangeC
+  "/appointments/range",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
+  getAppointmentsInRangeC
 );
 
 // Secretaria endpoints for scheduling appointments
@@ -68,7 +68,7 @@ router.get(
   authenticate,
   requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
   getAppointmentDateAvailability
-)
+);
 
 router.get(
   "/doctors",
