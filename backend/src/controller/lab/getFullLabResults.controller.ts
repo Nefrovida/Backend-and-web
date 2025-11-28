@@ -98,36 +98,24 @@ export const getResultsPDF = async (req: Request, res: Response) => {
             });
         }
 
-        console.log(`Database path value: "${results.path}"`);
-
-        // Extract filename from the path (handles URLs and file paths)
-        let filename = results.path.trim();
-        
-        try {
-            // Try to parse as URL
-            const url = new URL(filename);
-            // Extract filename from URL pathname
-            filename = path.basename(url.pathname);
-        } catch (e) {
-            // Not a URL, extract filename from path
-            filename = path.basename(filename);
+        // Database stores path relative to backend root (e.g., "/uploads/results/analysis_2.pdf" or "uploads/results/analysis_2.pdf")
+        // Strip leading slash if present and resolve relative to backend root
+        let relativePath = results.path.trim();
+        // Remove leading slash to make it truly relative
+        if (relativePath.startsWith('/') || relativePath.startsWith('\\')) {
+            relativePath = relativePath.substring(1);
         }
-
-        console.log(`Extracted filename: ${filename}`);
-
-        const uploadDir = path.join(process.cwd(), "uploads");
-        const filePath = path.join(uploadDir, filename);
-
-        console.log(`Resolved file path: ${filePath}`);
-        console.log(`Upload directory: ${uploadDir}`);
+        const absolutePath = path.resolve(process.cwd(), relativePath);
+        
+        // Extract just the filename for Content-Disposition header
+        const filename = path.basename(relativePath);
 
         // Check if file exists
-        if (!fs.existsSync(filePath)) {
-            console.error(`PDF file not found at: ${filePath}`);
-            console.error(`Current working directory: ${process.cwd()}`);
+        if (!fs.existsSync(absolutePath)) {
+            console.error(`PDF file not found at: ${absolutePath}`);
             return res.status(404).json({ 
                 success: false, 
-                message: `PDF file not found on server. Expected path: ${filePath}` 
+                message: `PDF file not found on server. Expected path: ${absolutePath}` 
             });
         }
 
@@ -135,8 +123,8 @@ export const getResultsPDF = async (req: Request, res: Response) => {
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
         
-        // Send the file
-        res.sendFile(filePath, (err) => {
+        // Send the file (sendFile requires absolute path)
+        res.sendFile(absolutePath, (err) => {
             if (err) {
                 console.error("Error sending PDF file:", err);
                 if (!res.headersSent) {
