@@ -30,4 +30,4 @@ export { Privilege };
  * APPROVED - User has been approved by an admin and can access the platform
  * REJECTED - User registration was rejected by an admin
  */
-export { UserStatus } from '../../prisma/database/prisma/index.js';
+export { UserStatus } from '@prisma/client';

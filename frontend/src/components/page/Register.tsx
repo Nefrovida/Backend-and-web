@@ -71,11 +71,16 @@ function Register() {
 
       const response = await authService.register(formData as RegisterData);
       
-      // Store only user data (tokens are in httpOnly cookies)
-      localStorage.setItem("user", JSON.stringify(response.user));
-
-      // Redirect to home
-      navigate("/dashboard");
+      // Check if registration is pending approval
+      if (response.pending) {
+        // Show success message and redirect to login
+        alert("¡Registro exitoso! Tu cuenta está pendiente de aprobación por un administrador. Te notificaremos cuando puedas acceder.");
+        navigate("/login");
+      } else {
+        // Fallback for backward compatibility (shouldn't happen with new flow)
+        localStorage.setItem("user", JSON.stringify(response.user));
+        navigate("/dashboard");
+      }
     } catch (err: any) {
       setError(err.message || "Error en el registro");
     } finally {
