@@ -3,6 +3,7 @@ node_modules/
 .env
 .DS_Store
 ./backend/prisma/database/prisma
+./*/dist
 */package-lock.json
 ./backend/prisma/migrations
 

@@ -389,26 +389,28 @@ function Navbar({ children }: Props) {
         `}
       >
         {/* Intern Container */}
-        <div className="h-full w-fit flex flex-col bg-white">
-          <div className="p-5 bg-white border-b border-gray-100 flex justify-between items-center shadow-sm z-10">
-            <div className="flex items-center gap-3">
-              <div className="bg-green-100 p-2 rounded-lg text-green-600">
-                <LuNotebookPen size={20} />
+        {isDoctor && (
+          <div className="h-full w-fit flex flex-col bg-white">
+            <div className="p-5 bg-white border-b border-gray-100 flex justify-between items-center shadow-sm z-10">
+              <div className="flex items-center gap-3">
+                <div className="bg-green-100 p-2 rounded-lg text-green-600">
+                  <LuNotebookPen size={20} />
+                </div>
+                <h2 className="font-bold text-gray-800 text-xl">Notas</h2>
               </div>
-              <h2 className="font-bold text-gray-800 text-xl">Notas</h2>
+              <button
+                onClick={() => setShowNotes(false)}
+                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                ✕
+              </button>
             </div>
-            <button
-              onClick={() => setShowNotes(false)}
-              className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              ✕
-            </button>
-          </div>
 
-          <div className="flex-1 overflow-y-auto p-0 bg-white relative">
-            <Notes />
+            <div className="flex-1 overflow-y-auto p-0 bg-white relative">
+              <Notes />
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Logout Modal */}
