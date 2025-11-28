@@ -262,9 +262,9 @@ INSERT INTO patient_appointment (patient_id, appointment_id, date_hour, duration
 VALUES 
 ('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 1, '2025-11-25 10:00:00', 60, 'PRESENCIAL', NULL, 'Consultorio 101, Hospital Central', 'PROGRAMMED'),
 ('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 2, '2025-10-15 14:00:00', 30, 'PRESENCIAL', NULL, 'Consultorio 101, Hospital Central', 'FINISHED'),
-('c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', 3, '2025-11-23 09:00:00', 45, 'VIRTUAL', 'https://meet.google.com/abc-defg-hij', NULL, 'PROGRAMMED'),
-('c3eebc99-9c0b-4ef8-bb6d-6bb9bd380a77', 3, '2025-10-20 16:00:00', 45, 'PRESENCIAL', NULL, 'Consultorio 205, Clínica del Sur', 'FINISHED'),
-('c4eebc99-9c0b-4ef8-bb6d-6bb9bd380a88', 4, '2025-11-28 11:00:00', 45, 'PRESENCIAL', NULL, 'Consultorio 302, Hospital Infantil', 'PROGRAMMED'),
+('c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', 3, '2025-11-23 09:00:00', 60, 'VIRTUAL', 'https://meet.google.com/abc-defg-hij', NULL, 'PROGRAMMED'),
+('c3eebc99-9c0b-4ef8-bb6d-6bb9bd380a77', 3, '2025-10-20 16:00:00', 60, 'PRESENCIAL', NULL, 'Consultorio 205, Clínica del Sur', 'FINISHED'),
+('c4eebc99-9c0b-4ef8-bb6d-6bb9bd380a88', 4, '2025-11-28 11:00:00', 60, 'PRESENCIAL', NULL, 'Consultorio 302, Hospital Infantil', 'PROGRAMMED'),
 ('c4eebc99-9c0b-4ef8-bb6d-6bb9bd380a88', 5, '2025-10-10 10:00:00', 30, 'PRESENCIAL', NULL, 'Consultorio 302, Hospital Infantil', 'FINISHED');
 
 -- ========================
