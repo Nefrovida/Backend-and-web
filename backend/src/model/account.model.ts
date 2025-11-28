@@ -10,7 +10,7 @@ export interface IAccount {
   username: string;
   password: string;
   birthday?: Date | null;
-  gender?: "MALE" | "FEMALE" | "OTHER" | null;
+  gender?: "MALE" | "FEMALE" | "OTHER";
   role_id: number;
 }
 
@@ -21,12 +21,13 @@ export const createAccount = async (account: IAccount): Promise<IAccount> => {
       parent_last_name: account.parent_last_name,
       maternal_last_name: account.maternal_last_name ?? null,
       active: account.active ?? true,
-      phone_number: account.phone_number ?? null,
+      phone_number: account.phone_number ?? "",
       username: account.username,
       password: account.password,
-      birthday: account.birthday ?? null,
-      gender: account.gender ?? null,
+      birthday: account.birthday!,
+      gender: account.gender!,
       role_id: account.role_id,
+      first_login: true,
     },
   });
   return newAccount;
