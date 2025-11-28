@@ -1,0 +1,272 @@
+// frontend/src/components/page/AnalysisManager.tsx
+import React, { useEffect, useState } from "react";
+import CreateAnalysisModal from "../organism/lab/CreateAnalysisModal";
+import EditAnalysisModal from "../organism/lab/EditAnalysisModal";
+import { authService } from "@/services/auth.service";
+import { analysisService } from "@/services/analysis.service";
+import {
+  CreateAnalysisData,
+  AnalysisResponse,
+  UpdateAnalysisData,
+} from "@/types/add.analysis.types";
+import FeedbackModal from "@/components/molecules/FeedbackModal";
+import ConfirmModal from "@/components/molecules/ConfirmModal";
+import Button from "@/components/atoms/Button";
+
+// Helper to extract the friendly message from the backend
+const getBackendErrorMessage = (err: any, fallback: string) => {
+  const backendMessage =
+    err?.response?.data?.error?.message ??
+    err?.response?.data?.message;
+
+  if (typeof backendMessage === "string" && backendMessage.trim() !== "") {
+    return backendMessage;
+  }
+
+  return err?.message || fallback;
+};
+
+// Truncate text
+const truncate = (text: string, max: number) => {
+  const clean = text.trim();
+  if (clean.length <= max) return clean;
+  return clean.slice(0, max) + "…";
+};
+
+type FeedbackState =
+  | { type: "success" | "error"; message: string }
+  | null;
+
+const AnalysisManager: React.FC = () => {
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [analyses, setAnalyses] = useState<AnalysisResponse[]>([]);
+  const [editingAnalysis, setEditingAnalysis] =
+    useState<AnalysisResponse | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [feedback, setFeedback] = useState<FeedbackState>(null);
+  const [deleteTarget, setDeleteTarget] = useState<AnalysisResponse | null>(null);
+
+  const load = async () => {
+    try {
+      setLoading(true);
+      const res = await analysisService.getAll(1, 50);
+      setAnalyses(res.data);
+    } catch (err) {
+      console.error(err);
+      setFeedback({
+        type: "error",
+        message: "Error al cargar los exámenes.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    void load();
+  }, []);
+
+  const currentUser = authService.getCurrentUser();
+
+  const handleDeleteConfirmed = async () => {
+    if (!deleteTarget) return;
+
+    try {
+      await analysisService.deleteAnalysis(deleteTarget.analysisId);
+      await load();
+      setDeleteTarget(null);
+      setFeedback({
+        type: "success",
+        message: "Análisis eliminado correctamente.",
+      });
+    } catch (err: any) {
+      const msg = getBackendErrorMessage(
+        err,
+        "Error al eliminar el análisis"
+      );
+      setFeedback({
+        type: "error",
+        message: msg,
+      });
+      setDeleteTarget(null);
+    }
+  };
+
+  return (
+    <div className="p-6 min-h-screen bg-gray-50">
+      <div className="max-w-4xl mx-auto bg-white rounded-lg p-6 shadow">
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-xl font-bold">Administrar tipos de análisis</h1>
+          {currentUser && (
+            <Button
+              onClick={() => setIsCreateOpen(true)}
+            variant="primary"
+            className="px-3 py-1 text-sm rounded-lg"
+            >
+              Crear análisis
+            </Button>
+          )}
+        </div>
+
+        {loading && (
+          <p className="text-gray-500 text-sm mb-2">Cargando exámenes…</p>
+        )}
+
+        <div className="grid grid-cols-1 gap-3">
+          {analyses.length === 0 ? (
+            <p className="text-gray-600">No hay exámenes registrados.</p>
+          ) : (
+            analyses.map((a) => (
+              <div
+                key={a.analysisId}
+                className="flex justify-between items-start border p-3 rounded-lg bg-slate-50 gap-4 w-full overflow-hidden"
+              >
+                <div className="max-w-[70%] w-full overflow-hidden">
+                  <div className="font-semibold break-words">
+                    {a.name.trim() || "(Sin nombre)"}
+                  </div>
+
+                  <div
+                    className="
+                      text-xs text-gray-500 whitespace-pre-line break-words
+                      overflow-hidden mt-1
+                    "
+                  >
+                    {truncate(a.description, 500)}
+                  </div>
+
+                  <div
+                    className="
+                      text-xs text-gray-500 mt-1 break-words
+                      overflow-hidden
+                    "
+                  >
+                    <span className="font-semibold">Requisitos: </span>
+                    {truncate(a.previousRequirements, 500)}
+                  </div>
+
+                  <div className="text-xs text-gray-600 mt-1 flex flex-wrap gap-4">
+                    <span>General: ${a.generalCost}</span>
+                    <span>Comunitario: ${a.communityCost}</span>
+                  </div>
+                </div>
+
+                {currentUser && (
+                  <div className="flex flex-col gap-2 shrink-0">
+                    <Button
+                      onClick={() => {
+                        setEditingAnalysis(a);
+                        setIsEditOpen(true);
+                      }}
+                      variant="secondary"
+                      className="px-3 py-1 rounded text-sm border border-gray-300"
+                    >
+                      Editar
+                    </Button>
+                    <Button
+                      onClick={() => setDeleteTarget(a)}
+                      variant="danger"
+                      className="px-3 py-1 rounded text-sm"
+                    >
+                      Eliminar
+                    </Button>
+                  </div>
+                )}
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
+      {/* CREATE modal */}
+      <CreateAnalysisModal
+        isOpen={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
+        externalError={""}
+        onConfirm={async (data: CreateAnalysisData) => {
+          try {
+            await analysisService.createAnalysis(data);
+            await load();
+            setIsCreateOpen(false);
+            setFeedback({
+              type: "success",
+              message: "Análisis creado correctamente.",
+            });
+          } catch (err: any) {
+            const msg = getBackendErrorMessage(
+              err,
+              "Error al crear análisis"
+            );
+            setFeedback({
+              type: "error",
+              message: msg,
+            });
+          }
+        }}
+      />
+
+      {/* EDIT modal */}
+      <EditAnalysisModal
+        isOpen={isEditOpen}
+        analysis={editingAnalysis}
+        onClose={() => {
+          setIsEditOpen(false);
+          setEditingAnalysis(null);
+        }}
+        onConfirm={async (data: UpdateAnalysisData) => {
+          if (!editingAnalysis) return;
+          try {
+            await analysisService.updateAnalysis(
+              editingAnalysis.analysisId,
+              data
+            );
+            await load();
+            setIsEditOpen(false);
+            setEditingAnalysis(null);
+            setFeedback({
+              type: "success",
+              message: "Análisis actualizado correctamente.",
+            });
+          } catch (err: any) {
+            const msg = getBackendErrorMessage(
+              err,
+              "Error al actualizar análisis"
+            );
+            setFeedback({
+              type: "error",
+              message: msg,
+            });
+          }
+        }}
+      />
+      <FeedbackModal
+        isOpen={feedback !== null}
+        variant={feedback?.type === "error" ? "error" : "success"}
+        title={
+          feedback?.type === "error"
+            ? "Ocurrió un error"
+            : "Operación exitosa"
+        }
+        message={feedback?.message || ""}
+        onClose={() => setFeedback(null)}
+      />
+      <ConfirmModal
+        isOpen={deleteTarget !== null}
+        title="Eliminar análisis"
+        message={
+          deleteTarget
+            ? `¿Seguro que deseas eliminar "${deleteTarget.name.trim() || "(Sin nombre)"}"? Esta acción no se puede deshacer.`
+            : ""
+        }
+        confirmLabel="Eliminar"
+        cancelLabel="Cancelar"
+        variant="danger"
+        onCancel={() => setDeleteTarget(null)}
+        onConfirm={handleDeleteConfirmed}
+      />
+    </div>
+  );
+};
+
+export default AnalysisManager;

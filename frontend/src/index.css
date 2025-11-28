@@ -11,6 +11,39 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+@layer utilities {
+  .landing-text {
+      font-size: 1.05rem;
+    }
+
+  /* Hide scrollbar for Chrome, Safari, and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Hide scrollbar for IE, Edge, and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
+  /* Toast animation */
+  .animate-slide-in-right {
+    animation: slideInRight 0.3s ease-out;
+  }
+
+  @keyframes slideInRight {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;

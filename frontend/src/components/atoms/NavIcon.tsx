@@ -1,24 +1,46 @@
 import { FC, ReactNode } from "react";
-import { Link } from "react-router";
+import { NavLink } from "react-router-dom";
 
 interface Props {
   from: ReactNode;
   to: ReactNode;
   link: string;
-  option: string;
-  selected: Record<string, boolean>;
-  onHover: (key: string) => void;
+  end?: boolean;
 }
 
-const NavIcon: FC<Props> = ({ from, to, link, option, selected, onHover }) => {
+const NavIcon: FC<Props> = ({ from, to, link, end }) => {
   return (
-    <Link
+    <NavLink
       to={link}
-      onMouseEnter={() => onHover(option)}
-      onMouseLeave={() => onHover(option)}
+      end={end}
+      className="my-2 flex items-center justify-center group"
     >
-      {selected[option] ? to : from}
-    </Link>
+      {({ isActive }) => (
+        <div className="relative flex items-center justify-center">
+          {/* Default / inactive icon */}
+          <span
+            className={`
+              transition-opacity duration-150
+              ${isActive ? "opacity-0" : "opacity-100"}
+              group-hover:opacity-0
+            `}
+          >
+            {from}
+          </span>
+
+          {/* Filled / active icon */}
+          <span
+            className={`
+              absolute transition-opacity duration-150
+              ${isActive ? "opacity-100" : "opacity-0"}
+              group-hover:opacity-100
+            `}
+          >
+            {to}
+          </span>
+        </div>
+      )}
+    </NavLink>
   );
 };
 

@@ -1,3 +1,9 @@
+/*
+Defines the schema path, migrations directory,
+engine type, and datasource URL.
+(It does not create or export a PrismaClient instance.)
+*/
+
 import { defineConfig } from "prisma/config";
 import dotenv from "dotenv";
 
