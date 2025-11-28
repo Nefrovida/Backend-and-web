@@ -113,10 +113,12 @@ router.use("/historial", historialRoutes);
 // ============================================
 router.use("/appointments", appointmentsRoutes);
 
+// ============================================
 // Analysis Routes (Protected)
 // ============================================
 router.use("/analysis", analysisRoutes);
 
+// ============================================
 // Doctors Routes (Protected)
 // ============================================
 router.use("/doctors", doctorRoutes);
