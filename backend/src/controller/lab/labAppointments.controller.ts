@@ -94,26 +94,37 @@ export async function confirmUpload(req: Request, res: Response) {
       });
     }
 
-    // Validate that the URI points to our uploads server and has the expected format
+    // Accept absolute or relative upload URIs, and normalize to the filename
     const uploadsBase = (process.env.SERVER_ORIGIN || `http://localhost:${process.env.SERVER_PORT ?? 3001}`).replace(/\/$/, '') + "/uploads/";
-    if (!uri.startsWith(uploadsBase)) {
+    let fileName: string | null = null;
+
+    if (uri.startsWith(uploadsBase)) {
+      // Absolute URL (e.g. https://example.com/uploads/5-123.pdf)
+      fileName = uri.substring(uploadsBase.length);
+    } else if (uri.startsWith("/uploads/")) {
+      // Relative path with leading slash
+      fileName = uri.substring("/uploads/".length);
+    } else if (uri.startsWith("uploads/")) {
+      // Relative path without leading slash
+      fileName = uri.substring("uploads/".length);
+    } else {
       return res.status(400).json({
         success: false,
         message: "La URL de resultados no es válida.",
       });
     }
-
-    const fileName = uri.substring(uploadsBase.length); // ex: "5-1234567890.pdf"
     const fileNameRegex = /^[0-9]+-[0-9]+\.pdf$/;
 
-    if (!fileNameRegex.test(fileName)) {
+    if (!fileName || !fileNameRegex.test(fileName)) {
       return res.status(400).json({
         success: false,
         message: "La URL de resultados no tiene un formato permitido.",
       });
     }
 
-    await Laboratory.confirmLabAppointmentResult(id, uri);
+    // Normalize to relative path before storing in DB
+    const relativePath = `/uploads/${fileName}`;
+    await Laboratory.confirmLabAppointmentResult(id, relativePath);
 
     res
       .status(200)
