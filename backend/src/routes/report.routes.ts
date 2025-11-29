@@ -16,8 +16,8 @@ router.get(
 
 router.get(
     "/get-result-android/:patient_analysis_id",
-    //authenticate,
-    //requirePrivileges([Privilege.VIEW_ANALYSIS]),
+    authenticate,
+    requirePrivileges([Privilege.VIEW_ANALYSIS]),
     getResultV2
 );
 

@@ -25,8 +25,6 @@ export const getResultV2 = async (req: Request, res: Response) => {
   try {
     const { patient_analysis_id } = getResultParamsSchema.parse(req.params);
     const result = await getResultsService.getResultById(patient_analysis_id);
-    console.log(result)
-
     res.status(200).json({
       success: true,
       message: "Result retrieved successfully",
