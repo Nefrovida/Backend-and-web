@@ -785,7 +785,6 @@ export const getReplies = async (req: Request, res: Response): Promise<void> => 
     const userId = req.user!.userId;
 
     const result = await forumsService.getMessageReplies(forumId, messageId, userId, page, limit);
-
     res.status(200).json(result);
   } catch (error: any) {
     if (error instanceof NotFoundError) {
