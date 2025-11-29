@@ -44,3 +44,17 @@ export default class User {
         }
     }
 }
+
+// Check if username already exists
+export const checkUsernameExists = async (
+    username: string
+): Promise<boolean> => {
+    try {
+        const existingUser = await prisma.users.findFirst({
+            where: { username },
+        });
+        return !!existingUser;
+    } catch (error) {
+        return true;
+    }
+};
