@@ -1,7 +1,8 @@
 import { z } from "zod";
-import { checkUsernameExists, checkLicenseExists } from "../model/doctor.model";
+import { Gender } from "@prisma/client";
+import { checkUsernameExists } from "../model/user.model";
 
-export const DoctorSchema = z.object({
+export const AdminSchema = z.object({
   name: z.string()
     .min(2, "El nombre debe tener al menos 2 caracteres")
     .max(50, "El nombre debe tener máximo 50 caracteres")
@@ -49,23 +50,8 @@ export const DoctorSchema = z.object({
         message: "La fecha de nacimiento debe ser entre 1910 y 2099"
       }),
   gender:
-    z.enum(["MALE", "FEMALE", "OTHER"])
+    z.nativeEnum(Gender)
       .optional(),
-  specialty: z.string()
-    .min(3, "La especialidad debe tener al menos 3 caracteres")
-    .max(50, "La especialidad debe tener máximo 50 caracteres")
-    .regex(/^[a-zA-ZÁÉÍÓÚáéíóúÑñ ]+$/, "La especialidad solo puede contener letras y espacios"),
-  license: z.string()
-    .min(5, "La licencia debe tener al menos 5 caracteres")
-    .max(20, "La licencia debe tener máximo 20 caracteres")
-    .regex(/^[a-zA-Z0-9-]+$/, "La licencia solo puede contener letras, números y guiones")
-    .refine(
-      async (license) => {
-        const exists = await checkLicenseExists(license);
-        return !exists;
-      },
-      {
-        message: "Esta licencia ya está registrada",
-      }
-    ),
-}).passthrough(); // Allow extra fields but ignore them
+});
+
+export type AdminInput = z.infer<typeof AdminSchema>;
