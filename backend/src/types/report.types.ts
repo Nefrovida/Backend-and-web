@@ -7,6 +7,7 @@ export interface ResultResponse {
   date: string; // ISO string
   path: string;
   interpretation: string;
+  recommendation: string,
   patientAnalysis: {
     patientAnalysisId: number;
     analysisDate: string;
