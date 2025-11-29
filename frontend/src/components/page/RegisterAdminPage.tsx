@@ -4,8 +4,10 @@ import { AdminInput } from "../../types/admin.types";
 import { AuthResponse, Gender, ROLE_IDS } from "../../types/auth.types";
 import Title from "../atoms/Title";
 import ProtectedRoute from "../common/ProtectedRoute";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const RegisterAdminPage: React.FC = () => {
+    const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState<AdminInput>({
         name: "",
         parent_last_name: "",
@@ -155,16 +157,25 @@ const RegisterAdminPage: React.FC = () => {
                         <label htmlFor="password" className="block text-sm font-semibold mb-2">
                             Contraseña <span className="text-red-500">*</span>
                         </label>
-                        <input
-                            id="password"
-                            type="password"
-                            name="password"
-                            placeholder="Contraseña"
-                            value={formData.password}
-                            onChange={handleInputChange}
-                            className={`w-full border p-2 rounded ${fieldErrors.password ? "border-red-500" : ""}`}
-                            required
-                        />
+                        <div className="relative">
+                            <input
+                                id="password"
+                                type={showPassword ? "text" : "password"}
+                                name="password"
+                                placeholder="Contraseña"
+                                value={formData.password}
+                                onChange={handleInputChange}
+                                className={`w-full border p-2 rounded pr-10 ${fieldErrors.password ? "border-red-500" : ""}`}
+                                required
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700"
+                            >
+                                {showPassword ? <FaEye /> : <FaEyeSlash />}
+                            </button>
+                        </div>
                         {fieldErrors.password && <p className="text-red-500 text-sm mt-1">{fieldErrors.password}</p>}
                     </div>
 
