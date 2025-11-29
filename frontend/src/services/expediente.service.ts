@@ -66,7 +66,7 @@ export const expedienteService = {
       const { url } = await presignResponse.json();
 
       // Step 2: Upload file to the presigned URL (convert relative path to full URL)
-      const uploadUrl = url.startsWith('http') ? url : `${BACKEND_ORIGIN}${url}`;
+      const uploadUrl = url.startsWith('https') ? url : `${BACKEND_ORIGIN}${url}`;
       const uploadResponse = await fetch(uploadUrl, {
         method: "PUT",
         body: file,
