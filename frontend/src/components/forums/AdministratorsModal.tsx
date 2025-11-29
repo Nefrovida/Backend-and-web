@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Forum } from '../../types/forum.types';
 
-const API_BASE = (import.meta as any).env?.VITE_APP_API_URL || 'http://localhost:3001/api';
+const API_BASE = (import.meta as any).env?.VITE_APP_API_URL || 'https://www.snefrovidaac.com/api/';
 
 interface Administrator {
   user_id: string;

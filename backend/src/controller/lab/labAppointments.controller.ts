@@ -63,7 +63,8 @@ export async function requestPresign(req: Request, res: Response) {
     console.log("Presign for lab appointment", { id, mime, size });
 
     const safeName = `${id}-${Date.now()}.pdf`;
-    const url = `http://localhost:3001/uploads/${safeName}`;
+    const base = process.env.SERVER_ORIGIN || `http://localhost:${process.env.SERVER_PORT ?? 3001}`;
+    const url = `${base.replace(/\/$/, '')}/uploads/${safeName}`;
 
     res.status(200).json({ url });
   } catch (error: any) {
@@ -94,7 +95,7 @@ export async function confirmUpload(req: Request, res: Response) {
     }
 
     // Validate that the URI points to our uploads server and has the expected format
-    const uploadsBase = "http://localhost:3001/uploads/";
+    const uploadsBase = (process.env.SERVER_ORIGIN || `http://localhost:${process.env.SERVER_PORT ?? 3001}`).replace(/\/$/, '') + "/uploads/";
     if (!uri.startsWith(uploadsBase)) {
       return res.status(400).json({
         success: false,

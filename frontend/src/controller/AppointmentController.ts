@@ -1,6 +1,8 @@
 import { Appointment, RescheduleData } from '../types/appointment';
 
-const API_URL = import.meta.env.VITE_APP_API_URL || 'http://localhost:3001';
+const _API_RAW = import.meta.env.VITE_APP_API_URL || 'https://www.snefrovidaac.com/api/';
+// Ensure API_URL is the server origin (without trailing / or /api)
+const API_URL = _API_RAW.replace(/\/api\/?$/i, '').replace(/\/$/, '');
 
 class AppointmentController {
 

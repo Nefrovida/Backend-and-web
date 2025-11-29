@@ -1,7 +1,7 @@
 import { DoctorAppointment } from "../types/doctorAppointment.types";
 
 const API_BASE_URL =
-  (import.meta as any).env?.VITE_APP_API_URL || "http://localhost:3001/api";
+  (import.meta as any).env?.VITE_APP_API_URL || "https://www.snefrovidaac.com/api/";
 
 export const appointmentsService = {
   async getMyAppointments(): Promise<DoctorAppointment[]> {
