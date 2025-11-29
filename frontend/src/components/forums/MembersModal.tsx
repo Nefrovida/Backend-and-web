@@ -59,8 +59,8 @@ export const MembersModal: React.FC<MembersModalProps> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0);
-  // Prefer using a configured API base URL; fallback to the backend default
-  const API_BASE = (import.meta as any).env?.VITE_APP_API_URL || 'http://localhost:3001/api';
+  // Prefer using a configured API base URL; fallback to production origin
+  const API_BASE = (import.meta as any).env?.VITE_APP_API_URL || 'https://www.snefrovidaac.com/api/';
 
   // Update local error when external error changes
   useEffect(() => {

@@ -26,8 +26,8 @@ const LabResultsSection: React.FC<Props> = ({
 }) => {
   const [analysisItems, setAnalysisItems] = useState<AnalysisWithUpload[]>(existingAnalysis);
 
-  // Derive backend origin from Vite env or default to http://localhost:3001
-  const API_BASE = (import.meta as any).env?.VITE_APP_API_URL || "http://localhost:3001/api";
+  // Derive backend origin from Vite env or default to production API
+  const API_BASE = (import.meta as any).env?.VITE_APP_API_URL || "https://www.snefrovidaac.com/api";
   const BACKEND_ORIGIN = API_BASE.replace(/\/api$/, "");
 
   function getFullPath(path: string | null | undefined) {

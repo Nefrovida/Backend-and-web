@@ -26,8 +26,8 @@ const MedicalRecordViewPage = () => {
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>("info");
 
-  // Derive backend origin from Vite env or default to http://localhost:3001
-  const API_BASE = (import.meta as any).env?.VITE_APP_API_URL || "http://localhost:3001/api";
+  // Derive backend origin from Vite env or default to production API
+  const API_BASE = (import.meta as any).env?.VITE_APP_API_URL || "https://www.snefrovidaac.com/api";
   const BACKEND_ORIGIN = API_BASE.replace(/\/api$/, "");
 
   if (loading) {
