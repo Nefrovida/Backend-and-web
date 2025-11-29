@@ -13,6 +13,7 @@ const transformResultToResponse = (result: any): ResultResponse => {
     date: result.date.toISOString(),
     path: result.path,
     interpretation: result.interpretation,
+    recommendation: result.recommendation,
     patientAnalysis: {
       patientAnalysisId: result.patient_analysis.patient_analysis_id,
       analysisDate: result.patient_analysis.analysis_date.toISOString(),
