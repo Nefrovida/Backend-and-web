@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import Report from '../../model/report.model';
-import { ResultResponse, RiskQuestionResponse, RiskOptionResponse } from '../../types/report.types';
+import { ResultResponse,NoteResponse, RiskQuestionResponse, RiskOptionResponse } from '../../types/report.types';
 import { NotFoundError } from '../../util/errors.util';
 
 /**
@@ -25,6 +25,33 @@ const transformResultToResponse = (result: any): ResultResponse => {
         name: result.patient_analysis.analysis.name,
         description: result.patient_analysis.analysis.description,
       },
+    },
+  };
+};
+
+const transformNoteToResponse = (note: any): NoteResponse => {
+  return {
+    noteId: note.note_id,
+    patientAppointmentId: note.patient_appointment_id,
+    patientId: note.patient_id,
+
+    title: note.title,
+    content: note.content,
+
+    ailments: note.ailments,
+    generalNotes: note.general_notes,
+    prescription: note.prescription,
+
+    visibility: note.visibility,
+    createdAt: note.creation_date?.toISOString(),
+
+    appointment: {
+      appointmentId: note.patient_appointment.appointment_id,
+      date: note.patient_appointment.date_hour?.toISOString(),
+      duration: note.patient_appointment.duration,
+      type: note.patient_appointment.appointment_type,
+      place: note.patient_appointment.place,
+      status: note.patient_appointment.appointment_status,
     },
   };
 };
@@ -72,12 +99,11 @@ export const getResultById = async (patientAnalysisId: number) => {
 /**
  * Get results by patient user ID
  */
-export const getResultsByUserId = async (userId: string) => {
-  const results = await Report.getResultsByUserId(userId);
+export const getResultsAndNotesByUserId = async (userId: string) => {
+  const { results, notes } = await Report.getResultsAndNotesByUserId(userId);
 
-  if (results.length === 0) {
-    return [];
-  }
-
-  return results.map(transformResultToResponse);
+  return {
+    analysisResults: results.map(transformResultToResponse),
+    appointmentNotes: notes.map(transformNoteToResponse),
+  };
 };
