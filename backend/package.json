@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.ts",
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
     "dev": "npx tsx --env-file=../.env --watch src/index.ts",
     "start": "npx tsx --env-file=../.env src/index.ts",
-    "build": "tsc",
+    "build": "esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js --format=cjs --external:@prisma/client --external:bcrypt --external:sharp --external:canvas --packages=external",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "seed:sql": "tsx --env-file=../.env database/run-seed-sql.ts",
@@ -35,10 +35,14 @@
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
-    "@types/node": "^24.9.1",
+    "@types/node": "^24.10.1",
+    "@types/supertest": "^2.0.12",
+    "esbuild": "^0.27.0",
     "prisma": "^6.19.0",
+    "supertest": "^6.3.3",
     "ts-node": "^10.9.2",
     "tsx": "^4.20.6",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^1.1.5"
   }
 }
