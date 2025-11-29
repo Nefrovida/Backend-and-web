@@ -26,7 +26,7 @@ router.get(
 router.put(
   '/:id/reschedule',
   authenticate,
-  requirePrivileges([Privilege.UPDATE_APPOINTMENTS]),
+  requirePrivileges([Privilege.CREATE_APPOINTMENTS]),
   AppointmentController.rescheduleAppointment
 );
 
