@@ -66,7 +66,8 @@ VALUES
 ('REMOVE_USER_FROM_FORUM'),
 ('VIEW_FORUM_USERS'),
 ('UPDATE_NOTES'),
-('DELETE_NOTES');
+('DELETE_NOTES'),
+('CREATE_ADMIN');
 
 -- ========================
 -- 🧩 ROLES - PRIVILEGIOS
