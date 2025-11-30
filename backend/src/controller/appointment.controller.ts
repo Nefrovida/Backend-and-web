@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import AppointmentModel from '../model/appointment.model';
+import {getAppointmentByPatient} from '../service/appointments.service';
 
 export default class AppointmentController {
   
@@ -91,4 +92,17 @@ export default class AppointmentController {
       res.status(500).json({ error: 'Error al reagendar cita' });
     }
   }
+
+  static async getPatientApointment(req: Request, res: Response){
+    try {
+      const {id} = req.params;
+      const data = await getAppointmentByPatient(id);
+      res.status(200).json(data);
+    }
+    catch (error){
+      console.error('Error fetching patient appointments');
+      res.status(500).json({error: 'No se pudo cargar la información correctamente'})
+    }
+  }
+
 }

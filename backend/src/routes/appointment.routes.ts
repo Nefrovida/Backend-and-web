@@ -30,4 +30,12 @@ router.put(
   AppointmentController.rescheduleAppointment
 );
 
+// GET /api/appointments/patient/get-notes/:id
+router.get(
+  '/patient/get-notes/:id',
+  //authenticate,
+  //requirePrivileges([Privilege.VIEW_NOTES]),
+  AppointmentController.getPatientApointment
+);
+
 export default router;
