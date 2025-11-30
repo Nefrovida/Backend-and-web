@@ -25,7 +25,7 @@ router.get("/all",
   getAllPatients)
 
 router.get("/get-services",
-  //authenticate,
+  authenticate,
   getAllServices
 )
 
