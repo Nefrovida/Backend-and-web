@@ -5,8 +5,7 @@ export class ProfileController {
 
     static async getMe(req: Request, res: Response) {
         try {
-            // @ts-ignore
-            const userId = req.user.user_id; 
+            const userId = req.user?.userId;
             if (!userId) return res.status(401).json({ message: 'No autorizado' });
 
             const profile = await ProfileService.getMyProfile(userId);
@@ -18,8 +17,7 @@ export class ProfileController {
 
     static async updateMe(req: Request, res: Response) {
         try {
-            // @ts-ignore
-            const userId = req.user.user_id;
+            const userId = req.user?.userId;
             if (!userId) return res.status(401).json({ message: 'No autorizado' });
 
             const updatedProfile = await ProfileService.updateMyProfile(userId, req.body);
@@ -34,8 +32,7 @@ export class ProfileController {
 
     static async changePassword(req: Request, res: Response) {
         try {
-            // @ts-ignore
-            const userId = req.user.user_id;
+            const userId = req.user?.userId;
             if (!userId) return res.status(401).json({ message: 'No autorizado' });
 
             await ProfileService.changePassword(userId, req.body);
