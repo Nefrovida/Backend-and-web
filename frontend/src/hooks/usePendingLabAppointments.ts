@@ -1,6 +1,7 @@
 // src/hooks/usePendingLabAppointments.ts
 import { useEffect, useState } from "react";
 import { LabAppointment } from "../types/labAppointment";
+import { ANALYSIS_STATUS } from "@/types/Analysis_status";
 
 async function fetchPendingAppointments(): Promise<LabAppointment[]> {
     const res = await fetch("/api/laboratory/lab-appointments", {
@@ -25,7 +26,11 @@ export default function usePendingLabAppointments() {
             setError(null);
             const data = await fetchPendingAppointments();
 
-            const sorted = [...data].sort((a, b) => {
+            const onlyUpload = data.filter(
+                (appt) => appt.status === ANALYSIS_STATUS.LAB
+            );
+
+            const sorted = [...onlyUpload].sort((a, b) => {
                 const weight = (s: LabAppointment["status"]) =>
                     s === "REQUESTED" ? 0 : 1;
 

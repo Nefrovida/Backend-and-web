@@ -267,4 +267,11 @@ router.get(
   forumsController.getReplies
 );
 
+router.get(
+  "/message/:messageId",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_FORUMS]),
+  forumsController.getMessage
+);
+
 export default router;

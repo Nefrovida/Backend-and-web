@@ -131,6 +131,14 @@ export default class Forum {
       },
     });
   }
+
+  static async getMessage(messageId: number) {
+    return await prisma.messages.findUnique({
+      where: {
+        message_id: messageId,
+      },
+    });
+  }
 }
 
 /**
@@ -492,12 +500,19 @@ export const getUserRole = async (forumId: number, userId: string) => {
  * Check if user is member of forum
  */
 export const isUserMember = async (forumId: number, userId: string) => {
-  const member = await prisma.users_forums.findUnique({
+  const member = await prisma.users_forums.findFirst({
     where: {
-      user_id_forum_id: {
-        user_id: userId,
-        forum_id: forumId,
-      },
+      OR: [
+        {
+          user_id: userId,
+          forum_id: forumId,
+        },
+        {
+          forum: {
+            public_status: true,
+          },
+        },
+      ],
     },
   });
   return member !== null;
