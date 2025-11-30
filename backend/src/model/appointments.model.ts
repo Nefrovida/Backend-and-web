@@ -73,7 +73,19 @@ export const getDoctorAppointments = async (doctorId: string) => {
 };
 
   export const getAllAppointments = async () => {
-    const appointments = await prisma.appointments.findMany();
+    const appointments = await prisma.appointments.findMany({
+      select: {
+      appointment_id: true,
+      doctor_id: true,
+      name: true,
+      general_cost: true,
+      community_cost: true,
+      image_url: true,
+    },
+      where: {
+        active: true,
+      },
+    });
     return appointments;
   };
 
