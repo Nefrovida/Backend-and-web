@@ -16,6 +16,7 @@ import adminRoutes from "./admin.routes";
 import expedienteRoutes from "./expediente.routes";
 
 import ProtectedRoute from "../components/common/ProtectedRoute";
+import GenericDashboard from "@/components/organism/GenericDashboard";
 
 const router = createBrowserRouter([
   ...authRoutes,
@@ -29,6 +30,10 @@ const router = createBrowserRouter([
     ),
     errorElement: <NotFoundPage />,
     children: [
+      {
+        path: "",
+        element: <GenericDashboard />,
+      },
       ...analisisRoutes,
       ...forumsRoutes, // admin
       ...forumRoutes, // chat
