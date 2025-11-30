@@ -12,6 +12,7 @@ import { MdForum, MdOutlineForum } from "react-icons/md";
 import { LuNotebook, LuNotebookPen } from "react-icons/lu";
 import { IoFlaskSharp, IoFlaskOutline } from "react-icons/io5";
 import { RiChatSettingsLine, RiChatSettingsFill } from "react-icons/ri";
+import {  FaCalendarPlus } from "react-icons/fa";
 import {
   FaUserMd,
   FaListAlt,
@@ -355,6 +356,13 @@ function Navbar({ children }: Props) {
                 to="/dashboard/analisis"
                 icon={<FaRegListAlt />}
                 activeIcon={<FaListAlt />}
+                end
+              />
+                <CustomLink
+                label="Catálogo de citas"
+                to="/dashboard/citas"
+                icon={<FaCalendarPlus />}
+                activeIcon={<FaCalendarPlus />}
                 end
               />
             </>

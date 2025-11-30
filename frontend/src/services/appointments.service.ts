@@ -1,6 +1,5 @@
 import { DoctorAppointment } from "../types/doctorAppointment.types";
 import {
-  AppointmentTypeResponse,
   CreateAppointmentTypeData,
   UpdateAppointmentTypeData,
 } from "../types/add.appointment.types";
@@ -26,19 +25,6 @@ export const appointmentsService = {
 
     return response.json();
   },
-};
-
-
-type AppointmentTypeListResponse = {
-  success: boolean;
-  message: string;
-  data: AppointmentTypeResponse[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
 };
 
 export const appointmentTypeService = {
@@ -71,7 +57,7 @@ export const appointmentTypeService = {
 },
 
   async create(data: CreateAppointmentTypeData) {
-    const res = await fetch(`${API_BASE_URL}/appointment-types`, {
+    const res = await fetch(`${API_BASE_URL}/new-appointment`, {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },

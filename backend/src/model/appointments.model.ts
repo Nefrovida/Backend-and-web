@@ -77,6 +77,30 @@ export const getDoctorAppointments = async (doctorId: string) => {
     return appointments;
   };
 
+
+  export const createAppointment = async ( validatedData: any) => {
+    try {
+      const newAppointment = await prisma.appointments.create({
+        data: validatedData,
+      });
+      return true;
+    } catch (error) {
+      if (error instanceof ZodError) {
+        throw new Error(`Validation error: ${error.errors.map(e => e.message).join(', ')}`);
+      }
+      throw error;
+    }
+  };
+
+  export const getAppointmentByData = async (validatedData: any) => {
+    return await prisma.appointments.findFirst({
+      where: {
+        name: validatedData.name,
+        doctor_id: validatedData.doctor_id
+      },
+    });
+  };
+
   export const getAppointmentByUserId = async (req: Request, res: Response, UserId: string) =>{
     const patientId  = await prisma.patients.findFirst({
         where: {

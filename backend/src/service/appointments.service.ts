@@ -30,7 +30,7 @@ export const getAllAppointments = async () => {
 };
 /**
  *
- * @param userId
+ * @param userId createAppointment
  * @returns List appointment
  */
 export const getAllAppointmentsByUserId = async (
@@ -39,6 +39,22 @@ export const getAllAppointmentsByUserId = async (
   userId: string
 ) => {
   return await appointmentsModel.getAppointmentByUserId(req, res, userId);
+};
+
+/**
+ *
+ * @param validateData data of appointment
+ */
+export const createAppointment = async (validatedData: any) => {
+  return await appointmentsModel.createAppointment(validatedData);
+};
+
+/**
+ *
+ * @param validateData data of appointment
+ */
+export const getAppointmentByData = async (validatedData: any) => {
+  return await appointmentsModel.getAppointmentByData(validatedData);
 };
 
 export const getAppointmentByName = async (appointmentName: string) => {
