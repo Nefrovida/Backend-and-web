@@ -301,8 +301,7 @@ function LabAppointmentUpload() {
                             Resultados ya enviados
                         </p>
                         <p className="text-xs text-slate-600 mt-1">
-                            Este estudio ya cuenta con un archivo de resultados registrado. Si
-                            necesitas corregirlo, solicita apoyo de un administrador.
+                            Este estudio ya cuenta con un archivo de resultados registrado.
                         </p>
                     </div>
                 ) : (

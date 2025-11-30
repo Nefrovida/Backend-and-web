@@ -1,10 +1,9 @@
-
 import { prisma } from "../util/prisma";
 import { ForumRole } from ".prisma/client";
 import { Message } from "../types/forum.types";
 
 export default class Forum {
-  Forum() { }
+  Forum() {}
 
   static async postNewMessage(
     userId: string,
@@ -49,6 +48,34 @@ export default class Forum {
       },
       take: 5,
     });
+
+    const publicForums = await this.getPublicForums();
+
+    return [...myForums, ...publicForums];
+  }
+
+  static async getMyForumsWeb(userId: string) {
+    const myForums = await prisma.users_forums
+      .findMany({
+        where: {
+          user_id: userId,
+        },
+        select: {
+          forum: {
+            select: {
+              forum_id: true,
+              name: true,
+            },
+          },
+        },
+        take: 5,
+      })
+      .then((data) => {
+        return data.map((f) => ({
+          forum_id: f.forum.forum_id,
+          name: f.forum.name,
+        }));
+      });
 
     const publicForums = await this.getPublicForums();
 
@@ -101,6 +128,14 @@ export default class Forum {
 
       orderBy: {
         publication_timestamp: "desc",
+      },
+    });
+  }
+
+  static async getMessage(messageId: number) {
+    return await prisma.messages.findUnique({
+      where: {
+        message_id: messageId,
       },
     });
   }
@@ -207,8 +242,8 @@ export const findAll = async (
     if (filters.isPublic === false && userId) {
       whereClause.users_forums = {
         some: {
-          user_id: userId
-        }
+          user_id: userId,
+        },
       };
     }
   } else if (userId) {
@@ -222,12 +257,12 @@ export const findAll = async (
           {
             users_forums: {
               some: {
-                user_id: userId
-              }
-            }
-          }
-        ]
-      }
+                user_id: userId,
+              },
+            },
+          },
+        ],
+      },
     ];
   }
 
@@ -244,14 +279,16 @@ export const findAll = async (
         },
       },
       // Include users_forums to check membership status if needed
-      users_forums: userId ? {
-        where: {
-          user_id: userId
-        },
-        select: {
-          forum_role: true
-        }
-      } : false
+      users_forums: userId
+        ? {
+            where: {
+              user_id: userId,
+            },
+            select: {
+              forum_role: true,
+            },
+          }
+        : false,
     },
     orderBy: {
       creation_date: "desc",
@@ -463,12 +500,19 @@ export const getUserRole = async (forumId: number, userId: string) => {
  * Check if user is member of forum
  */
 export const isUserMember = async (forumId: number, userId: string) => {
-  const member = await prisma.users_forums.findUnique({
+  const member = await prisma.users_forums.findFirst({
     where: {
-      user_id_forum_id: {
-        user_id: userId,
-        forum_id: forumId,
-      },
+      OR: [
+        {
+          user_id: userId,
+          forum_id: forumId,
+        },
+        {
+          forum: {
+            public_status: true,
+          },
+        },
+      ],
     },
   });
   return member !== null;
@@ -797,8 +841,8 @@ export const getForumRegularMembers = async (forumId: number) => {
 export const findMessageById = async (messageId: number) => {
   return await prisma.messages.findUnique({
     where: {
-      message_id: messageId
-    }
+      message_id: messageId,
+    },
   });
 };
 
@@ -867,7 +911,7 @@ export const findMessagesByForumId = async (
     where: {
       forum_id: forumId,
       active: true,
-      parent_message_id: null // Only root messages (threads)
+      parent_message_id: null, // Only root messages (threads)
     },
     include: {
       user: {
@@ -876,21 +920,21 @@ export const findMessagesByForumId = async (
           name: true,
           parent_last_name: true,
           maternal_last_name: true,
-          username: true
-        }
+          username: true,
+        },
       },
       _count: {
         select: {
           messages: true, // Count of replies
-          likes: true
-        }
-      }
+          likes: true,
+        },
+      },
     },
     orderBy: {
-      publication_timestamp: 'desc'
+      publication_timestamp: "desc",
     },
     skip,
-    take
+    take,
   });
 };
 
@@ -902,8 +946,8 @@ export const countForumMessages = async (forumId: number) => {
     where: {
       forum_id: forumId,
       active: true,
-      parent_message_id: null
-    }
+      parent_message_id: null,
+    },
   });
 };
 
@@ -918,7 +962,7 @@ export const findRepliesByMessageId = async (
   return await prisma.messages.findMany({
     where: {
       parent_message_id: parentMessageId,
-      active: true
+      active: true,
     },
     include: {
       user: {
@@ -927,21 +971,21 @@ export const findRepliesByMessageId = async (
           name: true,
           parent_last_name: true,
           maternal_last_name: true,
-          username: true
-        }
+          username: true,
+        },
       },
       _count: {
         select: {
           messages: true, // Count of nested replies (if any, though usually 1 level deep)
-          likes: true
-        }
-      }
+          likes: true,
+        },
+      },
     },
     orderBy: {
-      publication_timestamp: 'asc' // Replies usually shown oldest to newest
+      publication_timestamp: "asc", // Replies usually shown oldest to newest
     },
     skip,
-    take
+    take,
   });
 };
 
@@ -952,7 +996,7 @@ export const countReplies = async (parentMessageId: number) => {
   return await prisma.messages.count({
     where: {
       parent_message_id: parentMessageId,
-      active: true
-    }
+      active: true,
+    },
   });
 };
