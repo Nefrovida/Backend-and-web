@@ -16,9 +16,6 @@ async function getAppointmentsPerPatient(req: Request, res: Response) {
 
         const result = await Agenda.getAppointmentsPerPatient(targetDate, userId);
 
-        console.log("Date:", targetDate);
-        console.log("UserID:", userId);
-        console.log("Appointments:", result);
 
         res.json(result);
     } catch (error) {
