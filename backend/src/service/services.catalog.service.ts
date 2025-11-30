@@ -24,17 +24,19 @@ export const getServices = async () => {
 
 function parseAnalysis(analysis) {
   return {
+    id: analysis.analysis_id,
     name: analysis.name,
-    general_cost: analysis.general_cost,
-    community_cost: analysis.community_cost
+    generalCost: analysis.general_cost,
+    communityCost: analysis.community_cost
   }
 }
 
 function parseAppointment(appointment) {
   return {
+    id: appointment.appointment_id,
     name: appointment.name,
-    general_cost: appointment.general_cost,
-    community_cost: appointment.community_cost,
+    generalCost: appointment.general_cost,
+    communityCost: appointment.community_cost,
     doctor: appointment.doctor.user.name + " " + appointment.doctor.user.parent_last_name
   }
 }
