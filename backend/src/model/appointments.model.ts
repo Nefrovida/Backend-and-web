@@ -126,3 +126,44 @@ export const getAppointmentByName = async (appointmentName: string) => {
     throw new Error('Failed to fetch appointment by name');
   }
 }
+
+export const getAppointmentByPatient = async (now: Date, id: string) => {
+    const patientId  = await prisma.patients.findFirst({
+        where: {
+            user_id: id
+        },
+    });
+
+    if (!patientId) {
+       throw new Error("Patient not found");
+    }
+    const appointments = await prisma.patient_appointment.findMany({
+      where: { 
+        patient_id: patientId.patient_id,
+        date_hour: {
+          lt: now
+        },
+        notes: {
+          some: {
+            visibility: true
+          }
+        }
+      },
+      include: {
+        appointment: {
+          select: {
+            name: true,
+          },
+        },
+        notes: {
+          where: {
+            visibility: true
+          }
+        }
+      }
+    });
+
+
+  return appointments;
+
+};
