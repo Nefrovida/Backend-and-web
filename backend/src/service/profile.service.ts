@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import ProfileModel from '../model/profile.model'; 
 import { ChangePasswordDTO, UpdateProfileDTO, UserProfileDTO } from '../types/profile.types';
+import { PASSWORD_REGEX, BCRYPT_SALT_ROUNDS } from '../config/constants';
 
 export class ProfileService {
 
@@ -29,8 +30,7 @@ export class ProfileService {
             throw new Error('Las nuevas contraseñas no coinciden');
         }
 
-        const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[#?!@$%^&*-]).{8,}$/;
-        if (!passwordRegex.test(newPassword)) {
+        if (!PASSWORD_REGEX.test(newPassword)) {
             throw new Error('La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un carácter especial [#?!@$%^&*-].');
         }
 
@@ -40,7 +40,7 @@ export class ProfileService {
         const isMatch = await bcrypt.compare(currentPassword, currentHash);
         if (!isMatch) throw new Error('La contraseña actual es incorrecta');
 
-        const salt = await bcrypt.genSalt(10);
+        const salt = await bcrypt.genSalt(BCRYPT_SALT_ROUNDS);
         const newHash = await bcrypt.hash(newPassword, salt);
         
         const success = await ProfileModel.updatePassword(userId, newHash);

@@ -3,8 +3,6 @@ import { UserProfileDTO, UpdateProfileDTO } from "../types/profile.types";
 
 export default class ProfileModel {
   
-  ProfileModel() {
-  }
 
   // Get profile (Prisma)
   static async getProfile(userId: string): Promise<UserProfileDTO | null> {
@@ -45,40 +43,36 @@ export default class ProfileModel {
 
   // Updating Profile (Prisma)
   static async updateProfile(userId: string, data: UpdateProfileDTO): Promise<UserProfileDTO | null> {
-    try {
-      const user = await prisma.users.update({
-        where: { user_id: userId },
-        data: {
-          name: data.name || undefined,
-          parent_last_name: data.parent_last_name || undefined,
-          maternal_last_name: data.maternal_last_name || undefined,
-          phone_number: data.phone_number || undefined,
-        },
-        select: {
-          user_id: true,
-          name: true,
-          parent_last_name: true,
-          maternal_last_name: true,
-          username: true,
-          phone_number: true,
-          role: {
-            select: { role_name: true }
-          }
+    const user = await prisma.users.update({
+      where: { user_id: userId },
+      data: {
+        name: data.name || undefined,
+        parent_last_name: data.parent_last_name || undefined,
+        maternal_last_name: data.maternal_last_name || undefined,
+        phone_number: data.phone_number || undefined,
+      },
+      select: {
+        user_id: true,
+        name: true,
+        parent_last_name: true,
+        maternal_last_name: true,
+        username: true,
+        phone_number: true,
+        role: {
+          select: { role_name: true }
         }
-      });
+      }
+    });
 
-      return {
-        user_id: user.user_id,
-        name: user.name,
-        parent_last_name: user.parent_last_name,
-        maternal_last_name: user.maternal_last_name,
-        username: user.username,
-        phone_number: user.phone_number,
-        role_name: user.role ? user.role.role_name : ''
-      };
-    } catch (error) {
-      return null;
-    }
+    return {
+      user_id: user.user_id,
+      name: user.name,
+      parent_last_name: user.parent_last_name,
+      maternal_last_name: user.maternal_last_name,
+      username: user.username,
+      phone_number: user.phone_number,
+      role_name: user.role ? user.role.role_name : ''
+    };
   }
 
   // Get Hash (Prisma)
