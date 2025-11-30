@@ -94,7 +94,7 @@ const RescheduleModal: React.FC<RescheduleModalProps> = ({
 
         <div className="flex space-x-3 mt-6">
           <Button
-            variant="warning"
+            variant="primary"
             onClick={handleSave}
             disabled={loading}
             className="flex-1 py-3"

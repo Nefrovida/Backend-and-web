@@ -9,11 +9,13 @@ interface AppointmentModalProps {
     end: Date | null;
   };
   onClose: () => void;
+  onReschedule: () => void;
 }
 
 export const AppointmentModal: React.FC<AppointmentModalProps> = ({
   event,
   onClose,
+  onReschedule,
 }) => {
   const formatDate = (date: Date | null) => {
     if (!date) return "";
@@ -44,6 +46,14 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
               <strong>Fecha y hora:</strong> {formatDate(event.start)}
             </div>
           )}
+        </div>
+        <div className="modal-footer">
+          <button className="modal-button-primary" onClick={onReschedule}>
+            Reagendar
+          </button>
+          <button className="modal-button-secondary" onClick={onClose}>
+            Cerrar
+          </button>
         </div>
       </div>
     </div>

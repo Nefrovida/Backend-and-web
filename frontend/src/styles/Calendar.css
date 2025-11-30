@@ -185,3 +185,44 @@
   color: #374151;
   margin-right: 8px;
 }
+
+/* ---------- MODAL FOOTER ---------- */
+.modal-footer {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.modal-button-primary {
+  flex: 1;
+  padding: 10px 16px;
+  background-color: #010C5E;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.modal-button-primary:hover {
+  background-color: #020a4a;
+}
+
+.modal-button-secondary {
+  flex: 1;
+  padding: 10px 16px;
+  background-color: #f3f4f6;
+  color: #374151;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.modal-button-secondary:hover {
+  background-color: #e5e7eb;
+}

@@ -13,6 +13,9 @@ import esLocale from "@fullcalendar/core/locales/es";
 import "../../styles/Calendar.css";
 import { mapAppointmentsToEvents } from "../../model/secretaryCalendar.model";
 import { AppointmentModal } from "../molecules/AppointmentModal";
+import RescheduleModal from "../organism/RescheduleModal";
+import { Appointment, RescheduleData } from "../../types/appointment";
+import appointmentController from "../../controller/AppointmentController";
 
 function renderEventContent(eventInfo: any) {
   return (
@@ -27,6 +30,7 @@ function Agenda() {
   const [events, setEvents] = useState<any[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const lastRange = useRef({ start: "", end: "" });
 
   const fetchAppointments = async (start: Date, end: Date) => {
@@ -69,10 +73,18 @@ function Agenda() {
 
   const handleEventClick = (clickInfo: EventClickArg) => {
     setSelectedEvent({
+      id: clickInfo.event.extendedProps.id,
       title: clickInfo.event.title,
       description: clickInfo.event.extendedProps.description,
       start: clickInfo.event.start,
       end: clickInfo.event.end,
+      patient_id: clickInfo.event.extendedProps.patient_id,
+      patient_name: clickInfo.event.extendedProps.patient_name,
+      patient_parent_last_name: clickInfo.event.extendedProps.patient_parent_last_name,
+      patient_maternal_last_name: clickInfo.event.extendedProps.patient_maternal_last_name,
+      reason: clickInfo.event.extendedProps.description,
+      date_hour: clickInfo.event.start,
+      status: clickInfo.event.extendedProps.status || 'PROGRAMMED',
     });
     setIsModalOpen(true);
   };
@@ -80,6 +92,47 @@ function Agenda() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedEvent(null);
+  };
+
+  const handleReschedule = () => {
+    if (selectedEvent) {
+      // Convertir el evento del calendario a formato Appointment
+      const appointment: Appointment = {
+        id: selectedEvent.id,
+        patient_id: selectedEvent.patient_id,
+        date_hour: selectedEvent.date_hour,
+        reason: selectedEvent.reason,
+        status: selectedEvent.status,
+        patient_name: selectedEvent.patient_name,
+        patient_parent_last_name: selectedEvent.patient_parent_last_name,
+        patient_maternal_last_name: selectedEvent.patient_maternal_last_name,
+      };
+      setSelectedAppointment(appointment);
+      setIsModalOpen(false); // Cerrar el modal de detalles
+    }
+  };
+
+  const handleSaveReschedule = async (id: number, data: RescheduleData) => {
+    try {
+      await appointmentController.rescheduleAppointment(id, data);
+      
+      setSelectedAppointment(null);
+      alert('Cita reagendada exitosamente');
+      
+      // Recargar las citas del calendario
+      if (lastRange.current.start && lastRange.current.end) {
+        fetchAppointments(
+          new Date(lastRange.current.start),
+          new Date(lastRange.current.end)
+        );
+      }
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Error al reagendar');
+    }
+  };
+
+  const handleCloseRescheduleModal = () => {
+    setSelectedAppointment(null);
   };
 
   return (
@@ -108,10 +161,21 @@ function Agenda() {
         />
       </div>
       
+      {/* Modal de detalles de la cita */}
       {isModalOpen && selectedEvent && (
         <AppointmentModal
           event={selectedEvent}
           onClose={handleCloseModal}
+          onReschedule={handleReschedule}
+        />
+      )}
+
+      {/* Modal de reagendar */}
+      {selectedAppointment && (
+        <RescheduleModal
+          appointment={selectedAppointment}
+          onClose={handleCloseRescheduleModal}
+          onSave={handleSaveReschedule}
         />
       )}
     </div>
