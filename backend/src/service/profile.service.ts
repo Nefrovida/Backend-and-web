@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import ProfileModel from '../model/profile.model'; // Nota: Importación por default
+import ProfileModel from '../model/profile.model'; 
 import { ChangePasswordDTO, UpdateProfileDTO, UserProfileDTO } from '../types/profile.types';
 
 export class ProfileService {
@@ -11,7 +11,7 @@ export class ProfileService {
     }
 
     static async updateMyProfile(userId: string, data: UpdateProfileDTO): Promise<UserProfileDTO> {
-        // Validar que hay datos
+        // validate that theres data to update
         const hasData = Object.values(data).some(val => val !== undefined && val !== null);
         if (!hasData) {
             throw new Error('No hay datos para actualizar');
