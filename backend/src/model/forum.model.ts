@@ -54,6 +54,34 @@ export default class Forum {
     return [...myForums, ...publicForums];
   }
 
+  static async getMyForumsWeb(userId: string) {
+    const myForums = await prisma.users_forums
+      .findMany({
+        where: {
+          user_id: userId,
+        },
+        select: {
+          forum: {
+            select: {
+              forum_id: true,
+              name: true,
+            },
+          },
+        },
+        take: 5,
+      })
+      .then((data) => {
+        return data.map((f) => ({
+          forum_id: f.forum.forum_id,
+          name: f.forum.name,
+        }));
+      });
+
+    const publicForums = await this.getPublicForums();
+
+    return [...myForums, ...publicForums];
+  }
+
   static async getForumFeed(
     page: number,
     userId: string,

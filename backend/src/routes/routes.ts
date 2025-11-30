@@ -13,12 +13,13 @@ import forumsRoutes from "./forums.routes";
 import patientRoutes from "./patients.routes";
 import clinicalHistoryRoutes from "./clinicalHistory.routes";
 import reportRouter from "./report.routes";
-import historialRoutes from "./historial.routes"
+import historialRoutes from "./historial.routes";
 import historyRoutes from "./history.routes";
-import agendaRoutes from "./agenda.routes"
+import agendaRoutes from "./agenda.routes";
 import appointmentRoutes from "./appointment.routes";
 import expedienteRoutes from "./expediente.routes";
 import analysisRoutes from "./analysis.routes";
+import dashboardRoutes from "./dashboard.routes";
 const router = express.Router();
 
 // ============================================
@@ -115,6 +116,9 @@ router.use("/analysis", analysisRoutes);
 router.use("/doctors", doctorRoutes);
 
 // ============================================
+// Doctors Routes (Protected)
+// ============================================
+router.use("/update-dashboard", dashboardRoutes);
 // Admin Routes (Protected)
 // ============================================
 router.use("/admins", adminRoutes);
