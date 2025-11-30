@@ -20,7 +20,7 @@ router.get("/health", (_req, res) => {
 router.get("/profile", authenticate, usersController.getProfile);
 
 router.get("/first-login/:user_id", 
-  //authenticate, 
+  authenticate, 
   usersController.isFirstLogin);
 
 router.get(
