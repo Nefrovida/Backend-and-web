@@ -9,6 +9,8 @@ import getAppointmentsPerPatient from "../controller/agenda/getAppointmentsPerPa
 import getAppointmentDateAvailability from "../controller/agenda/getAppointmentDateAvailability.controller";
 
 import cancelAppointment from "src/controller/agenda/cancelAppointment.controller";
+import cancelAnalysis from "src/controller/agenda/cancelAnalysis.controller";
+
 import * as secretariaController from "../controller/agenda/secretaria.controller";
 import getAppointmentById from "src/controller/agenda/getAppointmentById.controller";
 import getAnalysisById from "src/controller/agenda/getAnalysisById.controller";
@@ -64,6 +66,13 @@ router.post(
   authenticate,
   requirePrivileges([Privilege.CREATE_APPOINTMENTS]),
   cancelAppointment
+);
+
+router.post(
+  "/analysis/:id/cancel",
+  authenticate,
+  requirePrivileges([Privilege.CREATE_APPOINTMENTS]),
+  cancelAnalysis
 );
 
 // Secretaria – appointments in date range (calendar view / filter)
