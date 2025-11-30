@@ -1,5 +1,6 @@
 import { DoctorAppointment } from "../types/doctorAppointment.types";
 import {
+  AppointmentTypeResponse,
   CreateAppointmentTypeData,
   UpdateAppointmentTypeData,
 } from "../types/add.appointment.types";
@@ -28,87 +29,95 @@ export const appointmentsService = {
 };
 
 export const appointmentTypeService = {
-  async getAll(): Promise<DoctorAppointment[]> {
-  const res = await fetch(`${API_BASE_URL}/appointments/getAllAppointments`, {
-    method: "GET",
-    credentials: "include",
-  });
+  // ==============================
+  // GET ALL
+  // ==============================
+  async getAll(): Promise<AppointmentTypeResponse[]> {
+    const res = await fetch(`${API_BASE_URL}/appointments/getAllAppointments`, {
+      method: "GET",
+      credentials: "include",
+    });
 
-  if (!res.ok) {
-    const error = await res.json().catch(() => ({}));
-    throw new Error(
-      error?.error?.message ||
-        error?.message ||
-        "Error al cargar servicios de citas"
-    );
-  }
+    if (!res.ok) {
+      const json = await res.json().catch(() => ({}));
+      throw new Error(json?.message || "Error al cargar servicios");
+    }
 
-  const json = await res.json();
+    const data = await res.json();
 
-  // map memo épico 💪
-  return json.map((item: any) => ({
-    appointmentId: item.appointment_id,
-    doctorId: item.doctor_id,
-    name: item.name?.trim() ?? "",
-    cost: item.general_cost,
-    communityCost: item.community_cost ?? null,
-    imageUrl: item.image_url
-  }));
-},
+    return data.map((item: any) => ({
+      appointmentId: item.appointment_id,
+      doctorId: item.doctor_id,
+      name: item.name?.trim(),
+      cost: item.general_cost,
+      communityCost: item.community_cost ?? null,
+    }));
+  },
 
+  // ==============================
+  // CREATE
+  // ==============================
   async create(data: CreateAppointmentTypeData) {
-    const res = await fetch(`${API_BASE_URL}/new-appointment`, {
+    const res = await fetch(`${API_BASE_URL}/appointments/new-appointment`, {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
+      // Backend espera snake_case
+      body: JSON.stringify({
+        doctor_id: data.doctorId,
+        name: data.name,
+        general_cost: data.cost,
+        community_cost: data.communityCost,
+        image_url: data.imageUrl,
+      }),
     });
 
     if (!res.ok) {
-      const error = await res.json().catch(() => ({}));
-      throw new Error(
-        error?.error?.message ||
-          error?.message ||
-          "Error al crear tipo de cita"
-      );
+      const json = await res.json().catch(() => ({}));
+      throw new Error(json?.message || "Error al crear servicio");
     }
 
     return res.json();
   },
 
+  // ==============================
+  // UPDATE
+  // ==============================
   async update(id: number, data: UpdateAppointmentTypeData) {
-    const res = await fetch(`${API_BASE_URL}/appointment-types/${id}`, {
+    const res = await fetch(`${API_BASE_URL}/appointments/${id}`, {
       method: "PUT",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        appointment_id: data.appointmentId,
+        doctor_id: data.doctorId,
+        name: data.name,
+        general_cost: data.cost,
+        community_cost: data.communityCost,
+        image_url: data.imageUrl,
+      }),
     });
 
     if (!res.ok) {
-      const error = await res.json().catch(() => ({}));
-      throw new Error(
-        error?.error?.message ||
-          error?.message ||
-          "Error al actualizar tipo de cita"
-      );
+      const json = await res.json().catch(() => ({}));
+      throw new Error(json?.message || "Error al actualizar servicio");
     }
 
     return res.json();
   },
 
+  // ==============================
+  // DELETE
+  // ==============================
   async delete(id: number) {
-    const res = await fetch(`${API_BASE_URL}/appointment-types/${id}`, {
+    const res = await fetch(`${API_BASE_URL}/appointments/${id}`, {
       method: "DELETE",
       credentials: "include",
     });
 
     if (!res.ok) {
-      const error = await res.json().catch(() => ({}));
-      throw new Error(
-        error?.error?.message ||
-          error?.message ||
-          "Error al eliminar tipo de cita"
-      );
+      const json = await res.json().catch(() => ({}));
+      throw new Error(json?.message || "Error al eliminar servicio");
     }
 
     return res.json();

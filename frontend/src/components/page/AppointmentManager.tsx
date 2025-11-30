@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import Button from "@/components/atoms/Button";
-import FeedbackModal from "@/components/molecules/FeedbackModal";
 import ConfirmModal from "@/components/molecules/ConfirmModal";
+import FeedbackModal from "@/components/molecules/FeedbackModal";
 
-import { authService } from "@/services/auth.service";
+import { getDoctors } from "@/services/doctor.service";
 import { appointmentTypeService } from "@/services/appointments.service";
 
 import {
@@ -16,218 +16,189 @@ import CreateAppointmentTypeModal from "@/components/organism/appointments/Creat
 import EditAppointmentTypeModal from "@/components/organism/appointments/EditAppointmentTypeModal";
 
 const AppointmentTypeManager: React.FC = () => {
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [isEditOpen, setIsEditOpen] = useState(false);
-
-  const [types, setTypes] = useState<AppointmentTypeResponse[]>([]);
-  const [editingType, setEditingType] =
-    useState<AppointmentTypeResponse | null>(null);
-
   const [loading, setLoading] = useState(false);
-  const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(
-    null
-  );
+
+  const [services, setServices] = useState<AppointmentTypeResponse[]>([]);
+  const [doctors, setDoctors] = useState<any[]>([]);
+
+  const [feedback, setFeedback] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
+
+  const [isCreate, setIsCreate] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
+
   const [deleteTarget, setDeleteTarget] =
     useState<AppointmentTypeResponse | null>(null);
+  const [editing, setEditing] =
+    useState<AppointmentTypeResponse | null>(null);
 
-  const currentUser = authService.getCurrentUser();
-
-  // ==============================
-  // CARGAR SERVICIOS
-  // ==============================
-  const load = async () => {
+  // ==================
+  // LOAD
+  // ==================
+  const loadAll = async () => {
     try {
       setLoading(true);
-      const services = await appointmentTypeService.getAll(); // devuelve lista mapeada
-      setTypes(services);
+      const list = await appointmentTypeService.getAll();
+      setServices(list);
+
+      const d = await getDoctors();
+      setDoctors(d.data);
     } catch (err) {
       console.error(err);
       setFeedback({
         type: "error",
-        message: "Error al cargar servicios de citas.",
+        message: "Error cargando datos",
       });
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    void load();
-  }, []);
+  useEffect(() => { void loadAll(); }, []);
 
-  // ==============================
-  // DELETE
-  // ==============================
-  const handleDeleteConfirmed = async () => {
-    if (!deleteTarget) return;
-
+  // ==================
+  // CREATE
+  // ==================
+  const onCreate = async (data: CreateAppointmentTypeData) => {
     try {
-      await appointmentTypeService.delete(deleteTarget.appointmentId);
-      await load();
-      setDeleteTarget(null);
+      await appointmentTypeService.create(data);
+      await loadAll();
+      setIsCreate(false);
       setFeedback({
         type: "success",
-        message: "Servicio eliminado correctamente.",
+        message: "Servicio creado correctamente.",
       });
     } catch (err: any) {
-      setFeedback({
-        type: "error",
-        message: "Error al eliminar el servicio.",
-      });
-      setDeleteTarget(null);
+      setFeedback({ type: "error", message: err.message });
     }
   };
 
-  // ==============================
-  // RENDER
-  // ==============================
+  // ==================
+  // UPDATE
+  // ==================
+  const onUpdate = async (data: UpdateAppointmentTypeData) => {
+    if (!editing) return;
+    try {
+      await appointmentTypeService.update(editing.appointmentId, data);
+      await loadAll();
+      setIsEdit(false);
+      setEditing(null);
+      setFeedback({
+        type: "success",
+        message: "Servicio actualizado.",
+      });
+    } catch (err: any) {
+      setFeedback({ type: "error", message: err.message });
+    }
+  };
+
+  // ==================
+  // DELETE
+  // ==================
+  const onDelete = async () => {
+    if (!deleteTarget) return;
+    try {
+      await appointmentTypeService.delete(deleteTarget.appointmentId);
+      await loadAll();
+      setDeleteTarget(null);
+      setFeedback({
+        type: "success",
+        message: "Servicio eliminado.",
+      });
+    } catch {
+      setFeedback({
+        type: "error",
+        message: "No se pudo eliminar.",
+      });
+    }
+  };
+
   return (
-    <div className="p-6 min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto bg-white rounded-lg p-6 shadow">
-        {/* HEADER */}
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-xl font-bold">Servicios médicos ofrecidos</h1>
+    <div className="p-6">
+      <div className="flex justify-between mb-4">
+        <h2 className="text-xl font-bold">Servicios Médicos</h2>
+        <Button onClick={() => setIsCreate(true)} variant="primary">
+          Nuevo
+        </Button>
+      </div>
 
-          {currentUser && (
-            <Button
-              variant="primary"
-              onClick={() => setIsCreateOpen(true)}
-              className="px-3 py-1 text-sm rounded-lg"
-            >
-              Crear servicio
-            </Button>
-          )}
-        </div>
+      {loading && <p>Cargando...</p>}
 
-        {loading && (
-          <p className="text-gray-500 text-sm mb-2">Cargando servicios…</p>
-        )}
+      <div className="space-y-2">
+        {services.map((s) => (
+          <div
+            key={s.appointmentId}
+            className="p-3 bg-slate-50 flex justify-between border rounded-md"
+          >
+            <div>
+              <p className="font-semibold">{s.name}</p>
+              <p className="text-sm text-gray-500">General: ${s.cost}</p>
+              {s.communityCost && (
+                <p className="text-sm text-gray-500">
+                  Comunitario: ${s.communityCost}
+                </p>
+              )}
+            </div>
 
-        {/* LISTA */}
-        <div className="grid grid-cols-1 gap-3">
-          {types.length === 0 ? (
-            <p className="text-gray-600">No hay servicios registrados.</p>
-          ) : (
-            types.map((svc) => (
-              <div
-                key={svc.appointmentId}
-                className="flex justify-between items-start border p-3 rounded-lg bg-slate-50 gap-4 w-full overflow-hidden"
+            <div className="flex gap-3">
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setEditing(s);
+                  setIsEdit(true);
+                }}
               >
-                <div className="max-w-[70%] w-full overflow-hidden">
-                  <div className="font-semibold break-words">
-                    {svc.name.trim()}
-                  </div>
+                Editar
+              </Button>
 
-                  <div className="text-xs text-gray-600 mt-1 flex flex-wrap gap-4">
-                    <span>Costo: ${svc.cost}</span>
-                    {typeof svc.communityCost === "number" && (
-                      <span>Comunitario: ${svc.communityCost}</span>
-                    )}
-                  </div>
-                </div>
-
-                {currentUser && (
-                  <div className="flex flex-col gap-2 shrink-0">
-                    <Button
-                      variant="secondary"
-                      onClick={() => {
-                        setEditingType(svc);
-                        setIsEditOpen(true);
-                      }}
-                      className="px-3 py-1 rounded text-sm border border-gray-300"
-                    >
-                      Editar
-                    </Button>
-
-                    <Button
-                      variant="danger"
-                      onClick={() => setDeleteTarget(svc)}
-                      className="px-3 py-1 rounded text-sm"
-                    >
-                      Eliminar
-                    </Button>
-                  </div>
-                )}
-              </div>
-            ))
-          )}
-        </div>
+              <Button
+                variant="danger"
+                onClick={() => setDeleteTarget(s)}
+              >
+                Eliminar
+              </Button>
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* CREATE */}
       <CreateAppointmentTypeModal
-        isOpen={isCreateOpen}
-        onClose={() => setIsCreateOpen(false)}
-        externalError={""}
-        onConfirm={async (data: CreateAppointmentTypeData) => {
-          try {
-            await appointmentTypeService.create(data);
-            await load();
-            setIsCreateOpen(false);
-            setFeedback({
-              type: "success",
-              message: "Servicio creado correctamente.",
-            });
-          } catch (err: any) {
-            setFeedback({
-              type: "error",
-              message: "Error al crear servicio",
-            });
-          }
-        }}
+        isOpen={isCreate}
+        doctors={doctors}
+        onConfirm={onCreate}
+        onClose={() => setIsCreate(false)}
       />
 
       {/* EDIT */}
       <EditAppointmentTypeModal
-        isOpen={isEditOpen}
-        appointmentType={editingType}
-        onClose={() => {
-          setIsEditOpen(false);
-          setEditingType(null);
-        }}
-        onConfirm={async (data: UpdateAppointmentTypeData) => {
-          if (!editingType) return;
-          try {
-            await appointmentTypeService.update(editingType.appointmentId, data);
-            await load();
-            setIsEditOpen(false);
-            setEditingType(null);
-            setFeedback({
-              type: "success",
-              message: "Servicio actualizado correctamente.",
-            });
-          } catch (err: any) {
-            setFeedback({
-              type: "error",
-              message: "Error al actualizar servicio",
-            });
-          }
-        }}
+        isOpen={isEdit}
+        appointmentType={editing}
+        onClose={() => setIsEdit(false)}
+        onConfirm={onUpdate}
       />
 
       {/* FEEDBACK */}
       <FeedbackModal
-        isOpen={feedback !== null}
+        isOpen={!!feedback}
         title={feedback?.type === "error" ? "Error" : "Éxito"}
-        variant={feedback?.type === "error" ? "error" : "success"}
+        variant={feedback?.type}
         message={feedback?.message || ""}
         onClose={() => setFeedback(null)}
       />
 
-      {/* CONFIRM DELETE */}
+      {/* DELETE */}
       <ConfirmModal
-        isOpen={deleteTarget !== null}
+        isOpen={!!deleteTarget}
         title="Eliminar servicio"
-        message={
-          deleteTarget
-            ? `¿Seguro que deseas eliminar "${deleteTarget.name}"?`
-            : ""
-        }
+        message={`¿Seguro que deseas eliminar "${deleteTarget?.name}"?`}
         confirmLabel="Eliminar"
         cancelLabel="Cancelar"
         variant="danger"
+        onConfirm={onDelete}
         onCancel={() => setDeleteTarget(null)}
-        onConfirm={handleDeleteConfirmed}
       />
     </div>
   );

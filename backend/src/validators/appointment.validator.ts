@@ -31,7 +31,8 @@ export const createAppointmentTypeSchema = z.object({
   image_url: z
     .string()
     .url('La imagen debe ser una URL válida')
-    .optional(),
+    .optional()
+    .or(z.literal('')),
 
   doctor_id: z
     .string({

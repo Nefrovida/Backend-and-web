@@ -1,4 +1,3 @@
-
 export interface AppointmentTypeResponse {
   appointmentId: number;
   doctorId: string;
@@ -8,19 +7,19 @@ export interface AppointmentTypeResponse {
   imageUrl: string;
 }
 
-// Datos para crear un tipo de cita
 export interface CreateAppointmentTypeData {
+  doctorId: string;
   name: string;
-  description: string;
   cost: number;
   communityCost?: number;
+  imageUrl?: string;
 }
 
-// Datos para actualizar un tipo de cita
 export interface UpdateAppointmentTypeData {
-  name?: string;
-  description?: string;
-  cost?: number;
+  appointmentId: number;
+  doctorId: string;
+  name: string;
+  cost: number;
   communityCost?: number;
-  active?: boolean;
+  imageUrl?: string;
 }
