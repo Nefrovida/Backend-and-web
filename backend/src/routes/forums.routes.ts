@@ -5,7 +5,10 @@ import { authenticate } from "../middleware/auth.middleware";
 import { requirePrivileges } from "../middleware/rbac.middleware";
 import { Privilege } from "../types/rbac.types";
 import postNewMessage from "src/controller/forum/postNewMessage.controller";
-import getMyForums from "src/controller/forum/getMyForums.controller";
+import {
+  getMyForums,
+  getMyForumsWeb,
+} from "src/controller/forum/getMyForums.controller";
 import getForumFeed from "src/controller/forum/getForumFeed.controller";
 
 const router = express.Router();
@@ -46,6 +49,7 @@ const router = express.Router();
  * ]
  */
 router.get("/myForums", authenticate, getMyForums);
+router.get("/myForums/web", authenticate, getMyForumsWeb);
 
 router.get("/feed", authenticate, getForumFeed);
 
@@ -261,6 +265,13 @@ router.get(
   authenticate,
   requirePrivileges([Privilege.VIEW_FORUMS]),
   forumsController.getReplies
+);
+
+router.get(
+  "/message/:messageId",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_FORUMS]),
+  forumsController.getMessage
 );
 
 export default router;
