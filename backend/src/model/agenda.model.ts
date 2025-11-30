@@ -357,7 +357,7 @@ export default class Agenda {
 
   static async getDoctorAvailability(doctorId: string, date: string) {
     // Parse date components to avoid timezone issues
-    const [year, month, day] = date.split('-').map(Number);
+    const [year, month, day] = date.split("-").map(Number);
     const targetDate = new Date(year, month - 1, day); // month is 0-indexed in JS Date
     const startOfDay = new Date(year, month - 1, day, 0, 0, 0, 0);
     const endOfDay = new Date(year, month - 1, day, 23, 59, 59, 999);
@@ -428,7 +428,7 @@ export default class Agenda {
     const now = new Date();
 
     if (proposedStart <= now) {
-      throw new Error('Appointment date and time must be in the future');
+      throw new Error("Appointment date and time must be in the future");
     }
 
     const proposedEnd = new Date(proposedStart.getTime() + duration * 60000);
@@ -482,7 +482,7 @@ export default class Agenda {
     });
 
     if (doctorOverlaps.length > 0) {
-      throw new Error('Doctor has a conflicting appointment at this time');
+      throw new Error("Doctor has a conflicting appointment at this time");
     }
 
     // Get the patient_appointment to check patient conflicts
@@ -491,7 +491,7 @@ export default class Agenda {
     });
 
     if (!patientAppt) {
-      throw new Error('Patient appointment not found');
+      throw new Error("Patient appointment not found");
     }
 
     // Check for conflicts with patient
@@ -519,7 +519,7 @@ export default class Agenda {
     });
 
     if (patientOverlaps.length > 0) {
-      throw new Error('Patient has a conflicting appointment at this time');
+      throw new Error("Patient has a conflicting appointment at this time");
     }
 
     // First, get an appointment for this doctor (or create one if needed)
@@ -571,7 +571,7 @@ export default class Agenda {
     doctorId: string;
     dateHour: string;
     duration: number;
-    appointmentType: 'PRESENCIAL' | 'VIRTUAL';
+    appointmentType: "PRESENCIAL" | "VIRTUAL";
     place?: string;
   }) {
     const { patientId, doctorId, dateHour, duration, appointmentType, place } = data;
@@ -580,7 +580,7 @@ export default class Agenda {
     const now = new Date();
 
     if (proposedStart <= now) {
-      throw new Error('Appointment date and time must be in the future');
+      throw new Error("Appointment date and time must be in the future");
     }
 
     const proposedEnd = new Date(proposedStart.getTime() + duration * 60000);
@@ -607,7 +607,7 @@ export default class Agenda {
     });
 
     if (doctorOverlaps.length > 0) {
-      throw new Error('Doctor has a conflicting appointment at this time');
+      throw new Error("Doctor has a conflicting appointment at this time");
     }
 
     // Check for conflicts with patient
@@ -632,7 +632,7 @@ export default class Agenda {
     });
 
     if (patientOverlaps.length > 0) {
-      throw new Error('Patient has a conflicting appointment at this time');
+      throw new Error("Patient has a conflicting appointment at this time");
     }
 
     // Get an appointment for this doctor
@@ -643,7 +643,7 @@ export default class Agenda {
     });
 
     if (!doctorAppointment) {
-      throw new Error('No appointment type found for this doctor');
+      throw new Error("No appointment type found for this doctor");
     }
 
     // Create a new patient_appointment directly
@@ -654,8 +654,8 @@ export default class Agenda {
         date_hour: proposedStart,
         duration,
         appointment_type: appointmentType,
-        place: place || (appointmentType === 'PRESENCIAL' ? 'Consultorio' : undefined),
-        appointment_status: 'PROGRAMMED',
+        place: place || (appointmentType === "PRESENCIAL" ? "Consultorio" : undefined),
+        appointment_status: "PROGRAMMED",
       },
       include: {
         patient: {
