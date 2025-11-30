@@ -30,9 +30,9 @@ router.put(
   AppointmentController.rescheduleAppointment
 );
 
-// GET /api/appointments/patient/get-notes/:id
+// GET /api/appointments/patient/get-notes
 router.get(
-  '/patient/get-notes/:id',
+  '/patient/get-notes',
   authenticate,
   requirePrivileges([Privilege.VIEW_NOTES]),
   AppointmentController.getPatientAppointment

@@ -95,8 +95,12 @@ export default class AppointmentController {
 
   static async getPatientAppointment(req: Request, res: Response){
     try {
-      const {id} = req.params;
-      const data = await getAppointmentByPatient(id);
+      const userId = req.user?.userId;
+
+      if (!userId) {
+        return res.status(401).json({ error: "User not authenticated" });
+      }
+      const data = await getAppointmentByPatient(userId);
       res.status(200).json(data);
     }
     catch (error){
