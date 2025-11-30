@@ -169,4 +169,16 @@ export default class AppointmentModel {
       };
     });
   }
+
+static async getAppointmentCatalog() {
+  return await prisma.appointments.findMany({
+    include: {
+      doctor: {
+        include: {
+          user: true,
+        },
+      },
+    },
+  });
+}
 }
