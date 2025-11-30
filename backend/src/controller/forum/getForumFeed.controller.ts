@@ -20,6 +20,8 @@ async function getForumFeed(req: Request, res: Response) {
       await Forum.getForumFeed(pageNumber, userId, forumId)
     ).map(parseMessages);
 
+    console.log(messages);
+
     res.status(200).json(messages);
   } catch (e) {
     res
