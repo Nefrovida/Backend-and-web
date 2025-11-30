@@ -157,7 +157,9 @@ export default class Agenda {
       data: { analysis_status: "CANCELED" },
     });
   }
-
+  /**
+   * Mobile – Analysis details (card), by id.
+   */
 static async getAnalysisById(id: number) {
   const analysis = await prisma.patient_analysis.findUnique({
     where: {
@@ -180,7 +182,6 @@ static async getAnalysisById(id: number) {
 
   if (!analysis) return null;
 
-  // Desestructurar correctamente
   const {
     analysis: nestedAnalysis,
     analysis_date,
@@ -203,9 +204,6 @@ static async getAnalysisById(id: number) {
     analysisStatus: analysis_status,
   };
 }
-
-
-
 
 
   /**
@@ -812,7 +810,7 @@ static async getAppointmentsPerPatient(targetDate: string, userId: string ) {
       where: {
         patient_id: patientId,
         date_hour: { gte: start, lt: end },
-        appointment_status: { in: ["PROGRAMMED"] },
+        appointment_status: { in: ["PROGRAMMED", "REQUESTED"] },
       },
       select: {
         patient_appointment_id: true,
@@ -848,7 +846,7 @@ static async getAppointmentsPerPatient(targetDate: string, userId: string ) {
       where: {
         patient_id: patientId,
         analysis_date: { gte: start, lt: end },
-        analysis_status: { in: ["PROGRAMMED"] },
+        analysis_status: { in: ["PROGRAMMED", "REQUESTED"] },
       },
       select: {
         patient_analysis_id: true,
