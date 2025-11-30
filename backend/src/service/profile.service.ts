@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import ProfileModel from '../model/profile.model'; 
+import ProfileModel from '../model/profile.model'; // Nota: Importación por default
 import { ChangePasswordDTO, UpdateProfileDTO, UserProfileDTO } from '../types/profile.types';
 
 export class ProfileService {
@@ -14,8 +14,7 @@ export class ProfileService {
         // Validar que hay datos
         const hasData = Object.values(data).some(val => val !== undefined && val !== null);
         if (!hasData) {
-             // Si quieres permitir updates vacíos, quita esto. Si no, lanza error.
-             // throw new Error('No se enviaron datos para actualizar');
+            throw new Error('No hay datos para actualizar');
         }
 
         const updatedUser = await ProfileModel.updateProfile(userId, data);
@@ -30,7 +29,6 @@ export class ProfileService {
             throw new Error('Las nuevas contraseñas no coinciden');
         }
 
-        
         const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[#?!@$%^&*-]).{8,}$/;
         if (!passwordRegex.test(newPassword)) {
             throw new Error('La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un carácter especial [#?!@$%^&*-].');
