@@ -44,3 +44,29 @@ export const getAllAppointmentsByUserId = async (
 export const getAppointmentByName = async (appointmentName: string) => {
   return await appointmentsModel.getAppointmentByName(appointmentName);
 };
+
+export const getAppointmentByPatient = async(id: string) => {
+  const now = new Date()
+  const data = await appointmentsModel.getAppointmentByPatient(now, id);
+
+  const parsedData = []
+
+  for (const ap of data) {
+    parsedData.push({
+      appointmentName: ap.appointment.name.trim(),
+      dateHour: ap.date_hour,
+      notes: ap.notes.map(n => ({
+        content: n.content,
+        generalNotes: n.general_notes,
+        ailments: n.ailments,
+        prescription: n.prescription,
+        visibility: n.visibility
+      }))
+    });
+  }
+
+  return parsedData
+
+
+
+};
