@@ -12,6 +12,7 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import esLocale from "@fullcalendar/core/locales/es";
 import "../../styles/Calendar.css";
 import { mapAppointmentsToEvents } from "../../model/secretaryCalendar.model";
+import { AppointmentModal } from "../molecules/AppointmentModal";
 
 function renderEventContent(eventInfo: any) {
   return (
@@ -24,6 +25,8 @@ function renderEventContent(eventInfo: any) {
 
 function Agenda() {
   const [events, setEvents] = useState<any[]>([]);
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const lastRange = useRef({ start: "", end: "" });
 
   const fetchAppointments = async (start: Date, end: Date) => {
@@ -64,6 +67,21 @@ function Agenda() {
     fetchAppointments(arg.view.currentStart, arg.view.currentEnd);
   };
 
+  const handleEventClick = (clickInfo: EventClickArg) => {
+    setSelectedEvent({
+      title: clickInfo.event.title,
+      description: clickInfo.event.extendedProps.description,
+      start: clickInfo.event.start,
+      end: clickInfo.event.end,
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedEvent(null);
+  };
+
   return (
     <div className="h-full w-full flex flex-col">
       <div className="flex-1 min-h-0">
@@ -76,6 +94,7 @@ function Agenda() {
           allDaySlot={false}
           events={events}
           eventContent={renderEventContent}
+          eventClick={handleEventClick}
           height="100%"
           expandRows={true}
           slotMinTime="09:00:00"
@@ -84,9 +103,17 @@ function Agenda() {
           eventDidMount={(info) => {
             info.el.style.backgroundColor = "#DCEBF1";
             info.el.style.border = "1px solid #DCEBF1";
+            info.el.style.cursor = "pointer";
           }}
         />
       </div>
+      
+      {isModalOpen && selectedEvent && (
+        <AppointmentModal
+          event={selectedEvent}
+          onClose={handleCloseModal}
+        />
+      )}
     </div>
   );
 }
