@@ -6,6 +6,7 @@ import getAppointmentsPerDay from "../controller/agenda/getAppointmentsPerDay.co
 import getAppointmentsInRangeC from "../controller/agenda/getAppointmentsInRange.controller";
 import getAppointmentsPerPatient from "../controller/agenda/getAppointmentsPerPatient.controller";
 
+import getAppointmentDateAvailability from "../controller/agenda/getAppointmentDateAvailability.controller";
 
 import cancelAppointment from "src/controller/agenda/cancelAppointment.controller";
 import * as secretariaController from "../controller/agenda/secretaria.controller";
@@ -19,18 +20,18 @@ import createAppointment from "../controller/agenda/createAppointment.controller
 
 // Secretaria – day appointments (secretary view, with patient names)
 router.get(
-    "/appointments-per-day-sec",
-    authenticate,
-    requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
-    getAppointmentsPerDaySec
+  "/appointments-per-day-sec",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
+  getAppointmentsPerDaySec
 );
 
 // Doctor daily appointments (doctor's name)
 router.get(
-    "/appointments-per-day",
-    authenticate,
-    requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
-    getAppointmentsPerDay
+  "/appointments-per-day",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
+  getAppointmentsPerDay
 );
 
 // mobile – daily appointments per patient (doctor's name)
@@ -43,10 +44,10 @@ router.get(
 
 // Appointment detail by id
 router.get(
-    "/appointment/:id",
-    authenticate,
-    requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
-    getAppointmentById
+  "/appointment/:id",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
+  getAppointmentById
 );
 
 // Analysis detail by id
@@ -59,18 +60,18 @@ router.get(
 
 // Cancel appointment
 router.post(
-    "/appointments/:id/cancel",
-    authenticate,
-    requirePrivileges([Privilege.UPDATE_APPOINTMENTS]),
-    cancelAppointment
+  "/appointments/:id/cancel",
+  authenticate,
+  requirePrivileges([Privilege.CREATE_APPOINTMENTS]),
+  cancelAppointment
 );
 
 // Secretaria – appointments in date range (calendar view / filter)
 router.get(
-    "/appointments/range",
-    authenticate,
-    requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
-    getAppointmentsInRangeC
+  "/appointments/range",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
+  getAppointmentsInRangeC
 );
 
 // Secretaria endpoints for scheduling appointments
@@ -79,6 +80,13 @@ router.get(
   authenticate,
   requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
   secretariaController.getPendingAppointmentRequests
+);
+
+router.get(
+  "/appointments/date-availability",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
+  getAppointmentDateAvailability
 );
 
 router.get(

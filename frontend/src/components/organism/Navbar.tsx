@@ -1,8 +1,13 @@
 import React, { useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import { NavLink, useNavigate } from "react-router-dom";
-import Notas from "../page/Notas";
-import { BsPerson, BsFillPersonFill, BsGear, BsGearFill, BsDoorClosed, BsDoorOpenFill } from "react-icons/bs";
+import Notes from "../page/Notes";
+import {
+  BsPerson,
+  BsFillPersonFill,
+  BsDoorClosed,
+  BsDoorOpenFill,
+} from "react-icons/bs";
 import { MdForum, MdOutlineForum } from "react-icons/md";
 import { LuNotebook, LuNotebookPen } from "react-icons/lu";
 import { IoFlaskSharp, IoFlaskOutline } from "react-icons/io5";
@@ -22,6 +27,8 @@ import ConfirmModal from "../molecules/ConfirmModal";
 
 import { ROLE_IDS } from "../../types/auth.types";
 import { authService } from "../../services/auth.service";
+import { PiFlaskFill, PiFlaskLight } from "react-icons/pi";
+import { ImUserTie } from "react-icons/im";
 
 interface Props {
   children: React.ReactNode;
@@ -38,7 +45,7 @@ const useTooltip = () => {
       const rect = ref.current.getBoundingClientRect();
       setTooltipPos({
         top: rect.top + rect.height / 2,
-        left: rect.right + 10
+        left: rect.right + 10,
       });
       setShowTooltip(true);
     }
@@ -50,11 +57,19 @@ const useTooltip = () => {
 };
 
 // 2. Tooltip visual component (portal)
-const Tooltip = ({ label, top, left }: { label: string, top: number, left: number }) => {
+const Tooltip = ({
+  label,
+  top,
+  left,
+}: {
+  label: string;
+  top: number;
+  left: number;
+}) => {
   return createPortal(
     <div
       className="fixed z-[9999] px-3 py-1.5 bg-gray-800 text-white text-xs font-bold rounded-md shadow-xl whitespace-nowrap pointer-events-none animate-in fade-in zoom-in-95 slide-in-from-left-2 duration-200"
-      style={{ top, left, transform: 'translateY(-50%)' }}
+      style={{ top, left, transform: "translateY(-50%)" }}
     >
       {label}
       <span className="absolute top-1/2 -left-1 -mt-1 border-4 border-transparent border-r-gray-800" />
@@ -65,15 +80,28 @@ const Tooltip = ({ label, top, left }: { label: string, top: number, left: numbe
 
 // 3. Links component (routes)
 const CustomLink = ({
-  to, icon, activeIcon, label, end = false
+  to,
+  icon,
+  activeIcon,
+  label,
+  end = false,
 }: {
-  to: string; icon: React.ReactNode; activeIcon: React.ReactNode; label: string; end?: boolean;
+  to: string;
+  icon: React.ReactNode;
+  activeIcon: React.ReactNode;
+  label: string;
+  end?: boolean;
 }) => {
-  const { showTooltip, tooltipPos, ref, handleMouseEnter, handleMouseLeave } = useTooltip();
+  const { showTooltip, tooltipPos, ref, handleMouseEnter, handleMouseLeave } =
+    useTooltip();
 
   return (
     <>
-      <div ref={ref} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+      <div
+        ref={ref}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
         <NavLink
           to={to}
           end={end}
@@ -93,23 +121,42 @@ const CustomLink = ({
           )}
         </NavLink>
       </div>
-      {showTooltip && <Tooltip label={label} top={tooltipPos.top} left={tooltipPos.left} />}
+      {showTooltip && (
+        <Tooltip label={label} top={tooltipPos.top} left={tooltipPos.left} />
+      )}
     </>
   );
 };
 
 // 4. Buttons components
 const NavButton = ({
-  onClick, isActive, icon, activeIcon, label, activeClass
+  onClick,
+  isActive,
+  icon,
+  activeIcon,
+  label,
+  activeClass,
 }: {
-  onClick: () => void; isActive: boolean; icon: React.ReactNode; activeIcon: React.ReactNode; label: string; activeClass?: string;
+  onClick: () => void;
+  isActive: boolean;
+  icon: React.ReactNode;
+  activeIcon: React.ReactNode;
+  label: string;
+  activeClass?: string;
 }) => {
-  const { showTooltip, tooltipPos, ref, handleMouseEnter, handleMouseLeave } = useTooltip();
-  const activeStyle = activeClass || "bg-blue-50 text-blue-600 scale-105 shadow-sm ring-1 ring-blue-100";
+  const { showTooltip, tooltipPos, ref, handleMouseEnter, handleMouseLeave } =
+    useTooltip();
+  const activeStyle =
+    activeClass ||
+    "bg-blue-50 text-blue-600 scale-105 shadow-sm ring-1 ring-blue-100";
 
   return (
     <>
-      <div ref={ref} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+      <div
+        ref={ref}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
         <button
           type="button"
           onClick={onClick}
@@ -127,7 +174,9 @@ const NavButton = ({
           </div>
         </button>
       </div>
-      {showTooltip && <Tooltip label={label} top={tooltipPos.top} left={tooltipPos.left} />}
+      {showTooltip && (
+        <Tooltip label={label} top={tooltipPos.top} left={tooltipPos.left} />
+      )}
     </>
   );
 };
@@ -160,9 +209,9 @@ function Navbar({ children }: Props) {
 
   return (
     <div className="flex h-screen w-full bg-gray-50 relative">
-
       {/* Floating Navigation Bar */}
-      <nav className={`
+      <nav
+        className={`
         relative flex flex-col items-center justify-between py-6
         m-4 w-[4.5rem] h-[calc(100vh-2rem)] 
         bg-white/80 backdrop-blur-xl 
@@ -170,18 +219,19 @@ function Navbar({ children }: Props) {
         border border-white/40
         transition-all duration-500
         ${showNotes ? "z-[80]" : "z-50"}
-      `}>
-
+      `}
+      >
         {/* Top Section */}
         <div className="flex flex-col gap-2 items-center w-full">
-            <CustomLink 
-              label="Mi Perfil"
-              to="/dashboard/"
-              icon={<BsPerson />}
-              activeIcon={<BsFillPersonFill />}
-              end
-            />
-            <NavButton 
+          <CustomLink
+            label="Mi Perfil"
+            to="/dashboard/"
+            icon={<BsPerson />}
+            activeIcon={<BsFillPersonFill />}
+            end
+          />
+          {isDoctor && (
+            <NavButton
               label={showNotes ? "Cerrar Notas" : "Notas"}
               isActive={showNotes}
               onClick={() => setShowNotes(!showNotes)}
@@ -189,26 +239,35 @@ function Navbar({ children }: Props) {
               activeIcon={<LuNotebookPen />}
               activeClass="bg-green-50 text-green-600 scale-105 shadow-sm ring-1 ring-green-100"
             />
+          )}
 
           <div className="w-8 h-0.5 bg-gray-200/60 rounded-full mt-1"></div>
         </div>
 
         {/* Scrollable Mid Section */}
         <div className="flex flex-col gap-3 items-center w-full justify-center flex-1 py-4 overflow-y-auto scrollbar-hide px-2">
-
           {/* Only Admins can see this icons */}
           {isAdmin && (
-            <CustomLink
-              label="Registrar Doctor"
-              to="/dashboard/register-doctor"
-              icon={<FaUserMd />}
-              activeIcon={<FaUserMd />}
-              end
-            />
+            <>
+              <CustomLink
+                label="Registrar Doctor"
+                to="/dashboard/registrar-doctor"
+                icon={<FaUserMd />}
+                activeIcon={<FaUserMd />}
+                end
+              />
+              <CustomLink
+                label="Registrar Admin"
+                to="/dashboard/registrar-admin"
+                icon={<ImUserTie />}
+                activeIcon={<ImUserTie />}
+                end
+              />
+            </>
           )}
 
           {/* Upload Results, only Laboratorist */}
-          {(isLaboratorist || isAdmin) && (
+          {isLaboratorist && (
             <CustomLink
               label="Subir Resultados"
               to="/dashboard/laboratorio/subir"
@@ -219,13 +278,15 @@ function Navbar({ children }: Props) {
           )}
 
           {/* Expedientes */}
-          <CustomLink
-            label="Expedientes"
-            to="/dashboard/expedientes"
-            icon={<FaRegFolder />}
-            activeIcon={<FaFolderOpen />}
-            end
-          />
+          {isDoctor && (
+            <CustomLink
+              label="Expedientes"
+              to="/dashboard/expedientes"
+              icon={<FaRegFolder />}
+              activeIcon={<FaFolderOpen />}
+              end
+            />
+          )}
 
           {/* Forum access EVERYONE */}
           <CustomLink
@@ -235,7 +296,7 @@ function Navbar({ children }: Props) {
             activeIcon={<MdForum />}
             end
           />
-        
+
           {/* Forum settings ONLY ADMIN*/}
           {isAdmin && (
             <CustomLink
@@ -258,14 +319,25 @@ function Navbar({ children }: Props) {
           )}
 
           {/* Laboratory results, Doctor */}
-          {(isDoctor || isAdmin) && (
-              <CustomLink 
-                label="Laboratorio"
-                to="/dashboard/laboratorio"
-                icon={<IoFlaskOutline />}
-                activeIcon={<IoFlaskSharp />}
-                end
-              />
+          {isDoctor && (
+            <CustomLink
+              label="Laboratorio"
+              to="/dashboard/laboratorio"
+              icon={<IoFlaskOutline />}
+              activeIcon={<IoFlaskSharp />}
+              end
+            />
+          )}
+
+          {/* Laboratorista analysis */}
+          {isLaboratorist && (
+            <CustomLink
+              label="Agenda"
+              to="/dashboard/analisis-dia"
+              icon={<PiFlaskLight />}
+              activeIcon={<PiFlaskFill />}
+              end
+            />
           )}
 
           {/* Secretary */}
@@ -318,34 +390,34 @@ function Navbar({ children }: Props) {
           bg-white shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] rounded-3xl border border-gray-100
           overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]
           ${showNotes
-            ? "w-[1000px] opacity-100 translate-x-0"
+            ? "opacity-100 translate-x-0"
             : "w-0 opacity-0 -translate-x-4 pointer-events-none"
           }
         `}
       >
         {/* Intern Container */}
-        <div className="h-full w-[1000px] flex flex-col bg-white">
-          <div className="p-5 bg-white border-b border-gray-100 flex justify-between items-center shadow-sm z-10">
-            <div className="flex items-center gap-3">
-              <div className="bg-green-100 p-2 rounded-lg text-green-600">
-                <LuNotebookPen size={20} />
+        {isDoctor && (
+          <div className="h-full w-fit flex flex-col bg-white">
+            <div className="p-5 bg-white border-b border-gray-100 flex justify-between items-center shadow-sm z-10">
+              <div className="flex items-center gap-3">
+                <div className="bg-green-100 p-2 rounded-lg text-green-600">
+                  <LuNotebookPen size={20} />
+                </div>
+                <h2 className="font-bold text-gray-800 text-xl">Notas</h2>
               </div>
-              <h2 className="font-bold text-gray-800 text-xl">Notas</h2>
+              <button
+                onClick={() => setShowNotes(false)}
+                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                ✕
+              </button>
             </div>
-            <button
-              onClick={() => setShowNotes(false)}
-              className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              ✕
-            </button>
-          </div>
 
-          <div className="flex-1 overflow-y-auto p-0 bg-white relative">
-            <div className="min-h-full">
-              <Notas />
+            <div className="flex-1 overflow-y-auto p-0 bg-white relative">
+              <Notes />
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Logout Modal */}
@@ -362,9 +434,7 @@ function Navbar({ children }: Props) {
 
       {/* Main Content */}
       <main className="flex-1 h-screen p-4 transition-all duration-300 relative z-10 overflow-auto">
-        <div className="h-full min-h-0">
-          {children}
-        </div>
+        <div className="h-full min-h-0">{children}</div>
       </main>
     </div>
   );

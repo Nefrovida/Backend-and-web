@@ -194,16 +194,16 @@ model analysis {
 
 model patient_analysis {
   patient_analysis_id Int             @id @default(autoincrement())
-  laboratorist_id     String          @db.Uuid
+  laboratorist_id     String?          @db.Uuid
   analysis_id         Int
   patient_id          String          @db.Uuid
   analysis_date       DateTime
-  results_date        DateTime
-  place               String
+  results_date        DateTime?
+  place               String?
   duration            Int
   analysis_status     ANALYSIS_STATUS @default(REQUESTED)
   analysis            analysis        @relation(fields: [analysis_id], references: [analysis_id], onDelete: Cascade)
-  laboratorist        laboratorists   @relation(fields: [laboratorist_id], references: [laboratorist_id], onDelete: Cascade)
+  laboratorist        laboratorists?   @relation(fields: [laboratorist_id], references: [laboratorist_id], onDelete: Cascade)
   patient             patients        @relation(fields: [patient_id], references: [patient_id], onDelete: Cascade)
   results             results?
 }
@@ -256,14 +256,14 @@ model user_reports {
 }
 
 model notifications {
-  report_id Int      @id @default(autoincrement())
-  user_id   String   @db.Uuid
-  answer    String
-  date      DateTime
-  title     String
-  content   String
-  seen      Boolean  @default(false)
-  user      users    @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  report_id     Int      @id @default(autoincrement())
+  user_id       String   @db.Uuid
+  date          DateTime
+  answer        String
+  title         String
+  content       String
+  seen          Boolean  @default(false)
+  user          users    @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
 }
 
 enum Gender {

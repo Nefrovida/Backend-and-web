@@ -59,6 +59,8 @@ export const MembersModal: React.FC<MembersModalProps> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0);
+  // Prefer using a configured API base URL; fallback to the backend default
+  const API_BASE = (import.meta as any).env?.VITE_APP_API_URL || 'http://localhost:3001/api';
 
   // Update local error when external error changes
   useEffect(() => {
@@ -81,8 +83,8 @@ export const MembersModal: React.FC<MembersModalProps> = ({
     try {
       setIsLoading(true);
       setError('');
-      
-      const response = await fetch(`/api/forums/regular-users?page=${currentPage}&limit=10`, {
+
+      const response = await fetch(`${API_BASE}/forums/regular-users?page=${currentPage}&limit=10`, {
         credentials: 'include',
       });
 
@@ -104,12 +106,12 @@ export const MembersModal: React.FC<MembersModalProps> = ({
 
   const fetchForumMembers = async () => {
     if (!forum?.forum_id) return;
-    
+
     try {
       setIsLoadingForum(true);
       setError('');
-      
-      const response = await fetch(`/api/forums/${forum.forum_id}/members`, {
+
+      const response = await fetch(`${API_BASE}/forums/${forum.forum_id}/members`, {
         credentials: 'include',
       });
 
@@ -135,8 +137,8 @@ export const MembersModal: React.FC<MembersModalProps> = ({
 
     try {
       setError('');
-      
-      const response = await fetch(`/api/forums/${forum.forum_id}/members`, {
+
+      const response = await fetch(`${API_BASE}/forums/${forum.forum_id}/members`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -155,7 +157,7 @@ export const MembersModal: React.FC<MembersModalProps> = ({
         fetchForumMembers(),
         fetchUsers()
       ]);
-      
+
       console.log('Miembro agregado exitosamente');
     } catch (err: any) {
       setError(err.message);
@@ -165,11 +167,11 @@ export const MembersModal: React.FC<MembersModalProps> = ({
 
   const handleRemoveForumMember = async (userId: string) => {
     if (!forum?.forum_id) return;
-    
+
     try {
       setError('');
-      
-      const response = await fetch(`/api/forums/${forum.forum_id}/members/${userId}`, {
+
+      const response = await fetch(`${API_BASE}/forums/${forum.forum_id}/members/${userId}`, {
         method: 'DELETE',
         credentials: 'include',
       });
@@ -184,7 +186,7 @@ export const MembersModal: React.FC<MembersModalProps> = ({
         fetchForumMembers(),
         fetchUsers()
       ]);
-      
+
       console.log('Miembro removido exitosamente');
     } catch (err: any) {
       setError(err.message);
@@ -200,24 +202,27 @@ export const MembersModal: React.FC<MembersModalProps> = ({
     const matchesSearch = user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       `${user.name} ${user.parent_last_name}`.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     // Then exclude users who are already in the forum
-    const isNotInForum = !forumMembers.some(forumMember => 
+    const isNotInForum = !forumMembers.some(forumMember =>
       forumMember.user_id === user.user_id
     );
-    
+
     return matchesSearch && isNotInForum;
   });
 
   // Filter forum members based on search
-  const filteredForumMembers = forumMembers.filter(member => 
+  const filteredForumMembers = forumMembers.filter(member =>
     member.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
     member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     `${member.name} ${member.parent_last_name}`.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]">
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]"
+      onClick={onClose}
+    >
       <div
         className="bg-[#CFE6ED] rounded-3xl shadow-2xl p-6 w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
@@ -246,27 +251,9 @@ export const MembersModal: React.FC<MembersModalProps> = ({
             </button>
           )}
           <h2 className="text-lg font-semibold text-gray-800">
-            Gestionar Miembros
-          </h2>
-          <button
-            onClick={onClose}
-            className="p-1 hover:bg-gray-200 rounded-full transition-colors"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 text-gray-600"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
+          Gestionar Miembros
+        </h2>
+        <div className="w-8"></div>
         </div>
 
         {/* Error Message */}
@@ -307,21 +294,19 @@ export const MembersModal: React.FC<MembersModalProps> = ({
         <div className="flex mb-4 bg-white rounded-lg p-1">
           <button
             onClick={() => setShowAddSection(true)}
-            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-              showAddSection
+            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${showAddSection
                 ? 'bg-green-500 text-white'
                 : 'text-gray-600 hover:text-gray-900'
-            }`}
+              }`}
           >
             Agregar Miembros
           </button>
           <button
             onClick={() => setShowAddSection(false)}
-            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-              !showAddSection
+            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${!showAddSection
                 ? 'bg-blue-500 text-white'
                 : 'text-gray-600 hover:text-gray-900'
-            }`}
+              }`}
           >
             Miembros Actuales ({forumMembers.length})
           </button>
@@ -339,7 +324,7 @@ export const MembersModal: React.FC<MembersModalProps> = ({
                 {totalRecords} usuarios disponibles
               </p>
             </div>
-            
+
             {isLoading ? (
               <div className="text-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500 mx-auto"></div>
@@ -379,7 +364,7 @@ export const MembersModal: React.FC<MembersModalProps> = ({
                           </p>
                         </div>
                       </div>
-                      
+
                       <div className="flex items-center space-x-2">
                         <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">
                           {user.role.role_name}
@@ -427,11 +412,11 @@ export const MembersModal: React.FC<MembersModalProps> = ({
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                       </svg>
                     </button>
-                    
+
                     <span className="text-sm text-gray-600">
                       Página {currentPage} de {totalPages}
                     </span>
-                    
+
                     <button
                       onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                       disabled={currentPage === totalPages}
@@ -460,7 +445,7 @@ export const MembersModal: React.FC<MembersModalProps> = ({
                 Miembros del foro
               </h3>
             </div>
-            
+
             {isLoadingForum ? (
               <div className="text-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
@@ -499,11 +484,11 @@ export const MembersModal: React.FC<MembersModalProps> = ({
                         </p>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center space-x-2">
                       <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
-                        {member.forum_role === 'MEMBER' || member.forum_role === 'VIEWER' 
-                          ? member.role?.role_name || member.forum_role 
+                        {member.forum_role === 'MEMBER' || member.forum_role === 'VIEWER'
+                          ? member.role?.role_name || member.forum_role
                           : member.forum_role}
                       </span>
                       <button
@@ -535,16 +520,28 @@ export const MembersModal: React.FC<MembersModalProps> = ({
         )}
 
         {/* Footer */}
-        <div className="mt-6 text-center">
-          <p className="text-xs text-gray-500">
-            {forum ? `Foro: ${forum.name}` : 'Sin foro seleccionado'} • {' '}
-            {new Date().toLocaleDateString('es-ES', {
-              day: '2-digit',
-              month: '2-digit',
-              year: 'numeric',
-            })}
-          </p>
+        {/* Action Buttons */}
+        <div className="flex gap-4 justify-center mt-6">
+          <button
+            onClick={() => {
+              setError("");
+              onClose();
+            }}
+            className="px-6 py-2 bg-white text-gray-700 font-medium rounded-lg hover:bg-gray-100 transition-colors shadow-sm"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={() => {
+              setError("");
+              onClose();
+            }}
+            className="px-6 py-2 bg-blue-500 text-white font-medium rounded-lg hover:bg-blue-600 transition-colors shadow-sm"
+          >
+            Actualizar
+          </button>
         </div>
+
       </div>
     </div>
   );

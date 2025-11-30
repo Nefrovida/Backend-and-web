@@ -1,6 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
-import type { DateSelectArg, EventClickArg, DatesSetArg } from "@fullcalendar/core";
+import type {
+  DateSelectArg,
+  EventClickArg,
+  DatesSetArg,
+} from "@fullcalendar/core";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import allLocales from "@fullcalendar/core/locales-all";
 import interactionPlugin from "@fullcalendar/interaction";
@@ -20,7 +24,7 @@ function renderEventContent(eventInfo: any) {
 
 function Agenda() {
   const [events, setEvents] = useState<any[]>([]);
-  const lastRange = useRef({ start: "", end: "" }); 
+  const lastRange = useRef({ start: "", end: "" });
 
   const fetchAppointments = async (start: Date, end: Date) => {
     try {
@@ -33,7 +37,7 @@ function Agenda() {
       let data = await res.json();
       data = data.map((appt: any) => ({
         ...appt,
-        date_hour: appt.date_hour.replace("Z", "") 
+        date_hour: appt.date_hour.replace("Z", ""),
       }));
       const mappedEvents = mapAppointmentsToEvents(data);
 
@@ -52,7 +56,7 @@ function Agenda() {
       lastRange.current.start === startStr &&
       lastRange.current.end === endStr
     ) {
-      return; 
+      return;
     }
 
     lastRange.current = { start: startStr, end: endStr };
@@ -63,25 +67,25 @@ function Agenda() {
   return (
     <div className="h-full w-full flex flex-col">
       <div className="flex-1 min-h-0">
-      <FullCalendar
-        locales={[esLocale]}
-        locale="es"
-        plugins={[dayGridPlugin, interactionPlugin, timeGridPlugin]}
-        initialView="timeGridWeek"
-        slotDuration="00:15:00"
-        allDaySlot={false}
-        events={events}
-        eventContent={renderEventContent}
-        height="100%"
-        expandRows={true}
-        slotMinTime="09:00:00"
-        slotMaxTime="19:01:00"
-        datesSet={handleDatesSet} 
-        eventDidMount={(info) => {
-          info.el.style.backgroundColor = "#DCEBF1";
-          info.el.style.border = "1px solid #DCEBF1";
-        }}
-      />
+        <FullCalendar
+          locales={[esLocale]}
+          locale="es"
+          plugins={[dayGridPlugin, interactionPlugin, timeGridPlugin]}
+          initialView="timeGridWeek"
+          slotDuration="00:15:00"
+          allDaySlot={false}
+          events={events}
+          eventContent={renderEventContent}
+          height="100%"
+          expandRows={true}
+          slotMinTime="09:00:00"
+          slotMaxTime="19:01:00"
+          datesSet={handleDatesSet}
+          eventDidMount={(info) => {
+            info.el.style.backgroundColor = "#DCEBF1";
+            info.el.style.border = "1px solid #DCEBF1";
+          }}
+        />
       </div>
     </div>
   );

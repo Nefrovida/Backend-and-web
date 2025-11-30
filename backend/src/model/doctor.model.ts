@@ -16,6 +16,32 @@ export interface IUser {
   role_id: number; // doctor role id
 }
 
+// Check if username already exists
+export const checkUsernameExists = async (
+  username: string
+): Promise<boolean> => {
+  try {
+    const existingUser = await prisma.users.findFirst({
+      where: { username },
+    });
+    return !!existingUser;
+  } catch (error) {
+    return true;
+  }
+};
+
+// Check if license already exists
+export const checkLicenseExists = async (license: string): Promise<boolean> => {
+  try {
+    const existingDoctor = await prisma.doctors.findFirst({
+      where: { license },
+    });
+    return !!existingDoctor;
+  } catch (error) {
+    return true;
+  }
+};
+
 // Interface for Doctor entity
 export interface IDoctor {
   doctor_id?: string;
@@ -44,7 +70,7 @@ export const createUser = async (user: IUser): Promise<IUser> => {
     },
   });
 
-  return newUser;
+  return newUser as IUser;
 };
 
 // Create a doctor linked to the user

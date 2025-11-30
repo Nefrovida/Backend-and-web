@@ -40,7 +40,7 @@ const AgendarCitaPage: React.FC = () => {
   };
 
   return (
-    <section className="flex flex-col w-full h-screen">
+    <section className="flex flex-col w-full min-h-screen">
       {/* Content */}
       <div className="flex flex-1 overflow-hidden">
         <AppointmentRequestsList

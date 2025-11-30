@@ -18,6 +18,6 @@ export const createNote = async (data: {
 /**
  * Get notes by patient ID
  */
-export const getNotesByPatient = async (patientId: string) => {
-  return await Notes.getNotesByPatient(patientId);
+export const getNotesByPatient = async (page: number, patientId: string) => {
+  return await Notes.getNotesByPatient(page, patientId);
 };

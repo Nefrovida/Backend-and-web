@@ -29,7 +29,7 @@ const NewMessageModal: FC<Props> = ({ onClick, setSuccess }) => {
         className="bg-white w-1/3 h-2/3 rounded-xl p-4"
         onClick={(e) => e.stopPropagation()}
       >
-        <Title>Nuevo Mensaje</Title>
+        <Title size="medium">Nuevo Mensaje</Title>
         <SelectForum setForumId={setForumId} forums={forums} />
 
         <h2 className="text-lg mb-1">Mensaje</h2>

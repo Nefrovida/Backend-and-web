@@ -43,6 +43,51 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 };
 
 /**
+ * Login controller
+ */
+export const loginMobile = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const loginData: LoginRequest = req.body;
+    const result = await authService.login(loginData);
+
+    if (result.user.role_id !== 3) {
+      res.status(404).json({ error: "Invalid user for this application"});
+      return;
+    }
+    
+    // Set tokens in httpOnly cookies
+    res.cookie('accessToken', result.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    });
+    
+    res.cookie('refreshToken', result.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
+    
+    // Return only user data, not tokens by default
+    // Mobile/native clients can request tokens in the JSON response by
+    // sending the header 'x-return-tokens: true' or query param 'returnTokens=true'
+    const returnTokensHeader = String(req.headers['x-return-tokens'] || '').toLowerCase() === 'true';
+    const returnTokensQuery = String(req.query.returnTokens || '').toLowerCase() === 'true';
+
+    if (returnTokensHeader || returnTokensQuery) {
+      res.status(200).json({ user: result.user, accessToken: result.accessToken, refreshToken: result.refreshToken });
+      return;
+    }
+
+    res.status(200).json({ user: result.user });
+  } catch (error: any) {
+    res.status(error.statusCode || 500).json({ error: error.message });
+  }
+};
+
+/**
  * Register controller
  */
 export const register = async (req: Request, res: Response): Promise<void> => {
