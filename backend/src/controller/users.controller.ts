@@ -71,3 +71,20 @@ export const getProfile = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
+/**
+ * Get first login status
+ */
+export const isFirstLogin = async (req: Request, res: Response): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    const user = await usersService.getUserById(req.user.userId);
+    res.status(200).json(user);
+  } catch (error: any) {
+    res.status(error.statusCode || 500).json({ error: error.message });
+  }
+};
+
