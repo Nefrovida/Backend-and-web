@@ -2,9 +2,9 @@ import { CreateNotePayload, NoteContent } from "@/types/note";
 import { useCallback, useState } from "react";
 
 const MAX_TITLE_LENGHT = 200;
-const MAX_GENERAL_NOTES_LENGTH = 1000;
-const MAX_AILMENTS_LENGTH = 1000;
-const MAX_PRESCRIPTION_LENGTH = 2000;
+const MAX_GENERAL_NOTES_LENGTH = 3000;
+const MAX_AILMENTS_LENGTH = 3000;
+const MAX_PRESCRIPTION_LENGTH = 3000;
 
 function usePostNotes(
   selectedPatientId: string,
