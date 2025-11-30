@@ -71,3 +71,21 @@ export const getProfile = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
+/**
+ * Get first login status
+ */
+export const isFirstLogin = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const user_id  = req.params.user_id;
+    if (!user_id) {
+      res.status(400).json({ error: 'User ID is required' });
+      return;
+    }
+
+    const isFirstLogin = await usersService.isFirstLogin(user_id);
+    res.status(200).json({ isFirstLogin });
+    
+  } catch (error: any) {
+    res.status(error.statusCode || 500).json({ error: error.message });
+  }
+}
