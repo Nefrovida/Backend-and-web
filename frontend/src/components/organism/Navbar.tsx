@@ -28,6 +28,7 @@ import ConfirmModal from "../molecules/ConfirmModal";
 import { ROLE_IDS } from "../../types/auth.types";
 import { authService } from "../../services/auth.service";
 import { PiFlaskFill, PiFlaskLight } from "react-icons/pi";
+import { ImUserTie } from "react-icons/im";
 
 interface Props {
   children: React.ReactNode;
@@ -107,10 +108,9 @@ const CustomLink = ({
           className={({ isActive }) => `
             group relative flex items-center justify-center w-12 h-12 
             transition-all duration-300 ease-out rounded-xl cursor-pointer
-            ${
-              isActive
-                ? "bg-blue-50 text-blue-600 scale-105 shadow-sm ring-1 ring-blue-100"
-                : "text-gray-500 hover:bg-gray-100 hover:text-gray-700 hover:scale-110"
+            ${isActive
+              ? "bg-blue-50 text-blue-600 scale-105 shadow-sm ring-1 ring-blue-100"
+              : "text-gray-500 hover:bg-gray-100 hover:text-gray-700 hover:scale-110"
             }
           `}
         >
@@ -163,10 +163,9 @@ const NavButton = ({
           className={`
             group relative flex items-center justify-center w-12 h-12 
             transition-all duration-300 ease-out rounded-xl cursor-pointer border-none outline-none
-            ${
-              isActive
-                ? activeStyle
-                : "text-gray-500 hover:bg-gray-100 hover:text-gray-700 hover:scale-110"
+            ${isActive
+              ? activeStyle
+              : "text-gray-500 hover:bg-gray-100 hover:text-gray-700 hover:scale-110"
             }
           `}
         >
@@ -249,13 +248,22 @@ function Navbar({ children }: Props) {
         <div className="flex flex-col gap-3 items-center w-full justify-center flex-1 py-4 overflow-y-auto scrollbar-hide px-2">
           {/* Only Admins can see this icons */}
           {isAdmin && (
-            <CustomLink
-              label="Registrar Doctor"
-              to="/dashboard/registrar-doctor"
-              icon={<FaUserMd />}
-              activeIcon={<FaUserMd />}
-              end
-            />
+            <>
+              <CustomLink
+                label="Registrar Doctor"
+                to="/dashboard/registrar-doctor"
+                icon={<FaUserMd />}
+                activeIcon={<FaUserMd />}
+                end
+              />
+              <CustomLink
+                label="Registrar Admin"
+                to="/dashboard/registrar-admin"
+                icon={<ImUserTie />}
+                activeIcon={<ImUserTie />}
+                end
+              />
+            </>
           )}
 
           {/* Upload Results, only Laboratorist */}
@@ -381,10 +389,9 @@ function Navbar({ children }: Props) {
           fixed top-4 bottom-4 left-[6.5rem] z-[70]
           bg-white shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] rounded-3xl border border-gray-100
           overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]
-          ${
-            showNotes
-              ? "opacity-100 translate-x-0"
-              : "w-0 opacity-0 -translate-x-4 pointer-events-none"
+          ${showNotes
+            ? "opacity-100 translate-x-0"
+            : "w-0 opacity-0 -translate-x-4 pointer-events-none"
           }
         `}
       >

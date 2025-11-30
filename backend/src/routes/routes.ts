@@ -1,6 +1,7 @@
 // backend/src/routes/routes.ts
 import express from "express";
 import doctorRoutes from "./doctor.routes";
+import adminRoutes from "./admin.routes";
 import labRoutes from "./lab.routes";
 import authRoutes from "./auth.routes";
 import usersRoutes from "./users.routes";
@@ -87,12 +88,12 @@ router.use("/agenda", agendaRoutes);
 // ============================================
 // Appointments Routes (Protected)
 // ============================================
-router.use("/appointments", appointmentRoutes); 
+router.use("/appointments", appointmentRoutes);
 
 // ============================================
 // Appointments Routes (Protected)
 // ============================================
-router.use("/appointments", appointmentRoutes); 
+router.use("/appointments", appointmentRoutes);
 
 // ============================================
 // Historial Routes (Patient Analysis History)
@@ -112,5 +113,10 @@ router.use("/analysis", analysisRoutes);
 // Doctors Routes (Protected)
 // ============================================
 router.use("/doctors", doctorRoutes);
+
+// ============================================
+// Admin Routes (Protected)
+// ============================================
+router.use("/admins", adminRoutes);
 
 export default router;
