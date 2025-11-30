@@ -33,9 +33,9 @@ router.put(
 // GET /api/appointments/patient/get-notes/:id
 router.get(
   '/patient/get-notes/:id',
-  //authenticate,
-  //requirePrivileges([Privilege.VIEW_NOTES]),
-  AppointmentController.getPatientApointment
+  authenticate,
+  requirePrivileges([Privilege.VIEW_NOTES]),
+  AppointmentController.getPatientAppointment
 );
 
 export default router;

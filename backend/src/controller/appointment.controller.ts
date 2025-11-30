@@ -93,7 +93,7 @@ export default class AppointmentController {
     }
   }
 
-  static async getPatientApointment(req: Request, res: Response){
+  static async getPatientAppointment(req: Request, res: Response){
     try {
       const {id} = req.params;
       const data = await getAppointmentByPatient(id);
