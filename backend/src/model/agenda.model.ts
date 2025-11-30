@@ -1,3 +1,4 @@
+import { ANALYSIS_STATUS } from "@prisma/client";
 import { prisma } from "../util/prisma";
 
 
@@ -145,6 +146,16 @@ export default class Agenda {
     await prisma.patient_appointment.update({
       where: { patient_appointment_id: id },
       data: { appointment_status: "CANCELED" },
+    });
+  }
+
+  /**
+   * Mobile – Cancel analysis by patient_analysis_id
+   */
+  static async cancelAnalysis(id: number) {
+    await prisma.patient_analysis.update({
+      where: { patient_analysis_id: id },
+      data: { analysis_status: {set: ANALYSIS_STATUS.CANCELED} },
     });
   }
 

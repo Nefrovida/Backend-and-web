@@ -28,4 +28,31 @@ async function cancelAppointment(req: Request, res: Response) {
     }
 }
 
-export default cancelAppointment;
+    async function cancelAnalysis(req: Request, res: Response) {
+        try {
+            const idParam = req.params.id;
+
+            if (!idParam) {
+                return res
+                    .status(400)
+                    .json({ error: "Parameter 'id' is required (e.g., ?id=1)" });
+            }
+
+            const id = Number(idParam);
+
+            if (isNaN(id)) {
+                return res
+                    .status(400)
+                    .json({ error: "Parameter 'id' must be a number" });
+            }
+
+            await Agenda.cancelAnalysis(id);
+
+            return res.status(204).send();
+        } catch (error) {
+            console.error("Error canceling appointment:", error);
+            res.status(500).json({ error: "Failed to cancel appointment" });
+        }
+    }
+
+export {cancelAppointment, cancelAnalysis};
