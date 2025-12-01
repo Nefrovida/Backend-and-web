@@ -84,12 +84,11 @@ export const appointmentTypeService = {
   // UPDATE
   // ==============================
   async update(id: number, data: UpdateAppointmentTypeData) {
-    const res = await fetch(`${API_BASE_URL}/appointments/${id}`, {
+    const res = await fetch(`${API_BASE_URL}/appointments/modify/${id}`, {
       method: "PUT",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        appointment_id: data.appointmentId,
         doctor_id: data.doctorId,
         name: data.name,
         general_cost: data.cost,
@@ -100,7 +99,7 @@ export const appointmentTypeService = {
 
     if (!res.ok) {
       const json = await res.json().catch(() => ({}));
-      throw new Error(json?.message || "Error al actualizar servicio");
+      throw new Error(json?.message || "Error al actualizar servicio médico");
     }
 
     return res.json();
@@ -110,14 +109,14 @@ export const appointmentTypeService = {
   // DELETE
   // ==============================
   async delete(id: number) {
-    const res = await fetch(`${API_BASE_URL}/appointments/${id}`, {
-      method: "DELETE",
+    const res = await fetch(`${API_BASE_URL}/appointments/delete/${id}`, {
+      method: "PUT",
       credentials: "include",
     });
 
     if (!res.ok) {
       const json = await res.json().catch(() => ({}));
-      throw new Error(json?.message || "Error al eliminar servicio");
+      throw new Error(json?.message || "Error al eliminar servicio médico");
     }
 
     return res.json();

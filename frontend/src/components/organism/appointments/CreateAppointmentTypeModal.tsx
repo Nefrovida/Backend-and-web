@@ -22,6 +22,9 @@ const CreateAppointmentTypeModal: React.FC<Props> = ({
   const [communityCost, setCommunityCost] = useState("");
   const [imageUrl, setImageUrl] = useState("");
 
+  // Errores por campo
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
   useEffect(() => {
     if (isOpen) {
       setDoctorId("");
@@ -29,26 +32,70 @@ const CreateAppointmentTypeModal: React.FC<Props> = ({
       setGeneralCost("");
       setCommunityCost("");
       setImageUrl("");
+      setErrors({});
     }
   }, [isOpen]);
 
+  const validate = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    // Doctor
+    if (!doctorId.trim()) newErrors.doctorId = "Selecciona un doctor";
+
+    // Nombre
+    if (!name.trim()) newErrors.name = "El nombre es obligatorio";
+    else if (name.trim().length < 3)
+      newErrors.name = "Debe tener mínimo 3 caracteres";
+
+    // Costo general
+    if (!generalCost.trim()) newErrors.generalCost = "El costo es obligatorio";
+    else if (isNaN(Number(generalCost)))
+      newErrors.generalCost = "Debe ser un número";
+    else if (Number(generalCost) <= 0)
+      newErrors.generalCost = "Debe ser mayor a 0";
+
+    // Costo comunitario
+    if (!communityCost.trim()) newErrors.communityCost = "El costo es obligatorio";
+    else if (isNaN(Number(communityCost)))
+      newErrors.communityCost = "Debe ser un número";
+    else if (Number(communityCost) <= 0)
+      newErrors.communityCost = "Debe ser mayor a 0";
+    
+    // Imagen (si se llena)
+    if (imageUrl.trim()) {
+      try {
+        new URL(imageUrl);
+      } catch (_) {
+        newErrors.imageUrl = "Debe ser una URL válida";
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleConfirm = () => {
+    if (!validate()) return;
+
     onConfirm({
       doctorId,
-      name,
+      name: name.trim(),
       cost: Number(generalCost),
       communityCost: communityCost ? Number(communityCost) : undefined,
-      imageUrl,
+      imageUrl: imageUrl || undefined,
     });
   };
 
   return (
     <ModalBase isOpen={isOpen} onClose={onClose} title="Nuevo Servicio Médico">
 
+      {/* DOCTOR */}
       <div className="mb-3">
-        <label>Doctor</label>
+        <label className="font-semibold">Doctor</label>
         <select
-          className="w-full p-2 border rounded"
+          className={`w-full p-2 border rounded ${
+            errors.doctorId ? "border-red-500" : ""
+          }`}
           value={doctorId}
           onChange={(e) => setDoctorId(e.target.value)}
         >
@@ -59,32 +106,82 @@ const CreateAppointmentTypeModal: React.FC<Props> = ({
             </option>
           ))}
         </select>
+        {errors.doctorId && (
+          <p className="text-red-500 text-sm">{errors.doctorId}</p>
+        )}
       </div>
 
+      {/* NOMBRE */}
       <div className="mb-3">
-        <label>Nombre</label>
-        <input className="w-full p-2 border rounded" value={name} onChange={(e) => setName(e.target.value)} />
+        <label className="font-semibold">Nombre</label>
+        <input
+          className={`w-full p-2 border rounded ${
+            errors.name ? "border-red-500" : ""
+          }`}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+        {errors.name && (
+          <p className="text-red-500 text-sm">{errors.name}</p>
+        )}
       </div>
 
+      {/* IMAGEN */}
       <div className="mb-3">
-        <label>Imagen URL</label>
-        <input className="w-full p-2 border rounded" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} />
+        <label className="font-semibold">Imagen URL (opcional)</label>
+        <input
+          className={`w-full p-2 border rounded ${
+            errors.imageUrl ? "border-red-500" : ""
+          }`}
+          value={imageUrl}
+          onChange={(e) => setImageUrl(e.target.value)}
+        />
+        {errors.imageUrl && (
+          <p className="text-red-500 text-sm">{errors.imageUrl}</p>
+        )}
       </div>
 
+      {/* COSTOS */}
       <div className="grid grid-cols-2 gap-2">
         <div>
-          <label>Costo</label>
-          <input className="w-full p-2 border rounded" value={generalCost} onChange={(e) => setGeneralCost(e.target.value)} />
+          <label className="font-semibold">Costo General</label>
+          <input
+            className={`w-full p-2 border rounded ${
+              errors.generalCost ? "border-red-500" : ""
+            }`}
+            value={generalCost}
+            onChange={(e) => setGeneralCost(e.target.value)}
+            inputMode="decimal"
+          />
+          {errors.generalCost && (
+            <p className="text-red-500 text-sm">{errors.generalCost}</p>
+          )}
         </div>
+
         <div>
-          <label>Comunitario</label>
-          <input className="w-full p-2 border rounded" value={communityCost} onChange={(e) => setCommunityCost(e.target.value)} />
+          <label className="font-semibold">Costo Comunitario</label>
+          <input
+            className={`w-full p-2 border rounded ${
+              errors.communityCost ? "border-red-500" : ""
+            }`}
+            value={communityCost}
+            onChange={(e) => setCommunityCost(e.target.value)}
+            inputMode="decimal"
+          />
+          {errors.communityCost && (
+            <p className="text-red-500 text-sm">{errors.communityCost}</p>
+          )}
         </div>
       </div>
 
+      {/* BOTONES */}
       <div className="flex justify-end gap-2 mt-4">
-        <Button variant="secondary" onClick={onClose}>Cancelar</Button>
-        <Button variant="primary" onClick={handleConfirm}>Crear</Button>
+        <Button variant="secondary" onClick={onClose}>
+          Cancelar
+        </Button>
+        <Button variant="primary" onClick={handleConfirm}>
+          Crear
+        </Button>
       </div>
     </ModalBase>
   );

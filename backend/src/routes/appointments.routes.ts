@@ -32,8 +32,8 @@ router.post("/new-appointment",
   appointmentsController.createAppointment);
 
 router.put("/modify/:appointment_id",
-//authenticate,
-//requirePrivileges([Privilege.CREATE_APPOINTMENTS]),
+authenticate,
+requirePrivileges([Privilege.CREATE_APPOINTMENTS]),
 appointmentsController.updateAppointment);
 
 router.put("/delete/:appointment_id",
