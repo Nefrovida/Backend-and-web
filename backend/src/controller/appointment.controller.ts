@@ -44,6 +44,7 @@ export default class AppointmentController {
     try {
       const { id } = req.params;
       const { date_hour, reason } = req.body;
+      console.log("date hour passed to reschedule appointment: ", date_hour);
 
       // Validaciones
       if (!date_hour || !reason) {
@@ -64,7 +65,19 @@ export default class AppointmentController {
       }
 
       // Verificar que la fecha no sea en el pasado
-      const newDate = new Date(date_hour);
+      // Parse date_hour string (format: "YYYY-MM-DD HH:mm") and create Date object
+      // Parse manually to avoid timezone conversion issues
+      const dateMatch = date_hour.match(/^(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2})/);
+      if (!dateMatch) {
+        return res.status(400).json({ 
+          error: 'Formato de fecha/hora inválido. Use: YYYY-MM-DD HH:mm' 
+        });
+      }
+      
+      const [, year, month, day, hour, minute] = dateMatch.map(Number);
+      // Create Date object treating the input as UTC to avoid timezone shifts
+      const newDate = new Date(Date.UTC(year, month - 1, day, hour, minute));
+      
       if (newDate < new Date()) {
         return res.status(400).json({ 
           error: 'No se puede agendar en el pasado' 
