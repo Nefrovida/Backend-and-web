@@ -147,6 +147,7 @@ model appointments {
   general_cost         Float
   community_cost       Float
   image_url            String?
+  active               Boolean               @default(true)
   doctor               doctors               @relation(fields: [doctor_id], references: [doctor_id], onDelete: Cascade)
   patient_appointments patient_appointment[]
 }
