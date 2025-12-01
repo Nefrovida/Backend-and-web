@@ -19,9 +19,9 @@ async function postNote(req: Request, res: Response) {
     const validatedData = createNoteSchema.parse(req.body);
 
     // Verify that the patient belongs to the authenticated doctor
-    const patientBelongsToDoctor = Notes.patientBelogsToDoctor(
-      userId,
-      validatedData.patientId
+    const patientBelongsToDoctor = await Notes.patientBelogsToDoctor(
+      validatedData.patientId,
+      userId
     );
 
     if (!patientBelongsToDoctor) {
@@ -30,14 +30,31 @@ async function postNote(req: Request, res: Response) {
         .json({ error: "Forbidden: patient does not belong to this doctor" });
     }
 
+    // Verify that the appointment exists and belongs to the patient (if provided)
+    if (validatedData.patient_appointment_id) {
+      const appointmentBelongsToPatient =
+        await Notes.appointmentBelongsToPatient(
+          validatedData.patient_appointment_id,
+          validatedData.patientId
+        );
+
+      if (!appointmentBelongsToPatient) {
+        return res.status(400).json({
+          error: "Appointment not found or does not belong to this patient",
+        });
+      }
+    }
+
     // Create the note using the service
     const note = await notesService.createNote({
       patient_id: validatedData.patientId,
+      patient_appointment_id: validatedData.patient_appointment_id,
       title: validatedData.title,
       content: validatedData.content || "",
       general_notes: validatedData.general_notes,
       ailments: validatedData.ailments,
       prescription: validatedData.prescription,
+      additional_notes: validatedData.additional_notes,
       visibility: validatedData.visibility,
     });
 

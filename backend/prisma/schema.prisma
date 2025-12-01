@@ -175,6 +175,7 @@ model notes {
   general_notes          String?
   ailments               String?
   prescription           String?
+  additional_notes       String?
   visibility             Boolean              @default(true)
   creation_date          DateTime             @default(now())
   patient_appointment    patient_appointment? @relation(fields: [patient_appointment_id], references: [patient_appointment_id], onDelete: Cascade)
