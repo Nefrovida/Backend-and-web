@@ -108,7 +108,8 @@ export const getDoctorAppointments = async (doctorId: string) => {
     return await prisma.appointments.findFirst({
       where: {
         name: validatedData.name,
-        doctor_id: validatedData.doctor_id
+        doctor_id: validatedData.doctor_id,
+        active: true,
       },
     });
   };

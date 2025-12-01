@@ -24,7 +24,7 @@ const EditAppointmentTypeModal: React.FC<Props> = ({
   const [community, setCommunity] = useState("");
   const [image, setImage] = useState("");
 
-  // Errores UI
+
   const [errorName, setErrorName] = useState("");
   const [errorGeneral, setErrorGeneral] = useState("");
   const [errorCommunity, setErrorCommunity] = useState("");
@@ -42,11 +42,11 @@ const EditAppointmentTypeModal: React.FC<Props> = ({
     }
   }, [appointmentType]);
 
-  // Validación inline
+
   const validate = (): boolean => {
     let valid = true;
 
-    // Validación nombre
+
     if (name && name.trim().length < 3) {
       setErrorName("El nombre debe tener al menos 3 caracteres.");
       valid = false;
@@ -54,7 +54,6 @@ const EditAppointmentTypeModal: React.FC<Props> = ({
       setErrorName("");
     }
 
-    // Costo General
     if (!general) {
       setErrorGeneral("El costo general es obligatorio.");
       valid = false;
@@ -68,7 +67,6 @@ const EditAppointmentTypeModal: React.FC<Props> = ({
       setErrorGeneral("");
     }
 
-    // Costo Comunitario (opcional)
     if (!community) {
       setErrorCommunity("El costo general es obligatorio.");
       valid = false;

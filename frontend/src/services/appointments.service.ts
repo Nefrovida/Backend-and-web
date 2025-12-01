@@ -62,7 +62,7 @@ export const appointmentTypeService = {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
-      // Backend espera snake_case
+      // Backend expects snake_case keys
       body: JSON.stringify({
         doctor_id: data.doctorId,
         name: data.name,

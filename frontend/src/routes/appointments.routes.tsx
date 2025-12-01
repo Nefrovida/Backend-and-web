@@ -14,7 +14,7 @@ const appointmentsRoutes: RouteObject[] = [
     ),
   },
   {
-    // Solo Admin (1) y Secretaria (6) pueden administrar tipos de cita
+
     path: "citas",
     element: (
       <ProtectedRoute allowedRoles={[1, 6]}>

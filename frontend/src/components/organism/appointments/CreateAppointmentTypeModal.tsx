@@ -22,7 +22,6 @@ const CreateAppointmentTypeModal: React.FC<Props> = ({
   const [communityCost, setCommunityCost] = useState("");
   const [imageUrl, setImageUrl] = useState("");
 
-  // Errores por campo
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -39,29 +38,24 @@ const CreateAppointmentTypeModal: React.FC<Props> = ({
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
 
-    // Doctor
     if (!doctorId.trim()) newErrors.doctorId = "Selecciona un doctor";
 
-    // Nombre
     if (!name.trim()) newErrors.name = "El nombre es obligatorio";
     else if (name.trim().length < 3)
       newErrors.name = "Debe tener mínimo 3 caracteres";
 
-    // Costo general
     if (!generalCost.trim()) newErrors.generalCost = "El costo es obligatorio";
     else if (isNaN(Number(generalCost)))
       newErrors.generalCost = "Debe ser un número";
     else if (Number(generalCost) <= 0)
       newErrors.generalCost = "Debe ser mayor a 0";
 
-    // Costo comunitario
     if (!communityCost.trim()) newErrors.communityCost = "El costo es obligatorio";
     else if (isNaN(Number(communityCost)))
       newErrors.communityCost = "Debe ser un número";
     else if (Number(communityCost) <= 0)
       newErrors.communityCost = "Debe ser mayor a 0";
-    
-    // Imagen (si se llena)
+
     if (imageUrl.trim()) {
       try {
         new URL(imageUrl);
