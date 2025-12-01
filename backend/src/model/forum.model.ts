@@ -124,8 +124,15 @@ export default class Forum {
             name: true,
           },
         },
+        user: {
+          select: {
+            name: true,
+            parent_last_name: true,
+            maternal_last_name: true,
+            username: true,
+          },
+        },
       },
-
       orderBy: {
         publication_timestamp: "desc",
       },
