@@ -1,18 +1,80 @@
-import { FC } from "react";
-import { BsX } from "react-icons/bs";
-import { FaCheck } from "react-icons/fa";
+import React from "react";
+import "../../../styles/Calendar.css"; 
 
-interface Props{
-    modalStatus : boolean
+interface AppointmentModalProps {
+  event: {
+    title: string;
+    description: string;
+    start: Date | null;
+    end: Date | null;
+  };
+  onClose: () => void;
+  onReschedule: () => void;
+  onCancel: () => void; 
 }
 
-const AppoinmentModal: FC<Props> = ({modalStatus})=>{
-    return(
-        <div className = {`flex justify-around bg-white absolute left-[32%] top-6 w-[30vw] text-xl items-center py-2 rounded-md border-2 ${modalStatus ? 'border-green-500' : 'border-red-600'}`}>
-            {modalStatus ? <FaCheck className = "text-green-500 size-6"/> : <BsX className = "text-red-600 size-10"/>}
-            {modalStatus ? "Se eliminó exitosamente." : "ERROR: No se pudo eliminar."}
+export const AppointmentModal: React.FC<AppointmentModalProps> = ({
+  event,
+  onClose,
+  onReschedule,
+  onCancel,
+}) => {
+  const formatDate = (date: Date | null) => {
+    if (!date) return "";
+    return new Intl.DateTimeFormat("es-MX", {
+      dateStyle: "full",
+      timeStyle: "short",
+    }).format(date);
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <h2>Detalles de la Cita</h2>
+          <button className="modal-close" onClick={onClose}>
+            ×
+          </button>
         </div>
-    );
-}
+        <div className="modal-body">
+          <div className="modal-field">
+            <strong>Paciente:</strong> {event.title}
+          </div>
+          <div className="modal-field">
+            <strong>Cita:</strong> {event.description}
+          </div>
+          {event.start && (
+            <div className="modal-field">
+              <strong>Fecha y hora:</strong> {formatDate(event.start)}
+            </div>
+          )}
+        </div>
+        
+        <div className="modal-footer flex gap-2 justify-end">
+          
+          <button className="modal-button-primary" onClick={onReschedule}>
+            Reagendar
+          </button>
 
-export default AppoinmentModal;
+          <button 
+            className="modal-button-primary" 
+            onClick={() => {
+                if(window.confirm("¿Estás seguro de eliminar esta cita?")) {
+                    onCancel();
+                }
+            }}
+            style={{ backgroundColor: '#dc2626', borderColor: '#dc2626' }} 
+          >
+            Cancelar Cita
+          </button>
+
+          <button className="modal-button-secondary" onClick={onClose}>
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AppointmentModal;
