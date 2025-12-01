@@ -20,6 +20,8 @@ async function getForumFeed(req: Request, res: Response) {
       await Forum.getForumFeed(pageNumber, userId, forumId)
     ).map(parseMessages);
 
+    console.log(messages);
+
     res.status(200).json(messages);
   } catch (e) {
     res
@@ -29,6 +31,16 @@ async function getForumFeed(req: Request, res: Response) {
 }
 
 function parseMessages(m: Message): ParsedMessage {
+  const fullName = [
+    m.user.name,
+    m.user.parent_last_name,
+    m.user.maternal_last_name,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const userName = fullName || m.user.username || "Usuario";
+
   return {
     messageId: m.message_id,
     content: m.content,
@@ -38,6 +50,7 @@ function parseMessages(m: Message): ParsedMessage {
       forumId: m.forum.forum_id,
       name: m.forum.name,
     },
+    userName,
   };
 }
 

@@ -10,7 +10,7 @@ const ForumList = () => {
 
   useEffect(() => {
     setIsLoading(true);
-    fetch("/api/forums/myForums")
+    fetch("/api/forums/myForums/web")
       .then((res) => {
         if (!res.ok) {
           console.log("Error in response");
