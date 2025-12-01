@@ -69,10 +69,11 @@ router.post(
   cancelAppointment,
 );
 
+//cancel analysis
 router.post(
   "/analysis/:id/cancel",
-  //authenticate,
-  //requirePrivileges([Privilege.CREATE_ANALYSIS]),
+  authenticate,
+  requirePrivileges([Privilege.CREATE_ANALYSIS]),
   cancelAnalysis
 );
 
