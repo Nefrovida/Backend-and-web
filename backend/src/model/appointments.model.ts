@@ -113,6 +113,33 @@ export const getDoctorAppointments = async (doctorId: string) => {
     });
   };
 
+  export const updateAppointment = async (appointmentId: number, updateData: any) => {
+    try {
+      const updatedAppointment = await prisma.appointments.update({
+        where: { appointment_id: appointmentId },
+        data: updateData,
+      });
+      return updatedAppointment;
+    } catch (error) {
+      if (error instanceof ZodError) {
+        throw new Error(`Validation error: ${error.errors.map(e => e.message).join(', ')}`);
+      }
+      throw error;
+    }
+  };
+
+  export const deleteAppointment = async (appointmentId: number) => {
+    try {
+      const deletedAppointment = await prisma.appointments.update({
+        where: { appointment_id: appointmentId },
+        data: { active: false },
+      });
+      return deletedAppointment;
+    } catch (error) {
+      throw error;
+    }
+  };
+
   export const getAppointmentByUserId = async (req: Request, res: Response, UserId: string) =>{
     const patientId  = await prisma.patients.findFirst({
         where: {

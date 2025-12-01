@@ -70,6 +70,16 @@ export const updateAppointmentTypeSchema = z
     image_url: z
       .string()
       .url('La imagen debe ser una URL válida')
+      .optional()
+      .or(z.literal('')),
+
+    doctor_id: z
+      .string()
+      .uuid('El doctor_id debe ser un UUID válido')
+      .optional(),
+    
+    active: z
+      .boolean()
       .optional(),
   })
   .refine((data) => Object.keys(data).length > 0, {

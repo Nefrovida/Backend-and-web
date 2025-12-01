@@ -50,6 +50,22 @@ export const createAppointment = async (validatedData: any) => {
 };
 
 /**
+ * @param appointmentId ID of the appointment to update
+ * @param updateData Data to update the appointment with
+ */
+
+export const updateAppointment = async (appointmentId: number, updateData: any) => {
+  return await appointmentsModel.updateAppointment(appointmentId, updateData);
+};
+
+/**
+ * @param appointmentId ID of the appointment to delete
+ */
+export const deleteAppointment = async (appointmentId: number) => {
+  return await appointmentsModel.deleteAppointment(appointmentId);
+};  
+
+/**
  *
  * @param validateData data of appointment
  */
