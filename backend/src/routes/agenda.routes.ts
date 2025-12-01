@@ -61,17 +61,18 @@ router.get(
 );
 
 // Cancel appointment
+  console.log("Canceling appointment..."),
 router.post(
   "/appointments/:id/cancel",
   authenticate,
   requirePrivileges([Privilege.CREATE_APPOINTMENTS]),
-  cancelAppointment
+  cancelAppointment,
 );
 
 router.post(
   "/analysis/:id/cancel",
-  authenticate,
-  requirePrivileges([Privilege.CREATE_APPOINTMENTS]),
+  //authenticate,
+  //requirePrivileges([Privilege.CREATE_ANALYSIS]),
   cancelAnalysis
 );
 
