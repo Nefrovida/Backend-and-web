@@ -105,7 +105,7 @@ const CreateAppointmentTypeModal: React.FC<Props> = ({
         )}
       </div>
 
-      {/* NOMBRE */}
+      {/* NAME */}
       <div className="mb-3">
         <label className="font-semibold">Nombre</label>
         <input
@@ -120,7 +120,7 @@ const CreateAppointmentTypeModal: React.FC<Props> = ({
         )}
       </div>
 
-      {/* IMAGEN */}
+      {/* IMAGE */}
       <div className="mb-3">
         <label className="font-semibold">Imagen URL (opcional)</label>
         <input
@@ -135,7 +135,7 @@ const CreateAppointmentTypeModal: React.FC<Props> = ({
         )}
       </div>
 
-      {/* COSTOS */}
+      {/* COST */}
       <div className="grid grid-cols-2 gap-2">
         <div>
           <label className="font-semibold">Costo General</label>
@@ -168,7 +168,7 @@ const CreateAppointmentTypeModal: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* BOTONES */}
+      {/* BUTTON */}
       <div className="flex justify-end gap-2 mt-4">
         <Button variant="secondary" onClick={onClose}>
           Cancelar
