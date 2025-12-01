@@ -61,7 +61,6 @@ router.get(
 );
 
 // Cancel appointment
-  console.log("Canceling appointment..."),
 router.post(
   "/appointments/:id/cancel",
   authenticate,
