@@ -1,9 +1,11 @@
 import React from "react";
 import "../../styles/Calendar.css";
+import DeleteAppoinmentButton from "../atoms/appointments/DeleteAppoinmentButton";
 
 interface AppointmentModalProps {
   event: {
     title: string;
+    id: number;
     description: string;
     start: Date | null;
     end: Date | null;
@@ -48,11 +50,9 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
           )}
         </div>
         <div className="modal-footer">
+          <DeleteAppoinmentButton appointmentId={event.id} onClick={onClose} />
           <button className="modal-button-primary" onClick={onReschedule}>
             Reagendar
-          </button>
-          <button className="modal-button-secondary" onClick={onClose}>
-            Cerrar
           </button>
         </div>
       </div>
