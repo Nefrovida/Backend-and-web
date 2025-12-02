@@ -7,7 +7,7 @@ type Props = {
 };
 
 const ChangePasswordForm: React.FC<Props> = ({ onChangePassword }) => {
-  const [form, setForm] = useState({ currentPassword: '', newPassword: '', confirmNewPassword: '' });
+  const [form, setForm] = useState({ newPassword: '', confirmNewPassword: '' });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -25,10 +25,6 @@ const ChangePasswordForm: React.FC<Props> = ({ onChangePassword }) => {
 
   return (
     <form onSubmit={submit} className="space-y-4">
-      <div>
-        <label className="block text-sm text-gray-600">Contraseña actual</label>
-        <input type="password" className="w-full p-2 border rounded mt-1" value={form.currentPassword} onChange={e => setForm({...form, currentPassword: e.target.value})} />
-      </div>
       <div>
         <label className="block text-sm text-gray-600">Nueva contraseña</label>
         <input type="password" className="w-full p-2 border rounded mt-1" value={form.newPassword} onChange={e => setForm({...form, newPassword: e.target.value})} />
