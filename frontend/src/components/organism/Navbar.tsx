@@ -260,6 +260,13 @@ function Navbar({ children }: Props) {
                 end
               />
               <CustomLink
+                label="Usuarios Rechazados"
+                to="/dashboard/rejected-users"
+                icon={<FaUserCheck />}
+                activeIcon={<FaUserCheck />}
+                end
+              />
+              <CustomLink
                 label="Registrar Doctor"
                 to="/dashboard/registrar-doctor"
                 icon={<FaUserMd />}

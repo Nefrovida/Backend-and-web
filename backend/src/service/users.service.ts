@@ -147,6 +147,31 @@ export const getPendingUsers = async (): Promise<UserWithRoleAndPrivileges[]> =>
 };
 
 /**
+ * Get all rejected users
+ */
+export const getRejectedUsers = async (): Promise<UserWithRoleAndPrivileges[]> => {
+  return await prisma.users.findMany({
+    where: {
+      user_status: 'REJECTED'
+    },
+    include: {
+      role: {
+        include: {
+          role_privileges: {
+            include: {
+              privilege: true,
+            },
+          },
+        },
+      },
+    },
+    orderBy: {
+      registration_date: 'desc'
+    }
+  });
+};
+
+/**
  * Approve a user by setting their status to APPROVED and active to true
  */
 export const approveUser = async (

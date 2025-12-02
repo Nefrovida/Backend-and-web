@@ -20,8 +20,8 @@ router.get("/health", (_req, res) => {
 // ============================================
 router.get("/profile", authenticate, usersController.getProfile);
 
-router.get("/first-login/:user_id", 
-  authenticate, 
+router.get("/first-login/:user_id",
+  authenticate,
   usersController.isFirstLogin);
 
 // Get all external users (users without role-specific records)
@@ -90,6 +90,13 @@ router.get(
   authenticate,
   requirePrivileges([Privilege.APPROVE_USERS]),
   usersController.getPendingUsers
+);
+
+router.get(
+  "/rejected/all",
+  authenticate,
+  requirePrivileges([Privilege.APPROVE_USERS]),
+  usersController.getRejectedUsers
 );
 
 router.put(

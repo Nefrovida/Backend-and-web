@@ -35,6 +35,23 @@ export const usersService = {
     return response.json();
   },
 
+  async getRejectedUsers(): Promise<PendingUser[]> {
+    const response = await fetch(`${API_BASE_URL}/users/rejected/all`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || "Failed to fetch rejected users");
+    }
+
+    return response.json();
+  },
+
   async approveUser(userId: string): Promise<void> {
     const response = await fetch(`${API_BASE_URL}/users/${userId}/approve`, {
       method: "PUT",

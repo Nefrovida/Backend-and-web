@@ -84,6 +84,18 @@ export const getPendingUsers = async (req: Request, res: Response): Promise<void
 };
 
 /**
+ * Get all rejected users
+ */
+export const getRejectedUsers = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const rejectedUsers = await usersService.getRejectedUsers();
+    res.status(200).json(rejectedUsers);
+  } catch (error: any) {
+    res.status(error.statusCode || 500).json({ error: error.message });
+  }
+};
+
+/**
  * Approve a user
  */
 export const approveUser = async (req: Request, res: Response): Promise<void> => {
