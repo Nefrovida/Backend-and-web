@@ -472,6 +472,60 @@ static async getAnalysisById(id: number) {
     return availableSlots;
   }
 
+  static async getLaboratoryAvailability(date: string) {
+    // Parse date components to avoid timezone issues
+    const [year, month, day] = date.split('-').map(Number);
+    const targetDate = new Date(year, month - 1, day); // month is 0-indexed in JS Date
+    const startOfDay = new Date(year, month - 1, day, 0, 0, 0, 0);
+    const endOfDay = new Date(year, month - 1, day, 23, 59, 59, 999);
+
+    // Get all scheduled analyses for this date
+    const bookedAnalyses = await prisma.patient_analysis.findMany({
+      where: {
+        analysis_date: {
+          gte: startOfDay,
+          lte: endOfDay,
+        },
+        analysis_status: {
+          in: ["PROGRAMMED", "LAB"],
+        },
+      },
+      select: {
+        analysis_date: true,
+        duration: true,
+      },
+    });
+
+    // Generate available time slots (e.g., 7 AM to 5 PM, every 30 minutes)
+    const availableSlots: string[] = [];
+    const workStart = 7; // 7 AM
+    const workEnd = 17; // 5 PM
+
+    for (let hour = workStart; hour < workEnd; hour++) {
+      for (let minute = 0; minute < 60; minute += 30) {
+        const slotTime = new Date(year, month - 1, day, hour, minute, 0, 0);
+
+        // Check if this slot conflicts with any booked analysis
+        const isBooked = bookedAnalyses.some((analysis) => {
+          if (!analysis.analysis_date) return false;
+          const analysisStart = new Date(analysis.analysis_date);
+          const analysisEnd = new Date(analysisStart.getTime() + analysis.duration * 60000);
+          return slotTime >= analysisStart && slotTime < analysisEnd;
+        });
+
+        if (!isBooked) {
+          availableSlots.push(
+            `${hour.toString().padStart(2, "0")}:${minute
+              .toString()
+              .padStart(2, "0")}`
+          );
+        }
+      }
+    }
+
+    return availableSlots;
+  }
+
   static async scheduleAppointment(data: {
     patientAppointmentId: number;
     doctorId: string;
