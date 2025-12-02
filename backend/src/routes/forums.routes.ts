@@ -53,6 +53,18 @@ router.get("/myForums/web", authenticate, getMyForumsWeb);
 
 router.get("/feed", authenticate, getForumFeed);
 
+/**
+ * Delete a message from a forum
+ *
+ * DELETE /api/forums/messages/:messageId
+ */
+router.delete(
+  "/messages/:messageId",
+  authenticate,
+  requirePrivileges([Privilege.DELETE_FORUMS]),
+  forumsController.deleteMessage
+);
+
 router.get(
   "/",
   authenticate,
@@ -272,33 +284,6 @@ router.get(
   authenticate,
   requirePrivileges([Privilege.VIEW_FORUMS]),
   forumsController.getMessage
-);
-
-/**
- * Delete a message from a forum
- *
- * DELETE /api/forums/messages/:messageId
- *
- * User Story: "Admin deletes message from forum"
- *
- * Path Parameters:
- * - messageId: number - ID of the message to delete
- *
- * Response: 200 OK
- * {
- *   "success": true,
- *   "message": "Mensaje eliminado exitosamente",
- *   "data": {
- *     "message_id": number,
- *     "deleted_at": Date
- *   }
- * }
- */
-router.delete(
-  "/messages/:messageId",
-  authenticate,
-  requirePrivileges([Privilege.DELETE_FORUMS]),
-  forumsController.deleteMessage
 );
 
 export default router;

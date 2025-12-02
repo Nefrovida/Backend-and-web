@@ -2,17 +2,33 @@ import { BasicForumInfo } from "@/types/forum.types";
 import { Link } from "react-router-dom";
 import { HiDotsHorizontal } from "react-icons/hi";
 import { BiLike } from "react-icons/bi";
-import { FC } from "react";
+import { FC, useState } from "react";
 import { MdChatBubbleOutline } from "react-icons/md";
+import { RiDeleteBin6Line } from "react-icons/ri";
+import { authService } from "@/services/auth.service";
+import { ROLE_IDS } from "@/types/auth.types";
 
 interface Props {
+  messageId: number;
   f: BasicForumInfo;
   content: string;
   likes: number;
   comments: number;
+  onDelete?: (messageId: number) => void;
 }
 
-const MessageCard: FC<Props> = ({ f, content, likes, comments }) => {
+const MessageCard: FC<Props> = ({ messageId, f, content, likes, comments, onDelete }) => {
+  const [showMenu, setShowMenu] = useState(false);
+  const currentUser = authService.getCurrentUser();
+  const isAdmin = currentUser?.role_id === ROLE_IDS.ADMIN;
+
+  const handleDeleteClick = () => {
+    setShowMenu(false);
+    if (onDelete) {
+      onDelete(messageId);
+    }
+  };
+
   return (
     <div className="w-8/12 rounded-md border-2 bg-white drop-shadow-sm p-2">
       <section className="flex justify-between">
@@ -22,7 +38,26 @@ const MessageCard: FC<Props> = ({ f, content, likes, comments }) => {
         >
           {f.name}
         </Link>
-        <HiDotsHorizontal className="hover:text-blue-600" />
+        {isAdmin && (
+          <div className="relative">
+            <HiDotsHorizontal
+              className="hover:text-blue-600 cursor-pointer"
+              onClick={() => setShowMenu(!showMenu)}
+            />
+            {showMenu && (
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+                <button
+                  onClick={handleDeleteClick}
+                  className="flex items-center gap-2 w-full px-4 py-2 text-left text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                >
+                  <RiDeleteBin6Line className="text-lg" />
+                  <span className="text-sm font-medium">Eliminar mensaje</span>
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+        {!isAdmin && <HiDotsHorizontal className="text-gray-300 cursor-not-allowed" />}
       </section>
       <section className="w-full text-lg my-2">{content}</section>
       <section className="flex gap-4 items-center">
