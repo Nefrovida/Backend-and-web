@@ -9,6 +9,11 @@ export interface Note {
   prescription: string | null;
   visibility: boolean;
   creation_date: Date | string;
+  patient_appointment?: {
+    appointment?: {
+      name?: string;
+    };
+  };
 }
 
 export interface CreateNotePayload {

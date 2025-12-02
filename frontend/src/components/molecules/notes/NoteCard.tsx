@@ -18,7 +18,7 @@ const NoteCard: FC<Props> = ({ note }) => {
       
       {note.patient_appointment_id ? (
         <div className="mb-2 text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded inline-block">
-          Asociada a consulta #{note.patient_appointment_id}
+          Asociada a consulta: {note.patient_appointment?.appointment?.name || `#${note.patient_appointment_id}`}
         </div>
       ) : (
         <div className="mb-2 text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded inline-block">
