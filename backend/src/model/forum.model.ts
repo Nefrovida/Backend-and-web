@@ -1007,3 +1007,13 @@ export const countReplies = async (parentMessageId: number) => {
     },
   });
 };
+
+/**
+ * Soft delete a message by ID (sets active to false)
+ */
+export const softDeleteMessage = async (messageId: number) => {
+  return await prisma.messages.update({
+    where: { message_id: messageId },
+    data: { active: false },
+  });
+};

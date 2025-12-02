@@ -968,3 +968,86 @@ export const getMessage = async (
     });
   }
 };
+
+/**
+ * Delete a message from a forum
+ *
+ * DELETE /api/forums/messages/:messageId
+ *
+ * Prerequisites (handled by middlewares):
+ * - authenticate: Ensures req.user exists and is valid
+ * - requirePrivileges(['DELETE_FORUMS']): Ensures user has permission
+ *
+ * Response format:
+ * {
+ *   success: true,
+ *   message: "Mensaje eliminado exitosamente",
+ *   data: {
+ *     message_id: number,
+ *     deleted_at: Date
+ *   }
+ * }
+ *
+ * @param req - Express request with messageId in params
+ * @param res - Express response
+ */
+export const deleteMessage = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const messageId = parseInt(req.params.messageId);
+
+    // Validate messageId
+    if (isNaN(messageId)) {
+      res.status(400).json({
+        success: false,
+        error: {
+          code: "INVALID_MESSAGE_ID",
+          message: "El ID del mensaje debe ser un número válido",
+        },
+      });
+      return;
+    }
+
+    // Get userId from authenticated user
+    const userId = req.user!.userId;
+
+    // Call service to delete message
+    const result = await forumsService.deleteMessage(messageId, userId);
+
+    // Return success response
+    res.status(200).json(result);
+  } catch (error: any) {
+    if (error instanceof NotFoundError) {
+      res.status(404).json({
+        success: false,
+        error: {
+          code: "NOT_FOUND",
+          message: error.message,
+        },
+      });
+      return;
+    }
+
+    if (error instanceof BadRequestError) {
+      res.status(403).json({
+        success: false,
+        error: {
+          code: "FORBIDDEN",
+          message: error.message,
+        },
+      });
+      return;
+    }
+
+    console.error("Error deleting message:", error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Error interno del servidor al eliminar el mensaje",
+      },
+    });
+  }
+};

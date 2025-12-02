@@ -368,3 +368,48 @@ export const getMessageReplies = async (
 export const getMessage = async (messageId: number) => {
   return await Forum.getMessage(messageId);
 };
+
+/**
+ * Delete a message from a forum (Admin only)
+ *
+ * Business logic:
+ * 1. Validate that the message exists and is active
+ * 2. Validate that the user is an admin (role_id = 1)
+ * 3. Soft delete the message (set active to false)
+ *
+ * @param messageId - ID of the message to delete
+ * @param userId - User ID from the JWT token
+ * @throws NotFoundError if message doesn't exist or is already inactive
+ * @throws BadRequestError if user is not an admin
+ */
+export const deleteMessage = async (messageId: number, userId: string) => {
+  // 1. Validate that the message exists and is active
+  const message = await forumModel.findMessageById(messageId);
+  if (!message) {
+    throw new NotFoundError("Mensaje no encontrado");
+  }
+
+  if (!message.active) {
+    throw new NotFoundError("El mensaje ya ha sido eliminado");
+  }
+
+  // 2. Validate that the user is an admin
+  const isAdmin = await forumModel.isUserAdmin(userId);
+  if (!isAdmin) {
+    throw new BadRequestError(
+      "Solo los administradores pueden eliminar mensajes"
+    );
+  }
+
+  // 3. Soft delete the message
+  await forumModel.softDeleteMessage(messageId);
+
+  return {
+    success: true,
+    message: "Mensaje eliminado exitosamente",
+    data: {
+      message_id: messageId,
+      deleted_at: new Date(),
+    },
+  };
+};
