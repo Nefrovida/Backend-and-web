@@ -10,7 +10,7 @@ const Notes = ({ className }: { className?: string }) => {
   const [validationError, setValidationError] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
 
-  const { isLoading, error, setNoteData, handleSave } = usePostNotes(
+  const { isLoading, error, noteData, setNoteData, handleSave } = usePostNotes(
     selectedPatientId,
     setValidationError,
     setShowModal
@@ -36,6 +36,7 @@ const Notes = ({ className }: { className?: string }) => {
               validationError={validationError}
               error={error}
               isLoading={isLoading}
+              title={noteData.title}
               setShowModal={setShowModal}
               handleSave={handleSave}
               setNoteData={setNoteData}

@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { ANALYSIS_STATUS, PrismaClient } from "@prisma/client";
 import {Request, Response} from 'express';
 import { ZodError } from 'zod';
 
@@ -149,31 +149,34 @@ export const getDoctorAppointments = async (doctorId: string) => {
     });
 
     if (!patientId) {
-        return res.status(404).json({ error: 'Patient not found' });
+        return res.status(404).json({ error: "Patient not found" });
     }
-      const appointments = await prisma.patient_appointment.findMany({
-          where: { patient_id: patientId.patient_id},
-          include: {
+
+    const appointments = await prisma.patient_appointment.findMany({
+        where: {
+            patient_id: patientId.patient_id,
+            appointment_status: { not: "CANCELED" }
+        },
+        include: {
             appointment: {
-              select: {
-                name: true,
+                select: { name: true }
             }
-          }
         }
-      });
+    });
 
-      const analysis = await prisma.patient_analysis.findMany({
-          where: { patient_id: patientId.patient_id },
-          include: {
+    const analysis = await prisma.patient_analysis.findMany({
+        where: {
+            patient_id: patientId.patient_id,
+            analysis_status: { not: "CANCELED" }
+        },
+        include: {
             analysis: {
-              select: {
-                name: true,
-              }
+                select: { name: true }
             }
-          }
-      });
+        }
+    });
 
-      return { appointments, analysis };
+    return { appointments, analysis };
 }
 
 export const getAppointmentByName = async (appointmentName: string) => {
