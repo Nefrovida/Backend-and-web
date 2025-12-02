@@ -1,8 +1,7 @@
 import { prisma } from "../util/prisma";
 
-
 export default class Agenda {
-  constructor() { }
+  constructor() {}
 
   /**
    * Secretaria (web) – Daily appointments, including patient name.
@@ -37,10 +36,10 @@ export default class Agenda {
           },
         },
       },
-            orderBy: {
-                date_hour: "asc",
-            },
-        });
+      orderBy: {
+        date_hour: "asc",
+      },
+    });
 
     // Unnest joins -> patient name
     const flattened = appointments.map((a) => {
@@ -274,8 +273,9 @@ static async getAnalysisById(id: number) {
    */
   static async getAppointmentsInRange(startDate: string, endDate: string) {
     // Parse date components to avoid timezone issues
-    const [startYear, startMonth, startDay] = startDate.split('-').map(Number);
-    const [endYear, endMonth, endDay] = endDate.split('-').map(Number);
+    const [startYear, startMonth, startDay] = startDate.split("-").map(Number);
+    const [endYear, endMonth, endDay] = endDate.split("-").map(Number);
+
     const start = new Date(startYear, startMonth - 1, startDay);
     const end = new Date(endYear, endMonth - 1, endDay);
 
@@ -455,7 +455,9 @@ static async getAnalysisById(id: number) {
           const apptStart = new Date(appt.date_hour);
           // If duration is 45 minutes, treat it as occupying the full hour
           const effectiveDuration = appt.duration === 45 ? 60 : appt.duration;
-          const apptEnd = new Date(apptStart.getTime() + effectiveDuration * 60000);
+          const apptEnd = new Date(
+            apptStart.getTime() + effectiveDuration * 60000
+          );
           return slotTime >= apptStart && slotTime < apptEnd;
         });
 
@@ -480,7 +482,14 @@ static async getAnalysisById(id: number) {
     appointmentType: "PRESENCIAL" | "VIRTUAL";
     place?: string;
   }) {
-    const { patientAppointmentId, doctorId, dateHour, duration, appointmentType, place } = data;
+    const {
+      patientAppointmentId,
+      doctorId,
+      dateHour,
+      duration,
+      appointmentType,
+      place,
+    } = data;
 
     const proposedStart = new Date(dateHour);
     const now = new Date();
@@ -531,11 +540,16 @@ static async getAnalysisById(id: number) {
     const doctorOverlaps = doctorConflicts.filter((appt) => {
       const apptStart = new Date(appt.date_hour);
       // If existing appointment is 45 min, treat it as occupying 60 min
-      const effectiveExistingDuration = appt.duration === 45 ? 60 : appt.duration;
-      const apptEnd = new Date(apptStart.getTime() + effectiveExistingDuration * 60000);
+      const effectiveExistingDuration =
+        appt.duration === 45 ? 60 : appt.duration;
+      const apptEnd = new Date(
+        apptStart.getTime() + effectiveExistingDuration * 60000
+      );
       // For checking conflicts, if the new appointment is 45 min, treat it as 60 min
       const effectiveNewDuration = duration === 45 ? 60 : duration;
-      const newEnd = new Date(proposedStart.getTime() + effectiveNewDuration * 60000);
+      const newEnd = new Date(
+        proposedStart.getTime() + effectiveNewDuration * 60000
+      );
       return proposedStart < apptEnd && newEnd > apptStart;
     });
 
@@ -568,11 +582,16 @@ static async getAnalysisById(id: number) {
     const patientOverlaps = patientConflicts.filter((appt) => {
       const apptStart = new Date(appt.date_hour);
       // If existing appointment is 45 min, treat it as occupying 60 min
-      const effectiveExistingDuration = appt.duration === 45 ? 60 : appt.duration;
-      const apptEnd = new Date(apptStart.getTime() + effectiveExistingDuration * 60000);
+      const effectiveExistingDuration =
+        appt.duration === 45 ? 60 : appt.duration;
+      const apptEnd = new Date(
+        apptStart.getTime() + effectiveExistingDuration * 60000
+      );
       // For checking conflicts, if the new appointment is 45 min, treat it as 60 min
       const effectiveNewDuration = duration === 45 ? 60 : duration;
-      const newEnd = new Date(proposedStart.getTime() + effectiveNewDuration * 60000);
+      const newEnd = new Date(
+        proposedStart.getTime() + effectiveNewDuration * 60000
+      );
       return proposedStart < apptEnd && newEnd > apptStart;
     });
 
@@ -632,7 +651,8 @@ static async getAnalysisById(id: number) {
     appointmentType: "PRESENCIAL" | "VIRTUAL";
     place?: string;
   }) {
-    const { patientId, doctorId, dateHour, duration, appointmentType, place } = data;
+    const { patientId, doctorId, dateHour, duration, appointmentType, place } =
+      data;
 
     const proposedStart = new Date(dateHour);
     const now = new Date();
@@ -660,7 +680,9 @@ static async getAnalysisById(id: number) {
       const apptEnd = new Date(apptStart.getTime() + appt.duration * 60000);
       // For checking conflicts, if the new appointment is 45 min, treat it as 60 min
       const effectiveNewDuration = duration === 45 ? 60 : duration;
-      const newEnd = new Date(proposedStart.getTime() + effectiveNewDuration * 60000);
+      const newEnd = new Date(
+        proposedStart.getTime() + effectiveNewDuration * 60000
+      );
       return proposedStart < apptEnd && newEnd > apptStart;
     });
 
@@ -681,11 +703,16 @@ static async getAnalysisById(id: number) {
     const patientOverlaps = patientConflicts.filter((appt) => {
       const apptStart = new Date(appt.date_hour);
       // If existing appointment is 45 min, treat it as occupying 60 min
-      const effectiveExistingDuration = appt.duration === 45 ? 60 : appt.duration;
-      const apptEnd = new Date(apptStart.getTime() + effectiveExistingDuration * 60000);
+      const effectiveExistingDuration =
+        appt.duration === 45 ? 60 : appt.duration;
+      const apptEnd = new Date(
+        apptStart.getTime() + effectiveExistingDuration * 60000
+      );
       // For checking conflicts, if the new appointment is 45 min, treat it as 60 min
       const effectiveNewDuration = duration === 45 ? 60 : duration;
-      const newEnd = new Date(proposedStart.getTime() + effectiveNewDuration * 60000);
+      const newEnd = new Date(
+        proposedStart.getTime() + effectiveNewDuration * 60000
+      );
       return proposedStart < apptEnd && newEnd > apptStart;
     });
 

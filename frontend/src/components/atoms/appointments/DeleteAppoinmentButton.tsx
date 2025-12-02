@@ -10,6 +10,7 @@ const DeleteAppoinmentButton: React.FC<Props> = ({
   onClick,
 }) => {
   const [confirm, setConfirm] = useState(false);
+
   function handleConfirmation() {
     setConfirm(true);
   }

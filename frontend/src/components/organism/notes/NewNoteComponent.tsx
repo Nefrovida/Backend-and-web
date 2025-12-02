@@ -7,6 +7,7 @@ interface Props {
   validationError: string | null;
   error: string | null;
   isLoading: boolean;
+  title: string;
   setShowModal: (b: boolean) => void;
   handleSave: () => void;
   setNoteData: (x: NoteContent) => void;
@@ -16,6 +17,7 @@ const NewNoteComponent: FC<Props> = ({
   validationError,
   error,
   isLoading,
+  title,
   setShowModal,
   handleSave,
   setNoteData,
@@ -29,7 +31,7 @@ const NewNoteComponent: FC<Props> = ({
       />
 
       <div className="flex-1 overflow-y-auto p-4">
-        <NewNoteModal modalState={setNoteData} />
+        <NewNoteModal modalState={setNoteData} title={title} />
 
         {(validationError || error) && (
           <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm">
