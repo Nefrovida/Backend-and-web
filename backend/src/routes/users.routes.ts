@@ -19,8 +19,8 @@ router.get("/health", (_req, res) => {
 // ============================================
 router.get("/profile", authenticate, usersController.getProfile);
 
-router.get("/first-login/:user_id", 
-  authenticate, 
+router.get("/first-login/:user_id",
+  authenticate,
   usersController.isFirstLogin);
 
 router.get(
@@ -55,6 +55,13 @@ router.delete(
   authenticate,
   requirePrivileges([Privilege.DELETE_USERS]),
   usersController.deleteUser
+);
+
+router.post(
+  "/:id/reset-password",
+  authenticate,
+  requirePrivileges([Privilege.UPDATE_USERS]),
+  usersController.resetPassword
 );
 
 export default router;
