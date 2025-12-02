@@ -1,5 +1,17 @@
 import { Request, Response } from "express";
 import Forum from "src/model/forum.model";
+import sanitizeHtml from "sanitize-html";
+
+
+function sanitizeMessage(raw: string) {
+    if (!raw) return "";
+
+    return sanitizeHtml(raw, {
+        allowedTags: [],         
+        allowedAttributes: {},   
+        disallowedTagsMode: "discard"
+    }).trim();
+}
 
 async function postNewMessage(req: Request, res: Response) {
   try {
@@ -17,10 +29,18 @@ async function postNewMessage(req: Request, res: Response) {
       return;
     }
 
+    const contentClean = sanitizeMessage(content);
+
+    if (!contentClean) {
+      return res.status(400).json({
+        error: "Mensaje inválido"
+      });
+    }
+
     const response = await Forum.postNewMessage(
       userId,
       Number(forumId),
-      content
+      contentClean
     );
     res.status(200).json({ message: "Exitoso" });
   } catch (e) {

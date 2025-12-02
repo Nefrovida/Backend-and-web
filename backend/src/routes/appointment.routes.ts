@@ -6,6 +6,7 @@ import { Privilege } from "../types/rbac.types";
 
 const router = express.Router();
 
+
 // GET /api/appointments
 router.get(
   "/",
