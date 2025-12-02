@@ -1,23 +1,20 @@
-import { BasicForumInfo } from "@/types/forum.types";
-import { Link } from "react-router-dom";
-import { HiDotsHorizontal } from "react-icons/hi";
-import { BiLike } from "react-icons/bi";
+import { Message } from "@/types/forum.types";
 import { FC, useState } from "react";
-import { MdChatBubbleOutline } from "react-icons/md";
-import { RiDeleteBin6Line } from "react-icons/ri";
+import MessageContent from "./MessageContent";
+import { Link } from "react-router-dom";
 import { authService } from "@/services/auth.service";
 import { ROLE_IDS } from "@/types/auth.types";
+import { HiDotsHorizontal } from "react-icons/hi";
+import { RiDeleteBin6Line } from "react-icons/ri";
+import { BiLike } from "react-icons/bi";
+import { MdChatBubbleOutline } from "react-icons/md";
 
 interface Props {
-  messageId: number;
-  f: BasicForumInfo;
-  content: string;
-  likes: number;
-  comments: number;
+  message: Message;
   onDelete?: (messageId: number) => void;
 }
 
-const MessageCard: FC<Props> = ({ messageId, f, content, likes, comments, onDelete }) => {
+const MessageCard: FC<Props> = ({ message, onDelete }) => {
   const [showMenu, setShowMenu] = useState(false);
   const currentUser = authService.getCurrentUser();
   const isAdmin = currentUser?.role_id === ROLE_IDS.ADMIN;
@@ -25,7 +22,7 @@ const MessageCard: FC<Props> = ({ messageId, f, content, likes, comments, onDele
   const handleDeleteClick = () => {
     setShowMenu(false);
     if (onDelete) {
-      onDelete(messageId);
+      onDelete(message.messageId);
     }
   };
 
@@ -33,10 +30,10 @@ const MessageCard: FC<Props> = ({ messageId, f, content, likes, comments, onDele
     <div className="w-8/12 rounded-md border-2 bg-white drop-shadow-sm p-2">
       <section className="flex justify-between">
         <Link
-          to={`${f.forumId}`}
+          to={`/dashboard/foro/${message.forums.forumId}`}
           className="text-gray-400 text-sm hover:underline"
         >
-          {f.name}
+          {message.forums.name}
         </Link>
         {isAdmin && (
           <div className="relative">
@@ -59,17 +56,18 @@ const MessageCard: FC<Props> = ({ messageId, f, content, likes, comments, onDele
         )}
         {!isAdmin && <HiDotsHorizontal className="text-gray-300 cursor-not-allowed" />}
       </section>
-      <section className="w-full text-lg my-2">{content}</section>
+      <section className="w-full text-lg my-2">{message.content}</section>
       <section className="flex gap-4 items-center">
         <div className="flex gap-2 items-center">
           <BiLike className="hover:text-blue-600" />
-          {likes}
+          {message.likes}
         </div>
         <div className="flex gap-2 items-center">
           <MdChatBubbleOutline className="hover:text-blue-600" />
-          {comments}
+          {message.replies}
         </div>
       </section>
+      <MessageContent message={message} />
     </div>
   );
 };

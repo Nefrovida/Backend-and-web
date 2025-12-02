@@ -24,16 +24,8 @@ const FeedList: FC<Props> = ({ messageInfo, onDeleteMessage }) => {
       className="flex flex-col items-center gap-4 overflow-scroll h-[95%]"
       ref={scrollRef}
     >
-      {messages.map((m) => (
-        <MemoizedMessageCard
-          messageId={m.messageId}
-          f={m.forums}
-          content={m.content}
-          likes={m.likes}
-          comments={m.replies}
-          key={m.messageId}
-          onDelete={onDeleteMessage}
-        />
+      {messages.map((m: Message) => (
+        <MemoizedMessageCard key={m.messageId} message={m} />
       ))}
     </ul>
   );

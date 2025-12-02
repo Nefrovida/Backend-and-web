@@ -144,6 +144,18 @@ export default class Forum {
       where: {
         message_id: messageId,
       },
+      select: {
+        message_id: true,
+        forum_id: true,
+        user_id: true,
+        content: true,
+        user: {
+          select: {
+            username: true,
+            user_id: true,
+          },
+        },
+      },
     });
   }
 }

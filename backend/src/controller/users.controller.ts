@@ -7,7 +7,8 @@ import { UpdateUserRequest } from '../types/user.types';
  */
 export const getAllUsers = async (req: Request, res: Response): Promise<void> => {
   try {
-    const users = await usersService.getAllUsers();
+    const onlyRequestedReset = req.query.resetRequested === 'true';
+    const users = await usersService.getAllUsers(onlyRequestedReset);
     res.status(200).json(users);
   } catch (error: any) {
     res.status(error.statusCode || 500).json({ error: error.message });
@@ -76,7 +77,7 @@ export const getProfile = async (req: Request, res: Response): Promise<void> => 
  */
 export const isFirstLogin = async (req: Request, res: Response): Promise<void> => {
   try {
-    const user_id  = req.params.user_id;
+    const user_id = req.params.user_id;
     if (!user_id) {
       res.status(400).json({ error: 'User ID is required' });
       return;
@@ -84,8 +85,28 @@ export const isFirstLogin = async (req: Request, res: Response): Promise<void> =
 
     const isFirstLogin = await usersService.isFirstLogin(user_id);
     res.status(200).json({ isFirstLogin });
-    
+
   } catch (error: any) {
     res.status(error.statusCode || 500).json({ error: error.message });
   }
 }
+
+/**
+ * Reset user password
+ */
+export const resetPassword = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const { password } = req.body;
+
+    if (!password) {
+      res.status(400).json({ error: 'Se requiere la contraseña' });
+      return;
+    }
+
+    await usersService.resetPassword(id, password);
+    res.status(200).json({ message: 'Contraseña restablecida exitosamente' });
+  } catch (error: any) {
+    res.status(error.statusCode || 500).json({ error: error.message });
+  }
+};
