@@ -24,7 +24,7 @@ export class ProfileService {
     }
 
     static async changePassword(userId: string, data: ChangePasswordDTO): Promise<void> {
-        const { currentPassword, newPassword, confirmNewPassword } = data;
+        const { newPassword, confirmNewPassword } = data;
 
         if (newPassword !== confirmNewPassword) {
             throw new Error('Las nuevas contraseñas no coinciden');
@@ -34,12 +34,7 @@ export class ProfileService {
             throw new Error('La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un carácter especial [#?!@$%^&*-].');
         }
 
-        const currentHash = await ProfileModel.getPasswordHash(userId);
-        if (!currentHash) throw new Error('Usuario no encontrado');
-
-        const isMatch = await bcrypt.compare(currentPassword, currentHash);
-        if (!isMatch) throw new Error('La contraseña actual es incorrecta');
-
+        // Directly update password without requiring the current password
         const salt = await bcrypt.genSalt(BCRYPT_SALT_ROUNDS);
         const newHash = await bcrypt.hash(newPassword, salt);
         
