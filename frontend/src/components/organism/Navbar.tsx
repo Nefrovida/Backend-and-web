@@ -225,7 +225,7 @@ function Navbar({ children }: Props) {
         <div className="flex flex-col gap-2 items-center w-full">
           <CustomLink
             label="Mi Perfil"
-            to="/dashboard/"
+            to="/dashboard/profile/me"
             icon={<BsPerson />}
             activeIcon={<BsFillPersonFill />}
             end
