@@ -53,4 +53,8 @@ export type Reply = {
   forumId: number;
   id: number;
   parentMessageId: number;
+  stats: {
+    likesCount: number;
+    repliesCount: number;
+  };
 };
