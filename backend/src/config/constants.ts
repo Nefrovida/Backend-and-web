@@ -23,3 +23,9 @@ export const DEFAULT_ROLES = {
  * in your RBAC (Role-Based Access Control) system.
  */
 export { Privilege };
+
+// Password policy regex: at least 8 chars, one uppercase, one digit and one special char
+export const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*\d)(?=.*[#?!@$%^&*\-]).{8,}$/;
+
+// Bcrypt salt rounds: can be overridden by env var BCRYPT_ROUNDS
+export const BCRYPT_SALT_ROUNDS = Number(process.env.BCRYPT_ROUNDS) || 10;
