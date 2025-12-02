@@ -12,6 +12,10 @@ const adminRoutes: RouteObject[] = [
     path: "pending-users",
     element: <PendingUsersPage />,
   },
+  {
+    path: "registrar-doctor",
+    element: <RegisterDoctorPage />,
+  }
 ];
 
 export default adminRoutes;
