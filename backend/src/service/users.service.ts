@@ -126,7 +126,7 @@ export const getUserByUsername = async (username: string): Promise<UserWithRoleA
  */
 export const getPendingUsers = async (): Promise<UserWithRoleAndPrivileges[]> => {
   return await prisma.users.findMany({
-    where: { 
+    where: {
       user_status: 'PENDING'
     },
     include: {
@@ -150,7 +150,7 @@ export const getPendingUsers = async (): Promise<UserWithRoleAndPrivileges[]> =>
  * Approve a user by setting their status to APPROVED and active to true
  */
 export const approveUser = async (
-  userId: string, 
+  userId: string,
   approvedByUserId: string
 ): Promise<UserWithRoleAndPrivileges> => {
   const user = await prisma.users.findUnique({
@@ -167,7 +167,7 @@ export const approveUser = async (
 
   const updatedUser = await prisma.users.update({
     where: { user_id: userId },
-    data: { 
+    data: {
       user_status: 'APPROVED',
       active: true,
       approval_date: new Date(),
@@ -207,7 +207,7 @@ export const rejectUser = async (userId: string): Promise<UserWithRoleAndPrivile
 
   const updatedUser = await prisma.users.update({
     where: { user_id: userId },
-    data: { 
+    data: {
       user_status: 'REJECTED',
       active: false
     },
@@ -227,3 +227,18 @@ export const rejectUser = async (userId: string): Promise<UserWithRoleAndPrivile
   return updatedUser;
 };
 
+/**
+ * Get user first login status by user Id
+ */
+export const isFirstLogin = async (userId: string): Promise<boolean> => {
+  const user = await prisma.users.findUnique({
+    where: { user_id: userId },
+    select: { first_login: true },
+  });
+
+  if (!user) {
+    throw new NotFoundError('User not found');
+  }
+
+  return user.first_login;
+}

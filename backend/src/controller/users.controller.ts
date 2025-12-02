@@ -95,9 +95,9 @@ export const approveUser = async (req: Request, res: Response): Promise<void> =>
 
     const { id } = req.params;
     const approvedUser = await usersService.approveUser(id, req.user.userId);
-    res.status(200).json({ 
+    res.status(200).json({
       message: 'User approved successfully',
-      user: approvedUser 
+      user: approvedUser
     });
   } catch (error: any) {
     res.status(error.statusCode || 500).json({ error: error.message });
@@ -111,12 +111,30 @@ export const rejectUser = async (req: Request, res: Response): Promise<void> => 
   try {
     const { id } = req.params;
     const rejectedUser = await usersService.rejectUser(id);
-    res.status(200).json({ 
+    res.status(200).json({
       message: 'User rejected successfully',
-      user: rejectedUser 
+      user: rejectedUser
     });
   } catch (error: any) {
     res.status(error.statusCode || 500).json({ error: error.message });
   }
 };
 
+/**
+ * Get first login status
+ */
+export const isFirstLogin = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const user_id = req.params.user_id;
+    if (!user_id) {
+      res.status(400).json({ error: 'User ID is required' });
+      return;
+    }
+
+    const isFirstLogin = await usersService.isFirstLogin(user_id);
+    res.status(200).json({ isFirstLogin });
+
+  } catch (error: any) {
+    res.status(error.statusCode || 500).json({ error: error.message });
+  }
+}

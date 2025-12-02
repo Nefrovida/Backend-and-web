@@ -24,6 +24,12 @@ export const DEFAULT_ROLES = {
  */
 export { Privilege };
 
+// Password policy regex: at least 8 chars, one uppercase, one digit and one special char
+export const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*\d)(?=.*[#?!@$%^&*\-]).{8,}$/;
+
+// Bcrypt salt rounds: can be overridden by env var BCRYPT_ROUNDS
+export const BCRYPT_SALT_ROUNDS = Number(process.env.BCRYPT_ROUNDS) || 10;
+
 /**
  * Re-export the UserStatus enum for tracking user approval state.
  * PENDING - User registered but awaiting admin approval

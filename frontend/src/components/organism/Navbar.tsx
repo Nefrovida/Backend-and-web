@@ -12,6 +12,7 @@ import { MdForum, MdOutlineForum } from "react-icons/md";
 import { LuNotebook, LuNotebookPen } from "react-icons/lu";
 import { IoFlaskSharp, IoFlaskOutline } from "react-icons/io5";
 import { RiChatSettingsLine, RiChatSettingsFill } from "react-icons/ri";
+import { FaCalendarPlus } from "react-icons/fa";
 import {
   FaUserMd,
   FaListAlt,
@@ -30,6 +31,7 @@ import ConfirmModal from "../molecules/ConfirmModal";
 import { ROLE_IDS } from "../../types/auth.types";
 import { authService } from "../../services/auth.service";
 import { PiFlaskFill, PiFlaskLight } from "react-icons/pi";
+import { ImUserTie } from "react-icons/im";
 
 interface Props {
   children: React.ReactNode;
@@ -109,10 +111,9 @@ const CustomLink = ({
           className={({ isActive }) => `
             group relative flex items-center justify-center w-12 h-12 
             transition-all duration-300 ease-out rounded-xl cursor-pointer
-            ${
-              isActive
-                ? "bg-blue-50 text-blue-600 scale-105 shadow-sm ring-1 ring-blue-100"
-                : "text-gray-500 hover:bg-gray-100 hover:text-gray-700 hover:scale-110"
+            ${isActive
+              ? "bg-blue-50 text-blue-600 scale-105 shadow-sm ring-1 ring-blue-100"
+              : "text-gray-500 hover:bg-gray-100 hover:text-gray-700 hover:scale-110"
             }
           `}
         >
@@ -165,10 +166,9 @@ const NavButton = ({
           className={`
             group relative flex items-center justify-center w-12 h-12 
             transition-all duration-300 ease-out rounded-xl cursor-pointer border-none outline-none
-            ${
-              isActive
-                ? activeStyle
-                : "text-gray-500 hover:bg-gray-100 hover:text-gray-700 hover:scale-110"
+            ${isActive
+              ? activeStyle
+              : "text-gray-500 hover:bg-gray-100 hover:text-gray-700 hover:scale-110"
             }
           `}
         >
@@ -267,6 +267,22 @@ function Navbar({ children }: Props) {
                 end
               />
             </>
+            <>
+              <CustomLink
+                label="Registrar Doctor"
+                to="/dashboard/registrar-doctor"
+                icon={<FaUserMd />}
+                activeIcon={<FaUserMd />}
+                end
+              />
+              <CustomLink
+                label="Registrar Admin"
+                to="/dashboard/registrar-admin"
+                icon={<ImUserTie />}
+                activeIcon={<ImUserTie />}
+                end
+              />
+            </>
           )}
 
           {/* Upload Results, only Laboratorist */}
@@ -323,13 +339,22 @@ function Navbar({ children }: Props) {
 
           {/* Laboratory results, Doctor */}
           {isDoctor && (
-            <CustomLink
-              label="Laboratorio"
-              to="/dashboard/laboratorio"
-              icon={<IoFlaskOutline />}
-              activeIcon={<IoFlaskSharp />}
-              end
-            />
+            <>
+              <CustomLink
+                label="Laboratorio"
+                to="/dashboard/laboratorio"
+                icon={<IoFlaskOutline />}
+                activeIcon={<IoFlaskSharp />}
+                end
+              />
+              <CustomLink
+                label="Usuarios Externos"
+                to="/dashboard/usuarios-externos"
+                icon={<FaUserMd />}
+                activeIcon={<FaUserMd />}
+                end
+              />
+            </>
           )}
 
           {/* Laboratorista analysis */}
@@ -358,6 +383,13 @@ function Navbar({ children }: Props) {
                 to="/dashboard/analisis"
                 icon={<FaRegListAlt />}
                 activeIcon={<FaListAlt />}
+                end
+              />
+              <CustomLink
+                label="Catálogo de citas"
+                to="/dashboard/citas"
+                icon={<FaCalendarPlus />}
+                activeIcon={<FaCalendarPlus />}
                 end
               />
             </>
@@ -392,34 +424,35 @@ function Navbar({ children }: Props) {
           fixed top-4 bottom-4 left-[6.5rem] z-[70]
           bg-white shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] rounded-3xl border border-gray-100
           overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]
-          ${
-            showNotes
-              ? "opacity-100 translate-x-0"
-              : "w-0 opacity-0 -translate-x-4 pointer-events-none"
+          ${showNotes
+            ? "opacity-100 translate-x-0"
+            : "w-0 opacity-0 -translate-x-4 pointer-events-none"
           }
         `}
       >
         {/* Intern Container */}
-        <div className="h-full w-fit flex flex-col bg-white">
-          <div className="p-5 bg-white border-b border-gray-100 flex justify-between items-center shadow-sm z-10">
-            <div className="flex items-center gap-3">
-              <div className="bg-green-100 p-2 rounded-lg text-green-600">
-                <LuNotebookPen size={20} />
+        {isDoctor && (
+          <div className="h-full w-fit flex flex-col bg-white">
+            <div className="p-5 bg-white border-b border-gray-100 flex justify-between items-center shadow-sm z-10">
+              <div className="flex items-center gap-3">
+                <div className="bg-green-100 p-2 rounded-lg text-green-600">
+                  <LuNotebookPen size={20} />
+                </div>
+                <h2 className="font-bold text-gray-800 text-xl">Notas</h2>
               </div>
-              <h2 className="font-bold text-gray-800 text-xl">Notas</h2>
+              <button
+                onClick={() => setShowNotes(false)}
+                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                ✕
+              </button>
             </div>
-            <button
-              onClick={() => setShowNotes(false)}
-              className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              ✕
-            </button>
-          </div>
 
-          <div className="flex-1 overflow-y-auto p-0 bg-white relative">
-            <Notes />
+            <div className="flex-1 overflow-y-auto p-0 bg-white relative">
+              <Notes />
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Logout Modal */}

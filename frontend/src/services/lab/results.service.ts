@@ -27,10 +27,10 @@ export const generateReport = async (
     recommendations: string
 ) => {
     const patient_analysis_id = Number(id);
-    console.log("patient_analysis_id: ", patient_analysis_id);
+    // console.log("patient_analysis_id: ", patient_analysis_id);
     if (isNaN(patient_analysis_id)) return { success: false, message: "unable to make the request" }
 
-    console.log("about to make the call")
+    // console.log("about to make the call")
     const response = await fetch("/api/laboratory/generate-report", {
         method: "POST",
         credentials: "include",

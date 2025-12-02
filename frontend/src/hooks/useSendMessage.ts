@@ -16,7 +16,7 @@ export default function useSendMessage(
   const [forumId, setForumId] = useState<number>();
 
   useEffect(() => {
-    fetch("/api/forums/myForums")
+    fetch("/api/forums/myForums/web")
       .then((res) => res.json())
       .then((data) => {
         const dataInfo = data.map((d) => {

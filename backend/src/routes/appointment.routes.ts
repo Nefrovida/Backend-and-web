@@ -6,6 +6,7 @@ import { Privilege } from '../types/rbac.types';
 
 const router = express.Router();
 
+
 // GET /api/appointments
 router.get(
   '/',
@@ -26,8 +27,16 @@ router.get(
 router.put(
   '/:id/reschedule',
   authenticate,
-  requirePrivileges([Privilege.UPDATE_APPOINTMENTS]),
+  requirePrivileges([Privilege.CREATE_APPOINTMENTS]),
   AppointmentController.rescheduleAppointment
+);
+
+// GET /api/appointments/patient/get-notes
+router.get(
+  '/patient/get-notes',
+  authenticate,
+  requirePrivileges([Privilege.VIEW_NOTES]),
+  AppointmentController.getPatientAppointment
 );
 
 export default router;

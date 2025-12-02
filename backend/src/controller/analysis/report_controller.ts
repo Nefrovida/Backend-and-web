@@ -25,7 +25,6 @@ export const getResultV2 = async (req: Request, res: Response) => {
   try {
     const { patient_analysis_id } = getResultParamsSchema.parse(req.params);
     const result = await getResultsService.getResultById(patient_analysis_id);
-
     res.status(200).json({
       success: true,
       message: "Result retrieved successfully",
@@ -68,41 +67,45 @@ export const getResultV2 = async (req: Request, res: Response) => {
 export const getResultsByUserId = async (req: Request, res: Response) => {
   try {
     const userId = req.params.user_id;
-    const result = await getResultsService.getResultsByUserId(userId);
+    const data  = await getResultsService.getResultsAndNotesByUserId(userId);
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "Results retrieved successfully",
-      data: result,
+      data: data,
     });
-  } catch (error) {
+
+  } catch (error: any) {
+
     if (error instanceof ZodError) {
-      res.status(400).json({
+      return res.status(400).json({
         success: false,
         error: {
           code: "VALIDATION_ERROR",
-          message: "Invalid patient_analysis_id",
+          message: "Invalid input format",
           details: error.errors,
         },
       });
-    } else if (error instanceof NotFoundError) {
-      res.status(404).json({
+    }
+
+    if (error instanceof NotFoundError) {
+      return res.status(404).json({
         success: false,
         error: {
           code: "RESULT_NOT_FOUND",
           message: error.message,
         },
       });
-    } else {
-      console.error(error);
-      res.status(500).json({
-        success: false,
-        error: {
-          code: "INTERNAL_ERROR",
-          message: "An unexpected error occurred",
-        },
-      });
     }
+
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      error: {
+        code: "INTERNAL_ERROR",
+        message: "An unexpected error occurred",
+      },
+    });
   }
 };
 

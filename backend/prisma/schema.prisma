@@ -150,6 +150,7 @@ model appointments {
   general_cost         Float
   community_cost       Float
   image_url            String?
+  active               Boolean               @default(true)
   doctor               doctors               @relation(fields: [doctor_id], references: [doctor_id], onDelete: Cascade)
   patient_appointments patient_appointment[]
 }
@@ -259,14 +260,14 @@ model user_reports {
 }
 
 model notifications {
-  report_id Int      @id @default(autoincrement())
-  user_id   String   @db.Uuid
-  answer    String
-  date      DateTime
-  title     String
-  content   String
-  seen      Boolean  @default(false)
-  user      users    @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  report_id     Int      @id @default(autoincrement())
+  user_id       String   @db.Uuid
+  date          DateTime
+  answer        String
+  title         String
+  content       String
+  seen          Boolean  @default(false)
+  user          users    @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
 }
 
 enum Gender {
@@ -288,6 +289,8 @@ enum ANALYSIS_STATUS {
   PENDING
   SENT
   REQUESTED
+  CANCELED
+  PROGRAMMED
 }
 
 enum Type {

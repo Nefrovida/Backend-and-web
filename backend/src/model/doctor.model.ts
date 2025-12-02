@@ -17,7 +17,9 @@ export interface IUser {
 }
 
 // Check if username already exists
-export const checkUsernameExists = async (username: string): Promise<boolean> => {
+export const checkUsernameExists = async (
+  username: string
+): Promise<boolean> => {
   try {
     const existingUser = await prisma.users.findFirst({
       where: { username },
@@ -68,7 +70,7 @@ export const createUser = async (user: IUser): Promise<IUser> => {
     },
   });
 
-  return newUser;
+  return newUser as IUser;
 };
 
 // Create a doctor linked to the user

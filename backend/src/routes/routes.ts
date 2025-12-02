@@ -1,39 +1,38 @@
 // backend/src/routes/routes.ts
 import express from "express";
 import doctorRoutes from "./doctor.routes";
+import adminRoutes from "./admin.routes";
 import labRoutes from "./lab.routes";
 import authRoutes from "./auth.routes";
 import usersRoutes from "./users.routes";
 import rolesRoutes from "./roles.routes";
 import privilegesRoutes from "./privileges.routes";
-import * as analysisController from "../controller/analysis/add_analysis.controller";
 import appointmentsRoutes from "./appointments.routes";
 import notesRouter from "./notes.routes";
 import forumsRoutes from "./forums.routes";
 import patientRoutes from "./patients.routes";
 import clinicalHistoryRoutes from "./clinicalHistory.routes";
 import reportRouter from "./report.routes";
-import historialRoutes from "./historial.routes"
+import historialRoutes from "./historial.routes";
 import historyRoutes from "./history.routes";
-import agendaRoutes from "./agenda.routes"
+import agendaRoutes from "./agenda.routes";
 import appointmentRoutes from "./appointment.routes";
 import expedienteRoutes from "./expediente.routes";
-import * as analysisPDFController from "../controller/analysisPDF.controller";
 import analysisRoutes from "./analysis.routes";
-
-import { authenticate } from "../middleware/auth.middleware";
-import { requirePrivileges } from "../middleware/rbac.middleware";
-import { Privilege } from "../types/rbac.types";
-
+import dashboardRoutes from "./dashboard.routes";
+import profileRoutes from "./profile.routes";
 const router = express.Router();
-
-
 
 
 // ============================================
 // Authentication Routes (Public)
 // ============================================
 router.use("/auth", authRoutes);
+
+// ============================================
+// Profile Routes (Protected)
+// ============================================
+router.use("/profile", profileRoutes);
 
 // ============================================
 // User Routes (Protected)
@@ -97,12 +96,12 @@ router.use("/agenda", agendaRoutes);
 // ============================================
 // Appointments Routes (Protected)
 // ============================================
-router.use("/appointments", appointmentRoutes); 
+router.use("/appointments", appointmentRoutes);
 
 // ============================================
 // Appointments Routes (Protected)
 // ============================================
-router.use("/appointments", appointmentRoutes); 
+router.use("/appointments", appointmentRoutes);
 
 // ============================================
 // Historial Routes (Patient Analysis History)
@@ -113,61 +112,22 @@ router.use("/historial", historialRoutes);
 // ============================================
 router.use("/appointments", appointmentsRoutes);
 
+// ============================================
 // Analysis Routes (Protected)
 // ============================================
 router.use("/analysis", analysisRoutes);
 
+// ============================================
 // Doctors Routes (Protected)
 // ============================================
 router.use("/doctors", doctorRoutes);
 
 // ============================================
-// Analysis Routes (Secretary: creates / views / updates / deletes analysis types)
+// Doctors Routes (Protected)
 // ============================================
-// List / view details: anyone with VIEW_ANALYSIS (doctor, lab, secretary, admin)
-router.get(
-  "/analysis",
-  authenticate,
-  requirePrivileges([Privilege.VIEW_ANALYSIS]),
-  analysisController.getAllAnalysis
-);
-
-router.get(
-  "/analysis/:id",
-  authenticate,
-  requirePrivileges([Privilege.VIEW_ANALYSIS]),
-  analysisController.getAnalysisById
-);
-// Create / update / delete analysis types:
-// only those with MANAGE_ANALYSIS_TYPES (secretary + admin)
-router.post(
-  "/analysis",
-  authenticate,
-  requirePrivileges([Privilege.MANAGE_ANALYSIS_TYPES]),
-  analysisController.createAnalysis
-);
-
-router.put(
-  "/analysis/:id",
-  authenticate,
-  requirePrivileges([Privilege.MANAGE_ANALYSIS_TYPES]),
-  analysisController.updateAnalysis
-);
-
-router.delete(
-  "/analysis/:id",
-  authenticate,
-  requirePrivileges([Privilege.MANAGE_ANALYSIS_TYPES]),
-  analysisController.deleteAnalysis
-);
-
-//AnalysisPDF Routes
-router.get(
-  "/analysis/my-results",
-  authenticate,
-  requirePrivileges([Privilege.VIEW_ANALYSIS]),
-  analysisPDFController.getMyAnalysisResultsController as express.RequestHandler
-);
+router.use("/update-dashboard", dashboardRoutes);
+// Admin Routes (Protected)
+// ============================================
+router.use("/admins", adminRoutes);
 
 export default router;
-

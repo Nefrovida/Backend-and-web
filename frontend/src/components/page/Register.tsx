@@ -88,7 +88,61 @@ function Register() {
         navigate("/dashboard");
       }
     } catch (err: any) {
-      setError(err.message || "Error en el registro");
+      const errorMessage = err.message || "";
+      const errorLower = errorMessage.toLowerCase();
+      
+      // Translate technical/Prisma errors to user-friendly Spanish messages
+      let friendlyMessage = "";
+      
+      // Check for duplicate username
+      if (errorLower.includes("user already exists") || 
+          errorLower.includes("usuario ya existe") ||
+          errorLower.includes("username already") ||
+          errorLower.includes("unique constraint") && errorLower.includes("username") ||
+          errorLower.includes("duplicate") && errorLower.includes("username")) {
+        friendlyMessage = "El nombre de usuario ya está registrado. Por favor elige otro.";
+        setError(friendlyMessage);
+        setStep(1); // Return to step 1 where username field is
+        return;
+      }
+      
+      // Check for duplicate CURP
+      if (errorLower.includes("curp") && (errorLower.includes("duplicate") || errorLower.includes("unique"))) {
+        friendlyMessage = "El CURP ingresado ya está registrado en el sistema.";
+      }
+      // Check for duplicate phone number
+      else if (errorLower.includes("phone") && (errorLower.includes("duplicate") || errorLower.includes("unique"))) {
+        friendlyMessage = "El número de teléfono ya está registrado. Por favor usa otro número.";
+        setError(friendlyMessage);
+        setStep(1);
+        return;
+      }
+      // Check for invalid CURP format
+      else if (errorLower.includes("curp") && errorLower.includes("invalid")) {
+        friendlyMessage = "El formato del CURP no es válido. Verifica que tenga 18 caracteres.";
+      }
+      // Check for patient not found (for familiar registration)
+      else if (errorLower.includes("patient not found") || errorLower.includes("paciente no encontrado")) {
+        friendlyMessage = "No se encontró un paciente con el CURP proporcionado. Verifica que sea correcto.";
+      }
+      // Check for invalid license
+      else if (errorLower.includes("license") || errorLower.includes("cédula")) {
+        friendlyMessage = "La cédula profesional no es válida. Debe tener al menos 7 caracteres.";
+      }
+      // Check for connection errors
+      else if (errorLower.includes("network") || errorLower.includes("fetch") || errorLower.includes("connection")) {
+        friendlyMessage = "Error de conexión. Por favor verifica tu internet e intenta nuevamente.";
+      }
+      // Check for validation errors
+      else if (errorLower.includes("validation") || errorLower.includes("required")) {
+        friendlyMessage = "Algunos campos no son válidos. Por favor revisa la información ingresada.";
+      }
+      // Default friendly message for any other error
+      else {
+        friendlyMessage = "Ocurrió un error al registrar tu cuenta. Por favor intenta nuevamente.";
+      }
+      
+      setError(friendlyMessage);
     } finally {
       setLoading(false);
     }
@@ -103,6 +157,7 @@ function Register() {
           value={formData.name || ""}
           onChange={(e) => updateFormData({ name: e.target.value })}
           className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-900 transition-colors"
+          maxLength={50}
           required
         />
       </div>
@@ -114,6 +169,7 @@ function Register() {
           value={formData.parent_last_name || ""}
           onChange={(e) => updateFormData({ parent_last_name: e.target.value })}
           className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-900 transition-colors"
+          maxLength={50}
           required
         />
       </div>
@@ -125,6 +181,7 @@ function Register() {
           value={formData.maternal_last_name || ""}
           onChange={(e) => updateFormData({ maternal_last_name: e.target.value })}
           className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-900 transition-colors"
+          maxLength={50}
         />
       </div>
 
@@ -133,8 +190,15 @@ function Register() {
         <input
           type="tel"
           value={formData.phone_number || ""}
-          onChange={(e) => updateFormData({ phone_number: e.target.value })}
+          onChange={(e) => {
+            const value = e.target.value.replace(/\D/g, '');
+            if (value.length <= 10) {
+              updateFormData({ phone_number: value });
+            }
+          }}
           className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-900 transition-colors"
+          pattern="[0-9]{10}"
+          maxLength={10}
           required
         />
       </div>
@@ -171,6 +235,7 @@ function Register() {
           value={formData.username || ""}
           onChange={(e) => updateFormData({ username: e.target.value })}
           className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-900 transition-colors"
+          maxLength={30}
           required
         />
       </div>
@@ -182,6 +247,7 @@ function Register() {
           value={formData.password || ""}
           onChange={(e) => updateFormData({ password: e.target.value })}
           className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-900 transition-colors"
+          maxLength={100}
           required
         />
       </div>
