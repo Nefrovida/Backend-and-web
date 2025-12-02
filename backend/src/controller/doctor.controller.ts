@@ -4,40 +4,7 @@ import { DoctorSchema } from "../validators/doctor.validator";
 import { ZodError } from "zod";
 import { JwtPayload } from "../types/auth.types";
 
-export const getAllDoctors = async (req: Request, res: Response) => {
-  try {
-    const { prisma } = await import("../util/prisma");
-    
-    const doctors = await prisma.doctors.findMany({
-      include: {
-        user: {
-          select: {
-            user_id: true,
-            name: true,
-            parent_last_name: true,
-            maternal_last_name: true,
-            phone_number: true,
-            username: true,
-            birthday: true,
-            gender: true,
-            registration_date: true,
-            active: true,
-          },
-        },
-      },
-    });
 
-    res.status(200).json({
-      message: "Doctors retrieved successfully",
-      data: doctors,
-    });
-  } catch (error: any) {
-    const status = error?.statusCode ?? 500;
-    res.status(status).json({
-      message: error?.message ?? "Internal server error",
-    });
-  }
-};
 
 export const createDoctor = async (req: Request, res: Response) => {
   try {
@@ -64,7 +31,7 @@ export const createDoctor = async (req: Request, res: Response) => {
 
     // Call service to register doctor
     const result = await DoctorRegistrationService.registerDoctor(
-      { role_id: adminAccount.roleId }, 
+      { role_id: adminAccount.roleId },
       doctorData
     );
 

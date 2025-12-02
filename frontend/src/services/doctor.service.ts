@@ -31,24 +31,3 @@ export const registerDoctor = async (
 
   return response.json();
 };
-
-export const getDoctors = async () => {
-  const response = await fetch(`${API_URL}/doctors`, {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    // Create an error with the response data attached
-    const err = new Error(error.message || "Failed to fetch doctors");
-    (err as any).response = {
-      data: error,
-      status: response.status,
-    };
-    throw err;
-  }
-
-  return response.json();
-};

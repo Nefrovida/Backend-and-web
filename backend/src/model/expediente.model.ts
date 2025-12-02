@@ -1,7 +1,7 @@
 import { prisma } from "../util/prisma";
 
 export default class MedicalRecord {
-  MedicalRecord() {}
+  MedicalRecord() { }
 
   /**
    * Get complete medical record for a patient
@@ -11,7 +11,7 @@ export default class MedicalRecord {
   static async getMedicalRecord(patientId: string) {
     // Get patient basic info - search by user_id first, then by patient_id
     let patient = await prisma.patients.findFirst({
-      where: { 
+      where: {
         OR: [
           { user_id: patientId },
           { patient_id: patientId }

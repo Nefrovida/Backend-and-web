@@ -14,6 +14,8 @@ import {
   FaIdCard,
   FaVenusMars,
   FaBirthdayCake,
+  FaFilter,
+  FaTimes,
 } from "react-icons/fa";
 
 type TabType = "info" | "appointments" | "notes" | "analysis" | "history" | "reports";
@@ -25,6 +27,11 @@ const MedicalRecordViewPage = () => {
   const [pdfOpen, setPdfOpen] = useState(false);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>("info");
+
+  // Filter state for Analysis
+  const [showFilters, setShowFilters] = useState(false);
+  const [filterDate, setFilterDate] = useState("");
+  const [filterType, setFilterType] = useState("");
 
   // Derive backend origin from Vite env or default to http://localhost:3001
   const API_BASE = (import.meta as any).env?.VITE_APP_API_URL || "http://localhost:3001/api";
@@ -109,6 +116,25 @@ const MedicalRecordViewPage = () => {
     { id: "history" as TabType, label: "Historial", icon: FaFileMedicalAlt, count: clinicalHistory.length },
     { id: "reports" as TabType, label: "Reportes", icon: FaExclamationTriangle, count: reports.length },
   ];
+
+  // Filter logic for Analysis
+  const filteredAnalysis = analysis.filter((item: any) => {
+    // Filter by date
+    if (filterDate) {
+      const itemDate = new Date(item.analysis_date).toISOString().split('T')[0];
+      if (itemDate !== filterDate) return false;
+    }
+
+    // Filter by type/name
+    if (filterType) {
+      const searchLower = filterType.toLowerCase();
+      const nameMatch = item.analysis.name.toLowerCase().includes(searchLower);
+      const typeMatch = item.analysis.description?.toLowerCase().includes(searchLower);
+      if (!nameMatch && !typeMatch) return false;
+    }
+
+    return true;
+  });
 
   return (
     <div className="w-full h-screen overflow-y-auto bg-gray-50/50 p-6">
@@ -389,9 +415,71 @@ const MedicalRecordViewPage = () => {
                   <FaVial className="text-primary" />
                   Análisis de Laboratorio
                 </h3>
-                {analysis.length > 0 ? (
+
+                {/* Filter Controls */}
+                <div className="mb-6">
+                  <div className="flex justify-between items-center mb-4">
+                    <p className="text-gray-600">
+                      Mostrando {filteredAnalysis.length} de {analysis.length} análisis
+                    </p>
+                    <button
+                      onClick={() => setShowFilters(!showFilters)}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${showFilters
+                        ? "bg-primary text-white shadow-md"
+                        : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+                        }`}
+                    >
+                      <FaFilter className={showFilters ? "text-white" : "text-gray-400"} />
+                      <span>Filtrar</span>
+                    </button>
+                  </div>
+
+                  {showFilters && (
+                    <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm animate-fadeIn mb-4">
+                      <div className="flex flex-col md:flex-row gap-4 items-end">
+                        <div className="w-full md:w-1/3">
+                          <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
+                            Fecha
+                          </label>
+                          <input
+                            type="date"
+                            value={filterDate}
+                            onChange={(e) => setFilterDate(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+                          />
+                        </div>
+                        <div className="w-full md:w-1/3">
+                          <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
+                            Tipo o Nombre
+                          </label>
+                          <input
+                            type="text"
+                            value={filterType}
+                            onChange={(e) => setFilterType(e.target.value)}
+                            placeholder="Buscar por nombre..."
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+                          />
+                        </div>
+                        <div className="w-full md:w-auto">
+                          <button
+                            onClick={() => {
+                              setFilterDate("");
+                              setFilterType("");
+                            }}
+                            className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-all w-full md:w-auto"
+                            disabled={!filterDate && !filterType}
+                          >
+                            <FaTimes />
+                            Limpiar
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                {filteredAnalysis.length > 0 ? (
                   <div className="grid grid-cols-1 gap-4">
-                    {analysis.map((item) => (
+                    {filteredAnalysis.map((item: any) => (
                       <div
                         key={item.patient_analysis_id}
                         className="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-md transition-all hover:border-blue-200"
@@ -490,7 +578,11 @@ const MedicalRecordViewPage = () => {
                 ) : (
                   <div className="text-center py-16 bg-gray-50 rounded-xl border border-dashed border-gray-300">
                     <FaVial className="mx-auto text-4xl text-gray-300 mb-4" />
-                    <p className="text-gray-500 font-medium">No hay análisis registrados</p>
+                    <p className="text-gray-500 font-medium">
+                      {analysis.length > 0
+                        ? "No se encontraron análisis con los filtros seleccionados"
+                        : "No hay análisis registrados"}
+                    </p>
                   </div>
                 )}
               </div>
