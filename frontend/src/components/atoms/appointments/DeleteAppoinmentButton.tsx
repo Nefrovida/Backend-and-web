@@ -38,30 +38,29 @@ const DeleteAppoinmentButton: React.FC<Props> = ({
       </button>
 
       {confirm && (
-        <section className="absolute top-0 left-0 flex items-center justify-center w-full h-full rounded-md">
-          <div className="bg-white rounded-md h-1/3 w-1/4">
-            <h1 className="bg-[#010C5E] text-white text-2xl font-semibold p-2 mb-2 rounded-t-md">
+        <section className="absolute top-0 left-0 flex items-center justify-center w-full h-full rounded-md bg-black bg-opacity-40">
+          <div className="bg-white rounded-md h-1/3 w-1/4 p-4">
+            <h1 className="text-2xl p-2 mb-2 rounded-t-md border-b-2 border-gray-200">
               ¿Segura de eliminar esta cita?
             </h1>
-            <div className="flex flex-col px-5 gap-4 text-lg">
+            <div className="flex flex-col px-5 gap-4 text-lg text-center">
               <p>
-                Esta accción no puede ser revertida, entonces confirma que
-                deseas eliminar esta cita.
+                Esta accción es permanente y no podrá ser revertida en un futuro
               </p>
-              <div className="flex justify-around">
-                <button
-                  className="bg-gray-200 rounded-md hover:bg-gray-300 w-1/3 text-2xl"
-                  onClick={() => setConfirm(false)}
-                >
-                  No
-                </button>
-                <button
-                  className="bg-red-600 rounded-md hover:bg-red-700 text-white w-1/3 text-2xl"
-                  onClick={handleDelete}
-                >
-                  Si
-                </button>
-              </div>
+            </div>
+            <div className="flex justify-between mt-10">
+              <button
+                className="bg-gray-200 rounded-md hover:bg-gray-300 text-xl py-2 px-10"
+                onClick={() => setConfirm(false)}
+              >
+                Cancelar
+              </button>
+              <button
+                className="bg-red-600 rounded-md hover:bg-red-700 text-white text-xl py-2 px-10"
+                onClick={handleDelete}
+              >
+                Eliminar
+              </button>
             </div>
           </div>
         </section>
