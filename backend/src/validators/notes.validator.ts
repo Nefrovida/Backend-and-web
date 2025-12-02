@@ -16,7 +16,6 @@ export const createNoteSchema = z.object({
   general_notes: z.string().max(2000).optional(),
   ailments: z.string().max(2000).optional(),
   prescription: z.string().max(2000).optional(),
-  additional_notes: z.string().max(2000).optional(),
   visibility: z
     .preprocess((v) => (typeof v === "string" ? v === "true" : v), z.boolean())
     .optional(),

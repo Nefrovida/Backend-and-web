@@ -11,7 +11,6 @@ export default class Notes {
     general_notes?: string;
     ailments?: string;
     prescription?: string;
-    additional_notes?: string;
     visibility?: boolean;
   }) {
     return await prisma.notes.create({
@@ -23,7 +22,6 @@ export default class Notes {
         general_notes: data.general_notes,
         ailments: data.ailments,
         prescription: data.prescription,
-        additional_notes: data.additional_notes,
         visibility: data.visibility ?? true,
       },
     });

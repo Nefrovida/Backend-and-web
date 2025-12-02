@@ -17,7 +17,6 @@ function usePostNotes(
     general_notes: "",
     ailments: "",
     prescription: "",
-    additional_notes: "",
     visibility: true,
   });
 
@@ -61,7 +60,6 @@ function usePostNotes(
       general_notes: noteData.general_notes || undefined,
       ailments: noteData.ailments || undefined,
       prescription: noteData.prescription || undefined,
-      additional_notes: noteData.additional_notes || undefined,
       visibility: noteData.visibility,
     };
 
@@ -72,7 +70,6 @@ function usePostNotes(
         general_notes: "",
         ailments: "",
         prescription: "",
-        additional_notes: "",
         visibility: true,
       });
     } catch (error) {

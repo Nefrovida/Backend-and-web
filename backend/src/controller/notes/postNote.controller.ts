@@ -54,7 +54,6 @@ async function postNote(req: Request, res: Response) {
       general_notes: validatedData.general_notes,
       ailments: validatedData.ailments,
       prescription: validatedData.prescription,
-      additional_notes: validatedData.additional_notes,
       visibility: validatedData.visibility,
     });
 

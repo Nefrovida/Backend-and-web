@@ -11,7 +11,6 @@ export const createNote = async (data: {
   general_notes?: string;
   ailments?: string;
   prescription?: string;
-  additional_notes?: string;
   visibility?: boolean;
 }) => {
   return await Notes.createNote(data);

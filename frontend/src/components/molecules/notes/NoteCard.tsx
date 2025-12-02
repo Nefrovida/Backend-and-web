@@ -30,7 +30,6 @@ const NoteCard: FC<Props> = ({ note }) => {
         <NoteSection noteContent={note.general_notes} title="Notas Generales" />
         <NoteSection noteContent={note.ailments} title="Padecimientos" />
         <NoteSection noteContent={note.prescription} title="Receta" />
-        <NoteSection noteContent={note.additional_notes} title="Notas Adicionales" />
       </div>
 
       <NoteVisibility visibility={note.visibility} />
