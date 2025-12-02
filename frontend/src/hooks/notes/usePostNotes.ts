@@ -1,9 +1,10 @@
 import { CreateNotePayload, NoteContent } from "@/types/note";
 import { useCallback, useState } from "react";
 
-const MAX_GENERAL_NOTES_LENGTH = 1000;
-const MAX_AILMENTS_LENGTH = 1000;
-const MAX_PRESCRIPTION_LENGTH = 2000;
+const MAX_TITLE_LENGHT = 200;
+const MAX_GENERAL_NOTES_LENGTH = 3000;
+const MAX_AILMENTS_LENGTH = 3000;
+const MAX_PRESCRIPTION_LENGTH = 3000;
 
 function usePostNotes(
   selectedPatientId: string,
@@ -13,6 +14,7 @@ function usePostNotes(
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [noteData, setNoteData] = useState<NoteContent>({
+    title: "Nota de consulta",
     general_notes: "",
     ailments: "",
     prescription: "",
@@ -57,7 +59,7 @@ function usePostNotes(
 
     const payload: CreateNotePayload = {
       patientId: selectedPatientId,
-      title: "Nota de consulta",
+      title: noteData.title || "Nota de consulta",
       content: "",
       general_notes: noteData.general_notes || undefined,
       ailments: noteData.ailments || undefined,
@@ -69,6 +71,7 @@ function usePostNotes(
       await postNote(payload);
       setShowModal(false);
       setNoteData({
+        title: "Nueva nota",
         general_notes: "",
         ailments: "",
         prescription: "",
@@ -82,6 +85,18 @@ function usePostNotes(
 
   const handleSave = async () => {
     setValidationError(null);
+
+    if (noteData.title.length > MAX_TITLE_LENGHT) {
+      setValidationError(
+        `El título no pueden exceder ${MAX_GENERAL_NOTES_LENGTH} caracteres`
+      );
+      return;
+    }
+
+    if (noteData.title.length <= 0) {
+      setValidationError(`El título no pueden estar vacío`);
+      return;
+    }
 
     if (noteData.general_notes.length > MAX_GENERAL_NOTES_LENGTH) {
       setValidationError(
@@ -109,6 +124,7 @@ function usePostNotes(
 
   return {
     isLoading,
+    noteData,
     error,
     handleSave,
     setNoteData,

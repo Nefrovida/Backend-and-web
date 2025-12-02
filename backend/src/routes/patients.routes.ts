@@ -3,6 +3,7 @@ const router = express.Router()
 
 import getDoctorPatients from "../controller/patients/getDoctorPatients.controller";
 import getAllPatients from "../controller/patients/getAllPatients.controller";
+import getAllServices from "../controller/patients/getServices.controller";
 import { authenticate } from "src/middleware/auth.middleware";
 import { requirePrivileges } from "src/middleware/rbac.middleware";
 import { Privilege } from "src/types/rbac.types";
@@ -23,5 +24,9 @@ router.get("/all",
   requirePrivileges([Privilege.VIEW_PATIENTS]),
   getAllPatients)
 
+router.get("/get-services",
+  authenticate,
+  getAllServices
+)
 
 export default router

@@ -121,3 +121,18 @@ export const getUserByUsername = async (username: string): Promise<UserWithRoleA
   });
 };
 
+/**
+ * Get user first login status by user Id
+ */
+export const isFirstLogin = async (userId: string): Promise<boolean> => {
+  const user = await prisma.users.findUnique({
+    where: { user_id: userId },
+    select: { first_login: true },
+  });
+
+  if (!user) {
+    throw new NotFoundError('User not found');
+  }
+
+  return user.first_login;
+}
