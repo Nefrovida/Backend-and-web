@@ -32,3 +32,13 @@ export type Message = {
   replies: number;
   forums: { forumId: number; name: string };
 };
+
+export type SimpleMessage = {
+  messageId: number;
+  content: string;
+  forumId: number;
+  user: {
+    userId: string;
+    userName: string;
+  };
+};
