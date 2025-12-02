@@ -321,13 +321,22 @@ function Navbar({ children }: Props) {
 
           {/* Laboratory results, Doctor */}
           {isDoctor && (
-            <CustomLink
-              label="Laboratorio"
-              to="/dashboard/laboratorio"
-              icon={<IoFlaskOutline />}
-              activeIcon={<IoFlaskSharp />}
-              end
-            />
+            <>
+              <CustomLink
+                label="Laboratorio"
+                to="/dashboard/laboratorio"
+                icon={<IoFlaskOutline />}
+                activeIcon={<IoFlaskSharp />}
+                end
+              />
+              <CustomLink
+                label="Usuarios Externos"
+                to="/dashboard/usuarios-externos"
+                icon={<FaUserMd />}
+                activeIcon={<FaUserMd />}
+                end
+              />
+            </>
           )}
 
           {/* Laboratorista analysis */}
