@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import usePostNotes from "@/hooks/notes/usePostNotes";
 import useGetPatients from "@/hooks/notes/useGetPatients";
+import useGetPatientAppointments from "@/hooks/notes/useGetPatientAppointments";
 import NotesTopController from "../organism/notes/NotesTopController";
 import NewNoteComponent from "../organism/notes/NewNoteComponent";
 import ViewNotesComponent from "../organism/notes/ViewNotesComponent";
@@ -9,9 +10,13 @@ const Notes = ({ className }: { className?: string }) => {
   const { patients, selectedPatientId, handlePatientChange } = useGetPatients();
   const [validationError, setValidationError] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [selectedAppointmentId, setSelectedAppointmentId] = useState<number | null>(null);
+
+  const { appointments, isLoading: appointmentsLoading } = useGetPatientAppointments(selectedPatientId);
 
   const { isLoading, error, noteData, setNoteData, handleSave } = usePostNotes(
     selectedPatientId,
+    selectedAppointmentId,
     setValidationError,
     setShowModal
   );
@@ -36,6 +41,10 @@ const Notes = ({ className }: { className?: string }) => {
               validationError={validationError}
               error={error}
               isLoading={isLoading}
+              appointments={appointments}
+              appointmentsLoading={appointmentsLoading}
+              selectedAppointmentId={selectedAppointmentId}
+              onAppointmentChange={setSelectedAppointmentId}
               title={noteData.title}
               setShowModal={setShowModal}
               handleSave={handleSave}

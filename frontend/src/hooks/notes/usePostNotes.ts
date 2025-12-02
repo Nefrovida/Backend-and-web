@@ -8,6 +8,7 @@ const MAX_PRESCRIPTION_LENGTH = 3000;
 
 function usePostNotes(
   selectedPatientId: string,
+  selectedAppointmentId: number | null,
   setValidationError: (string) => void,
   setShowModal: (boolean) => void
 ) {
@@ -18,6 +19,7 @@ function usePostNotes(
     general_notes: "",
     ailments: "",
     prescription: "",
+    visibility: true,
   });
 
   async function postNote(payload: CreateNotePayload) {
@@ -52,19 +54,15 @@ function usePostNotes(
   }
 
   const save = useCallback(async () => {
-    if (!selectedPatientId) {
-      setError("Selecciona un paciente");
-      return;
-    }
-
     const payload: CreateNotePayload = {
       patientId: selectedPatientId,
+      patient_appointment_id: selectedAppointmentId!,
       title: noteData.title || "Nota de consulta",
       content: "",
       general_notes: noteData.general_notes || undefined,
       ailments: noteData.ailments || undefined,
       prescription: noteData.prescription || undefined,
-      visibility: true,
+      visibility: noteData.visibility,
     };
 
     try {
@@ -75,17 +73,18 @@ function usePostNotes(
         general_notes: "",
         ailments: "",
         prescription: "",
+        visibility: true,
       });
     } catch (error) {
-      setError(
-        error instanceof Error ? error.message : "Error al guardar nota"
-      );
+      // El error de red ya se maneja en postNote con setError
     }
-  }, [selectedPatientId, noteData]);
+  }, [selectedPatientId, selectedAppointmentId, noteData]);
 
   const handleSave = async () => {
     setValidationError(null);
 
+    if (!selectedAppointmentId) {
+      setValidationError("Debes asociar la nota con una consulta");
     if (noteData.title.length > MAX_TITLE_LENGHT) {
       setValidationError(
         `El título no pueden exceder ${MAX_GENERAL_NOTES_LENGTH} caracteres`
