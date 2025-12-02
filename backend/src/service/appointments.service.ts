@@ -102,3 +102,35 @@ export const getAppointmentByPatient = async(id: string) => {
 
 
 };
+
+/**
+ * Get appointment by ID to validate it exists
+ * @param appointmentId - The ID of the appointment
+ * @returns The appointment or throws error if not found
+ */
+export const validateAppointment = async (appointmentId: number) => {
+  const appointment = await appointmentsModel.getAppointmentById(appointmentId);
+  if (!appointment) {
+    throw new NotFoundError(`Appointment with ID ${appointmentId} not found`);
+  }
+  return appointment;
+};
+
+/**
+ * Create a patient appointment (schedule an appointment)
+ * @param appointmentData - Data for the patient appointment
+ * @returns The created patient appointment
+ */
+export const schedulePatientAppointment = async (appointmentData: {
+  patient_id: string;
+  appointment_id: number;
+  date_hour: Date;
+  duration: number;
+  appointment_type: 'PRESENCIAL' | 'VIRTUAL';
+  link?: string | null;
+  place?: string | null;
+  appointment_status: 'REQUESTED' | 'PROGRAMMED' | 'FINISHED' | 'CANCELED' | 'MISSED';
+}) => {
+  appointmentData.appointment_type = appointmentData.appointment_type.toUpperCase() as 'PRESENCIAL' | 'VIRTUAL';
+  return await appointmentsModel.createPatientAppointment(appointmentData);
+};

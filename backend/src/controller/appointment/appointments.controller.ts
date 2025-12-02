@@ -124,3 +124,65 @@ export const getUserAppointmentsByUserId = async (
     res.status(error.statusCode || 500).json({ error: error.message });
   }
 };
+
+/**
+ * Schedule an appointment (patient schedules it)
+ */
+export const scheduleAppointment = async (req: Request, res: Response) => {
+  try {
+    const { appointmentId, patientId, dateHour, duration, appointmentType, place, link } = req.body;
+
+    // 1. Validate required fields
+    if (!appointmentId || !patientId || !dateHour) {
+      res.status(400).json({ success: false });
+      return;
+    }
+
+    // 2. Validate user is authenticated
+    if (!req.user) {
+      res.status(401).json({ success: false });
+      return;
+    }
+
+    // 3. Validate appointmentId exists and get appointment details
+    const appointment = await appointmentsService.validateAppointment(appointmentId);
+
+    // 4. Validate dateHour is in the future (preserve the exact datetime without timezone conversion)
+    const appointmentDate = new Date(dateHour);
+    const now = new Date();
+    if (appointmentDate <= now) {
+      res.status(400).json({ success: false });
+      return;
+    }
+
+    // 5. Determine appointment type and validate related fields
+    const type: 'PRESENCIAL' | 'VIRTUAL' = appointmentType || 'PRESENCIAL';
+    
+    if (type === 'VIRTUAL' && !link) {
+      res.status(400).json({ success: false });
+      return;
+    }
+
+    if (type === 'PRESENCIAL' && !place) {
+      res.status(400).json({ success: false });
+      return;
+    }
+
+    // 6. Create the patient appointment
+    await appointmentsService.schedulePatientAppointment({
+      patient_id: patientId,
+      appointment_id: appointmentId,
+      date_hour: appointmentDate,
+      duration: duration || 45,
+      appointment_type: type,
+      link: type === 'VIRTUAL' ? link : null,
+      place: type === 'PRESENCIAL' ? place : null,
+      appointment_status: 'PROGRAMMED'
+    });
+
+    res.status(201).json({ success: true });
+  } catch (error: any) {
+    console.error('Error scheduling appointment:', error);
+    res.status(error.statusCode || 500).json({ success: false });
+  }
+};

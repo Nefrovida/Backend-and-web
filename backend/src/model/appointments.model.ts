@@ -231,3 +231,50 @@ export const getAppointmentByPatient = async (now: Date, id: string) => {
   return appointments;
 
 };
+
+/**
+ * Get appointment by ID
+ * @param appointmentId - The ID of the appointment
+ * @returns The appointment or null if not found
+ */
+export const getAppointmentById = async (appointmentId: number) => {
+  try {
+    const appointment = await prisma.appointments.findFirst({
+      where: { 
+        appointment_id: appointmentId,
+        active: true 
+      },
+    });
+    return appointment;
+  } catch (error) {
+    console.error('Error fetching appointment by ID:', error);
+    throw new Error('Failed to fetch appointment by ID');
+  }
+};
+
+/**
+ * Create a patient appointment (patient_appointment table)
+ * @param appointmentData - Data for creating the patient appointment
+ * @returns The created patient appointment
+ */
+export const createPatientAppointment = async (appointmentData: {
+  patient_id: string;
+  appointment_id: number;
+  date_hour: Date;
+  duration: number;
+  appointment_type: 'PRESENCIAL' | 'VIRTUAL';
+  link?: string | null;
+  place?: string | null;
+  appointment_status: 'REQUESTED' | 'PROGRAMMED' | 'FINISHED' | 'CANCELED' | 'MISSED';
+}) => {
+  try {
+    console.log("appointmentData: ", appointmentData);
+    const newPatientAppointment = await prisma.patient_appointment.create({
+      data: appointmentData,
+    });
+    return newPatientAppointment;
+  } catch (error) {
+    console.error('Error creating patient appointment:', error);
+    throw new Error('Failed to create patient appointment');
+  }
+};
