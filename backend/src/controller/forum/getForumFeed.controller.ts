@@ -1,4 +1,3 @@
-
 import Forum from "#/src/model/forum.model";
 import { Request, Response } from "express";
 import { Message, ParsedMessage } from "#/src/types/forum.types";
@@ -19,7 +18,6 @@ async function getForumFeed(req: Request, res: Response) {
     const messages = (
       await Forum.getForumFeed(pageNumber, userId, forumId)
     ).map(parseMessages);
-
 
     res.status(200).json(messages);
   } catch (e) {

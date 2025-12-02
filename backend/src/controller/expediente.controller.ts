@@ -60,8 +60,6 @@ export const requestPresignForResult = async (req: Request, res: Response) => {
     const { patientId } = req.params;
     const { mime, size } = req.body ?? {};
 
-    console.log("Presign for expediente result", { patientId, mime, size });
-
     const safeName = `${patientId}-${Date.now()}.pdf`;
     const url = `/uploads/${safeName}`;
 
@@ -87,8 +85,6 @@ export const uploadAnalysisResult = async (req: Request, res: Response) => {
 
     const { patientId } = req.params;
     const { uri, interpretation, patientAnalysisId } = req.body ?? {};
-
-    console.log("Upload analysis result", { patientId, uri, interpretation, patientAnalysisId });
 
     if (!uri) {
       return res.status(400).json({ error: "uri is required" });
@@ -156,8 +152,6 @@ export const uploadAnalysisResult = async (req: Request, res: Response) => {
         analysis_status: "SENT",
       },
     });
-
-    console.log("Result saved successfully", { resultId: result.result_id });
 
     res.status(200).json({ 
       success: true, 

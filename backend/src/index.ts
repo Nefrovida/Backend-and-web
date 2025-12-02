@@ -5,7 +5,6 @@ import dotenv from "dotenv";
 import session from "express-session";
 import { errorHandler } from "./middleware/error.middleware";
 
-
 dotenv.config({ path: "../.env" });
 
 // Initialize server
@@ -61,7 +60,6 @@ fs.mkdir(uploadDir, { recursive: true }).catch(console.error);
 
 // Serve static files
 app.use("/uploads", express.static(uploadDir));
-
 
 // Endpoint to receibe new binary (presigned URL PUT)
 app.put(

@@ -11,18 +11,7 @@ import * as forumsService from "../service/forums.service";
 import * as forumModel from "../model/forum.model";
 import { BadRequestError, NotFoundError } from "../util/errors.util.js";
 import { DEFAULT_ROLES } from "../config/constants";
-import sanitizeHtml from "sanitize-html";
 
-
-function sanitizeMessage(raw: string) {
-    if (!raw) return "";
-
-    return sanitizeHtml(raw, {
-        allowedTags: [],         // ❗️ NO PERMITIR TAGS
-        allowedAttributes: {},   // ❗️ NO PERMITIR ATRIBUTOS
-        disallowedTagsMode: "discard"
-    }).trim();
-}
 /**
  * Create a new forum (Admin only)
  */
@@ -718,8 +707,6 @@ export const replyToMessage = async (
     const validatedData = replyToMessageSchema.parse(req.body);
     const forumId = parseInt(req.params.forumId);
 
-    const sanitizedContent = sanitizeMessage(validatedData.content);
-
     if (isNaN(forumId)) {
       res.status(400).json({
         success: false,
@@ -738,7 +725,7 @@ export const replyToMessage = async (
       forumId,
       userId,
       validatedData.parent_message_id,
-      sanitizedContent
+      validatedData.content
     );
 
     res.status(201).json(result);
