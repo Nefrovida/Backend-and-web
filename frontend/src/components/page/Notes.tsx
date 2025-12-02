@@ -14,7 +14,7 @@ const Notes = ({ className }: { className?: string }) => {
 
   const { appointments, isLoading: appointmentsLoading } = useGetPatientAppointments(selectedPatientId);
 
-  const { isLoading, error, setNoteData, handleSave } = usePostNotes(
+  const { isLoading, error, noteData, setNoteData, handleSave } = usePostNotes(
     selectedPatientId,
     selectedAppointmentId,
     setValidationError,
@@ -45,6 +45,7 @@ const Notes = ({ className }: { className?: string }) => {
               appointmentsLoading={appointmentsLoading}
               selectedAppointmentId={selectedAppointmentId}
               onAppointmentChange={setSelectedAppointmentId}
+              title={noteData.title}
               setShowModal={setShowModal}
               handleSave={handleSave}
               setNoteData={setNoteData}

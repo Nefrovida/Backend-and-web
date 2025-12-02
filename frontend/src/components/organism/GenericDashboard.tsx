@@ -7,6 +7,7 @@ import {
   FaClipboardCheck,
   FaRegClock,
   FaRegListAlt,
+  FaKey,
 } from "react-icons/fa";
 import { MdOutlineForum } from "react-icons/md";
 import { PiFlaskLight } from "react-icons/pi";
@@ -78,6 +79,13 @@ function DashboardHome() {
           icon: <FaRegClipboard size={24} />,
           onClick: () => navigate("/dashboard/agenda"),
           color: "green",
+        },
+        {
+          title: "Restablecer Contraseñas",
+          description: "Gestionar solicitudes de cambio de contraseña",
+          icon: <FaKey size={24} />,
+          onClick: () => navigate("/dashboard/reestablecer-contraseña"),
+          color: "red",
         },
         ...commonAccess,
       ];

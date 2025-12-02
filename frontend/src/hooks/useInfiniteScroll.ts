@@ -59,7 +59,13 @@ export default function useInfiniteScroll<T>(
           if (status == 400) {
             return;
           }
-          setResults((prev) => [...prev, ...data]);
+          setResults((prev) => {
+            try {
+              return [...prev, ...data];
+            } catch {
+              return [...prev, ...data.data];
+            }
+          });
           setHasMore(data.length > 0);
           setCurrentPage((prev) => prev + 1);
         })

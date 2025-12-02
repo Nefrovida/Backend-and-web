@@ -72,7 +72,7 @@ const LabFilter: FC<Props> = ({ onChange }) => {
   }, []);
 
   return (
-    <div className="absolute top-[6.2rem] -translate-x-28 bg-white rounded-md h-[30rem] w-80 z-10 drop-shadow-xl shadow-lg p-2">
+    <div className="absolute top-[7rem] -translate-x-28 bg-white rounded-md min-h-[30rem] w-80 z-10 drop-shadow-xl shadow-lg p-2">
       <div className="flex justify-between items-center mb-2">
         <h1 className="text-2xl font-semibold">Filtro</h1>
       </div>
@@ -131,39 +131,40 @@ const LabFilter: FC<Props> = ({ onChange }) => {
         />
       </div>
 
-      <h2 className="mt-2 text-xl">Tipo de examen</h2>
-      <div className="flex flex-col overflow-scroll h-40 text-lg">
-        {analysis.map((a, idx) => (
-          <label
-            htmlFor={"analysis_" + a.analysis_id}
-            className="flex gap-2 items-center"
-            key={idx}
+      <div>
+        <h2 className="mt-2 text-xl">Tipo de examen</h2>
+        <div className="flex flex-col overflow-scroll h-32 text-lg">
+          {analysis.map((a, idx) => (
+            <label
+              htmlFor={"analysis_" + a.analysis_id}
+              className="flex gap-2 items-center"
+              key={idx}
+            >
+              <input
+                type="checkbox"
+                id={"analysis_" + a.analysis_id}
+                name={a.name}
+                value={a.analysis_id}
+                onChange={handleChange}
+              />
+              {a.name}
+            </label>
+          ))}
+        </div>
+        <div className="flex gap-2 mt-4">
+          <button
+            className="bg-gray-300 hover:bg-gray-200 rounded-md w-1/2 py-1"
+            onClick={deleteFilter}
           >
-            <input
-              type="checkbox"
-              id={"analysis_" + a.analysis_id}
-              name={a.name}
-              value={a.analysis_id}
-              onChange={handleChange}
-            />
-            {a.name}
-          </label>
-        ))}
-      </div>
-
-      <div className="relative bottom-2  flex gap-2">
-        <button
-          className="bg-gray-300 hover:bg-gray-200 rounded-md w-1/2 py-1"
-          onClick={deleteFilter}
-        >
-          Borrar
-        </button>
-        <button
-          className="bg-success hover:bg-hover-success rounded-md w-1/2 py-1"
-          onClick={handleFilter}
-        >
-          Buscar
-        </button>
+            Borrar
+          </button>
+          <button
+            className="bg-success hover:bg-hover-success rounded-md w-1/2 py-1"
+            onClick={handleFilter}
+          >
+            Buscar
+          </button>
+        </div>
       </div>
     </div>
   );

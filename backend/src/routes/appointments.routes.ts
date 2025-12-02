@@ -25,7 +25,22 @@ router.get(
   appointmentsController.getDoctorAppointments
 );
 
-router.get("/getAllAppointments", appointmentsController.getAllAppointments);
+router.get("/getAllAppointments",appointmentsController.getAllAppointments);
+
+router.post("/new-appointment", 
+  authenticate,
+  requirePrivileges([Privilege.CREATE_APPOINTMENTS]),
+  appointmentsController.createAppointment);
+
+router.put("/modify/:appointment_id",
+authenticate,
+requirePrivileges([Privilege.CREATE_APPOINTMENTS]),
+appointmentsController.updateAppointment);
+
+router.put("/delete/:appointment_id",
+authenticate,
+requirePrivileges([Privilege.CREATE_APPOINTMENTS]),
+appointmentsController.deleteAppointment);
 
 router.get("/patient/:patientId",
   authenticate,

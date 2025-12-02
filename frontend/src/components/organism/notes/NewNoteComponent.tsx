@@ -19,6 +19,7 @@ interface Props {
   appointmentsLoading: boolean;
   selectedAppointmentId: number | null;
   onAppointmentChange: (id: number | null) => void;
+  title: string;
   setShowModal: (b: boolean) => void;
   handleSave: () => void;
   setNoteData: React.Dispatch<React.SetStateAction<NoteContent>>;
@@ -32,6 +33,7 @@ const NewNoteComponent: FC<Props> = ({
   appointmentsLoading,
   selectedAppointmentId,
   onAppointmentChange,
+  title,
   setShowModal,
   handleSave,
   setNoteData,
@@ -45,6 +47,8 @@ const NewNoteComponent: FC<Props> = ({
       />
 
       <div className="flex-1 overflow-y-auto p-4">
+        <NewNoteModal modalState={setNoteData} title={title} />
+
         {(validationError || error) && (
           <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm">
             {validationError || error}

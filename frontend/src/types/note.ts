@@ -28,6 +28,7 @@ export interface CreateNotePayload {
 }
 
 export interface NoteContent {
+  title: string;
   general_notes: string;
   ailments: string;
   prescription: string;
