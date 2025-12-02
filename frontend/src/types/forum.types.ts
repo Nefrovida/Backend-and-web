@@ -42,3 +42,15 @@ export type SimpleMessage = {
     userName: string;
   };
 };
+
+export type Reply = {
+  author: {
+    userId: string;
+    name: string;
+    lastName: string;
+  };
+  content: string;
+  forumId: number;
+  id: number;
+  parentMessageId: number;
+};

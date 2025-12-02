@@ -21,7 +21,7 @@ const MessageContent: FC<Props> = ({ message }) => {
         </button>
         <Link
           className="flex gap-2 items-center"
-          to={`${message.forums.forumId}/mensaje/${message.messageId}`}
+          to={`/dashboard/foro/${message.forums.forumId}/mensaje/${message.messageId}`}
         >
           <MdChatBubbleOutline className="hover:text-blue-600" />
           {message.replies}

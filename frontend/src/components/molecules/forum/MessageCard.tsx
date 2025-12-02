@@ -12,7 +12,7 @@ const MessageCard: FC<Props> = ({ message }) => {
     <div className="w-8/12 rounded-md border-2 bg-white drop-shadow-sm p-2">
       <section className="flex justify-between">
         <Link
-          to={`${message.forums.forumId}`}
+          to={`/dashboard/foro/${message.forums.forumId}`}
           className="text-gray-400 text-sm hover:underline"
         >
           {message.forums.name}
