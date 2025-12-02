@@ -20,12 +20,19 @@ import appointmentRoutes from "./appointment.routes";
 import expedienteRoutes from "./expediente.routes";
 import analysisRoutes from "./analysis.routes";
 import dashboardRoutes from "./dashboard.routes";
+import profileRoutes from "./profile.routes";
 const router = express.Router();
+
 
 // ============================================
 // Authentication Routes (Public)
 // ============================================
 router.use("/auth", authRoutes);
+
+// ============================================
+// Profile Routes (Protected)
+// ============================================
+router.use("/profile", profileRoutes);
 
 // ============================================
 // User Routes (Protected)
