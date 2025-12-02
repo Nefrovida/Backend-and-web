@@ -173,6 +173,12 @@ export type Message = {
   content: string;
   publication_timestamp: Date;
   forum: { name: string; forum_id: number };
+  user: {
+    name: string;
+    parent_last_name: string | null;
+    maternal_last_name: string | null;
+    username: string;
+  };
 };
 
 export type ParsedMessage = {
@@ -181,4 +187,5 @@ export type ParsedMessage = {
   likes: number;
   replies: number;
   forums: { forumId: number; name: string };
+  userName: string;
 };

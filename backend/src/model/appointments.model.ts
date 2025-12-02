@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { ANALYSIS_STATUS, PrismaClient } from "@prisma/client";
 import {Request, Response} from 'express';
 import { ZodError } from 'zod';
 
@@ -73,8 +73,72 @@ export const getDoctorAppointments = async (doctorId: string) => {
 };
 
   export const getAllAppointments = async () => {
-    const appointments = await prisma.appointments.findMany();
+    const appointments = await prisma.appointments.findMany({
+      select: {
+      appointment_id: true,
+      doctor_id: true,
+      name: true,
+      general_cost: true,
+      community_cost: true,
+      image_url: true,
+    },
+      where: {
+        active: true,
+      },
+    });
     return appointments;
+  };
+
+
+  export const createAppointment = async ( validatedData: any) => {
+    try {
+      const newAppointment = await prisma.appointments.create({
+        data: validatedData,
+      });
+      return true;
+    } catch (error) {
+      if (error instanceof ZodError) {
+        throw new Error(`Validation error: ${error.errors.map(e => e.message).join(', ')}`);
+      }
+      throw error;
+    }
+  };
+
+  export const getAppointmentByData = async (validatedData: any) => {
+    return await prisma.appointments.findFirst({
+      where: {
+        name: validatedData.name,
+        doctor_id: validatedData.doctor_id,
+        active: true,
+      },
+    });
+  };
+
+  export const updateAppointment = async (appointmentId: number, updateData: any) => {
+    try {
+      const updatedAppointment = await prisma.appointments.update({
+        where: { appointment_id: appointmentId },
+        data: updateData,
+      });
+      return updatedAppointment;
+    } catch (error) {
+      if (error instanceof ZodError) {
+        throw new Error(`Validation error: ${error.errors.map(e => e.message).join(', ')}`);
+      }
+      throw error;
+    }
+  };
+
+  export const deleteAppointment = async (appointmentId: number) => {
+    try {
+      const deletedAppointment = await prisma.appointments.update({
+        where: { appointment_id: appointmentId },
+        data: { active: false },
+      });
+      return deletedAppointment;
+    } catch (error) {
+      throw error;
+    }
   };
 
   export const getAppointmentByUserId = async (req: Request, res: Response, UserId: string) =>{
@@ -85,31 +149,34 @@ export const getDoctorAppointments = async (doctorId: string) => {
     });
 
     if (!patientId) {
-        return res.status(404).json({ error: 'Patient not found' });
+        return res.status(404).json({ error: "Patient not found" });
     }
-      const appointments = await prisma.patient_appointment.findMany({
-          where: { patient_id: patientId.patient_id},
-          include: {
+
+    const appointments = await prisma.patient_appointment.findMany({
+        where: {
+            patient_id: patientId.patient_id,
+            appointment_status: { not: "CANCELED" }
+        },
+        include: {
             appointment: {
-              select: {
-                name: true,
+                select: { name: true }
             }
-          }
         }
-      });
+    });
 
-      const analysis = await prisma.patient_analysis.findMany({
-          where: { patient_id: patientId.patient_id },
-          include: {
+    const analysis = await prisma.patient_analysis.findMany({
+        where: {
+            patient_id: patientId.patient_id,
+            analysis_status: { not: "CANCELED" }
+        },
+        include: {
             analysis: {
-              select: {
-                name: true,
-              }
+                select: { name: true }
             }
-          }
-      });
+        }
+    });
 
-      return { appointments, analysis };
+    return { appointments, analysis };
 }
 
 export const getAppointmentByName = async (appointmentName: string) => {
@@ -126,3 +193,44 @@ export const getAppointmentByName = async (appointmentName: string) => {
     throw new Error('Failed to fetch appointment by name');
   }
 }
+
+export const getAppointmentByPatient = async (now: Date, id: string) => {
+    const patientId  = await prisma.patients.findFirst({
+        where: {
+            user_id: id
+        },
+    });
+
+    if (!patientId) {
+       throw new Error("Patient not found");
+    }
+    const appointments = await prisma.patient_appointment.findMany({
+      where: { 
+        patient_id: patientId.patient_id,
+        date_hour: {
+          lt: now
+        },
+        notes: {
+          some: {
+            visibility: true
+          }
+        }
+      },
+      include: {
+        appointment: {
+          select: {
+            name: true,
+          },
+        },
+        notes: {
+          where: {
+            visibility: true
+          }
+        }
+      }
+    });
+
+
+  return appointments;
+
+};

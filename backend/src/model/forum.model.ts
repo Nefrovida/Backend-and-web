@@ -124,8 +124,15 @@ export default class Forum {
             name: true,
           },
         },
+        user: {
+          select: {
+            name: true,
+            parent_last_name: true,
+            maternal_last_name: true,
+            username: true,
+          },
+        },
       },
-
       orderBy: {
         publication_timestamp: "desc",
       },
@@ -136,6 +143,18 @@ export default class Forum {
     return await prisma.messages.findUnique({
       where: {
         message_id: messageId,
+      },
+      select: {
+        message_id: true,
+        forum_id: true,
+        user_id: true,
+        content: true,
+        user: {
+          select: {
+            username: true,
+            user_id: true,
+          },
+        },
       },
     });
   }
