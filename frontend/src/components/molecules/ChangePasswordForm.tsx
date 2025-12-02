@@ -4,9 +4,10 @@ import { ChangePasswordDTO } from '@/types/profile.types';
 
 type Props = {
   onChangePassword: (payload: ChangePasswordDTO) => Promise<void>;
+  onCancel?: () => void;
 };
 
-const ChangePasswordForm: React.FC<Props> = ({ onChangePassword }) => {
+const ChangePasswordForm: React.FC<Props> = ({ onChangePassword, onCancel }) => {
   const [form, setForm] = useState({ newPassword: '', confirmNewPassword: '' });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -34,10 +35,9 @@ const ChangePasswordForm: React.FC<Props> = ({ onChangePassword }) => {
         <input type="password" className="w-full p-2 border rounded mt-1" value={form.confirmNewPassword} onChange={e => setForm({...form, confirmNewPassword: e.target.value})} />
       </div>
       {error && <div className="text-sm text-red-600">{error}</div>}
-      <div className="flex justify-end">
-        <Button onClick={undefined} className="px-6">
-          <button type="submit" className="w-full">{saving ? 'Guardando...' : 'Cambiar contraseña'}</button>
-        </Button>
+      <div className="flex justify-end items-center gap-3">
+        <Button onClick={() => onCancel && onCancel()} variant="danger" className="px-4 py-2 text-sm rounded-full">Cancelar</Button>
+        <Button type="submit" variant="primary" className="px-6 py-2 text-sm rounded-full">{saving ? 'Guardando...' : 'Cambiar contraseña'}</Button>
       </div>
     </form>
   );

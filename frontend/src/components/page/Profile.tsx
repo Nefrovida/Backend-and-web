@@ -5,12 +5,15 @@ import ChangePasswordForm from '@/components/molecules/ChangePasswordForm';
 import profileService from '@/services/profile.service';
 import { UserProfileDTO, UpdateProfileDTO, ChangePasswordDTO } from '@/types/profile.types';
 import { useNavigate } from 'react-router-dom';
+import Button from '@/components/atoms/Button';
 
 const Profile: React.FC = () => {
   const [user, setUser] = useState<UserProfileDTO | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
+  // start password card in editing mode as requested
+  const [editingPassword, setEditingPassword] = useState(true);
   const navigate = useNavigate();
 
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -80,10 +83,8 @@ const Profile: React.FC = () => {
         >
           <div className="flex items-center justify-between">
             <h3 className="text-xl font-semibold mb-4">Mis datos</h3>
-            {!editing ? (
-              <button onClick={() => setEditing(true)} className="text-sm text-blue-600 hover:underline">Editar</button>
-            ) : (
-              <button onClick={() => setEditing(false)} className="text-sm text-gray-600 hover:underline">Cancelar</button>
+            {!editing && (
+              <Button onClick={() => setEditing(true)} variant="primary" className="px-3 py-1 text-sm rounded-full">Editar</Button>
             )}
           </div>
 
@@ -109,13 +110,26 @@ const Profile: React.FC = () => {
               </div>
             </div>
           ) : (
-            <ProfileForm initial={user} onSave={onSave} />
+            <ProfileForm initial={user} onSave={onSave} onCancel={() => setEditing(false)} />
           )}
         </div>
 
         <div className={`bg-white p-6 rounded shadow transform transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
-          <h3 className="text-xl font-semibold mb-4">Contraseña</h3>
-          <ChangePasswordForm onChangePassword={onChangePassword} />
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-semibold mb-4">Contraseña</h3>
+            {!editingPassword && (
+              <Button onClick={() => setEditingPassword(true)} variant="primary" className="px-3 py-1 text-sm rounded-full">Editar</Button>
+            )}
+          </div>
+
+          {editingPassword ? (
+            <ChangePasswordForm onChangePassword={onChangePassword} onCancel={() => setEditingPassword(false)} />
+          ) : (
+            <div className="space-y-3">
+              <div className="text-sm text-gray-500">Contraseña</div>
+              <div className="text-lg font-medium">********</div>
+            </div>
+          )}
         </div>
       </div>
     </div>
