@@ -1,9 +1,10 @@
 import * as appointmentsModel from "../model/appointments.model";
+import { notes } from "@prisma/client";
 import { NotFoundError } from "../util/errors.util";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../util/prisma";
 import { Request, Response } from "express";
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
 
 /**
  * Get all appointments for a doctor
@@ -63,7 +64,7 @@ export const updateAppointment = async (appointmentId: number, updateData: any) 
  */
 export const deleteAppointment = async (appointmentId: number) => {
   return await appointmentsModel.deleteAppointment(appointmentId);
-};  
+};
 
 /**
  *
@@ -77,7 +78,7 @@ export const getAppointmentByName = async (appointmentName: string) => {
   return await appointmentsModel.getAppointmentByName(appointmentName);
 };
 
-export const getAppointmentByPatient = async(id: string) => {
+export const getAppointmentByPatient = async (id: string) => {
   const now = new Date()
   const data = await appointmentsModel.getAppointmentByPatient(now, id);
 
@@ -87,7 +88,7 @@ export const getAppointmentByPatient = async(id: string) => {
     parsedData.push({
       appointmentName: ap.appointment.name.trim(),
       dateHour: ap.date_hour,
-      notes: ap.notes.map(n => ({
+      notes: ap.notes.map((n: notes) => ({
         content: n.content,
         generalNotes: n.general_notes,
         ailments: n.ailments,

@@ -226,7 +226,7 @@ function Navbar({ children }: Props) {
         <div className="flex flex-col gap-2 items-center w-full">
           <CustomLink
             label="Mi Perfil"
-            to="/dashboard/"
+            to="/dashboard/profile/me"
             icon={<BsPerson />}
             activeIcon={<BsFillPersonFill />}
             end
@@ -321,13 +321,22 @@ function Navbar({ children }: Props) {
 
           {/* Laboratory results, Doctor */}
           {isDoctor && (
-            <CustomLink
-              label="Laboratorio"
-              to="/dashboard/laboratorio"
-              icon={<IoFlaskOutline />}
-              activeIcon={<IoFlaskSharp />}
-              end
-            />
+            <>
+              <CustomLink
+                label="Laboratorio"
+                to="/dashboard/laboratorio"
+                icon={<IoFlaskOutline />}
+                activeIcon={<IoFlaskSharp />}
+                end
+              />
+              <CustomLink
+                label="Usuarios Externos"
+                to="/dashboard/usuarios-externos"
+                icon={<FaUserMd />}
+                activeIcon={<FaUserMd />}
+                end
+              />
+            </>
           )}
 
           {/* Laboratorista analysis */}

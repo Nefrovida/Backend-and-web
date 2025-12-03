@@ -118,6 +118,14 @@ export default class Forum {
             messages: true,
           },
         },
+        likes: {
+          where: {
+            user_id: userId,
+          },
+          select: {
+            like_id: true,
+          },
+        },
         forum: {
           select: {
             forum_id: true,
@@ -143,6 +151,19 @@ export default class Forum {
     return await prisma.messages.findUnique({
       where: {
         message_id: messageId,
+        active: true,
+      },
+      select: {
+        message_id: true,
+        forum_id: true,
+        user_id: true,
+        content: true,
+        user: {
+          select: {
+            username: true,
+            user_id: true,
+          },
+        },
       },
     });
   }
@@ -849,6 +870,7 @@ export const findMessageById = async (messageId: number) => {
   return await prisma.messages.findUnique({
     where: {
       message_id: messageId,
+      active: true,
     },
   });
 };
@@ -964,7 +986,8 @@ export const countForumMessages = async (forumId: number) => {
 export const findRepliesByMessageId = async (
   parentMessageId: number,
   skip: number,
-  take: number
+  take: number,
+  userId: string
 ) => {
   return await prisma.messages.findMany({
     where: {
@@ -979,6 +1002,14 @@ export const findRepliesByMessageId = async (
           parent_last_name: true,
           maternal_last_name: true,
           username: true,
+        },
+      },
+      likes: {
+        where: {
+          user_id: userId,
+        },
+        select: {
+          like_id: true,
         },
       },
       _count: {
@@ -1005,5 +1036,15 @@ export const countReplies = async (parentMessageId: number) => {
       parent_message_id: parentMessageId,
       active: true,
     },
+  });
+};
+
+/**
+ * Soft delete a message by ID (sets active to false)
+ */
+export const softDeleteMessage = async (messageId: number) => {
+  return await prisma.messages.update({
+    where: { message_id: messageId },
+    data: { active: false },
   });
 };
