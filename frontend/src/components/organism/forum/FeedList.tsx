@@ -25,7 +25,7 @@ const FeedList: FC<Props> = ({ messageInfo, onDeleteMessage }) => {
       ref={scrollRef}
     >
       {messages.map((m: Message) => (
-        <MemoizedMessageCard key={m.messageId} message={m} />
+        <MemoizedMessageCard key={m.messageId} message={m} onDelete={onDeleteMessage} />
       ))}
     </ul>
   );

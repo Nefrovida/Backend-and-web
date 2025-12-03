@@ -1,6 +1,5 @@
 import { Message } from "@/types/forum.types";
 import { FC, useState } from "react";
-import MessageContent from "./MessageContent";
 import { Link } from "react-router-dom";
 import { authService } from "@/services/auth.service";
 import { ROLE_IDS } from "@/types/auth.types";
@@ -11,7 +10,7 @@ import { MdChatBubbleOutline } from "react-icons/md";
 
 interface Props {
   message: Message;
-  onDelete?: (messageId: number) => void;
+  onDelete: (messageId: number) => void;
 }
 
 const MessageCard: FC<Props> = ({ message, onDelete }) => {
@@ -21,9 +20,7 @@ const MessageCard: FC<Props> = ({ message, onDelete }) => {
 
   const handleDeleteClick = () => {
     setShowMenu(false);
-    if (onDelete) {
-      onDelete(message.messageId);
-    }
+    onDelete(message.messageId);
   };
 
   return (
@@ -62,12 +59,14 @@ const MessageCard: FC<Props> = ({ message, onDelete }) => {
           <BiLike className="hover:text-blue-600" />
           {message.likes}
         </div>
-        <div className="flex gap-2 items-center">
+        <Link
+          className="flex gap-2 items-center"
+          to={`/dashboard/foro/${message.forums.forumId}/mensaje/${message.messageId}`}
+        >
           <MdChatBubbleOutline className="hover:text-blue-600" />
           {message.replies}
-        </div>
+        </Link>
       </section>
-      <MessageContent message={message} />
     </div>
   );
 };

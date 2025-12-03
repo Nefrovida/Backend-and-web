@@ -85,6 +85,8 @@ function usePostNotes(
 
     if (!selectedAppointmentId) {
       setValidationError("Debes asociar la nota con una consulta");
+      return;
+    }
     if (noteData.title.length > MAX_TITLE_LENGHT) {
       setValidationError(
         `El título no pueden exceder ${MAX_GENERAL_NOTES_LENGTH} caracteres`

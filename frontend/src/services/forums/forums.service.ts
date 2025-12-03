@@ -43,4 +43,24 @@ export const forumsService = {
 
     return response.json();
   },
+
+  /**
+   * Delete a reply from a message (Admin only)
+   * Note: Replies are just messages with a parent_message_id, so we use the same endpoint
+   *
+   * @param replyId - ID of the reply to delete
+   * @returns Promise with success response
+   * @throws Error if deletion fails
+   */
+  async deleteReply(replyId: number): Promise<{
+    success: boolean;
+    message: string;
+    data: {
+      message_id: number;
+      deleted_at: string;
+    };
+  }> {
+    // Replies are messages too, so we use the same endpoint
+    return this.deleteMessage(replyId);
+  },
 };
