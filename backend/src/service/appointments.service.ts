@@ -131,6 +131,5 @@ export const schedulePatientAppointment = async (appointmentData: {
   place?: string | null;
   appointment_status: 'REQUESTED' | 'PROGRAMMED' | 'FINISHED' | 'CANCELED' | 'MISSED';
 }) => {
-  appointmentData.appointment_type = appointmentData.appointment_type.toUpperCase() as 'PRESENCIAL' | 'VIRTUAL';
   return await appointmentsModel.createPatientAppointment(appointmentData);
 };

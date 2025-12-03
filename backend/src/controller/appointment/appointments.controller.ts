@@ -132,6 +132,8 @@ export const scheduleAppointment = async (req: Request, res: Response) => {
   try {
     const { appointmentId, patientId, dateHour, duration, appointmentType, place, link } = req.body;
 
+    console.log("dateHour before conversion: ", dateHour);
+
     // 1. Validate required fields
     if (!appointmentId || !patientId || !dateHour || !appointmentType) {
       res.status(400).json({ success: false });
@@ -151,26 +153,38 @@ export const scheduleAppointment = async (req: Request, res: Response) => {
       return;
     }
 
-    // 4. Validate dateHour is in the future (preserve the exact datetime without timezone conversion)
-    const appointmentDate = new Date(dateHour);
+    // 4. Parse dateHour as local time (treat the incoming string as local time, not UTC)
+    // If dateHour is "2025-12-04T11:50:00", parse it as local time components
+    let appointmentDate: Date;
+    
+    if (dateHour.includes('T')) {
+      // Parse as "YYYY-MM-DDTHH:mm:ss" format
+      const [datePart, timePart] = dateHour.split('T');
+      const [year, month, day] = datePart.split('-').map(Number);
+      const [hours, minutes, seconds = 0] = timePart.replace('Z', '').split(':').map(Number);
+      
+      // Create date using local timezone (not UTC)
+      appointmentDate = new Date(year, month - 1, day, hours, minutes, seconds);
+    } else {
+      // Fallback to direct parsing
+      appointmentDate = new Date(dateHour);
+    }
+    
     const now = new Date();
     if (appointmentDate <= now) {
       res.status(400).json({ success: false });
       return;
     }
+    console.log("appointmentDate after conversion: ", appointmentDate);
 
-    // 5. Determine appointment type and validate related fields
-    const type: 'PRESENCIAL' | 'VIRTUAL' = appointmentType || 'PRESENCIAL';
-    
-    if (type === 'VIRTUAL' && !link) {
-      res.status(400).json({ success: false });
-      return;
-    }
+    // validate that the dateHour is not already scheduled for this appointment
+    //const isAvailable = await appointmentsService.isTimeSlotAvailable(appointmentDate);
+    //if (!isAvailable) {
+    //  res.status(400).json({ success: false });
+    //  return;
+    //}
 
-    if (type === 'PRESENCIAL' && !place) {
-      res.status(400).json({ success: false });
-      return;
-    }
+    const normalizedAppointmentType = appointmentType.toUpperCase() as 'PRESENCIAL' | 'VIRTUAL';
 
     // 6. Create the patient appointment
     await appointmentsService.schedulePatientAppointment({
@@ -178,9 +192,9 @@ export const scheduleAppointment = async (req: Request, res: Response) => {
       appointment_id: appointmentId,
       date_hour: appointmentDate,
       duration: 10,
-      appointment_type: type,
-      link: type === 'VIRTUAL' ? link : null,
-      place: type === 'PRESENCIAL' ? place : null,
+      appointment_type: normalizedAppointmentType,
+      link: null,
+      place: null,
       appointment_status: 'PROGRAMMED'
     });
 
