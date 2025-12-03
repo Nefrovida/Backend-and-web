@@ -15,7 +15,8 @@ interface Props {
 
 const MessageCard: FC<Props> = ({ message, onDelete }) => {
   const [showMenu, setShowMenu] = useState(false);
-  const [like, setLike] = useState(message.liked);
+  const [hasLiked, setHasLiked] = useState(message.liked === 1);
+  const [likeCount, setLikeCount] = useState(message.likes);
   const currentUser = authService.getCurrentUser();
   const isAdmin = currentUser?.role_id === ROLE_IDS.ADMIN;
 
@@ -25,13 +26,9 @@ const MessageCard: FC<Props> = ({ message, onDelete }) => {
   };
 
   const handleLike = () => {
-    setLike((prev) => {
-      if (prev) {
-        return 0;
-      } else {
-        return 1;
-      }
-    });
+    setHasLiked((prev) => !prev);
+
+    setLikeCount((prev) => (hasLiked ? prev - 1 : prev + 1));
     fetch(`/api/forums/like/${message.messageId}`, {
       method: "POST",
       credentials: "include",
@@ -75,12 +72,12 @@ const MessageCard: FC<Props> = ({ message, onDelete }) => {
       <section className="w-full text-lg my-2">{message.content}</section>
       <section className="flex gap-4 items-center">
         <button className="flex gap-2 items-center" onClick={handleLike}>
-          {like ? (
+          {hasLiked ? (
             <BiSolidLike className="text-blue-600" />
           ) : (
             <BiLike className="hover:text-blue-600" />
           )}
-          {message.likes + like}
+          {likeCount}
         </button>
         <Link
           className="flex gap-2 items-center"
