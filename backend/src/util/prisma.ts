@@ -25,8 +25,15 @@ const encryptionConfig = {
   questions_history: ['description'],
 };
 
+// Define relation configuration for recursive decryption
+// Map: Model -> Field -> Target Model
+const relationConfig = {
+  patient_analysis: { results: 'results' },
+  patient_history: { question: 'questions_history' },
+};
+
 // Create or reuse the PrismaClient instance (singleton pattern)
-export const prisma = globalForPrisma.prisma ?? new PrismaClient().$extends(prismaEncryptionExtension(encryptionConfig));
+export const prisma = globalForPrisma.prisma ?? new PrismaClient().$extends(prismaEncryptionExtension(encryptionConfig, relationConfig));
 
 // In development, store the instance globally to prevent hot-reload issues
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
