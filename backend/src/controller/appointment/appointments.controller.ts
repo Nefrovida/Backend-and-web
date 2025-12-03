@@ -133,7 +133,7 @@ export const scheduleAppointment = async (req: Request, res: Response) => {
     const { appointmentId, patientId, dateHour, duration, appointmentType, place, link } = req.body;
 
     // 1. Validate required fields
-    if (!appointmentId || !patientId || !dateHour) {
+    if (!appointmentId || !patientId || !dateHour || !appointmentType) {
       res.status(400).json({ success: false });
       return;
     }
@@ -146,6 +146,10 @@ export const scheduleAppointment = async (req: Request, res: Response) => {
 
     // 3. Validate appointmentId exists and get appointment details
     const appointment = await appointmentsService.validateAppointment(appointmentId);
+    if (!appointment) {
+      res.status(404).json({ success: false });
+      return;
+    }
 
     // 4. Validate dateHour is in the future (preserve the exact datetime without timezone conversion)
     const appointmentDate = new Date(dateHour);
@@ -173,7 +177,7 @@ export const scheduleAppointment = async (req: Request, res: Response) => {
       patient_id: patientId,
       appointment_id: appointmentId,
       date_hour: appointmentDate,
-      duration: duration || 45,
+      duration: 10,
       appointment_type: type,
       link: type === 'VIRTUAL' ? link : null,
       place: type === 'PRESENCIAL' ? place : null,
