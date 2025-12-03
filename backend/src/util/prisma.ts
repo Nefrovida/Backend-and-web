@@ -18,7 +18,11 @@ import { prismaEncryptionExtension } from "../middleware/prismaEncryption.middle
 // Note: Passwords should be hashed, not just encrypted. This is just an example.
 const encryptionConfig = {
   // Add models and fields here, e.g.:
-  users: ['username', 'phone_number'],
+  notes: ['content', 'general_notes', 'ailments', 'prescription'],
+  results: ['interpretation', 'path', 'recommendation'],
+  options: ['description'],
+  patient_history: ['answer'],
+  questions_history: ['description'],
 };
 
 // Create or reuse the PrismaClient instance (singleton pattern)
