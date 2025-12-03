@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router";
 import { RegisterData, Gender, ROLE_IDS, ROLE_NAMES } from "../../types/auth.types";
 import { authService } from "../../services/auth.service";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 type RegistrationStep = 1 | 2 | 3;
 
@@ -14,6 +15,8 @@ function Register() {
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState(false);
 
+  const [showPassword, setShowPassword] = useState(false);
+
   const updateFormData = (data: Partial<RegisterData>) => {
     setFormData((prev) => ({ ...prev, ...data }));
     setError("");
@@ -21,10 +24,10 @@ function Register() {
 
   const handleStep1Submit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validate required fields
-    if (!formData.name || !formData.parent_last_name || !formData.username || 
-        !formData.password || !formData.birthday || !formData.phone_number) {
+    if (!formData.name || !formData.parent_last_name || !formData.username ||
+      !formData.password || !formData.birthday || !formData.phone_number) {
       setError("Por favor complete todos los campos requeridos");
       return;
     }
@@ -70,7 +73,7 @@ function Register() {
       }
 
       const response = await authService.register(formData as RegisterData);
-      
+
       // Store only user data (tokens are in httpOnly cookies)
       localStorage.setItem("user", JSON.stringify(response.user));
 
@@ -79,22 +82,22 @@ function Register() {
     } catch (err: any) {
       const errorMessage = err.message || "";
       const errorLower = errorMessage.toLowerCase();
-      
+
       // Translate technical/Prisma errors to user-friendly Spanish messages
       let friendlyMessage = "";
-      
+
       // Check for duplicate username
-      if (errorLower.includes("user already exists") || 
-          errorLower.includes("usuario ya existe") ||
-          errorLower.includes("username already") ||
-          errorLower.includes("unique constraint") && errorLower.includes("username") ||
-          errorLower.includes("duplicate") && errorLower.includes("username")) {
+      if (errorLower.includes("user already exists") ||
+        errorLower.includes("usuario ya existe") ||
+        errorLower.includes("username already") ||
+        errorLower.includes("unique constraint") && errorLower.includes("username") ||
+        errorLower.includes("duplicate") && errorLower.includes("username")) {
         friendlyMessage = "El nombre de usuario ya está registrado. Por favor elige otro.";
         setError(friendlyMessage);
         setStep(1); // Return to step 1 where username field is
         return;
       }
-      
+
       // Check for duplicate CURP
       if (errorLower.includes("curp") && (errorLower.includes("duplicate") || errorLower.includes("unique"))) {
         friendlyMessage = "El CURP ingresado ya está registrado en el sistema.";
@@ -130,7 +133,7 @@ function Register() {
       else {
         friendlyMessage = "Ocurrió un error al registrar tu cuenta. Por favor intenta nuevamente.";
       }
-      
+
       setError(friendlyMessage);
     } finally {
       setLoading(false);
@@ -231,14 +234,23 @@ function Register() {
 
       <div>
         <label className="block text-sm text-gray-600 mb-2 ml-1">Contraseña *</label>
-        <input
-          type="password"
-          value={formData.password || ""}
-          onChange={(e) => updateFormData({ password: e.target.value })}
-          className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-900 transition-colors"
-          maxLength={100}
-          required
-        />
+        <div className="relative">
+          <input
+            type={showPassword ? "text" : "password"}
+            value={formData.password || ""}
+            onChange={(e) => updateFormData({ password: e.target.value })}
+            className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-900 transition-colors pr-10"
+            maxLength={100}
+            required
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700"
+          >
+            {showPassword ? <FaEye /> : <FaEyeSlash />}
+          </button>
+        </div>
       </div>
 
       {error && (
@@ -273,7 +285,7 @@ function Register() {
       <p className="text-center text-gray-600 mb-6">¿Qué tipo de usuario eres?</p>
 
       <div className="space-y-3">
-    {[ROLE_IDS.PATIENT, ROLE_IDS.DOCTOR, ROLE_IDS.LABORATORIST, ROLE_IDS.FAMILIAR, ROLE_IDS.SECRETARIA].map((roleId) => (
+        {[ROLE_IDS.PATIENT, ROLE_IDS.DOCTOR, ROLE_IDS.LABORATORIST, ROLE_IDS.FAMILIAR, ROLE_IDS.SECRETARIA].map((roleId) => (
           <button
             key={roleId}
             onClick={() => handleStep2Submit(roleId)}
@@ -409,8 +421,8 @@ function Register() {
   );
 
   return (
-    <div 
-      className="min-h-screen flex items-center justify-center p-4" 
+    <div
+      className="min-h-screen flex items-center justify-center p-4"
       style={{
         background: "linear-gradient(180deg, #A8C5DD 0%, #1E3A8A 100%)"
       }}
@@ -441,9 +453,8 @@ function Register() {
             {[1, 2, 3].map((s) => (
               <React.Fragment key={s}>
                 <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold transition-colors ${
-                    step >= s ? "bg-blue-900 text-white" : "bg-gray-300 text-gray-600"
-                  }`}
+                  className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold transition-colors ${step >= s ? "bg-blue-900 text-white" : "bg-gray-300 text-gray-600"
+                    }`}
                 >
                   {s}
                 </div>
