@@ -25,7 +25,7 @@ const ReplyMessage = () => {
     type: "success" | "error" | "info";
   } | null>(null);
 
-  const { results, scrollRef } = useInfiniteScroll<Reply>(
+  const { results, loading, scrollRef } = useInfiniteScroll<Reply>(
     `/api/forums/${forumId}/messages/${messageId}/replies`,
     [messageId, forumId, refresh],
     (page: number) => {
@@ -105,6 +105,7 @@ const ReplyMessage = () => {
           scrollRef={scrollRef}
           forumId={forumId}
           onDeleteReply={handleDeleteReply}
+          loading={loading}
         />
         <SendReply replyInfo={{ messageId, forumId }} refresh={setRefresh} />
       </div>
