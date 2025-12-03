@@ -9,6 +9,7 @@ import SendReply from "../organism/forum/SendReply";
 import { DeleteMessageModal } from "../forums/DeleteMessageModal";
 import { forumsService } from "@/services/forums/forums.service";
 import { Toast } from "../forums/Toast";
+import Loading from "../molecules/Loading";
 
 const ReplyMessage = () => {
   const { messageId, forumId } = useParams();
@@ -94,7 +95,11 @@ const ReplyMessage = () => {
         <Link to={"/dashboard/foro"}>
           <Title size="large">Foro</Title>
         </Link>
-        {parentMessage && <ParentMessage message={parentMessage} />}
+        {parentMessage ? (
+          <ParentMessage message={parentMessage} />
+        ) : (
+          <Loading />
+        )}
         <RepliesList
           results={results}
           scrollRef={scrollRef}
