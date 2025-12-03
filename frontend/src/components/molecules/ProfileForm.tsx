@@ -45,16 +45,16 @@ const ProfileForm: React.FC<Props> = ({ initial, onSave, onCancel }) => {
     <form onSubmit={submit} className="space-y-4">
       <div>
         <label className="block text-sm text-gray-600">Nombre(s)</label>
-        <input className="w-full p-2 border rounded mt-1" value={form.name ?? ''} onChange={e => change('name', e.target.value)} />
+        <input maxLength={50} className="w-full p-2 border rounded mt-1" value={form.name ?? ''} onChange={e => change('name', e.target.value)} />
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm text-gray-600">Apellido Paterno</label>
-          <input className="w-full p-2 border rounded mt-1" value={form.parent_last_name ?? ''} onChange={e => change('parent_last_name', e.target.value)} />
+          <input maxLength={50} className="w-full p-2 border rounded mt-1" value={form.parent_last_name ?? ''} onChange={e => change('parent_last_name', e.target.value)} />
         </div>
         <div>
           <label className="block text-sm text-gray-600">Apellido Materno</label>
-          <input className="w-full p-2 border rounded mt-1" value={form.maternal_last_name ?? ''} onChange={e => change('maternal_last_name', e.target.value)} />
+          <input maxLength={50} className="w-full p-2 border rounded mt-1" value={form.maternal_last_name ?? ''} onChange={e => change('maternal_last_name', e.target.value)} />
         </div>
       </div>
       <div>

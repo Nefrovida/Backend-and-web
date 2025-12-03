@@ -18,6 +18,25 @@ export class ProfileService {
             throw new Error('No hay datos para actualizar');
         }
 
+        // validate field lengths
+        if (data.name && String(data.name).trim().length > 50) {
+            throw new Error('El nombre debe tener como máximo 50 caracteres');
+        }
+        if (data.parent_last_name && String(data.parent_last_name).trim().length > 50) {
+            throw new Error('El apellido paterno debe tener como máximo 50 caracteres');
+        }
+        if (data.maternal_last_name && String(data.maternal_last_name).trim().length > 50) {
+            throw new Error('El apellido materno debe tener como máximo 50 caracteres');
+        }
+
+        // validate phone if provided: only digits, between 10 and 15
+        if (data.phone_number) {
+            const phone = String(data.phone_number).trim();
+            if (!/^\d{10,15}$/.test(phone)) {
+                throw new Error('El número de teléfono debe contener sólo dígitos y tener entre 10 y 15 caracteres');
+            }
+        }
+
         const updatedUser = await ProfileModel.updateProfile(userId, data);
         if (!updatedUser) throw new Error('No se pudo actualizar el perfil');
         return updatedUser;
@@ -28,6 +47,11 @@ export class ProfileService {
 
         if (newPassword !== confirmNewPassword) {
             throw new Error('Las nuevas contraseñas no coinciden');
+        }
+
+        // maximum length for password
+        if (newPassword.length > 15) {
+            throw new Error('La contraseña no puede tener más de 15 caracteres');
         }
 
         if (!PASSWORD_REGEX.test(newPassword)) {

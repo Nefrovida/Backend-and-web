@@ -14,6 +14,16 @@ const ChangePasswordForm: React.FC<Props> = ({ onChangePassword, onCancel }) => 
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // client-side max length enforcement
+    if (form.newPassword.length > 15) {
+      setError('La contraseña no puede tener más de 15 caracteres');
+      return;
+    }
+    if (form.newPassword !== form.confirmNewPassword) {
+      setError('Las nuevas contraseñas no coinciden');
+      return;
+    }
+
     setSaving(true);
     setError(null);
     try {
@@ -28,11 +38,11 @@ const ChangePasswordForm: React.FC<Props> = ({ onChangePassword, onCancel }) => 
     <form onSubmit={submit} className="space-y-4">
       <div>
         <label className="block text-sm text-gray-600">Nueva contraseña</label>
-        <input type="password" className="w-full p-2 border rounded mt-1" value={form.newPassword} onChange={e => setForm({...form, newPassword: e.target.value})} />
+        <input type="password" maxLength={15} className="w-full p-2 border rounded mt-1" value={form.newPassword} onChange={e => setForm({...form, newPassword: e.target.value})} />
       </div>
       <div>
         <label className="block text-sm text-gray-600">Confirmar nueva contraseña</label>
-        <input type="password" className="w-full p-2 border rounded mt-1" value={form.confirmNewPassword} onChange={e => setForm({...form, confirmNewPassword: e.target.value})} />
+        <input type="password" maxLength={15} className="w-full p-2 border rounded mt-1" value={form.confirmNewPassword} onChange={e => setForm({...form, confirmNewPassword: e.target.value})} />
       </div>
       {error && <div className="text-sm text-red-600">{error}</div>}
       <div className="flex justify-end items-center gap-3">
