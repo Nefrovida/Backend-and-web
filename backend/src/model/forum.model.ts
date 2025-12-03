@@ -143,6 +143,7 @@ export default class Forum {
     return await prisma.messages.findUnique({
       where: {
         message_id: messageId,
+        active: true,
       },
       select: {
         message_id: true,
@@ -861,6 +862,7 @@ export const findMessageById = async (messageId: number) => {
   return await prisma.messages.findUnique({
     where: {
       message_id: messageId,
+      active: true,
     },
   });
 };
