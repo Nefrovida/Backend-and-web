@@ -18,6 +18,8 @@ export default class ProfileModel {
         maternal_last_name: true,
         username: true,
         phone_number: true,
+        gender: true,
+        birthday: true,
        
         role: { 
           select: {
@@ -37,7 +39,9 @@ export default class ProfileModel {
       maternal_last_name: user.maternal_last_name,
       username: user.username,
       phone_number: user.phone_number,
-      role_name: user.role ? user.role.role_name : ''
+      role_name: user.role ? user.role.role_name : '',
+      gender: user.gender ?? null,
+      birthday: user.birthday ? user.birthday.toISOString().slice(0,10) : null
     };
   }
 
@@ -50,6 +54,8 @@ export default class ProfileModel {
         parent_last_name: data.parent_last_name || undefined,
         maternal_last_name: data.maternal_last_name || undefined,
         phone_number: data.phone_number || undefined,
+        gender: data.gender ? (data.gender as any) : undefined,
+        birthday: data.birthday ? new Date(data.birthday) : undefined,
       },
       select: {
         user_id: true,
@@ -58,6 +64,8 @@ export default class ProfileModel {
         maternal_last_name: true,
         username: true,
         phone_number: true,
+        gender: true,
+        birthday: true,
         role: {
           select: { role_name: true }
         }
@@ -71,7 +79,9 @@ export default class ProfileModel {
       maternal_last_name: user.maternal_last_name,
       username: user.username,
       phone_number: user.phone_number,
-      role_name: user.role ? user.role.role_name : ''
+      role_name: (user as any).role ? (user as any).role.role_name : '',
+      gender: user.gender ?? null,
+      birthday: user.birthday ? user.birthday.toISOString().slice(0,10) : null
     };
   }
 

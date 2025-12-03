@@ -29,6 +29,25 @@ export class ProfileService {
             throw new Error('El apellido materno debe tener como máximo 50 caracteres');
         }
 
+        // validate gender length if provided
+        if (data.gender && String(data.gender).trim().length > 20) {
+            throw new Error('El género debe tener como máximo 20 caracteres');
+        }
+
+        // validate birthday if provided: valid date and not in the future
+        if (data.birthday) {
+            const d = new Date(String(data.birthday));
+            if (isNaN(d.getTime())) {
+                throw new Error('La fecha de nacimiento no es válida');
+            }
+            const today = new Date();
+            const dOnly = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+            const tOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+            if (dOnly > tOnly) {
+                throw new Error('La fecha de nacimiento no puede ser futura');
+            }
+        }
+
         // validate phone if provided: only digits, between 10 and 15
         if (data.phone_number) {
             const phone = String(data.phone_number).trim();

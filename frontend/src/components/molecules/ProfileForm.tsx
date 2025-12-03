@@ -14,6 +14,8 @@ const ProfileForm: React.FC<Props> = ({ initial, onSave, onCancel }) => {
     parent_last_name: initial.parent_last_name,
     maternal_last_name: initial.maternal_last_name,
     phone_number: initial.phone_number,
+    gender: (initial.gender as string) ?? '',
+    birthday: initial.birthday ?? '',
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -28,6 +30,23 @@ const ProfileForm: React.FC<Props> = ({ initial, onSave, onCancel }) => {
       // allow only digits and length between 10 and 15
       if (!/^\d{10,15}$/.test(phone)) {
         setError('El número de teléfono debe contener sólo dígitos y tener entre 10 y 15 caracteres');
+        return;
+      }
+    }
+
+    // validate birthday if provided: valid date and not in the future
+    if (form.birthday) {
+      const d = new Date(form.birthday);
+      if (isNaN(d.getTime())) {
+        setError('La fecha de nacimiento no es válida');
+        return;
+      }
+      const today = new Date();
+      // compare date only
+      const dOnly = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      const tOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      if (dOnly > tOnly) {
+        setError('La fecha de nacimiento no puede ser futura');
         return;
       }
     }
@@ -55,6 +74,21 @@ const ProfileForm: React.FC<Props> = ({ initial, onSave, onCancel }) => {
         <div>
           <label className="block text-sm text-gray-600">Apellido Materno</label>
           <input maxLength={50} className="w-full p-2 border rounded mt-1" value={form.maternal_last_name ?? ''} onChange={e => change('maternal_last_name', e.target.value)} />
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm text-gray-600">Género</label>
+          <select value={form.gender ?? ''} onChange={e => change('gender', e.target.value)} className="w-full p-2 border rounded mt-1">
+            <option value="">Seleccione</option>
+            <option value="male">Masculino</option>
+            <option value="female">Femenino</option>
+            <option value="other">Otro</option>
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm text-gray-600">Fecha de nacimiento</label>
+          <input type="date" value={form.birthday ?? ''} onChange={e => change('birthday', e.target.value)} className="w-full p-2 border rounded mt-1" />
         </div>
       </div>
       <div>
