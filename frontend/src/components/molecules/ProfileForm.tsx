@@ -81,9 +81,9 @@ const ProfileForm: React.FC<Props> = ({ initial, onSave, onCancel }) => {
           <label className="block text-sm text-gray-600">Género</label>
           <select value={form.gender ?? ''} onChange={e => change('gender', e.target.value)} className="w-full p-2 border rounded mt-1">
             <option value="">Seleccione</option>
-            <option value="male">Masculino</option>
-            <option value="female">Femenino</option>
-            <option value="other">Otro</option>
+            <option value="MALE">Masculino</option>
+            <option value="FEMALE">Femenino</option>
+            <option value="OTHER">Otro</option>
           </select>
         </div>
         <div>

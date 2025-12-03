@@ -110,7 +110,7 @@ const Profile: React.FC = () => {
               </div>
               <div>
                 <div className="text-sm text-gray-500">Género</div>
-                <div className="text-lg font-medium">{user.gender ?? '-'}</div>
+                <div className="text-lg font-medium">{user.gender === 'MALE' ? 'Masculino' : user.gender === 'FEMALE' ? 'Femenino' : user.gender === 'OTHER' ? 'Otro' : '-'}</div>
               </div>
               <div>
                 <div className="text-sm text-gray-500">Fecha de nacimiento</div>

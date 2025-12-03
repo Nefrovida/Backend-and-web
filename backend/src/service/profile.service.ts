@@ -56,6 +56,31 @@ export class ProfileService {
             }
         }
 
+        // map gender values to Prisma enum (MALE/FEMALE/OTHER)
+        if (data.gender) {
+            const raw = String(data.gender).trim();
+            const lower = raw.toLowerCase();
+            const map: Record<string, string> = {
+                'male': 'MALE',
+                'm': 'MALE',
+                'masculino': 'MALE',
+                'female': 'FEMALE',
+                'f': 'FEMALE',
+                'femenino': 'FEMALE',
+                'other': 'OTHER',
+                'o': 'OTHER',
+                'otro': 'OTHER'
+            };
+
+            if (map[lower]) {
+                data.gender = map[lower] as any;
+            } else if (['MALE', 'FEMALE', 'OTHER'].includes(raw.toUpperCase())) {
+                data.gender = raw.toUpperCase() as any;
+            } else {
+                throw new Error('Valor de género no válido');
+            }
+        }
+
         const updatedUser = await ProfileModel.updateProfile(userId, data);
         if (!updatedUser) throw new Error('No se pudo actualizar el perfil');
         return updatedUser;
