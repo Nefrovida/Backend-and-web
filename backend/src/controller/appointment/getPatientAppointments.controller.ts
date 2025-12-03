@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../../util/prisma";
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
 
 /**
  * Get all appointments for a specific patient
