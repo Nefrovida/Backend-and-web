@@ -5,7 +5,7 @@ import { authService } from "@/services/auth.service";
 import { ROLE_IDS } from "@/types/auth.types";
 import { HiDotsHorizontal } from "react-icons/hi";
 import { RiDeleteBin6Line } from "react-icons/ri";
-import { BiLike } from "react-icons/bi";
+import { BiLike, BiSolidLike } from "react-icons/bi";
 import { MdChatBubbleOutline } from "react-icons/md";
 
 interface Props {
@@ -15,12 +15,26 @@ interface Props {
 
 const MessageCard: FC<Props> = ({ message, onDelete }) => {
   const [showMenu, setShowMenu] = useState(false);
+  const [hasLiked, setHasLiked] = useState(message.liked === 1);
+  const [likeCount, setLikeCount] = useState(message.likes);
   const currentUser = authService.getCurrentUser();
   const isAdmin = currentUser?.role_id === ROLE_IDS.ADMIN;
 
   const handleDeleteClick = () => {
     setShowMenu(false);
     onDelete(message.messageId);
+  };
+
+  const handleLike = () => {
+    setHasLiked((prev) => !prev);
+
+    setLikeCount((prev) => (hasLiked ? prev - 1 : prev + 1));
+    fetch(`/api/forums/like/${message.messageId}`, {
+      method: "POST",
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .catch((e) => console.error(e));
   };
 
   return (
@@ -51,14 +65,20 @@ const MessageCard: FC<Props> = ({ message, onDelete }) => {
             )}
           </div>
         )}
-        {!isAdmin && <HiDotsHorizontal className="text-gray-300 cursor-not-allowed" />}
+        {!isAdmin && (
+          <HiDotsHorizontal className="text-gray-300 cursor-not-allowed" />
+        )}
       </section>
       <section className="w-full text-lg my-2">{message.content}</section>
       <section className="flex gap-4 items-center">
-        <div className="flex gap-2 items-center">
-          <BiLike className="hover:text-blue-600" />
-          {message.likes}
-        </div>
+        <button className="flex gap-2 items-center" onClick={handleLike}>
+          {hasLiked ? (
+            <BiSolidLike className="text-blue-600" />
+          ) : (
+            <BiLike className="hover:text-blue-600" />
+          )}
+          {likeCount}
+        </button>
         <Link
           className="flex gap-2 items-center"
           to={`/dashboard/foro/${message.forums.forumId}/mensaje/${message.messageId}`}

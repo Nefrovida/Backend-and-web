@@ -43,6 +43,7 @@ function parseMessages(m: Message): ParsedMessage {
     content: m.content,
     likes: m._count.likes,
     replies: m._count.messages,
+    liked: m.likes.length > 0 ? 1 : 0,
     forums: {
       forumId: m.forum.forum_id,
       name: m.forum.name,

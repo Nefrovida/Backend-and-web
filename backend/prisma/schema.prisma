@@ -137,6 +137,8 @@ model likes {
   message_id Int
   user_id    String   @db.Uuid
   date       DateTime @default(now())
+
+  @@unique([user_id, message_id])
   message    messages @relation(fields: [message_id], references: [message_id], onDelete: Cascade)
   user       users    @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
 }
