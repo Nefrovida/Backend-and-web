@@ -320,7 +320,7 @@ export const getMessageReplies = async (
 
   // 5. Get replies and total count
   const [replies, totalCount] = await Promise.all([
-    forumModel.findRepliesByMessageId(messageId, skip, limit),
+    forumModel.findRepliesByMessageId(messageId, skip, limit, userId),
     forumModel.countReplies(messageId),
   ]);
 
@@ -336,6 +336,7 @@ export const getMessageReplies = async (
     createdBy: reply.user_id,
     userId: reply.user_id,
     content: reply.content,
+    liked: reply.likes.length > 0 ? 1 : 0,
     createdAt: reply.publication_timestamp,
     publicationTimestamp: reply.publication_timestamp,
     parentMessageId: reply.parent_message_id,

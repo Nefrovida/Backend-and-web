@@ -29,6 +29,7 @@ export type Message = {
   messageId: number;
   content: string;
   likes: number;
+  liked: number;
   replies: number;
   forums: { forumId: number; name: string };
 };
@@ -50,6 +51,7 @@ export type Reply = {
     lastName: string;
   };
   content: string;
+  liked: number;
   forumId: number;
   id: number;
   parentMessageId: number;

@@ -19,7 +19,10 @@ const ReplyMessage = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedReplyId, setSelectedReplyId] = useState<number | null>(null);
   const [deleteError, setDeleteError] = useState<string>("");
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "error" | "info";
+  } | null>(null);
 
   const { results, scrollRef } = useInfiniteScroll<Reply>(
     `/api/forums/${forumId}/messages/${messageId}/replies`,
@@ -69,8 +72,11 @@ const ReplyMessage = () => {
       // Close modal and show success
       setIsDeleteModalOpen(false);
       setSelectedReplyId(null);
-      setToast({ message: "Respuesta eliminada exitosamente", type: "success" });
-    } catch (err: any) {
+      setToast({
+        message: "Respuesta eliminada exitosamente",
+        type: "success",
+      });
+    } catch (err) {
       setDeleteError(err.message || "Error al eliminar la respuesta");
       console.error("Error deleting reply:", err);
     }

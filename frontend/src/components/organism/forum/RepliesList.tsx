@@ -5,6 +5,7 @@ interface Props {
   results: {
     id: number;
     content: string;
+    liked: number;
     stats: { likesCount: number; repliesCount: number };
   }[];
   forumId: string;
@@ -12,7 +13,12 @@ interface Props {
   onDeleteReply?: (replyId: number) => void;
 }
 
-const RepliesList: FC<Props> = ({ results, scrollRef, forumId, onDeleteReply }) => {
+const RepliesList: FC<Props> = ({
+  results,
+  scrollRef,
+  forumId,
+  onDeleteReply,
+}) => {
   return (
     <ul
       ref={scrollRef}
@@ -24,6 +30,7 @@ const RepliesList: FC<Props> = ({ results, scrollRef, forumId, onDeleteReply }) 
             messageId: m.id,
             content: m.content,
             likes: m.stats.likesCount,
+            liked: m.liked,
             replies: m.stats.repliesCount,
             forums: {
               forumId: Number(forumId),

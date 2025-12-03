@@ -13,9 +13,14 @@ import { Toast } from "../forums/Toast";
 const Forums = () => {
   const { forumId } = useParams();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedMessageId, setSelectedMessageId] = useState<number | null>(null);
+  const [selectedMessageId, setSelectedMessageId] = useState<number | null>(
+    null
+  );
   const [deleteError, setDeleteError] = useState<string>("");
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "error" | "info";
+  } | null>(null);
 
   let fId = Number(forumId);
   if (isNaN(fId)) {
@@ -54,7 +59,7 @@ const Forums = () => {
       setIsDeleteModalOpen(false);
       setSelectedMessageId(null);
       setToast({ message: "Mensaje eliminado exitosamente", type: "success" });
-    } catch (err: any) {
+    } catch (err) {
       setDeleteError(err.message || "Error al eliminar el mensaje");
       console.error("Error deleting message:", err);
     }
@@ -75,7 +80,10 @@ const Forums = () => {
         </aside>
 
         <div className="w-full h-full">
-          <FeedList messageInfo={messageInfo} onDeleteMessage={handleDeleteMessage} />
+          <FeedList
+            messageInfo={messageInfo}
+            onDeleteMessage={handleDeleteMessage}
+          />
         </div>
 
         <NewMessageComponent />

@@ -172,6 +172,7 @@ export type Message = {
   message_id: number;
   content: string;
   publication_timestamp: Date;
+  likes: { like_id: number }[];
   forum: { name: string; forum_id: number };
   user: {
     name: string;
@@ -186,6 +187,7 @@ export type ParsedMessage = {
   content: string;
   likes: number;
   replies: number;
+  liked: number;
   forums: { forumId: number; name: string };
   userName: string;
 };

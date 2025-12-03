@@ -10,6 +10,7 @@ import {
   getMyForumsWeb,
 } from "src/controller/forum/getMyForums.controller";
 import getForumFeed from "src/controller/forum/getForumFeed.controller";
+import { likeMessage } from "../controller/forum/likeMessage.controller";
 
 const router = express.Router();
 
@@ -65,23 +66,11 @@ router.delete(
   forumsController.deleteMessage
 );
 
-router.get(
-  "/",
-  authenticate,
-  forumsController.getAll
-);
+router.get("/", authenticate, forumsController.getAll);
 
-router.get(
-  "/:forumId",
-  authenticate,
-  forumsController.getById
-);
+router.get("/:forumId", authenticate, forumsController.getById);
 
-router.get(
-  "/me",
-  authenticate,
-  forumsController.getMyForums
-);
+router.get("/me", authenticate, forumsController.getMyForums);
 
 /**
  * Create a new forum
@@ -144,11 +133,7 @@ router.get(
   forumsController.checkAdminStatus
 );
 
-router.get(
-  "/:forumId",
-  authenticate,
-  forumsController.getById
-);
+router.get("/:forumId", authenticate, forumsController.getById);
 
 router.post("/:forumId", authenticate, postNewMessage);
 
@@ -222,16 +207,14 @@ router.post(
   addPatientToForumController.joinForum
 );
 
+router.post("/like/:messageId", authenticate, likeMessage);
+
 /**
  * Get messages for a forum
  *
  * GET /api/forums/:forumId/messages
  */
-router.get(
-  "/:forumId/messages",
-  authenticate,
-  forumsController.getMessages
-);
+router.get("/:forumId/messages", authenticate, forumsController.getMessages);
 
 /**
  * Reply to a message in a forum
@@ -273,10 +256,6 @@ router.get(
   forumsController.getReplies
 );
 
-router.get(
-  "/message/:messageId",
-  authenticate,
-  forumsController.getMessage
-);
+router.get("/message/:messageId", authenticate, forumsController.getMessage);
 
 export default router;
