@@ -9,6 +9,7 @@ import SendReply from "../organism/forum/SendReply";
 import { DeleteMessageModal } from "../forums/DeleteMessageModal";
 import { forumsService } from "@/services/forums/forums.service";
 import { Toast } from "../forums/Toast";
+import Loading from "../molecules/Loading";
 
 const ReplyMessage = () => {
   const { messageId, forumId } = useParams();
@@ -24,7 +25,7 @@ const ReplyMessage = () => {
     type: "success" | "error" | "info";
   } | null>(null);
 
-  const { results, scrollRef } = useInfiniteScroll<Reply>(
+  const { results, loading, scrollRef } = useInfiniteScroll<Reply>(
     `/api/forums/${forumId}/messages/${messageId}/replies`,
     [messageId, forumId, refresh],
     (page: number) => {
@@ -94,12 +95,17 @@ const ReplyMessage = () => {
         <Link to={"/dashboard/foro"}>
           <Title size="large">Foro</Title>
         </Link>
-        {parentMessage && <ParentMessage message={parentMessage} />}
+        {parentMessage ? (
+          <ParentMessage message={parentMessage} />
+        ) : (
+          <Loading />
+        )}
         <RepliesList
           results={results}
           scrollRef={scrollRef}
           forumId={forumId}
           onDeleteReply={handleDeleteReply}
+          loading={loading}
         />
         <SendReply replyInfo={{ messageId, forumId }} refresh={setRefresh} />
       </div>

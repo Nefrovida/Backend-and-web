@@ -20,7 +20,8 @@ export default function useSendMessage(
       .then((res) => res.json())
       .then((data) => {
         const dataInfo = data.map((d) => {
-          const { forumId, name } = d;
+          const { forum_id, name } = d;
+          const forumId = forum_id;
           return { forumId, name: name };
         });
         setForums(dataInfo);
@@ -34,6 +35,7 @@ export default function useSendMessage(
   }
 
   function handleSent(): void {
+    console.log(content, forumId);
     if (!content || !forumId) {
       return;
     }

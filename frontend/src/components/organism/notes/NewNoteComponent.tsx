@@ -82,8 +82,8 @@ const NewNoteComponent: FC<Props> = ({
             Permitir que el paciente vea esta nota
           </label>
         </div>
-        
-        <NewNoteModal modalState={setNoteData} />
+
+        <NewNoteModal modalState={setNoteData} title={""} />
       </div>
     </div>
   );
