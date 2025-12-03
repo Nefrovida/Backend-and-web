@@ -53,6 +53,18 @@ router.get("/myForums/web", authenticate, getMyForumsWeb);
 
 router.get("/feed", authenticate, getForumFeed);
 
+/**
+ * Delete a message from a forum
+ *
+ * DELETE /api/forums/messages/:messageId
+ */
+router.delete(
+  "/messages/:messageId",
+  authenticate,
+  requirePrivileges([Privilege.DELETE_FORUMS]),
+  forumsController.deleteMessage
+);
+
 router.get(
   "/",
   authenticate,

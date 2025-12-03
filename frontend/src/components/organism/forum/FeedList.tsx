@@ -12,11 +12,12 @@ interface Props {
     handleSearch: () => void;
     handleFilter: () => void;
   };
+  onDeleteMessage?: (messageId: number) => void;
 }
 
 const MemoizedMessageCard = memo(MessageCard);
 
-const FeedList: FC<Props> = ({ messageInfo }) => {
+const FeedList: FC<Props> = ({ messageInfo, onDeleteMessage }) => {
   const { results: messages, scrollRef } = messageInfo;
   return (
     <ul
@@ -24,7 +25,7 @@ const FeedList: FC<Props> = ({ messageInfo }) => {
       ref={scrollRef}
     >
       {messages.map((m: Message) => (
-        <MemoizedMessageCard key={m.messageId} message={m} />
+        <MemoizedMessageCard key={m.messageId} message={m} onDelete={onDeleteMessage} />
       ))}
     </ul>
   );
