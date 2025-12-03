@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { encryptDeterministic } from '../src/util/encryption.util';
 
 const prisma = new PrismaClient();
 
@@ -31,9 +32,65 @@ async function runSeedSQL() {
   console.log(`Found ${statements.length} SQL statements to execute`);
 
   for (let i = 0; i < statements.length; i++) {
-    const statement = statements[i];
+    let statement = statements[i];
     if (statement.trim()) {
       try {
+        // Generic function to process INSERT statements
+        const processInsertStatement = (tableName: string, fieldsToEncrypt: string[]) => {
+          // Regex to match: INSERT INTO tableName ... VALUES ...
+          // Use [\s\S] to match newlines in the VALUES part
+          // Also handle potential schema prefix "public."
+          const regex = new RegExp(`INSERT INTO\\s+(?:"?public"?\\.?)?"?${tableName}"?\\s*\\(([^)]+)\\)\\s*VALUES\\s*([\\s\\S]+)`, 'i');
+          const match = statement.match(regex);
+
+          if (match) {
+            const columnsStr = match[1];
+            let valuesPart = match[2];
+
+            const columns = columnsStr.split(',').map(c => c.trim().replace(/"/g, ''));
+            const indices = fieldsToEncrypt.map(field => ({ field, index: columns.indexOf(field) })).filter(x => x.index !== -1);
+
+            if (indices.length > 0) {
+              valuesPart = valuesPart.trim();
+
+              const processRow = (rowStr: string): string => {
+                const values = rowStr.split(/,(?=(?:[^']*'[^']*')*[^']*$)/).map(v => v.trim());
+
+                indices.forEach(({ index }) => {
+                  if (values[index]) {
+                    let val = values[index];
+                    const isQuoted = val.startsWith("'") && val.endsWith("'");
+                    if (isQuoted) val = val.slice(1, -1);
+
+                    // Encrypt
+                    const encrypted = encryptDeterministic(val);
+                    values[index] = `'${encrypted}'`;
+                  }
+                });
+                return values.join(', ');
+              };
+
+              const modifiedValuesPart = valuesPart.replace(/\(([\s\S]*?)\)/g, (fullMatch, rowContent) => {
+                if (rowContent.includes(',')) {
+                  const newRowContent = processRow(rowContent);
+                  return `(${newRowContent})`;
+                }
+                return fullMatch;
+              });
+
+              statement = `INSERT INTO ${tableName} (${columnsStr}) VALUES ${modifiedValuesPart}`;
+              console.log(`Encrypted ${tableName} for insert block ${i + 1}`);
+            }
+          }
+        };
+
+        // Apply encryption for each table
+        processInsertStatement('notes', ['content', 'general_notes', 'ailments', 'prescription']);
+        processInsertStatement('results', ['interpretation', 'path', 'recommendation']);
+        processInsertStatement('options', ['description']);
+        processInsertStatement('patient_history', ['answer']);
+        processInsertStatement('questions_history', ['description']);
+
         // Execute the statement with semicolon
         await prisma.$executeRawUnsafe(statement + ';');
         console.log(`Executed statement ${i + 1}/${statements.length}`);

@@ -88,7 +88,7 @@ model doctors {
   doctor_id    String         @id @default(uuid()) @db.Uuid
   user_id      String         @unique @db.Uuid
   specialty    String         @db.Char(100)
-  license      String         @unique @db.Char(20)
+  license      String         @unique
   appointments appointments[]
   user         users          @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
 }
@@ -216,7 +216,7 @@ model results {
   result_id           Int              @id @default(autoincrement())
   patient_analysis_id Int              @unique
   date                DateTime
-  path                String           @db.Char(255)
+  path                String
   interpretation      String           @default("")
   recommendation      String           @default("")
   updated             DateTime         @default(now())
