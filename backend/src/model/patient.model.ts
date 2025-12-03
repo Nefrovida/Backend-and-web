@@ -1,0 +1,58 @@
+import { prisma } from "src/util/prisma";
+
+export default class Patients {
+  Patients() {
+
+  }
+
+  static async getMyPatients(doctorId: string) {
+    return await prisma.patient_appointment.findMany({
+      where: {
+        appointment: {
+          doctor: {
+            user_id: doctorId
+          }
+        }
+      },
+      distinct: ["patient_id"],
+      select: {
+        patient: {
+          select: {
+            patient_id: true,
+            user: {
+              select: {
+                name: true,
+                parent_last_name: true,
+                maternal_last_name: true,
+              }
+            }
+          }
+        }
+      }
+    })
+  }
+
+  static async getAllPatients() {
+    return await prisma.patients.findMany({
+      select: {
+        patient_id: true,
+        user: {
+          select: {
+            user_id: true,
+            name: true,
+            parent_last_name: true,
+            maternal_last_name: true,
+            phone_number: true,
+            birthday: true,
+            gender: true,
+          }
+        }
+      },
+      orderBy: {
+        user: {
+          name: 'asc'
+        }
+      }
+    })
+  }
+}

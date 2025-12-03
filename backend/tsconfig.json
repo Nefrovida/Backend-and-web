@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "esnext",
+    "moduleResolution": "bundler", // Cambia de "node" a "bundler"
+    "baseUrl": "./",
+    "paths": {
+      "@client": ["./prisma/database/prisma/client.ts"],
+      "#/*": ["*"]
+    },
+    "outDir": "./dist",
+    "rootDir": "./",
+    "strict": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "types": ["node"]
+  },
+  "include": ["src/**/*", "util/**/*", "prisma.config.ts", "database/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

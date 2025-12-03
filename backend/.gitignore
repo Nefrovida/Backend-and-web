@@ -1,4 +1,8 @@
 node_modules
 # Keep environment variables out of version control
+.DS_Store
 .env
 /prisma/database/prisma
+uploads/
+/dist
+package-lock.json

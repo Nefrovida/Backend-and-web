@@ -1,0 +1,112 @@
+/* ---------- EVENT CARD ---------- */
+.calendar-event-card {
+  background-color: #e6f3fa;
+  border-radius: 1px;
+  padding: 10px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #000;
+  line-height: 1.1;
+  border: 1px solid #e6f3fa;
+  opacity: 0.8;
+}
+
+/* Make events appear clickable */
+.fc-event {
+  cursor: pointer !important;
+  transition: opacity 0.2s ease, transform 0.1s ease !important;
+}
+
+.fc-event:hover {
+  opacity: 1 !important;
+  transform: scale(1.02) !important;
+}
+
+
+.full-page-calendar {
+  height: calc(100vh - 0px);
+  width: 80%;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+}
+
+
+/* ---------- SCROLLER ---------- */
+.calendar .fc-timegrid-body .fc-scroller,
+.calendar .fc-scroller-harness > .fc-scroller {
+  overflow-y: auto !important;
+}
+
+.calendar .fc-view-harness,
+.calendar .fc-timegrid,
+.calendar .fc-timegrid-body,
+.calendar .fc-scroller-harness {
+  min-height: 0 !important;
+  height: 100%;
+  max-height: 100%;
+}
+
+.full-page-calendar .fc-view-harness,
+.full-page-calendar .fc-timegrid,
+.full-page-calendar .fc-timegrid-body,
+.full-page-calendar .fc-scroller-harness {
+  min-height: 0 !important;
+  height: 100%;
+  max-height: 100%;
+}
+
+.fc-timegrid-slot,
+.fc-timegrid-axis,
+.fc-timegrid-slot-label,
+.fc-timegrid-slot-lane {
+  background-color: #fff !important;
+}
+
+.fc-header-toolbar {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.fc-toolbar-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0 auto;
+  text-align: center;
+  font-size: 1.4rem;
+}
+
+.fc-toolbar-chunk:nth-child(3) {
+  margin-left: auto;
+}
+
+.fc .fc-button {
+  background-color: #010C5E !important;
+  border-color: #010C5E !important;
+  color: white !important;
+}
+
+/* ---------- WEEK VIEW ---------- */
+.calendar-container-week {
+  width: 80%;
+  margin: 0 auto;
+}
+
+.calendar-container-week .calendar-event-card {
+  font-size: 10px;
+}
+
+
+/* ---------- DAY VIEW ---------- */
+.calendar-container-day {
+  width: 60%;
+  margin: 0 auto;
+}
+
+.calendar-container-day .calendar-event-card {
+  font-size: 12px;
+}
