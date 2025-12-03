@@ -9,10 +9,16 @@ export interface Note {
   prescription: string | null;
   visibility: boolean;
   creation_date: Date | string;
+  patient_appointment?: {
+    appointment?: {
+      name?: string;
+    };
+  };
 }
 
 export interface CreateNotePayload {
   patientId: string;
+  patient_appointment_id?: number;
   title: string;
   content?: string;
   general_notes?: string;
@@ -26,4 +32,5 @@ export interface NoteContent {
   general_notes: string;
   ailments: string;
   prescription: string;
+  visibility: boolean;
 }

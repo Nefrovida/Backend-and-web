@@ -53,24 +53,33 @@ router.get("/myForums/web", authenticate, getMyForumsWeb);
 
 router.get("/feed", authenticate, getForumFeed);
 
+/**
+ * Delete a message from a forum
+ *
+ * DELETE /api/forums/messages/:messageId
+ */
+router.delete(
+  "/messages/:messageId",
+  authenticate,
+  requirePrivileges([Privilege.DELETE_FORUMS]),
+  forumsController.deleteMessage
+);
+
 router.get(
   "/",
   authenticate,
-  requirePrivileges([Privilege.VIEW_FORUMS]),
   forumsController.getAll
 );
 
 router.get(
   "/:forumId",
   authenticate,
-  requirePrivileges([Privilege.VIEW_FORUMS]),
   forumsController.getById
 );
 
 router.get(
   "/me",
   authenticate,
-  requirePrivileges([Privilege.VIEW_FORUMS]),
   forumsController.getMyForums
 );
 
@@ -138,7 +147,6 @@ router.get(
 router.get(
   "/:forumId",
   authenticate,
-  requirePrivileges([Privilege.VIEW_FORUMS]),
   forumsController.getById
 );
 
@@ -222,7 +230,6 @@ router.post(
 router.get(
   "/:forumId/messages",
   authenticate,
-  requirePrivileges([Privilege.VIEW_FORUMS]),
   forumsController.getMessages
 );
 
@@ -263,14 +270,12 @@ router.post("/:forumId/replies", authenticate, forumsController.replyToMessage);
 router.get(
   "/:forumId/messages/:messageId/replies",
   authenticate,
-  requirePrivileges([Privilege.VIEW_FORUMS]),
   forumsController.getReplies
 );
 
 router.get(
   "/message/:messageId",
   authenticate,
-  requirePrivileges([Privilege.VIEW_FORUMS]),
   forumsController.getMessage
 );
 

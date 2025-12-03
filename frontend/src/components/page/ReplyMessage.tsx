@@ -6,6 +6,9 @@ import ParentMessage from "../molecules/forum/ParentMessage";
 import useInfiniteScroll from "@/hooks/useInfiniteScroll";
 import RepliesList from "../organism/forum/RepliesList";
 import SendReply from "../organism/forum/SendReply";
+import { DeleteMessageModal } from "../forums/DeleteMessageModal";
+import { forumsService } from "@/services/forums/forums.service";
+import { Toast } from "../forums/Toast";
 
 const ReplyMessage = () => {
   const { messageId, forumId } = useParams();
@@ -13,6 +16,10 @@ const ReplyMessage = () => {
     null
   );
   const [refresh, setRefresh] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedReplyId, setSelectedReplyId] = useState<number | null>(null);
+  const [deleteError, setDeleteError] = useState<string>("");
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
 
   const { results, scrollRef } = useInfiniteScroll<Reply>(
     `/api/forums/${forumId}/messages/${messageId}/replies`,
@@ -42,6 +49,39 @@ const ReplyMessage = () => {
       .catch((e) => console.log("error", e));
   }, [forumId, messageId]);
 
+  const handleDeleteReply = (replyId: number) => {
+    setSelectedReplyId(replyId);
+    setIsDeleteModalOpen(true);
+    setDeleteError("");
+  };
+
+  const handleConfirmDelete = async (replyId: number) => {
+    try {
+      setDeleteError("");
+      await forumsService.deleteReply(replyId);
+
+      // Remove reply from list
+      results.splice(
+        results.findIndex((r) => r.id === replyId),
+        1
+      );
+
+      // Close modal and show success
+      setIsDeleteModalOpen(false);
+      setSelectedReplyId(null);
+      setToast({ message: "Respuesta eliminada exitosamente", type: "success" });
+    } catch (err: any) {
+      setDeleteError(err.message || "Error al eliminar la respuesta");
+      console.error("Error deleting reply:", err);
+    }
+  };
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setSelectedReplyId(null);
+    setDeleteError("");
+  };
+
   return (
     <>
       <div>
@@ -53,9 +93,28 @@ const ReplyMessage = () => {
           results={results}
           scrollRef={scrollRef}
           forumId={forumId}
+          onDeleteReply={handleDeleteReply}
         />
         <SendReply replyInfo={{ messageId, forumId }} refresh={setRefresh} />
       </div>
+
+      {/* Delete Reply Modal */}
+      <DeleteMessageModal
+        isOpen={isDeleteModalOpen}
+        onClose={handleCloseDeleteModal}
+        onConfirm={handleConfirmDelete}
+        messageId={selectedReplyId}
+        externalError={deleteError}
+      />
+
+      {/* Toast Notification */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </>
   );
 };

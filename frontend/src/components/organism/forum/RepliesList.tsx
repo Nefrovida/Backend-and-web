@@ -9,9 +9,10 @@ interface Props {
   }[];
   forumId: string;
   scrollRef: React.RefObject<HTMLUListElement>;
+  onDeleteReply?: (replyId: number) => void;
 }
 
-const RepliesList: FC<Props> = ({ results, scrollRef, forumId }) => {
+const RepliesList: FC<Props> = ({ results, scrollRef, forumId, onDeleteReply }) => {
   return (
     <ul
       ref={scrollRef}
@@ -29,6 +30,7 @@ const RepliesList: FC<Props> = ({ results, scrollRef, forumId }) => {
               name: "",
             },
           }}
+          onDelete={onDeleteReply}
           key={idx}
         />
       ))}

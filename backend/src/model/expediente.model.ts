@@ -93,6 +93,15 @@ export default class MedicalRecord {
         visibility: true,
         creation_date: true,
         patient_appointment_id: true,
+        patient_appointment: {
+          select: {
+            appointment: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
       },
       orderBy: {
         creation_date: "desc",

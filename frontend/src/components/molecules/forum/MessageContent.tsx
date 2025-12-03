@@ -19,13 +19,6 @@ const MessageContent: FC<Props> = ({ message }) => {
           <BiLike className="hover:text-blue-600" />
           {message.likes}
         </button>
-        <Link
-          className="flex gap-2 items-center"
-          to={`/dashboard/foro/${message.forums.forumId}/mensaje/${message.messageId}`}
-        >
-          <MdChatBubbleOutline className="hover:text-blue-600" />
-          {message.replies}
-        </Link>
       </section>
     </>
   );
