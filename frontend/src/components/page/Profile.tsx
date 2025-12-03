@@ -108,6 +108,14 @@ const Profile: React.FC = () => {
                 <div className="text-sm text-gray-500">Teléfono</div>
                 <div className="text-lg font-medium">{user.phone_number}</div>
               </div>
+              <div>
+                <div className="text-sm text-gray-500">Género</div>
+                <div className="text-lg font-medium">{user.gender === 'MALE' ? 'Masculino' : user.gender === 'FEMALE' ? 'Femenino' : user.gender === 'OTHER' ? 'Otro' : '-'}</div>
+              </div>
+              <div>
+                <div className="text-sm text-gray-500">Fecha de nacimiento</div>
+                <div className="text-lg font-medium">{user.birthday ?? '-'}</div>
+              </div>
             </div>
           ) : (
             <ProfileForm initial={user} onSave={onSave} onCancel={() => setEditing(false)} />
