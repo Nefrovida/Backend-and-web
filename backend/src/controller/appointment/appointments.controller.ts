@@ -130,9 +130,7 @@ export const getUserAppointmentsByUserId = async (
  */
 export const scheduleAppointment = async (req: Request, res: Response) => {
   try {
-    const { appointmentId, patientId, dateHour, duration, appointmentType, place, link } = req.body;
-
-    console.log("dateHour before conversion: ", dateHour);
+    const { appointmentId, patientId, dateHour, appointmentType } = req.body;
 
     // 1. Validate required fields
     if (!appointmentId || !patientId || !dateHour || !appointmentType) {
@@ -164,7 +162,7 @@ export const scheduleAppointment = async (req: Request, res: Response) => {
       const [hours, minutes, seconds = 0] = timePart.replace('Z', '').split(':').map(Number);
       
       // Create date using local timezone (not UTC)
-      appointmentDate = new Date(year, month - 1, day, hours, minutes, seconds);
+      appointmentDate = new Date(year, month - 1, day, hours - 6, minutes, seconds);
     } else {
       // Fallback to direct parsing
       appointmentDate = new Date(dateHour);
@@ -175,14 +173,6 @@ export const scheduleAppointment = async (req: Request, res: Response) => {
       res.status(400).json({ success: false });
       return;
     }
-    console.log("appointmentDate after conversion: ", appointmentDate);
-
-    // validate that the dateHour is not already scheduled for this appointment
-    //const isAvailable = await appointmentsService.isTimeSlotAvailable(appointmentDate);
-    //if (!isAvailable) {
-    //  res.status(400).json({ success: false });
-    //  return;
-    //}
 
     const normalizedAppointmentType = appointmentType.toUpperCase() as 'PRESENCIAL' | 'VIRTUAL';
 
