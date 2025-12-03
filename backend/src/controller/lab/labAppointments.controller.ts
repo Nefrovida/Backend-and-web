@@ -60,8 +60,6 @@ export async function requestPresign(req: Request, res: Response) {
       });
     }
 
-    console.log("Presign for lab appointment", { id, mime, size });
-
     const safeName = `${id}-${Date.now()}.pdf`;
     const url = `http://localhost:3001/uploads/${safeName}`;
 

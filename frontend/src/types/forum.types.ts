@@ -32,3 +32,29 @@ export type Message = {
   replies: number;
   forums: { forumId: number; name: string };
 };
+
+export type SimpleMessage = {
+  messageId: number;
+  content: string;
+  forumId: number;
+  user: {
+    userId: string;
+    userName: string;
+  };
+};
+
+export type Reply = {
+  author: {
+    userId: string;
+    name: string;
+    lastName: string;
+  };
+  content: string;
+  forumId: number;
+  id: number;
+  parentMessageId: number;
+  stats: {
+    likesCount: number;
+    repliesCount: number;
+  };
+};
