@@ -222,6 +222,13 @@ router.post(
   addPatientToForumController.joinForum
 );
 
+// Allow any authenticated user to subscribe to public forums (self-subscribe)
+router.post(
+  "/:forumId/subscribe",
+  authenticate,
+  addPatientToForumController.subscribeToForum
+);
+
 /**
  * Get messages for a forum
  *

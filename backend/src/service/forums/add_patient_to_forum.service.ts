@@ -124,3 +124,56 @@ export async function joinForumService(
     }
   };
 }
+
+/**
+ * Service: subscribe any authenticated user to a public forum
+ * Allows non-patient users to subscribe to public forums.
+ */
+export async function subscribeToForumService(
+  forumId: number,
+  userId: string
+): Promise<AddPatientToForumResponse> {
+  // 1. Verify that forum exists
+  const forum = await findForumById(forumId);
+  if (!forum) {
+    throw new NotFoundError('Forum not found');
+  }
+
+  // 2. Only public forums can be subscribed directly
+  if (!forum.public_status) {
+    throw new BadRequestError('Only public forums can be joined directly');
+  }
+
+  // 3. Verify that forum is active
+  if (!forum.active) {
+    throw new BadRequestError('Forum is not active');
+  }
+
+  // 4. Verify that user is not already in forum
+  const existingMembership = await findUserInForum(userId, forumId);
+  if (existingMembership) {
+    // Return success if already a member (idempotent)
+    return {
+      success: true,
+      message: 'User is already a member of this forum',
+      data: {
+        userId: existingMembership.user_id,
+        forumId: existingMembership.forum_id,
+        forumRole: existingMembership.forum_role,
+      }
+    };
+  }
+
+  // 5. Add user to forum with default MEMBER role
+  const userForum = await addUserToForum(userId, forumId, FORUM_ROLES.MEMBER as unknown as ForumRole);
+
+  return {
+    success: true,
+    message: 'Successfully subscribed to the forum',
+    data: {
+      userId: userForum.user_id,
+      forumId: userForum.forum_id,
+      forumRole: userForum.forum_role,
+    }
+  };
+}

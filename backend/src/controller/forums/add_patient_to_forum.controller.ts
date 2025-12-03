@@ -1,10 +1,11 @@
 import type { Request, Response, NextFunction } from 'express';
-import { addPatientToForumService, joinForumService } from '../../service/forums/add_patient_to_forum.service';
+import { addPatientToForumService, joinForumService, subscribeToForumService } from '../../service/forums/add_patient_to_forum.service';
 import {
   addPatientToForumBodySchema,
   addPatientToForumParamsSchema
 } from '../../validators/forums/add_patient_to_forum.validator';
 import { BadRequestError } from '../../util/errors.util.js';
+import { success as successResponse } from '../../util/response.util';
 
 /**
  * Controller add patient to forum
@@ -41,8 +42,8 @@ export async function addPatientToForum(
     // Call service
     const result = await addPatientToForumService(forumId, userId, forumRole);
 
-    // Added successfully - result already contains the full response structure
-    res.status(201).json(result);
+    // Added successfully - use standardized success response
+    successResponse(res, result.data, result.message, 201);
   } catch (error) {
     next(error);
   }
@@ -73,9 +74,40 @@ export async function joinForum(
     const userId = req.user!.userId;
 
     // Call the service for joining forums (self-join)
-  const result = await joinForumService(forumId, userId);
+    const result = await joinForumService(forumId, userId);
 
-    res.status(201).json(result);
+    // Standardized response
+    successResponse(res, result.data, result.message, 201);
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Subscribe any authenticated user to a public forum (self-subscribe)
+ * This endpoint is similar to joinForum but allows non-patient users as well.
+ */
+export async function subscribeToForum(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const paramsValidation = addPatientToForumParamsSchema.safeParse(req.params);
+    if (!paramsValidation.success) {
+      const errors = paramsValidation.error.errors.map(err => ({
+        field: err.path.join('.'),
+        message: err.message
+      }));
+      return next(new BadRequestError(`Invalid request parameters: ${JSON.stringify(errors)}`));
+    }
+
+    const { forumId } = paramsValidation.data;
+    const userId = req.user!.userId;
+
+    const result = await subscribeToForumService(forumId, userId);
+
+    successResponse(res, result.data, result.message, 201);
   } catch (error) {
     next(error);
   }
