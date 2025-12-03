@@ -30,14 +30,14 @@ export default class Report {
     where: { patient_id: patient.patient_id },
   });
 
-  const analysisIds = analysis.map(a => a.patient_analysis_id);
+  const analysisIds = analysis.map((a: any) => a.patient_analysis_id);
 
   // APPOINTMENT IDS
   const appointments = await prisma.patient_appointment.findMany({
     where: { patient_id: patient.patient_id },
   });
 
-  const appointmentIds = appointments.map(a => a.patient_appointment_id);
+  const appointmentIds = appointments.map((a: any) => a.patient_appointment_id);
 
   // RESULTS QUERY
   const results = await prisma.results.findMany({
