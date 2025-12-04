@@ -3,17 +3,17 @@ import { z } from "zod";
 
 /**
  * Validation schema for forum creation (Admin)
- * 
+ *
  * User Story: "Admin: Create Forums"
- * 
+ *
  * This validator ensures that data received from the frontend complies
  * with business rules before reaching the service and database.
- * 
+ *
  * Applied validations:
  * - name: string between 3 and 100 characters (matches Prisma @db.Char(100))
  * - description: string max 255 characters (matches Prisma @db.Char(255))
  * - public_status: boolean (true = public, false = private)
- * 
+ *
  * Note: The 'created_by' field is not validated here as it's obtained from the JWT token.
  * Note: The 'active' field is handled by default in Prisma (true).
  */
@@ -43,7 +43,7 @@ export const createForumSchema = z.object({
 
 /**
  * Type automatically inferred from the Zod schema.
- * 
+ *
  * This type represents the ALREADY VALIDATED data at runtime that reaches the controller.
  * Equivalent to:
  * {
@@ -75,18 +75,24 @@ export const updateForumSchema = z.object({
     .trim()
     .optional(),
 
-  public_status: z.boolean({
-    invalid_type_error: "El estado de visibilidad debe ser un booleano (true/false)",
-  }).optional(),
+  public_status: z
+    .boolean({
+      invalid_type_error:
+        "El estado de visibilidad debe ser un booleano (true/false)",
+    })
+    .optional(),
 
-  active: z.boolean({
-    invalid_type_error: "El estado de actividad debe ser un booleano (true/false)",
-  }).optional(),
+  active: z
+    .boolean({
+      invalid_type_error:
+        "El estado de actividad debe ser un booleano (true/false)",
+    })
+    .optional(),
 });
 
 /**
  * Type automatically inferred from the Zod schema.
- * 
+ *
  * This type represents the ALREADY VALIDATED data at runtime that reaches the controller.
  * Equivalent to:
  * {
@@ -103,12 +109,20 @@ export type UpdateForumInputValidated = z.infer<typeof updateForumSchema>;
  */
 export const replyToMessageSchema = z.object({
   parent_message_id: z.coerce.number().int().positive({
-    message: 'El ID del mensaje padre debe ser un número entero positivo'
+    message: "El ID del mensaje padre debe ser un número entero positivo",
   }),
-  content: z.string()
-    .min(1, { message: 'El contenido no puede estar vacío' })
-    .max(5000, { message: 'El contenido no puede exceder 5000 caracteres' })
+  content: z
+    .string()
     .trim()
+    .min(1, { message: "El contenido no puede estar vacío" })
+    .max(5000, { message: "El contenido no puede exceder 5000 caracteres" }),
+});
+export const postMessageSchema = z.object({
+  content: z
+    .string()
+    .trim()
+    .min(1, { message: "El contenido no puede estar vacío" })
+    .max(5000, { message: "El contenido no puede exceder 5000 caracteres" }),
 });
 
 /**
