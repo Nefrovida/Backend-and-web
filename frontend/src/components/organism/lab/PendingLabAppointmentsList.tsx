@@ -41,6 +41,9 @@ function PendingLabAppointmentsList() {
         setPage((prev) => Math.min(totalPages, prev + 1));
     };
 
+    const hasAnyPending = appointments.length > 0;
+    const hasFilteredResults = filtered.length > 0;
+
     return (
         <div className="w-1/3 p-2 h-full overflow-hidden border-r border-slate-200 flex flex-col">
             <Title>Resultados de estudios pendientes</Title>
@@ -69,21 +72,31 @@ function PendingLabAppointmentsList() {
             {!loading && !error && (
                 <>
                     <ul className="flex flex-col gap-2 flex-1 overflow-y-auto">
-                        {filtered.length === 0 ? (
+                        {/* Case 1: nothing pending to upload */}
+                        {!hasAnyPending && (
                             <p className="text-sm text-slate-500">
-                                No hay citas pendientes que coincidan con la búsqueda.
+                                No hay estudios pendientes de subir resultados.
                             </p>
-                        ) : (
+                        )}
+
+                        {/* Case 2: there are pending items, but the filter does not match any */}
+                        {hasAnyPending && !hasFilteredResults && (
+                            <p className="text-sm text-slate-500">
+                                No hay estudios pendientes que coincidan con la búsqueda.
+                            </p>
+                        )}
+
+                        {/* Case 3: there are filtered results */}
+                        {hasFilteredResults &&
                             pageItems.map((appt) => (
                                 <li key={appt.id}>
                                     <LabAppointmentComponent appointment={appt} />
                                 </li>
-                            ))
-                        )}
+                            ))}
                     </ul>
 
                     {/* Pagination controls */}
-                    {filtered.length > 0 && (
+                    {hasFilteredResults && (
                         <div className="mt-2 flex items-center justify-between text-xs text-slate-600">
                             <button
                                 type="button"
@@ -104,8 +117,8 @@ function PendingLabAppointmentsList() {
                             <button
                                 type="button"
                                 onClick={handleNext}
-                                disabled={page === totalPages || filtered.length === 0}
-                                className={`px-3 py-1 rounded-full border ${page === totalPages || filtered.length === 0
+                                disabled={page === totalPages || !hasFilteredResults}
+                                className={`px-3 py-1 rounded-full border ${page === totalPages || !hasFilteredResults
                                         ? "border-slate-200 text-slate-300 cursor-not-allowed"
                                         : "border-slate-300 hover:border-slate-400 hover:bg-slate-50"
                                     }`}
