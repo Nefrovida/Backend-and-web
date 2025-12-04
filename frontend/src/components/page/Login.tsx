@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router";
 import { authService } from "../../services/auth.service";
+import nefrovidaLogo from "@/assets/logo.png";
 
 function Login() {
   const navigate = useNavigate();
@@ -75,12 +76,11 @@ function Login() {
         {/* Logo */}
         <div className="flex justify-center mb-6">
           <div className="text-center">
-            <h1 className="text-4xl font-bold">
-              <span style={{ color: "#1E3A8A" }}>NEFR</span>
-              <span style={{ color: "#DC2626" }}>O</span>
-              <span style={{ color: "#84CC16" }}>Vida</span>
-            </h1>
-            <p className="text-sm text-gray-600 mt-1">Asociación Civil</p>
+            <img
+              src={nefrovidaLogo}
+              alt="NefroVida A.C."
+              className="h-16 w-auto mx-auto select-none"
+            />
           </div>
         </div>
 
