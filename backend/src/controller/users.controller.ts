@@ -116,13 +116,24 @@ export const resetPassword = async (req: Request, res: Response): Promise<void> 
 // Report user
 
 export const reportUser = async (req: Request, res: Response) => {
-  const userId = req.params.id; // UUID (String)
-  const { messageId, cause } = req.body; // Datos extra necesarios
+  try {
+    const userIdToReport = req.params.id;
+    const { messageId, cause } = req.body;
 
-  if (!messageId || !cause) {
-     return res.status(400).json({ message: "Faltan datos: messageId y cause son obligatorios" });
+    if (!userIdToReport || !messageId || !cause) {
+      return res.status(400).json({ message: "Faltan datos para el reporte." });
+    }
+
+    const result = await userService.reportUser(userIdToReport, messageId, cause);
+
+    if (result.success) {
+      return res.status(200).json({ message: "Usuario reportado con éxito" });
+    } else {
+      return res.status(400).json({ message: "No se pudo reportar al usuario" });
+    }
+
+  } catch (error) {
+    console.error("Error reporting user:", error);
+    return res.status(500).json({ message: "Error interno del servidor" });
   }
-
-  const result = await userService.reportUser(userId, messageId, cause);
-  // ... respuesta ...
-}
+};
