@@ -35,21 +35,25 @@ export default function useSendMessage(
   }
 
   function handleSent(): void {
-    console.log(content, forumId);
-    if (!content || !forumId) {
+    const trimmed = content.trim();
+    console.log(trimmed, forumId);
+
+    if (!trimmed || !forumId) {
       return;
     }
+
     fetch(`/api/forums/${forumId}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       credentials: "include",
-      body: JSON.stringify({ message: content }),
+      body: JSON.stringify({ content: trimmed }),
     })
       .then(async (res) => {
         if (res.ok) {
           setSuccess({ status: true, message: "Mensaje enviado" });
+          onClick();
           return;
         } else {
           setSuccess({
@@ -62,7 +66,6 @@ export default function useSendMessage(
         console.error(e);
         setSuccess({ status: false, message: "Error al publicar mensaje" });
       });
-    onClick();
   }
 
   return {
