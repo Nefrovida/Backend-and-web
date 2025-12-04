@@ -201,9 +201,9 @@ VALUES
 ('e2eebc99-9c0b-4ef8-bb6d-6bb9bd380ccc', 'Patricia', 'Martínez', 'Díaz', true, '7722345678', 'testFamiliar2', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1993-11-20', 'FEMALE', 'APPROVED', false, 5);
 
 -- Secretaria
-INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
+INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, user_status, first_login, role_id)
 VALUES 
-('f1eebc99-9c0b-4ef8-bb6d-6bb9bd380ddd', 'Rosa', 'Jiménez', 'Ruiz', true, '7723456789', 'testSecretaria1', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1991-03-08', 'FEMALE', false, 6);
+('f1eebc99-9c0b-4ef8-bb6d-6bb9bd380ddd', 'Rosa', 'Jiménez', 'Ruiz', true, '7723456789', 'testSecretaria1', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1991-03-08', 'FEMALE', 'APPROVED', false, 6);
 
 -- ========================
 -- 🩺 DOCTORES
