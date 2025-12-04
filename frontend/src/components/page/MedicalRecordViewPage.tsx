@@ -26,8 +26,7 @@ const MedicalRecordViewPage = () => {
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>("info");
 
-  // Get medical record data from hook
-  const { data, loading, error } = useMedicalRecord(patientId || "");
+  const { data, loading, error, refetch } = useMedicalRecord(patientId);
 
   // Derive backend origin from API_BASE_URL
   const BACKEND_ORIGIN = API_BASE_URL.replace(/\/api$/, "");
