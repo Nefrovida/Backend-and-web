@@ -475,7 +475,7 @@ export default class Agenda {
 
   static async getLaboratoryAvailability(date: string) {
     // Parse date components to avoid timezone issues
-    const [year, month, day] = date.split('-').map(Number);
+    const [year, month, day] = date.split("-").map(Number);
     const targetDate = new Date(year, month - 1, day); // month is 0-indexed in JS Date
     const startOfDay = new Date(year, month - 1, day, 0, 0, 0, 0);
     const endOfDay = new Date(year, month - 1, day, 23, 59, 59, 999);
@@ -510,7 +510,9 @@ export default class Agenda {
         const isBooked = bookedAnalyses.some((analysis) => {
           if (!analysis.analysis_date) return false;
           const analysisStart = new Date(analysis.analysis_date);
-          const analysisEnd = new Date(analysisStart.getTime() + analysis.duration * 60000);
+          const analysisEnd = new Date(
+            analysisStart.getTime() + analysis.duration * 60000
+          );
           return slotTime >= analysisStart && slotTime < analysisEnd;
         });
 
