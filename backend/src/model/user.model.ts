@@ -58,3 +58,21 @@ export const checkUsernameExists = async (
         return true;
     }
 };
+
+export const reportUser = async (userId: string, messageId: number, cause: string) => {
+  try {
+    const report = await prisma.user_reports.create({
+      data: {
+        user_id: userId,              
+        reported_message: messageId,  
+        cause: cause,                 
+        date: new Date(),             
+        status: false,               
+      },
+    });
+    return { success: true, data: report };
+  } catch (error) {
+    console.error("Error al crear reporte de usuario en BD:", error);
+    return { success: false, error };
+  }
+};

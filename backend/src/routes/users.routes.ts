@@ -125,4 +125,10 @@ router.post(
   usersController.resetPassword
 );
 
+router.post(
+  "/:id/report", 
+  authenticate, 
+  
+  usersController.reportUser
+);
 export default router;

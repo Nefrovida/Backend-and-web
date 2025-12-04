@@ -2,6 +2,7 @@ import { prisma } from '../util/prisma.js';
 import { hashPassword } from '../util/password.util';
 import { UserWithRoleAndPrivileges, UpdateUserRequest } from '../types/user.types';
 import { NotFoundError } from '../util/errors.util';
+import * as userModel from "../model/user.model";
 
 /**
  * Get all users with their roles and privileges
@@ -295,6 +296,11 @@ export const resetPassword = async (userId: string, newPassword: string): Promis
   });
 };
 
+//Report user
+
+export const reportUser = async (userId: string, messageId: number, cause: string) => {
+  return await userModel.reportUser(userId, messageId, cause);
+};
 /**
  * 
  * return all external users
