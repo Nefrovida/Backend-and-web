@@ -16,11 +16,12 @@ export default function useSendMessage(
   const [forumId, setForumId] = useState<number>();
 
   useEffect(() => {
-    fetch("/api/forums/myForums")
+    fetch("/api/forums/myForums/web")
       .then((res) => res.json())
       .then((data) => {
         const dataInfo = data.map((d) => {
-          const { forumId, name } = d;
+          const { forum_id, name } = d;
+          const forumId = forum_id;
           return { forumId, name: name };
         });
         setForums(dataInfo);
@@ -34,20 +35,25 @@ export default function useSendMessage(
   }
 
   function handleSent(): void {
-    if (!content || !forumId) {
+    const trimmed = content.trim();
+    console.log(trimmed, forumId);
+
+    if (!trimmed || !forumId) {
       return;
     }
+
     fetch(`/api/forums/${forumId}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       credentials: "include",
-      body: JSON.stringify({ message: content }),
+      body: JSON.stringify({ content: trimmed }),
     })
       .then(async (res) => {
         if (res.ok) {
           setSuccess({ status: true, message: "Mensaje enviado" });
+          onClick();
           return;
         } else {
           setSuccess({
@@ -60,7 +66,6 @@ export default function useSendMessage(
         console.error(e);
         setSuccess({ status: false, message: "Error al publicar mensaje" });
       });
-    onClick();
   }
 
   return {

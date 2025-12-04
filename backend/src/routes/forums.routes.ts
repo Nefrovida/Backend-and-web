@@ -5,8 +5,12 @@ import { authenticate } from "../middleware/auth.middleware";
 import { requirePrivileges } from "../middleware/rbac.middleware";
 import { Privilege } from "../types/rbac.types";
 import postNewMessage from "src/controller/forum/postNewMessage.controller";
-import getMyForums from "src/controller/forum/getMyForums.controller";
+import {
+  getMyForums,
+  getMyForumsWeb,
+} from "src/controller/forum/getMyForums.controller";
 import getForumFeed from "src/controller/forum/getForumFeed.controller";
+import { likeMessage } from "../controller/forum/likeMessage.controller";
 
 const router = express.Router();
 
@@ -46,29 +50,27 @@ const router = express.Router();
  * ]
  */
 router.get("/myForums", authenticate, getMyForums);
+router.get("/myForums/web", authenticate, getMyForumsWeb);
 
 router.get("/feed", authenticate, getForumFeed);
 
-router.get(
-  "/",
+/**
+ * Delete a message from a forum
+ *
+ * DELETE /api/forums/messages/:messageId
+ */
+router.delete(
+  "/messages/:messageId",
   authenticate,
-  requirePrivileges([Privilege.VIEW_FORUMS]),
-  forumsController.getAll
+  requirePrivileges([Privilege.DELETE_FORUMS]),
+  forumsController.deleteMessage
 );
 
-router.get(
-  "/:forumId",
-  authenticate,
-  requirePrivileges([Privilege.VIEW_FORUMS]),
-  forumsController.getById
-);
+router.get("/", authenticate, forumsController.getAll);
 
-router.get(
-  "/me",
-  authenticate,
-  requirePrivileges([Privilege.VIEW_FORUMS]),
-  forumsController.getMyForums
-);
+router.get("/:forumId", authenticate, forumsController.getById);
+
+router.get("/me", authenticate, forumsController.getMyForums);
 
 /**
  * Create a new forum
@@ -131,12 +133,7 @@ router.get(
   forumsController.checkAdminStatus
 );
 
-router.get(
-  "/:forumId",
-  authenticate,
-  requirePrivileges([Privilege.VIEW_FORUMS]),
-  forumsController.getById
-);
+router.get("/:forumId", authenticate, forumsController.getById);
 
 router.post("/:forumId", authenticate, postNewMessage);
 
@@ -210,17 +207,14 @@ router.post(
   addPatientToForumController.joinForum
 );
 
+router.post("/like/:messageId", authenticate, likeMessage);
+
 /**
  * Get messages for a forum
  *
  * GET /api/forums/:forumId/messages
  */
-router.get(
-  "/:forumId/messages",
-  authenticate,
-  requirePrivileges([Privilege.VIEW_FORUMS]),
-  forumsController.getMessages
-);
+router.get("/:forumId/messages", authenticate, forumsController.getMessages);
 
 /**
  * Reply to a message in a forum
@@ -259,8 +253,9 @@ router.post("/:forumId/replies", authenticate, forumsController.replyToMessage);
 router.get(
   "/:forumId/messages/:messageId/replies",
   authenticate,
-  requirePrivileges([Privilege.VIEW_FORUMS]),
   forumsController.getReplies
 );
+
+router.get("/message/:messageId", authenticate, forumsController.getMessage);
 
 export default router;

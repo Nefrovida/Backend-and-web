@@ -7,6 +7,7 @@ export interface ResultResponse {
   date: string; // ISO string
   path: string;
   interpretation: string;
+  recommendation: string,
   patientAnalysis: {
     patientAnalysisId: number;
     analysisDate: string;
@@ -22,6 +23,34 @@ export interface ResultResponse {
   };
 }
 
+/**
+ * Note response DTO
+ */
+export interface NoteResponse {
+  noteId: number;
+  patientAppointmentId: number;
+  patientId: string;
+
+  title: string;
+  content: string;
+
+  ailments: string;           
+  generalNotes: string;       
+  prescription: string;       
+  visibility: boolean;
+
+  createdAt: string;          
+
+  appointment: {
+    appointmentId: number;
+    date: string;
+    duration: number;
+    type: string;
+    place: string | null;
+    status: string;
+  };
+}
+  
 /**
  * Risk question response DTO
  */

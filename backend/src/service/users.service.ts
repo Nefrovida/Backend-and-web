@@ -1,12 +1,17 @@
 import { prisma } from '../util/prisma.js';
+import { hashPassword } from '../util/password.util';
 import { UserWithRoleAndPrivileges, UpdateUserRequest } from '../types/user.types';
 import { NotFoundError } from '../util/errors.util';
+import * as userModel from "../model/user.model";
 
 /**
  * Get all users with their roles and privileges
  */
-export const getAllUsers = async (): Promise<UserWithRoleAndPrivileges[]> => {
+export const getAllUsers = async (onlyRequestedReset: boolean = false): Promise<UserWithRoleAndPrivileges[]> => {
+  const whereClause = onlyRequestedReset ? { password_reset_requested: true } : {};
+
   return await prisma.users.findMany({
+    where: whereClause,
     include: {
       role: {
         include: {
@@ -121,3 +126,213 @@ export const getUserByUsername = async (username: string): Promise<UserWithRoleA
   });
 };
 
+/**
+ * Get all pending users (awaiting approval)
+ */
+export const getPendingUsers = async (): Promise<UserWithRoleAndPrivileges[]> => {
+  return await prisma.users.findMany({
+    where: {
+      user_status: 'PENDING'
+    },
+    include: {
+      role: {
+        include: {
+          role_privileges: {
+            include: {
+              privilege: true,
+            },
+          },
+        },
+      },
+    },
+    orderBy: {
+      registration_date: 'desc'
+    }
+  });
+};
+
+/**
+ * Get all rejected users
+ */
+export const getRejectedUsers = async (): Promise<UserWithRoleAndPrivileges[]> => {
+  return await prisma.users.findMany({
+    where: {
+      user_status: 'REJECTED'
+    },
+    include: {
+      role: {
+        include: {
+          role_privileges: {
+            include: {
+              privilege: true,
+            },
+          },
+        },
+      },
+    },
+    orderBy: {
+      registration_date: 'desc'
+    }
+  });
+};
+
+/**
+ * Approve a user by setting their status to APPROVED and active to true
+ */
+export const approveUser = async (
+  userId: string,
+  approvedByUserId: string
+): Promise<UserWithRoleAndPrivileges> => {
+  const user = await prisma.users.findUnique({
+    where: { user_id: userId },
+  });
+
+  if (!user) {
+    throw new NotFoundError('User not found');
+  }
+
+  if (user.user_status !== 'PENDING') {
+    throw new Error('User is not in pending status');
+  }
+
+  const updatedUser = await prisma.users.update({
+    where: { user_id: userId },
+    data: {
+      user_status: 'APPROVED',
+      active: true,
+      approval_date: new Date(),
+      approved_by: approvedByUserId
+    },
+    include: {
+      role: {
+        include: {
+          role_privileges: {
+            include: {
+              privilege: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return updatedUser;
+};
+
+/**
+ * Reject a user by setting their status to REJECTED
+ */
+export const rejectUser = async (userId: string): Promise<UserWithRoleAndPrivileges> => {
+  const user = await prisma.users.findUnique({
+    where: { user_id: userId },
+  });
+
+  if (!user) {
+    throw new NotFoundError('User not found');
+  }
+
+  if (user.user_status !== 'PENDING') {
+    throw new Error('User is not in pending status');
+  }
+
+  const updatedUser = await prisma.users.update({
+    where: { user_id: userId },
+    data: {
+      user_status: 'REJECTED',
+      active: false
+    },
+    include: {
+      role: {
+        include: {
+          role_privileges: {
+            include: {
+              privilege: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return updatedUser;
+};
+
+/**
+ * Get user first login status by user Id
+ */
+export const isFirstLogin = async (userId: string): Promise<boolean> => {
+  const user = await prisma.users.findUnique({
+    where: { user_id: userId },
+    select: { first_login: true },
+  });
+
+  if (!user) {
+    throw new NotFoundError('User not found');
+  }
+
+  return user.first_login;
+}
+
+/**
+ * Reset user password
+ */
+export const resetPassword = async (userId: string, newPassword: string): Promise<void> => {
+  const user = await prisma.users.findUnique({
+    where: { user_id: userId },
+  });
+
+  if (!user) {
+    throw new NotFoundError('User not found');
+  }
+
+  const hashedPassword = await hashPassword(newPassword);
+
+  await prisma.users.update({
+    where: { user_id: userId },
+    data: {
+      password: hashedPassword,
+      password_reset_requested: false
+    },
+  });
+};
+
+//Report user
+
+export const reportUser = async (userId: string, messageId: number, cause: string) => {
+  return await userModel.reportUser(userId, messageId, cause);
+};
+/**
+ * 
+ * return all external users
+ */
+export const getAllExternalUsers = async () => { 
+  const externalUsers = await prisma.users.findMany({
+    where: {
+      first_login: true,
+    },
+  });
+
+  return externalUsers;
+};
+
+/**
+ * Convert external user to patient by assigning patient role
+ */
+export const convertExternalToPatient = async (userId: string) => {
+  const user = await prisma.users.findUnique({
+    where: { user_id: userId },
+  });
+
+  if (!user) {
+    throw new NotFoundError('User not found');
+  }
+
+  const updatedUser = await prisma.users.update({
+    where: { user_id: userId },
+    data: { first_login: false}
+  });
+
+      return updatedUser;
+};
+
+  // Assuming patient role_id is 3

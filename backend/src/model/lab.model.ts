@@ -1,16 +1,16 @@
-import { ANALYSIS_STATUS } from "@prisma/client";
-import { prisma } from "../util/prisma.js";
+import { ANALYSIS_STATUS, Prisma } from "@prisma/client";
+import { prisma } from "../util/prisma";
 
 export default class Laboratory {
   Laboratory() {
 
   }
 
-  static async getLabResults(pagination: number = 0, 
+  static async getLabResults(pagination: number = 0,
     filter: {
-      name?: string | null, 
-      start?: string | null, 
-      end?: string | null,  
+      name?: string | null,
+      start?: string | null,
+      end?: string | null,
       analysisType?: number[],
       status?: ANALYSIS_STATUS[] | null
     }) {
@@ -18,35 +18,37 @@ export default class Laboratory {
     const patientResults = await prisma.patient_analysis.findMany({
       where: {
         ...(filter.name
-            ? {
-                patient: {
-                  user: {
-                    name: {
-                      contains: filter.name,
-                      mode: "insensitive",
-                    },
-                  },
+          ? {
+            patient: {
+              user: {
+                name: {
+                  contains: filter.name,
+                  mode: "insensitive",
                 },
-              }
-            : {}),
+              },
+            },
+          }
+          : {}),
         ...(filter.start || filter.end
-        ? {
+          ? {
             analysis_date: {
               ...(filter.start ? { gte: filter.start } : {}),
               ...(filter.end ? { lte: filter.end } : {}),
             },
           }
-        : {}),
+          : {}),
         ...(filter.analysisType && filter.analysisType.length > 0
-        ? { analysis_id: { in: filter.analysisType } }
-        : {}),
-        ...(filter?.status ? {analysis_status: {
-          in: filter?.status
-        }} : {})
+          ? { analysis_id: { in: filter.analysisType } }
+          : {}),
+        ...(filter?.status ? {
+          analysis_status: {
+            in: filter?.status
+          }
+        } : {})
       },
       orderBy: [
-        {analysis_status: "desc"},
-        {analysis_date: "desc"},
+        { analysis_status: "desc" },
+        { analysis_date: "desc" },
       ],
       select: {
         patient_analysis_id: true,
@@ -130,7 +132,7 @@ export default class Laboratory {
     patientAnalysisId: number,
     fileUri: string
   ) {
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       // Verify it exists and that it is in REQUESTED status
       const existing = await tx.patient_analysis.findUnique({
         where: { patient_analysis_id: patientAnalysisId },
@@ -198,10 +200,10 @@ export default class Laboratory {
       throw new Error("request to db for patient analysis results failed");
     }
   }
-    
+
   static async generateReport(
     patient_analysis_id: number,
-    interpretations: string, 
+    interpretations: string,
     recommendations: string) {
     try {
       await prisma.results.update({

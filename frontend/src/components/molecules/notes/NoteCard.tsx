@@ -15,6 +15,16 @@ const NoteCard: FC<Props> = ({ note }) => {
       className="bg-gray-50 rounded-lg border border-gray-200 p-4 hover:bg-gray-100 transition-colors"
     >
       <NoteDate title={note.title} creationDate={note.creation_date} />
+      
+      {note.patient_appointment_id ? (
+        <div className="mb-2 text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded inline-block">
+          Asociada a consulta: {note.patient_appointment?.appointment?.name || `#${note.patient_appointment_id}`}
+        </div>
+      ) : (
+        <div className="mb-2 text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded inline-block">
+          ⚠ Nota sin consulta asociada
+        </div>
+      )}
 
       <div className="space-y-2">
         <NoteSection noteContent={note.general_notes} title="Notas Generales" />

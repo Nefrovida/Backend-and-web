@@ -1,7 +1,6 @@
-import { prisma } from '../util/prisma';
+import { prisma } from "../util/prisma";
 
 export default class AppointmentModel {
-  
   /**
    * Obtener todas las citas
    */
@@ -26,7 +25,7 @@ export default class AppointmentModel {
         },
       },
       orderBy: {
-        date_hour: 'asc',
+        date_hour: "asc",
       },
     });
 
@@ -37,7 +36,7 @@ export default class AppointmentModel {
    * Obtener citas de un día específico
    */
   static async getAppointmentsByDay(targetDate: string) {
-    const [year, month, day] = targetDate.split('-').map(Number);
+    const [year, month, day] = targetDate.split("-").map(Number);
     const start = new Date(year, month - 1, day, 0, 0, 0);
     const end = new Date(year, month - 1, day + 1, 0, 0, 0);
 
@@ -62,7 +61,7 @@ export default class AppointmentModel {
         },
       },
       orderBy: {
-        date_hour: 'asc',
+        date_hour: "asc",
       },
     });
 
@@ -74,7 +73,7 @@ export default class AppointmentModel {
    */
   static async getAppointmentById(id: number) {
     const appointment = await prisma.patient_appointment.findUnique({
-      where: {  patient_appointment_id: id  },
+      where: { patient_appointment_id: id },
       include: {
         patient: {
           include: {
@@ -104,28 +103,27 @@ export default class AppointmentModel {
       where: {
         date_hour,
         appointment_status: {
-          not: 'CANCELED',
+          not: "CANCELED",
         },
       },
     });
 
-
     return !existing;
   }
 
-  /**
+ /**
    * Reagendar una cita (actualizar fecha y motivo)
    */
  static async rescheduleAppointment(
   id: number,
   date_hour: Date,
   reason: string
-  ) {
+) {
   const updated = await prisma.patient_appointment.update({
     where: { patient_appointment_id: id },
     data: {
-      date_hour, 
-      appointment_status: 'PROGRAMMED',
+      date_hour,
+      appointment_status: "REQUESTED",
     },
     include: {
       patient: {
@@ -141,7 +139,7 @@ export default class AppointmentModel {
       },
       appointment: {
         select: {
-          name: true, 
+          name: true,
         },
       },
     },
@@ -165,8 +163,41 @@ export default class AppointmentModel {
         patient_name: user?.name ?? null,
         patient_parent_last_name: user?.parent_last_name ?? null,
         patient_maternal_last_name: user?.maternal_last_name ?? null,
-        reason: a.appointment?.name ?? 'Sin motivo',
+        reason: a.appointment?.name ?? "Sin motivo",
       };
     });
+  }
+
+  static async getAppointmentCatalog() {
+    return await prisma.appointments.findMany({
+      include: {
+        doctor: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
+  }
+  static async deleteAppointment(appointmentId: number) {
+    const appoinmentDeleted = await prisma.patient_appointment.update({
+      where: {
+        patient_appointment_id: appointmentId,
+        AND: {
+          OR: [
+            {
+              appointment_status: "REQUESTED",
+            },
+            {
+              appointment_status: "PROGRAMMED",
+            },
+          ],
+        },
+      },
+      data: {
+        appointment_status: "CANCELED",
+      },
+    });
+    return;
   }
 }

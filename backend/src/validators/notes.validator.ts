@@ -2,6 +2,11 @@ import { z } from "zod";
 
 export const createNoteSchema = z.object({
   patientId: z.string().uuid({ message: "Patient ID must be a valid UUID" }),
+  patient_appointment_id: z
+    .number()
+    .int()
+    .positive({ message: "Appointment ID must be a positive integer" })
+    .optional(),
   title: z
     .string()
     .trim()
