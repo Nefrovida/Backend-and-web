@@ -171,3 +171,38 @@ export const resetPassword = async (req: Request, res: Response): Promise<void> 
     res.status(error.statusCode || 500).json({ error: error.message });
   }
 };
+
+/**
+ * Get all external users
+ */
+export const getAllExternalUsers = async (req: Request, res: Response) => {
+  try {
+    const externalUsers = await usersService.getAllExternalUsers();
+    res.status(200).json(externalUsers);
+  } catch (error: any) {
+    res.status(error.statusCode || 500).json({ error: error.message });
+  }
+};
+
+/**
+ * Convert external user to patient
+ * @param userId
+ */
+export const convertExternalToPatient = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+
+    if (!userId) {
+      res.status(400).json({ error: 'User ID is required' });
+      return;
+    }
+
+    const patient = await usersService.convertExternalToPatient(userId);
+    res.status(200).json({
+      message: 'User converted to patient successfully',
+      patient
+    });
+  } catch (error: any) {
+    res.status(error.statusCode || 500).json({ error: error.message });
+  }
+};

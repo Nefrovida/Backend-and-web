@@ -181,6 +181,7 @@ export const forgotPassword = async (req: Request, res: Response): Promise<void>
     // Always return success to prevent user enumeration
     res.status(200).json({ message: "If the user exists, a password reset request has been sent to the administrators." });
   } catch (error: any) {
+    console.error("Error in forgotPassword controller:", error);
     res.status(error.statusCode || 500).json({ error: error.message });
   }
 };

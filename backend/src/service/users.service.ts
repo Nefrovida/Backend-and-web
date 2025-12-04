@@ -294,3 +294,39 @@ export const resetPassword = async (userId: string, newPassword: string): Promis
     },
   });
 };
+
+/**
+ * 
+ * return all external users
+ */
+export const getAllExternalUsers = async () => { 
+  const externalUsers = await prisma.users.findMany({
+    where: {
+      first_login: true,
+    },
+  });
+
+  return externalUsers;
+};
+
+/**
+ * Convert external user to patient by assigning patient role
+ */
+export const convertExternalToPatient = async (userId: string) => {
+  const user = await prisma.users.findUnique({
+    where: { user_id: userId },
+  });
+
+  if (!user) {
+    throw new NotFoundError('User not found');
+  }
+
+  const updatedUser = await prisma.users.update({
+    where: { user_id: userId },
+    data: { first_login: false}
+  });
+
+      return updatedUser;
+};
+
+  // Assuming patient role_id is 3

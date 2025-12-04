@@ -23,7 +23,14 @@ import dashboardRoutes from "./dashboard.routes";
 import profileRoutes from "./profile.routes";
 const router = express.Router();
 
-
+// ============================================
+// Clinical History Routes (Protected)
+// ============================================
+router.use("/clinical-history", clinicalHistoryRoutes);
+// ============================================
+// User Routes (Protected)
+// ============================================
+router.use("/users", usersRoutes);
 // ============================================
 // Authentication Routes (Public)
 // ============================================
@@ -33,16 +40,6 @@ router.use("/auth", authRoutes);
 // Profile Routes (Protected)
 // ============================================
 router.use("/profile", profileRoutes);
-
-// ============================================
-// User Routes (Protected)
-// ============================================
-router.use("/users", usersRoutes);
-
-// ============================================
-// Clinical History Routes (Protected)
-// ============================================
-router.use("/clinical-history", clinicalHistoryRoutes);
 
 // ============================================
 // Role Routes (Protected)
