@@ -18,6 +18,25 @@ export interface PendingUser {
 }
 
 export const usersService = {
+  async getUsers(resetRequested: boolean = false) {
+    const url = resetRequested
+      ? `${API_BASE_URL}/users?resetRequested=true`
+      : `${API_BASE_URL}/users`;
+
+    const response = await fetch(url, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch users");
+    }
+
+    return response.json();
+  },
+
   async getPendingUsers(): Promise<PendingUser[]> {
     const response = await fetch(`${API_BASE_URL}/users/pending/all`, {
       method: "GET",
@@ -81,6 +100,24 @@ export const usersService = {
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.error || "Failed to reject user");
+    }
+
+    return response.json();
+  },
+
+  async resetPassword(userId: string, password: string) {
+    const response = await fetch(`${API_BASE_URL}/users/${userId}/reset-password`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({ password }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || "Failed to reset password");
     }
 
     return response.json();

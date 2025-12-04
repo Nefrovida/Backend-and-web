@@ -1,14 +1,46 @@
-import { ANALYSIS_STATUS, PrismaClient } from "@prisma/client";
-import {Request, Response} from 'express';
+import { ANALYSIS_STATUS, Prisma } from "@prisma/client";
+import { Request, Response } from 'express';
+import { prisma } from "../util/prisma";
 import { ZodError } from 'zod';
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
 
 /**
  * Get all appointments for a specific doctor
  * @param doctorId - The ID of the doctor whose appointments to retrieve
  * @returns Array of appointments with patient and appointment details
  */
+const appointmentInclude = {
+  appointment: {
+    select: {
+      appointment_id: true,
+      name: true,
+      general_cost: true,
+      community_cost: true,
+      image_url: true,
+    },
+  },
+  patient: {
+    include: {
+      user: {
+        select: {
+          user_id: true,
+          name: true,
+          parent_last_name: true,
+          maternal_last_name: true,
+          phone_number: true,
+          birthday: true,
+          gender: true,
+        },
+      },
+    },
+  },
+} satisfies Prisma.patient_appointmentInclude;
+
+type AppointmentWithDetails = Prisma.patient_appointmentGetPayload<{
+  include: typeof appointmentInclude
+}>;
+
 export const getDoctorAppointments = async (doctorId: string) => {
 
   const appointments = await prisma.patient_appointment.findMany({
@@ -17,39 +49,14 @@ export const getDoctorAppointments = async (doctorId: string) => {
         doctor_id: doctorId,
       },
     },
-    include: {
-      appointment: {
-        select: {
-          appointment_id: true,
-          name: true,
-          general_cost: true,
-          community_cost: true,
-          image_url: true,
-        },
-      },
-      patient: {
-        include: {
-          user: {
-            select: {
-              user_id: true,
-              name: true,
-              parent_last_name: true,
-              maternal_last_name: true,
-              phone_number: true,
-              birthday: true,
-              gender: true,
-            },
-          },
-        },
-      },
-    },
+    include: appointmentInclude,
     orderBy: {
       date_hour: 'desc',
     },
   });
 
   // Flatten the nested structure for easier consumption
-  const formattedAppointments = appointments.map((appt) => {
+  const formattedAppointments = appointments.map((appt: AppointmentWithDetails) => {
     const user = appt.patient?.user;
     const { patient, appointment, ...appointmentData } = appt;
 
@@ -72,9 +79,9 @@ export const getDoctorAppointments = async (doctorId: string) => {
   return formattedAppointments;
 };
 
-  export const getAllAppointments = async () => {
-    const appointments = await prisma.appointments.findMany({
-      select: {
+export const getAllAppointments = async () => {
+  const appointments = await prisma.appointments.findMany({
+    select: {
       appointment_id: true,
       doctor_id: true,
       name: true,
@@ -82,101 +89,101 @@ export const getDoctorAppointments = async (doctorId: string) => {
       community_cost: true,
       image_url: true,
     },
-      where: {
-        active: true,
-      },
+    where: {
+      active: true,
+    },
+  });
+  return appointments;
+};
+
+
+export const createAppointment = async (validatedData: any) => {
+  try {
+    const newAppointment = await prisma.appointments.create({
+      data: validatedData,
     });
-    return appointments;
-  };
+    return true;
+  } catch (error) {
+    if (error instanceof ZodError) {
+      throw new Error(`Validation error: ${error.errors.map(e => e.message).join(', ')}`);
+    }
+    throw error;
+  }
+};
 
+export const getAppointmentByData = async (validatedData: any) => {
+  return await prisma.appointments.findFirst({
+    where: {
+      name: validatedData.name,
+      doctor_id: validatedData.doctor_id,
+      active: true,
+    },
+  });
+};
 
-  export const createAppointment = async ( validatedData: any) => {
-    try {
-      const newAppointment = await prisma.appointments.create({
-        data: validatedData,
-      });
-      return true;
-    } catch (error) {
-      if (error instanceof ZodError) {
-        throw new Error(`Validation error: ${error.errors.map(e => e.message).join(', ')}`);
+export const updateAppointment = async (appointmentId: number, updateData: any) => {
+  try {
+    const updatedAppointment = await prisma.appointments.update({
+      where: { appointment_id: appointmentId },
+      data: updateData,
+    });
+    return updatedAppointment;
+  } catch (error) {
+    if (error instanceof ZodError) {
+      throw new Error(`Validation error: ${error.errors.map(e => e.message).join(', ')}`);
+    }
+    throw error;
+  }
+};
+
+export const deleteAppointment = async (appointmentId: number) => {
+  try {
+    const deletedAppointment = await prisma.appointments.update({
+      where: { appointment_id: appointmentId },
+      data: { active: false },
+    });
+    return deletedAppointment;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getAppointmentByUserId = async (req: Request, res: Response, UserId: string) => {
+  const patientId = await prisma.patients.findFirst({
+    where: {
+      user_id: UserId
+    },
+  });
+
+  if (!patientId) {
+    return res.status(404).json({ error: "Patient not found" });
+  }
+
+  const appointments = await prisma.patient_appointment.findMany({
+    where: {
+      patient_id: patientId.patient_id,
+      appointment_status: { not: "CANCELED" }
+    },
+    include: {
+      appointment: {
+        select: { name: true }
       }
-      throw error;
     }
-  };
+  });
 
-  export const getAppointmentByData = async (validatedData: any) => {
-    return await prisma.appointments.findFirst({
-      where: {
-        name: validatedData.name,
-        doctor_id: validatedData.doctor_id,
-        active: true,
-      },
-    });
-  };
-
-  export const updateAppointment = async (appointmentId: number, updateData: any) => {
-    try {
-      const updatedAppointment = await prisma.appointments.update({
-        where: { appointment_id: appointmentId },
-        data: updateData,
-      });
-      return updatedAppointment;
-    } catch (error) {
-      if (error instanceof ZodError) {
-        throw new Error(`Validation error: ${error.errors.map(e => e.message).join(', ')}`);
+  const analysis = await prisma.patient_analysis.findMany({
+    where: {
+      patient_id: patientId.patient_id,
+      analysis_status: { not: "CANCELED" }
+    },
+    include: {
+      analysis: {
+        select: { name: true }
       }
-      throw error;
     }
-  };
+  });
 
-  export const deleteAppointment = async (appointmentId: number) => {
-    try {
-      const deletedAppointment = await prisma.appointments.update({
-        where: { appointment_id: appointmentId },
-        data: { active: false },
-      });
-      return deletedAppointment;
-    } catch (error) {
-      throw error;
-    }
-  };
-
-  export const getAppointmentByUserId = async (req: Request, res: Response, UserId: string) =>{
-    const patientId  = await prisma.patients.findFirst({
-        where: {
-            user_id: UserId
-        },
-    });
-
-    if (!patientId) {
-        return res.status(404).json({ error: "Patient not found" });
-    }
-
-    const appointments = await prisma.patient_appointment.findMany({
-        where: {
-            patient_id: patientId.patient_id,
-            appointment_status: { not: "CANCELED" }
-        },
-        include: {
-            appointment: {
-                select: { name: true }
-            }
-        }
-    });
-
-    const analysis = await prisma.patient_analysis.findMany({
-        where: {
-            patient_id: patientId.patient_id,
-            analysis_status: { not: "CANCELED" }
-        },
-        include: {
-            analysis: {
-                select: { name: true }
-            }
-        }
-    });
-
-    return { appointments, analysis };
+  return { appointments, analysis };
 }
 
 export const getAppointmentByName = async (appointmentName: string) => {
@@ -195,40 +202,40 @@ export const getAppointmentByName = async (appointmentName: string) => {
 }
 
 export const getAppointmentByPatient = async (now: Date, id: string) => {
-    const patientId  = await prisma.patients.findFirst({
-        where: {
-            user_id: id
-        },
-    });
+  const patientId = await prisma.patients.findFirst({
+    where: {
+      user_id: id
+    },
+  });
 
-    if (!patientId) {
-       throw new Error("Patient not found");
-    }
-    const appointments = await prisma.patient_appointment.findMany({
-      where: { 
-        patient_id: patientId.patient_id,
-        date_hour: {
-          lt: now
-        },
-        notes: {
-          some: {
-            visibility: true
-          }
-        }
+  if (!patientId) {
+    throw new Error("Patient not found");
+  }
+  const appointments = await prisma.patient_appointment.findMany({
+    where: {
+      patient_id: patientId.patient_id,
+      date_hour: {
+        lt: now
       },
-      include: {
-        appointment: {
-          select: {
-            name: true,
-          },
-        },
-        notes: {
-          where: {
-            visibility: true
-          }
+      notes: {
+        some: {
+          visibility: true
         }
       }
-    });
+    },
+    include: {
+      appointment: {
+        select: {
+          name: true,
+        },
+      },
+      notes: {
+        where: {
+          visibility: true
+        }
+      }
+    }
+  });
 
 
   return appointments;

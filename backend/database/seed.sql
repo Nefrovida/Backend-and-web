@@ -488,3 +488,21 @@ VALUES
 ('b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22', 'Respuesta', '2025-10-28 10:35:00', 'Nueva Respuesta en Foro', 'Pedro Fernández ha respondido a tu mensaje en el foro "Ejercicio y Salud Cardiovascular"', true),
 ('e1eebc99-9c0b-4ef8-bb6d-6bb9bd380bbb', 'Información', '2025-10-15 15:00:00', 'Acceso a Expediente', 'Ahora tienes acceso al expediente médico de Pedro Fernández como familiar autorizado', true),
 ('f1eebc99-9c0b-4ef8-bb6d-6bb9bd380ddd', 'Tarea', '2025-11-22 09:00:00', 'Actualizar Catálogo', 'Se requiere actualizar los costos del catálogo de análisis para el próximo mes', false);
+
+
+-- 1. Crear privilegios de autogestión
+INSERT INTO privileges (description) VALUES 
+('VIEW_OWN_PROFILE'),
+('UPDATE_OWN_PROFILE');
+
+-- 2. Asignar estos privilegios a TODOS los roles existentes (1 al 6)
+-- Esto asegura que desde el Admin hasta el Paciente puedan ver/editar su perfil
+INSERT INTO role_privilege (role_id, privilege_id)
+SELECT r.role_id, p.privilege_id
+FROM roles r
+CROSS JOIN privileges p
+WHERE p.description IN ('VIEW_OWN_PROFILE', 'UPDATE_OWN_PROFILE')
+  AND NOT EXISTS (
+    SELECT 1 FROM role_privilege rp 
+    WHERE rp.role_id = r.role_id AND rp.privilege_id = p.privilege_id
+  );

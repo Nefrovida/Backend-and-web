@@ -113,4 +113,11 @@ router.put(
   usersController.rejectUser
 );
 
+router.post(
+  "/:id/reset-password",
+  authenticate,
+  requirePrivileges([Privilege.UPDATE_USERS]),
+  usersController.resetPassword
+);
+
 export default router;

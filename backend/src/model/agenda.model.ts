@@ -739,9 +739,7 @@ static async getAnalysisById(id: number) {
         date_hour: proposedStart,
         duration,
         appointment_type: appointmentType,
-        place:
-          place ||
-          (appointmentType === "PRESENCIAL" ? "Consultorio" : undefined),
+        place: place || (appointmentType === "PRESENCIAL" ? "Consultorio" : undefined),
         appointment_status: "PROGRAMMED",
       },
       include: {

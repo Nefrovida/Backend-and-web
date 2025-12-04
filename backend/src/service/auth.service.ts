@@ -287,3 +287,45 @@ export const refreshAccessToken = async (
     },
   };
 };
+
+/**
+ * Request password reset
+ */
+export const forgotPassword = async (username: string): Promise<void> => {
+  // Find user
+  const user = await prisma.users.findFirst({
+    where: { username, active: true },
+  });
+
+  if (!user) {
+    // We don't want to reveal if a user exists or not
+    return;
+  }
+
+  // Update user to set password_reset_requested to true
+  await prisma.users.update({
+    where: { user_id: user.user_id },
+    data: { password_reset_requested: true },
+  });
+
+  // Find all admins
+  const admins = await prisma.users.findMany({
+    where: { role_id: DEFAULT_ROLES.ADMIN, active: true },
+  });
+
+  // Create notification for each admin
+  const notifications = admins.map((admin) => ({
+    user_id: admin.user_id,
+    title: "Solicitud de Restablecimiento de Contraseña",
+    content: `El usuario ${user.name} (${user.username}) ha solicitado restablecer su contraseña.`,
+    date: new Date(),
+    answer: "Pendiente",
+    seen: false,
+  }));
+
+  if (notifications.length > 0) {
+    await prisma.notifications.createMany({
+      data: notifications,
+    });
+  }
+};

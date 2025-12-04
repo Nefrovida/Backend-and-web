@@ -13,6 +13,7 @@ interface Props {
       general_notes: string;
       ailments: string;
       prescription: string;
+      visibility: boolean;
     }>
   >;
 }

@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
-import { PrismaClient, Type, Status } from "@prisma/client";
+import { prisma } from "../../util/prisma";
+import { Type, Status } from "@prisma/client";
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
 
 async function createAppointment(req: Request, res: Response) {
     try {

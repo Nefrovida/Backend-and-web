@@ -12,10 +12,10 @@ async function getAppointmentsInRangeC(req: Request, res: Response) {
       });
     }
 
-    const appointments: AppointmentRecord[] = await getAppointmentsInRange(
-      start.toString().split("T")[0],
-      end.toString().split("T")[0]
-    );
+        const appointments: AppointmentRecord[] = await getAppointmentsInRange(
+            start.toString().split("T")[0],
+            end.toString().split("T")[0]
+        );
 
     res.status(200).json(appointments);
   } catch (error) {

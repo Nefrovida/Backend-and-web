@@ -72,7 +72,7 @@ router.post(
 router.post(
   "/analysis/:id/cancel",
   authenticate,
-  requirePrivileges([Privilege.CREATE_ANALYSIS]),
+  requirePrivileges([Privilege.CREATE_APPOINTMENTS]),
   cancelAnalysis
 );
 
