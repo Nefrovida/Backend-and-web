@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router";
 import { RegisterData, Gender, ROLE_IDS, ROLE_NAMES } from "../../types/auth.types";
 import { authService } from "../../services/auth.service";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 type RegistrationStep = 1 | 2 | 3;
 
@@ -243,22 +242,15 @@ function Register() {
 
       <div>
         <label className="block text-sm text-gray-600 mb-2 ml-1">Contraseña *</label>
-        <div className="relative">
+        <div>
           <input
-            type={showPassword ? "text" : "password"}
+            type="password"
             value={formData.password || ""}
             onChange={(e) => updateFormData({ password: e.target.value })}
-            className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-900 transition-colors pr-10"
+            className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-900 transition-colors"
             maxLength={100}
             required
           />
-          <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700"
-          >
-            {showPassword ? <FaEye /> : <FaEyeSlash />}
-          </button>
         </div>
       </div>
 
