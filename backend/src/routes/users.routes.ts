@@ -89,6 +89,10 @@ router.post(
   usersController.resetPassword
 );
 
-router.post('/users/:id/report', authMiddleware, usersController.reportUser);
-
+router.post(
+  "/:id/report", 
+  authenticate, 
+  
+  usersController.reportUser
+);
 export default router;

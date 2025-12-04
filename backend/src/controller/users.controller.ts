@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import * as usersService from '../service/users.service';
 import { UpdateUserRequest } from '../types/user.types';
+import * as userService from "../service/users.service";
 
 /**
  * Get all users
@@ -110,3 +111,18 @@ export const resetPassword = async (req: Request, res: Response): Promise<void> 
     res.status(error.statusCode || 500).json({ error: error.message });
   }
 };
+
+
+// Report user
+
+export const reportUser = async (req: Request, res: Response) => {
+  const userId = req.params.id; // UUID (String)
+  const { messageId, cause } = req.body; // Datos extra necesarios
+
+  if (!messageId || !cause) {
+     return res.status(400).json({ message: "Faltan datos: messageId y cause son obligatorios" });
+  }
+
+  const result = await userService.reportUser(userId, messageId, cause);
+  // ... respuesta ...
+}
