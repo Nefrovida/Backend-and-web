@@ -73,6 +73,67 @@ export const getProfile = async (req: Request, res: Response): Promise<void> => 
 };
 
 /**
+ * Get all pending users (awaiting approval)
+ */
+export const getPendingUsers = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const pendingUsers = await usersService.getPendingUsers();
+    res.status(200).json(pendingUsers);
+  } catch (error: any) {
+    res.status(error.statusCode || 500).json({ error: error.message });
+  }
+};
+
+/**
+ * Get all rejected users
+ */
+export const getRejectedUsers = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const rejectedUsers = await usersService.getRejectedUsers();
+    res.status(200).json(rejectedUsers);
+  } catch (error: any) {
+    res.status(error.statusCode || 500).json({ error: error.message });
+  }
+};
+
+/**
+ * Approve a user
+ */
+export const approveUser = async (req: Request, res: Response): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    const { id } = req.params;
+    const approvedUser = await usersService.approveUser(id, req.user.userId);
+    res.status(200).json({
+      message: 'User approved successfully',
+      user: approvedUser
+    });
+  } catch (error: any) {
+    res.status(error.statusCode || 500).json({ error: error.message });
+  }
+};
+
+/**
+ * Reject a user
+ */
+export const rejectUser = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const rejectedUser = await usersService.rejectUser(id);
+    res.status(200).json({
+      message: 'User rejected successfully',
+      user: rejectedUser
+    });
+  } catch (error: any) {
+    res.status(error.statusCode || 500).json({ error: error.message });
+  }
+};
+
+/**
  * Get first login status
  */
 export const isFirstLogin = async (req: Request, res: Response): Promise<void> => {

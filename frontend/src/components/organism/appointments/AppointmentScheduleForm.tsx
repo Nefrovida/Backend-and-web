@@ -7,7 +7,10 @@ interface Props {
   onScheduleComplete: () => void;
 }
 
-const AppointmentScheduleForm: React.FC<Props> = ({ selectedRequest, onScheduleComplete }) => {
+const AppointmentScheduleForm: React.FC<Props> = ({
+  selectedRequest,
+  onScheduleComplete,
+}) => {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [selectedDoctor, setSelectedDoctor] = useState<string>("");
   const [selectedDate, setSelectedDate] = useState<string>("");
@@ -28,7 +31,9 @@ const AppointmentScheduleForm: React.FC<Props> = ({ selectedRequest, onScheduleC
       const year = requestDate.getFullYear();
       const month = requestDate.getMonth() + 1;
       const day = requestDate.getDate();
-      const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      const dateStr = `${year}-${String(month).padStart(2, "0")}-${String(
+        day
+      ).padStart(2, "0")}`;
       setSelectedDate(dateStr);
     }
   }, [selectedRequest]);
@@ -58,21 +63,26 @@ const AppointmentScheduleForm: React.FC<Props> = ({ selectedRequest, onScheduleC
     setLoadingSlots(true);
     setError("");
     try {
-      const availableSlotsData = await agendaService.getDoctorAvailability(selectedDoctor, selectedDate);
-      console.log('Available slots received:', availableSlotsData); // Debug log
-      
+      const availableSlotsData = await agendaService.getDoctorAvailability(
+        selectedDoctor,
+        selectedDate
+      );
+      console.log("Available slots received:", availableSlotsData); // Debug log
+
       // Generate all possible time slots (8 AM to 6 PM, every 30 minutes)
       const allSlots: string[] = [];
-      const workStart = 8; // 8 AM
+      const workStart = 7; // 8 AM
       const workEnd = 18; // 6 PM
-      
+
       for (let hour = workStart; hour < workEnd; hour++) {
         for (let minute = 0; minute < 60; minute += 30) {
-          const slotString = `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
+          const slotString = `${hour.toString().padStart(2, "0")}:${minute
+            .toString()
+            .padStart(2, "0")}`;
           allSlots.push(slotString);
         }
       }
-      
+
       // Set available slots from API
       setAvailableSlots(availableSlotsData || []);
       setAllSlots(allSlots);
@@ -96,19 +106,28 @@ const AppointmentScheduleForm: React.FC<Props> = ({ selectedRequest, onScheduleC
     setError("");
     try {
       const [hours, minutes] = selectedTime.split(":").map(Number);
-      const [year, month, day] = selectedDate.split('-').map(Number);
-      
+      const [year, month, day] = selectedDate.split("-").map(Number);
+
       // Create date string directly without Date object to avoid timezone issues
       // Format: YYYY-MM-DDTHH:MM:00 (no timezone suffix - server will interpret as local)
-      const dateHourString = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
-      
+      const dateHourString = `${year}-${String(month).padStart(
+        2,
+        "0"
+      )}-${String(day).padStart(2, "0")}T${String(hours).padStart(
+        2,
+        "0"
+      )}:${String(minutes).padStart(2, "0")}:00`;
+
       await agendaService.scheduleAppointment({
         patientAppointmentId: selectedRequest.patient_appointment_id,
         doctorId: selectedDoctor,
         dateHour: dateHourString,
         duration: selectedRequest.duration,
         appointmentType: selectedRequest.appointment_type,
-        place: selectedRequest.appointment_type === "PRESENCIAL" ? "Consultorio" : undefined,
+        place:
+          selectedRequest.appointment_type === "PRESENCIAL"
+            ? "Consultorio"
+            : undefined,
       });
 
       setShowConfirmation(false);
@@ -123,28 +142,39 @@ const AppointmentScheduleForm: React.FC<Props> = ({ selectedRequest, onScheduleC
       console.error("Error scheduling appointment:", error);
       // Extract the actual error message from backend response
       let errorMessage = "Error al agendar la cita";
-      if ((error as any)?.message) {
+      if (error?.message) {
         // Check for specific backend error messages and translate them
-        const backendMessage = (error as any).message;
+        const backendMessage = error.message;
         if (backendMessage.includes("Doctor has a conflicting appointment")) {
-          errorMessage = "El doctor ya tiene una cita programada en ese horario";
-        } else if (backendMessage.includes("Patient has a conflicting appointment")) {
-          errorMessage = "El paciente ya tiene una cita programada en ese horario";
+          errorMessage =
+            "El doctor ya tiene una cita programada en ese horario";
+        } else if (
+          backendMessage.includes("Patient has a conflicting appointment")
+        ) {
+          errorMessage =
+            "El paciente ya tiene una cita programada en ese horario";
         } else if (backendMessage.includes("must be in the future")) {
           errorMessage = "La fecha y hora de la cita deben ser en el futuro";
         } else if (backendMessage.includes("No appointment type found")) {
-          errorMessage = "No se pudo encontrar el tipo de cita para este doctor";
+          errorMessage =
+            "No se pudo encontrar el tipo de cita para este doctor";
         } else if (backendMessage.includes("Doctor not found")) {
           errorMessage = "Doctor no encontrado";
         } else if (backendMessage.includes("Patient not found")) {
           errorMessage = "Paciente no encontrado";
-        } else if (backendMessage.includes("Invalid date") || backendMessage.includes("Invalid time")) {
+        } else if (
+          backendMessage.includes("Invalid date") ||
+          backendMessage.includes("Invalid time")
+        ) {
           errorMessage = "Fecha u hora inválida";
         } else if (backendMessage.includes("Time slot is not available")) {
           errorMessage = "El horario seleccionado no está disponible";
         } else {
           // Use the backend message directly if it's user-friendly, otherwise keep generic
-          errorMessage = backendMessage.length > 10 && !backendMessage.includes("Error:") ? backendMessage : "Error al agendar la cita";
+          errorMessage =
+            backendMessage.length > 10 && !backendMessage.includes("Error:")
+              ? backendMessage
+              : "Error al agendar la cita";
         }
       }
       setError(errorMessage);
@@ -170,7 +200,7 @@ const AppointmentScheduleForm: React.FC<Props> = ({ selectedRequest, onScheduleC
     }
 
     // Parse date components to avoid timezone issues
-    const [year, month, day] = selectedDate.split('-').map(Number);
+    const [year, month, day] = selectedDate.split("-").map(Number);
     const selectedDateObj = new Date(year, month - 1, day);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -202,11 +232,13 @@ const AppointmentScheduleForm: React.FC<Props> = ({ selectedRequest, onScheduleC
   };
 
   const formatDate = (dateString: string) => {
-    const [year, month, day] = dateString.split('-');
+    const [year, month, day] = dateString.split("-");
     return `${day}/${month}/${year}`;
   };
 
-  const selectedDoctorInfo = doctors.find((d) => d.doctor_id === selectedDoctor);
+  const selectedDoctorInfo = doctors.find(
+    (d) => d.doctor_id === selectedDoctor
+  );
 
   if (!selectedRequest) {
     return (
@@ -233,14 +265,17 @@ const AppointmentScheduleForm: React.FC<Props> = ({ selectedRequest, onScheduleC
           Agendando cita para: {selectedRequest.patient_name}
         </h2>
         <p className="text-gray-600 text-sm">
-          {selectedRequest.appointment_name} - {selectedRequest.appointment_type}
+          {selectedRequest.appointment_name} -{" "}
+          {selectedRequest.appointment_type}
         </p>
         {/* Prominent Requested Date Banner */}
         <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-md">
           <div className="flex items-center text-blue-800">
-            <span className="font-semibold text-xs mr-1">FECHA SOLICITADA:</span>
+            <span className="font-semibold text-xs mr-1">
+              FECHA SOLICITADA:
+            </span>
             <span className="font-medium text-sm">
-              {new Date(selectedRequest.requested_date).toLocaleString('es-MX')}
+              {new Date(selectedRequest.requested_date).toLocaleString("es-MX")}
             </span>
           </div>
         </div>
@@ -276,22 +311,28 @@ const AppointmentScheduleForm: React.FC<Props> = ({ selectedRequest, onScheduleC
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              min={new Date().toISOString().split('T')[0]}
+              min={new Date().toISOString().split("T")[0]}
               className="w-full p-2 border-2 border-gray-300 rounded-lg focus:border-primary focus:outline-none"
             />
-            {selectedDate && selectedRequest && selectedDate !== (() => {
-              const requestDate = new Date(selectedRequest.requested_date);
-              const year = requestDate.getFullYear();
-              const month = requestDate.getMonth() + 1;
-              const day = requestDate.getDate();
-              return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-            })() && (
-              <div className="mt-1 p-2 bg-orange-100 border border-orange-300 rounded-md">
-                <p className="text-orange-800 text-xs">
-                  ⚠️ La fecha seleccionada es diferente a la solicitada por el paciente
-                </p>
-              </div>
-            )}
+            {selectedDate &&
+              selectedRequest &&
+              selectedDate !==
+                (() => {
+                  const requestDate = new Date(selectedRequest.requested_date);
+                  const year = requestDate.getFullYear();
+                  const month = requestDate.getMonth() + 1;
+                  const day = requestDate.getDate();
+                  return `${year}-${String(month).padStart(2, "0")}-${String(
+                    day
+                  ).padStart(2, "0")}`;
+                })() && (
+                <div className="mt-1 p-2 bg-orange-100 border border-orange-300 rounded-md">
+                  <p className="text-orange-800 text-xs">
+                    ⚠️ La fecha seleccionada es diferente a la solicitada por el
+                    paciente
+                  </p>
+                </div>
+              )}
           </div>
 
           {/* Time Slots */}
@@ -303,7 +344,9 @@ const AppointmentScheduleForm: React.FC<Props> = ({ selectedRequest, onScheduleC
               {loadingSlots ? (
                 <p className="text-gray-500 text-sm">Cargando horarios...</p>
               ) : allSlots.length === 0 ? (
-                <p className="text-gray-500 text-sm">No hay horarios disponibles para esta fecha</p>
+                <p className="text-gray-500 text-sm">
+                  No hay horarios disponibles para esta fecha
+                </p>
               ) : (
                 <div className="grid grid-cols-4 gap-2">
                   {allSlots.map((slot) => {
@@ -320,7 +363,9 @@ const AppointmentScheduleForm: React.FC<Props> = ({ selectedRequest, onScheduleC
                             ? "bg-primary text-white border-primary"
                             : "bg-white text-gray-700 border-gray-300 hover:border-primary"
                         }`}
-                        title={isAvailable ? "Horario disponible" : "Horario ocupado"}
+                        title={
+                          isAvailable ? "Horario disponible" : "Horario ocupado"
+                        }
                       >
                         {slot}
                       </button>
@@ -362,7 +407,7 @@ const AppointmentScheduleForm: React.FC<Props> = ({ selectedRequest, onScheduleC
             <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">
               ¿Estás seguro?
             </h3>
-            
+
             <div className="bg-gray-50 p-4 rounded-lg space-y-2 mb-4">
               <div className="flex justify-between text-sm">
                 <span className="font-medium text-gray-700">Paciente:</span>
@@ -377,11 +422,19 @@ const AppointmentScheduleForm: React.FC<Props> = ({ selectedRequest, onScheduleC
                 <span>{selectedDoctorInfo?.specialty}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="font-medium text-gray-700">Fecha solicitada:</span>
-                <span className="text-blue-600 font-semibold">{new Date(selectedRequest.requested_date).toLocaleString('es-MX')}</span>
+                <span className="font-medium text-gray-700">
+                  Fecha solicitada:
+                </span>
+                <span className="text-blue-600 font-semibold">
+                  {new Date(selectedRequest.requested_date).toLocaleString(
+                    "es-MX"
+                  )}
+                </span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="font-medium text-gray-700">Fecha agendada:</span>
+                <span className="font-medium text-gray-700">
+                  Fecha agendada:
+                </span>
                 <span>{formatDate(selectedDate)}</span>
               </div>
               <div className="flex justify-between text-sm">
@@ -424,8 +477,18 @@ const AppointmentScheduleForm: React.FC<Props> = ({ selectedRequest, onScheduleC
           <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4 shadow-2xl text-center">
             <div className="mb-4">
               <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                <svg
+                  className="w-8 h-8 text-green-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M5 13l4 4L19 7"
+                  />
                 </svg>
               </div>
             </div>
