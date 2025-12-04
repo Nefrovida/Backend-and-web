@@ -111,19 +111,19 @@ export default class AppointmentModel {
     return !existing;
   }
 
-  /**
+ /**
    * Reagendar una cita (actualizar fecha y motivo)
    */
-  static async rescheduleAppointment(
-    id: number,
-    date_hour: Date,
-    reason: string
-  ) {
+ static async rescheduleAppointment(
+  id: number,
+  date_hour: Date,
+  reason: string
+) {
   const updated = await prisma.patient_appointment.update({
     where: { patient_appointment_id: id },
     data: {
-      date_hour, 
-      appointment_status: 'REQUESTED',
+      date_hour,
+      appointment_status: "REQUESTED",
     },
     include: {
       patient: {
@@ -136,17 +136,18 @@ export default class AppointmentModel {
             },
           },
         },
-        appointment: {
-          select: {
-            name: true,
-          },
+      },
+      appointment: {
+        select: {
+          name: true,
         },
       },
-    });
+    },
+  });
 
-    const [flattened] = this.flattenAppointments([updated]);
-    return flattened;
-  }
+  const [flattened] = this.flattenAppointments([updated]);
+  return flattened;
+}
 
   /**
    * Desanidar joins (helper method)
