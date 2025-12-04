@@ -7,12 +7,14 @@ import {
   BsFillPersonFill,
   BsDoorClosed,
   BsDoorOpenFill,
+  BsHouse,
+  BsHouseFill,
 } from "react-icons/bs";
 import { MdForum, MdOutlineForum } from "react-icons/md";
 import { LuNotebook, LuNotebookPen } from "react-icons/lu";
 import { IoFlaskSharp, IoFlaskOutline } from "react-icons/io5";
 import { RiChatSettingsLine, RiChatSettingsFill } from "react-icons/ri";
-import {  FaCalendarPlus } from "react-icons/fa";
+import { FaCalendarPlus } from "react-icons/fa";
 import {
   FaUserMd,
   FaListAlt,
@@ -109,9 +111,10 @@ const CustomLink = ({
           className={({ isActive }) => `
             group relative flex items-center justify-center w-12 h-12 
             transition-all duration-300 ease-out rounded-xl cursor-pointer
-            ${isActive
-              ? "bg-blue-50 text-blue-600 scale-105 shadow-sm ring-1 ring-blue-100"
-              : "text-gray-500 hover:bg-gray-100 hover:text-gray-700 hover:scale-110"
+            ${
+              isActive
+                ? "bg-blue-50 text-blue-600 scale-105 shadow-sm ring-1 ring-blue-100"
+                : "text-gray-500 hover:bg-gray-100 hover:text-gray-700 hover:scale-110"
             }
           `}
         >
@@ -164,9 +167,10 @@ const NavButton = ({
           className={`
             group relative flex items-center justify-center w-12 h-12 
             transition-all duration-300 ease-out rounded-xl cursor-pointer border-none outline-none
-            ${isActive
-              ? activeStyle
-              : "text-gray-500 hover:bg-gray-100 hover:text-gray-700 hover:scale-110"
+            ${
+              isActive
+                ? activeStyle
+                : "text-gray-500 hover:bg-gray-100 hover:text-gray-700 hover:scale-110"
             }
           `}
         >
@@ -224,6 +228,13 @@ function Navbar({ children }: Props) {
       >
         {/* Top Section */}
         <div className="flex flex-col gap-2 items-center w-full">
+          <CustomLink
+            label="Inicio"
+            to="/dashboard"
+            icon={<BsHouse />}
+            activeIcon={<BsHouseFill />}
+            end
+          />
           <CustomLink
             label="Mi Perfil"
             to="/dashboard/profile/me"
@@ -367,7 +378,7 @@ function Navbar({ children }: Props) {
                 activeIcon={<FaListAlt />}
                 end
               />
-                <CustomLink
+              <CustomLink
                 label="Catálogo de citas"
                 to="/dashboard/citas"
                 icon={<FaCalendarPlus />}
@@ -406,9 +417,10 @@ function Navbar({ children }: Props) {
           fixed top-4 bottom-4 left-[6.5rem] z-[70]
           bg-white shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] rounded-3xl border border-gray-100
           overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]
-          ${showNotes
-            ? "opacity-100 translate-x-0"
-            : "w-0 opacity-0 -translate-x-4 pointer-events-none"
+          ${
+            showNotes
+              ? "opacity-100 translate-x-0"
+              : "w-0 opacity-0 -translate-x-4 pointer-events-none"
           }
         `}
       >
