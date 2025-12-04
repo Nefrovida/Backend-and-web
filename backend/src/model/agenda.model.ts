@@ -441,11 +441,11 @@ export default class Agenda {
 
     // Generate available time slots (e.g., 8 AM to 6 PM, every 30 minutes)
     const availableSlots: string[] = [];
-    const workStart = 8; // 8 AM
+    const workStart = 7; // 8 AM
     const workEnd = 18; // 6 PM
 
     for (let hour = workStart; hour < workEnd; hour++) {
-      for (let minute = 0; minute < 60; minute += 30) {
+      for (let minute = 0; minute < 60; minute += 10) {
         const slotTime = new Date(year, month - 1, day, hour, minute, 0, 0);
 
         // Check if this slot conflicts with any booked appointment
@@ -555,62 +555,12 @@ export default class Agenda {
 
     const proposedEnd = new Date(proposedStart.getTime() + duration * 60000);
 
-    // Check for conflicts with doctor
-    const doctorConflicts = await prisma.patient_appointment.findMany({
-      where: {
-        appointment: {
-          doctor_id: doctorId,
-        },
-        appointment_status: {
-          not: "CANCELED",
-        },
-        OR: [
-          {
-            date_hour: {
-              lt: proposedEnd,
-            },
-            AND: {
-              date_hour: {
-                gte: proposedStart,
-              },
-            },
-          },
-          {
-            date_hour: {
-              lte: proposedStart,
-            },
-            AND: [
-              {
-                date_hour: {
-                  gte: new Date(proposedStart.getTime() - 24 * 60 * 60 * 1000), // rough, but better to calculate
-                },
-              },
-            ],
-          },
-        ],
-      },
-    });
-
-    // Better overlap check
-    const doctorOverlaps = doctorConflicts.filter((appt) => {
-      const apptStart = new Date(appt.date_hour);
-      // If existing appointment is 45 min, treat it as occupying 60 min
-      const effectiveExistingDuration =
-        appt.duration === 45 ? 60 : appt.duration;
-      const apptEnd = new Date(
-        apptStart.getTime() + effectiveExistingDuration * 60000
-      );
-      // For checking conflicts, if the new appointment is 45 min, treat it as 60 min
-      const effectiveNewDuration = duration === 45 ? 60 : duration;
-      const newEnd = new Date(
-        proposedStart.getTime() + effectiveNewDuration * 60000
-      );
-      return proposedStart < apptEnd && newEnd > apptStart;
-    });
-
-    if (doctorOverlaps.length > 0) {
-      throw new Error("Doctor has a conflicting appointment at this time");
-    }
+    await this.checkDoctorOverlap(
+      doctorId,
+      proposedStart,
+      proposedEnd,
+      duration
+    );
 
     // Get the patient_appointment to check patient conflicts
     const patientAppt = await prisma.patient_appointment.findUnique({
@@ -621,38 +571,12 @@ export default class Agenda {
       throw new Error("Patient appointment not found");
     }
 
-    // Check for conflicts with patient
-    const patientConflicts = await prisma.patient_appointment.findMany({
-      where: {
-        patient_id: patientAppt.patient_id,
-        appointment_status: {
-          not: "CANCELED",
-        },
-        patient_appointment_id: {
-          not: patientAppointmentId, // exclude current if updating
-        },
-      },
-    });
-
-    const patientOverlaps = patientConflicts.filter((appt) => {
-      const apptStart = new Date(appt.date_hour);
-      // If existing appointment is 45 min, treat it as occupying 60 min
-      const effectiveExistingDuration =
-        appt.duration === 45 ? 60 : appt.duration;
-      const apptEnd = new Date(
-        apptStart.getTime() + effectiveExistingDuration * 60000
-      );
-      // For checking conflicts, if the new appointment is 45 min, treat it as 60 min
-      const effectiveNewDuration = duration === 45 ? 60 : duration;
-      const newEnd = new Date(
-        proposedStart.getTime() + effectiveNewDuration * 60000
-      );
-      return proposedStart < apptEnd && newEnd > apptStart;
-    });
-
-    if (patientOverlaps.length > 0) {
-      throw new Error("Patient has a conflicting appointment at this time");
-    }
+    await this.checkPatientAppointments(
+      patientAppointmentId,
+      proposedStart,
+      patientAppt,
+      duration
+    );
 
     // First, get an appointment for this doctor (or create one if needed)
     const doctorAppointment = await prisma.appointments.findFirst({
@@ -698,6 +622,115 @@ export default class Agenda {
 
     return scheduledAppointment;
   }
+
+  private static async checkDoctorOverlap(
+    doctorId: string,
+    proposedStart: Date,
+    proposedEnd: Date,
+    duration: number
+  ) {
+    // Check for conflicts with doctor
+    const doctorConflicts = await prisma.patient_appointment.findMany({
+      where: {
+        appointment: {
+          doctor_id: doctorId,
+        },
+        appointment_status: {
+          not: "CANCELED",
+        },
+        OR: [
+          {
+            date_hour: {
+              lt: proposedEnd,
+            },
+            AND: {
+              date_hour: {
+                gte: proposedStart,
+              },
+            },
+          },
+          {
+            date_hour: {
+              lte: proposedStart,
+            },
+            AND: [
+              {
+                date_hour: {
+                  gte: new Date(proposedStart.getTime() - 24 * 60 * 60 * 1000), // rough, but better to calculate
+                },
+              },
+            ],
+          },
+        ],
+      },
+    });
+
+    // Better overlap check
+    const doctorOverlaps = doctorConflicts.filter(
+      (appt: { date_hour: Date; duration: number }) => {
+        const apptStart = new Date(appt.date_hour);
+        // If existing appointment is 45 min, treat it as occupying 60 min
+        const effectiveExistingDuration =
+          appt.duration === 45 ? 60 : appt.duration;
+        const apptEnd = new Date(
+          apptStart.getTime() + effectiveExistingDuration * 60000
+        );
+        // For checking conflicts, if the new appointment is 45 min, treat it as 60 min
+        const effectiveNewDuration = duration === 45 ? 60 : duration;
+        const newEnd = new Date(
+          proposedStart.getTime() + effectiveNewDuration * 60000
+        );
+        return proposedStart < apptEnd && newEnd > apptStart;
+      }
+    );
+
+    if (doctorOverlaps.length > 0) {
+      throw new Error("Doctor has a conflicting appointment at this time");
+    }
+  }
+
+  private static async checkPatientAppointments(
+    patientAppointmentId: number,
+    proposedStart: Date,
+    patientAppt: { patient_id: string },
+    duration: number
+  ) {
+    // Check for conflicts with patient
+    const patientConflicts = await prisma.patient_appointment.findMany({
+      where: {
+        patient_id: patientAppt.patient_id,
+        appointment_status: {
+          not: "CANCELED",
+        },
+        patient_appointment_id: {
+          not: patientAppointmentId, // exclude current if updating
+        },
+      },
+    });
+
+    const patientOverlaps = patientConflicts.filter(
+      (appt: { date_hour: Date; duration: number }) => {
+        const apptStart = new Date(appt.date_hour);
+        // If existing appointment is 45 min, treat it as occupying 60 min
+        const effectiveExistingDuration =
+          appt.duration === 45 ? 60 : appt.duration;
+        const apptEnd = new Date(
+          apptStart.getTime() + effectiveExistingDuration * 60000
+        );
+        // For checking conflicts, if the new appointment is 45 min, treat it as 60 min
+        const effectiveNewDuration = duration === 45 ? 60 : duration;
+        const newEnd = new Date(
+          proposedStart.getTime() + effectiveNewDuration * 60000
+        );
+        return proposedStart < apptEnd && newEnd > apptStart;
+      }
+    );
+
+    if (patientOverlaps.length > 0) {
+      throw new Error("Patient has a conflicting appointment at this time");
+    }
+  }
+
   static async createAppointment(data: {
     patientId: string;
     doctorId: string;
@@ -746,10 +779,6 @@ export default class Agenda {
       );
       return proposedStart < apptEnd && newEnd > apptStart;
     });
-
-    if (doctorOverlaps.length > 0) {
-      throw new Error("Doctor has a conflicting appointment at this time");
-    }
 
     // Check for conflicts with patient
     const patientConflicts = await prisma.patient_appointment.findMany({
