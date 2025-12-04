@@ -1,6 +1,5 @@
 import { RegisterData, AuthResponse, LoginData } from "../types/auth.types";
-
-const API_BASE_URL = import.meta.env.VITE_APP_API_URL || "https://www.snefrovidaac.com/api/";
+import { API_BASE_URL } from "../config/api.config";
 
 export const authService = {
   async register(data: RegisterData): Promise<AuthResponse> {

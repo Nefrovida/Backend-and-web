@@ -1,7 +1,7 @@
 import { AuthResponse } from "../types/auth.types";
 import { AdminInput } from "../types/admin.types";
 
-const API_URL = import.meta.env.VITE_APP_API_URL || "http://localhost:3001/api";
+import { API_BASE_URL as API_URL } from "../config/api.config";
 
 export const registerAdmin = async (
     adminAccount: AuthResponse["user"],

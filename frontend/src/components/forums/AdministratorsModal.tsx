@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Forum } from "../../types/forum.types";
-
-const API_BASE = (import.meta as any).env?.VITE_APP_API_URL || 'https://www.snefrovidaac.com/api/';
+import { API_BASE_URL } from "../../config/api.config";
 
 interface Administrator {
   user_id: string;
@@ -85,7 +84,7 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
       setError("");
 
       const response = await fetch(
-        `${API_BASE}/forums/admin-users?page=${currentPage}&limit=10`,
+        `${API_BASE_URL}/forums/admin-users?page=${currentPage}&limit=10`,
         {
           credentials: "include",
         }
@@ -115,7 +114,7 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
       setError("");
 
       const response = await fetch(
-        `${API_BASE}/forums/${forum.forum_id}/administrators`,
+        `${API_BASE_URL}/forums/${forum.forum_id}/administrators`,
         {
           credentials: "include",
         }
@@ -145,7 +144,7 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
       setError("");
 
       const response = await fetch(
-        `${API_BASE}/forums/${forum.forum_id}/administrators`,
+        `${API_BASE_URL}/forums/${forum.forum_id}/administrators`,
         {
           method: "POST",
           headers: {
@@ -182,7 +181,7 @@ export const AdministratorsModal: React.FC<AdministratorsModalProps> = ({
       setError("");
 
       const response = await fetch(
-        `${API_BASE}/forums/${forum.forum_id}/administrators/${userId}`,
+        `${API_BASE_URL}/forums/${forum.forum_id}/administrators/${userId}`,
         {
           method: "DELETE",
           credentials: "include",
