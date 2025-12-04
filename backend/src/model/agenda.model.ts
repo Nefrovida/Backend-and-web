@@ -489,12 +489,8 @@ static async getAnalysisById(id: number) {
           lte: endOfDay,
         },
         analysis_status: {
-          in: ["PROGRAMMED", "LAB"],
+          in: ["REQUESTED", "PROGRAMMED", "LAB"],
         },
-      },
-      select: {
-        analysis_date: true,
-        duration: true,
       },
     });
 
@@ -503,25 +499,34 @@ static async getAnalysisById(id: number) {
     const workStart = 7; // 7 AM
     const workEnd = 17; // 5 PM
 
+    // Create full agenda - all slots are initially available
     for (let hour = workStart; hour < workEnd; hour++) {
       for (let minute = 0; minute < 60; minute += 30) {
-        const slotTime = new Date(year, month - 1, day, hour, minute, 0, 0);
+        availableSlots.push(
+          `${hour.toString().padStart(2, "0")}:${minute
+            .toString()
+            .padStart(2, "0")}`
+        );
+      }
+    }
 
-        // Check if this slot conflicts with any booked analysis
-        const isBooked = bookedAnalyses.some((analysis) => {
-          if (!analysis.analysis_date) return false;
-          const analysisStart = new Date(analysis.analysis_date);
-          const analysisEnd = new Date(analysisStart.getTime() + analysis.duration * 60000);
-          return slotTime >= analysisStart && slotTime < analysisEnd;
-        });
-
-        if (!isBooked) {
-          availableSlots.push(
-            `${hour.toString().padStart(2, "0")}:${minute
-              .toString()
-              .padStart(2, "0")}`
-          );
-        }
+    // Remove booked slots from available slots
+    for (const analysis of bookedAnalyses) {
+      if (!analysis.analysis_date) continue;
+      
+      const analysisDate = new Date(analysis.analysis_date);
+      
+      // Get local time components from the UTC analysis date
+      const analysisHour = analysisDate.getHours() + 6;
+      const analysisMinute = analysisDate.getMinutes();
+      
+      // Format the booked slot time as "HH:MM"
+      const bookedSlot = `${analysisHour.toString().padStart(2, "0")}:${analysisMinute.toString().padStart(2, "0")}`;
+      
+      // Remove the booked slot from available slots
+      const index = availableSlots.indexOf(bookedSlot);
+      if (index > -1) {
+        availableSlots.splice(index, 1);
       }
     }
 
