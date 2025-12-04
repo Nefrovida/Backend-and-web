@@ -109,7 +109,7 @@ const Home: React.FC = () => {
               {/* Left column: text + CTA */}
               <div>
                 <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 leading-tight">
-                  Cuidando íntegro de la salud renal
+                  Cuidado íntegro de la salud renal
                 </h1>
 
                 <p className="mt-4 text-base md:text-lg text-slate-700 max-w-xl">
