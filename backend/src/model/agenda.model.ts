@@ -491,6 +491,10 @@ static async getAnalysisById(id: number) {
         analysis_status: {
           in: ["REQUESTED", "PROGRAMMED", "LAB"],
         },
+        select: {
+          analysis_date: true,
+          duration: true,
+        },
       },
     });
 
