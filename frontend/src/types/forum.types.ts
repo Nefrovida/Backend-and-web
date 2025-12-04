@@ -32,23 +32,16 @@ export type Message = {
   liked: number;
   replies: number;
   forums: { forumId: number; name: string };
-};
-
-export type SimpleMessage = {
-  messageId: number;
-  content: string;
-  forumId: number;
-  user: {
-    userId: string;
-    userName: string;
-  };
+  userName?: string;
 };
 
 export type Reply = {
   author: {
     userId: string;
     name: string;
-    lastName: string;
+    parentLastName: string | null;
+    maternalLastName: string | null;
+    username: string;
   };
   content: string;
   liked: number;
