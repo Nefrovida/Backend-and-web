@@ -1,6 +1,5 @@
 import { RegisterData, AuthResponse, LoginData } from "../types/auth.types";
-
-const API_BASE_URL = import.meta.env.VITE_APP_API_URL || "https://www.snefrovidaac.com/api/";
+import { API_BASE_URL } from "../config/api.config";
 
 export const authService = {
   async register(data: RegisterData): Promise<AuthResponse> {
@@ -53,5 +52,21 @@ export const authService = {
   getCurrentUser() {
     const userStr = localStorage.getItem("user");
     return userStr ? JSON.parse(userStr) : null;
+  },
+
+  async forgotPassword(username: string): Promise<void> {
+    const response = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({ username }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || "Request failed");
+    }
   },
 };

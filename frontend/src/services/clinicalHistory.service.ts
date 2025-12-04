@@ -1,4 +1,4 @@
-const API_BASE_URL = (import.meta as any).env?.VITE_APP_API_URL || "https://www.snefrovidaac.com/api/";
+import { API_BASE_URL } from "../config/api.config";
 
 export interface Question {
   question_id: number;

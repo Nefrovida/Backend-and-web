@@ -28,7 +28,8 @@ const RescheduleModal: React.FC<RescheduleModalProps> = ({
 
     setLoading(true);
     
-    const dateTimeString = `${date}T${time}:00.00`;
+    const dateTimeString = `${date}T${time}:00.000Z`;
+    
 
     const rescheduleData: RescheduleData = {
       date_hour: dateTimeString,
@@ -94,7 +95,7 @@ const RescheduleModal: React.FC<RescheduleModalProps> = ({
 
         <div className="flex space-x-3 mt-6">
           <Button
-            variant="warning"
+            variant="primary"
             onClick={handleSave}
             disabled={loading}
             className="flex-1 py-3"

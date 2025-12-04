@@ -34,15 +34,19 @@ model users {
   name               String
   parent_last_name   String
   maternal_last_name String?
-  active             Boolean         @default(true)
+  active             Boolean         @default(false)
   phone_number       String
   username           String
   password           String
   birthday           DateTime
   gender             Gender
   registration_date  DateTime        @default(now())
+  approval_date      DateTime?
+  approved_by        String?         @db.Uuid
+  user_status        UserStatus      @default(PENDING)
   first_login        Boolean
   role_id            Int             @default(1)
+  password_reset_requested Boolean         @default(false)
   doctors            doctors?
   familiars          familiars[]
   forums             forums[]
@@ -87,7 +91,7 @@ model doctors {
   doctor_id    String         @id @default(uuid()) @db.Uuid
   user_id      String         @unique @db.Uuid
   specialty    String         @db.Char(100)
-  license      String         @unique @db.Char(20)
+  license      String         @unique
   appointments appointments[]
   user         users          @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
 }
@@ -136,6 +140,8 @@ model likes {
   message_id Int
   user_id    String   @db.Uuid
   date       DateTime @default(now())
+
+  @@unique([user_id, message_id])
   message    messages @relation(fields: [message_id], references: [message_id], onDelete: Cascade)
   user       users    @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
 }
@@ -147,6 +153,7 @@ model appointments {
   general_cost         Float
   community_cost       Float
   image_url            String?
+  active               Boolean               @default(true)
   doctor               doctors               @relation(fields: [doctor_id], references: [doctor_id], onDelete: Cascade)
   patient_appointments patient_appointment[]
 }
@@ -194,7 +201,7 @@ model analysis {
 
 model patient_analysis {
   patient_analysis_id Int             @id @default(autoincrement())
-  laboratorist_id     String?          @db.Uuid
+  laboratorist_id     String?         @db.Uuid
   analysis_id         Int
   patient_id          String          @db.Uuid
   analysis_date       DateTime
@@ -203,7 +210,7 @@ model patient_analysis {
   duration            Int
   analysis_status     ANALYSIS_STATUS @default(REQUESTED)
   analysis            analysis        @relation(fields: [analysis_id], references: [analysis_id], onDelete: Cascade)
-  laboratorist        laboratorists?   @relation(fields: [laboratorist_id], references: [laboratorist_id], onDelete: Cascade)
+  laboratorist        laboratorists?  @relation(fields: [laboratorist_id], references: [laboratorist_id], onDelete: Cascade)
   patient             patients        @relation(fields: [patient_id], references: [patient_id], onDelete: Cascade)
   results             results?
 }
@@ -212,7 +219,7 @@ model results {
   result_id           Int              @id @default(autoincrement())
   patient_analysis_id Int              @unique
   date                DateTime
-  path                String           @db.Char(255)
+  path                String
   interpretation      String           @default("")
   recommendation      String           @default("")
   updated             DateTime         @default(now())
@@ -256,14 +263,14 @@ model user_reports {
 }
 
 model notifications {
-  report_id     Int      @id @default(autoincrement())
-  user_id       String   @db.Uuid
-  date          DateTime
-  answer        String
-  title         String
-  content       String
-  seen          Boolean  @default(false)
-  user          users    @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  report_id Int      @id @default(autoincrement())
+  user_id   String   @db.Uuid
+  answer    String
+  date      DateTime
+  title     String
+  content   String
+  seen      Boolean  @default(false)
+  user      users    @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
 }
 
 enum Gender {
@@ -285,6 +292,8 @@ enum ANALYSIS_STATUS {
   PENDING
   SENT
   REQUESTED
+  CANCELED
+  PROGRAMMED
 }
 
 enum Type {
@@ -297,4 +306,10 @@ enum ForumRole {
   MODERATOR
   MEMBER
   VIEWER
+}
+
+enum UserStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }

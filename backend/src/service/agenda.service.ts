@@ -37,3 +37,7 @@ export const createAppointment = async (data: {
 export const getAppointmentsInRange = async (start: string, end: string) => {
   return await Agenda.getAppointmentsInRange(start, end);
 };
+
+export const getLaboratoryAvailability = async (date: string) => {
+  return await Agenda.getLaboratoryAvailability(date);
+};

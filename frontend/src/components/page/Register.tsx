@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router";
 import { RegisterData, Gender, ROLE_IDS, ROLE_NAMES } from "../../types/auth.types";
 import { authService } from "../../services/auth.service";
+import nefrovidaLogo from "@/assets/logo.png";
 
 type RegistrationStep = 1 | 2 | 3;
 
@@ -13,6 +14,8 @@ function Register() {
   });
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string>("");
 
   const updateFormData = (data: Partial<RegisterData>) => {
     setFormData((prev) => ({ ...prev, ...data }));
@@ -21,10 +24,10 @@ function Register() {
 
   const handleStep1Submit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validate required fields
-    if (!formData.name || !formData.parent_last_name || !formData.username || 
-        !formData.password || !formData.birthday || !formData.phone_number) {
+    if (!formData.name || !formData.parent_last_name || !formData.username ||
+      !formData.password || !formData.birthday || !formData.phone_number) {
       setError("Por favor complete todos los campos requeridos");
       return;
     }
@@ -71,30 +74,39 @@ function Register() {
 
       const response = await authService.register(formData as RegisterData);
       
-      // Store only user data (tokens are in httpOnly cookies)
-      localStorage.setItem("user", JSON.stringify(response.user));
-
-      // Redirect to home
-      navigate("/dashboard");
+      // Check if registration is pending approval
+      if (response.pending) {
+        // Show success message in UI
+        setSuccess(true);
+        setSuccessMessage(response.message || "¡Registro exitoso! Tu cuenta está pendiente de aprobación por un administrador. Te notificaremos cuando puedas acceder.");
+        // Redirect to login after 5 seconds
+        setTimeout(() => {
+          navigate("/login");
+        }, 5000);
+      } else {
+        // Fallback for backward compatibility (shouldn't happen with new flow)
+        localStorage.setItem("user", JSON.stringify(response.user));
+        navigate("/dashboard");
+      }
     } catch (err: any) {
       const errorMessage = err.message || "";
       const errorLower = errorMessage.toLowerCase();
-      
+
       // Translate technical/Prisma errors to user-friendly Spanish messages
       let friendlyMessage = "";
-      
+
       // Check for duplicate username
-      if (errorLower.includes("user already exists") || 
-          errorLower.includes("usuario ya existe") ||
-          errorLower.includes("username already") ||
-          errorLower.includes("unique constraint") && errorLower.includes("username") ||
-          errorLower.includes("duplicate") && errorLower.includes("username")) {
+      if (errorLower.includes("user already exists") ||
+        errorLower.includes("usuario ya existe") ||
+        errorLower.includes("username already") ||
+        errorLower.includes("unique constraint") && errorLower.includes("username") ||
+        errorLower.includes("duplicate") && errorLower.includes("username")) {
         friendlyMessage = "El nombre de usuario ya está registrado. Por favor elige otro.";
         setError(friendlyMessage);
         setStep(1); // Return to step 1 where username field is
         return;
       }
-      
+
       // Check for duplicate CURP
       if (errorLower.includes("curp") && (errorLower.includes("duplicate") || errorLower.includes("unique"))) {
         friendlyMessage = "El CURP ingresado ya está registrado en el sistema.";
@@ -130,7 +142,7 @@ function Register() {
       else {
         friendlyMessage = "Ocurrió un error al registrar tu cuenta. Por favor intenta nuevamente.";
       }
-      
+
       setError(friendlyMessage);
     } finally {
       setLoading(false);
@@ -231,14 +243,16 @@ function Register() {
 
       <div>
         <label className="block text-sm text-gray-600 mb-2 ml-1">Contraseña *</label>
-        <input
-          type="password"
-          value={formData.password || ""}
-          onChange={(e) => updateFormData({ password: e.target.value })}
-          className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-900 transition-colors"
-          maxLength={100}
-          required
-        />
+        <div>
+          <input
+            type="password"
+            value={formData.password || ""}
+            onChange={(e) => updateFormData({ password: e.target.value })}
+            className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-900 transition-colors"
+            maxLength={100}
+            required
+          />
+        </div>
       </div>
 
       {error && (
@@ -273,7 +287,7 @@ function Register() {
       <p className="text-center text-gray-600 mb-6">¿Qué tipo de usuario eres?</p>
 
       <div className="space-y-3">
-    {[ROLE_IDS.PATIENT, ROLE_IDS.DOCTOR, ROLE_IDS.LABORATORIST, ROLE_IDS.FAMILIAR, ROLE_IDS.SECRETARIA].map((roleId) => (
+        {[ROLE_IDS.PATIENT, ROLE_IDS.DOCTOR, ROLE_IDS.LABORATORIST, ROLE_IDS.FAMILIAR, ROLE_IDS.SECRETARIA].map((roleId) => (
           <button
             key={roleId}
             onClick={() => handleStep2Submit(roleId)}
@@ -409,8 +423,8 @@ function Register() {
   );
 
   return (
-    <div 
-      className="min-h-screen flex items-center justify-center p-4" 
+    <div
+      className="min-h-screen flex items-center justify-center p-4"
       style={{
         background: "linear-gradient(180deg, #A8C5DD 0%, #1E3A8A 100%)"
       }}
@@ -419,43 +433,85 @@ function Register() {
         {/* Logo */}
         <div className="flex justify-center mb-4">
           <div className="text-center">
-            <h1 className="text-3xl font-bold">
-              <span style={{ color: "#1E3A8A" }}>NEFR</span>
-              <span style={{ color: "#DC2626" }}>O</span>
-              <span style={{ color: "#84CC16" }}>Vida</span>
-            </h1>
-            <p className="text-xs text-gray-600 mt-1">Asociación Civil</p>
+            <img
+              src={nefrovidaLogo}
+              alt="NefroVida A.C."
+              className="h-16 w-auto mx-auto select-none"
+            />
           </div>
         </div>
 
-        {/* Welcome message - only on step 1 */}
-        {step === 1 && (
-          <h2 className="text-2xl font-semibold text-center mb-6 text-gray-800">
-            ¡Bienvenid@!
-          </h2>
+        {/* Success Message */}
+        {success ? (
+          <div className="space-y-6 text-center">
+            <div className="flex justify-center">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                <svg className="w-10 h-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+            </div>
+            
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-3">
+                ¡Registro Exitoso!
+              </h2>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-left">
+                <p className="text-sm text-gray-700">
+                  {successMessage}
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-center text-sm text-gray-600">
+                <svg className="animate-spin h-4 w-4 mr-2 text-blue-900" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Redirigiendo al inicio de sesión en unos segundos...
+              </div>
+              
+              <button
+                onClick={() => navigate("/login")}
+                className="w-full bg-blue-900 text-white py-3 rounded-full font-semibold hover:bg-blue-800 transition-colors shadow-lg"
+              >
+                Ir al Inicio de Sesión
+              </button>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Welcome message - only on step 1 */}
+            {step === 1 && (
+              <h2 className="text-2xl font-semibold text-center mb-6 text-gray-800">
+                ¡Bienvenid@!
+              </h2>
+            )}
+
+            {/* Progress indicator */}
+            <div className="flex justify-center mb-6">
+              <div className="flex items-center space-x-2">
+                {[1, 2, 3].map((s) => (
+                  <React.Fragment key={s}>
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold transition-colors ${
+                        step >= s ? "bg-blue-900 text-white" : "bg-gray-300 text-gray-600"
+                      }`}
+                    >
+                      {s}
+                    </div>
+                    {s < 3 && <div className={`w-8 h-1 transition-colors ${step > s ? "bg-blue-900" : "bg-gray-300"}`} />}
+                  </React.Fragment>
+                ))}
+              </div>
+            </div>
+
+            {step === 1 && renderStep1()}
+            {step === 2 && renderStep2()}
+            {step === 3 && renderStep3()}
+          </>
         )}
-
-        {/* Progress indicator */}
-        <div className="flex justify-center mb-6">
-          <div className="flex items-center space-x-2">
-            {[1, 2, 3].map((s) => (
-              <React.Fragment key={s}>
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold transition-colors ${
-                    step >= s ? "bg-blue-900 text-white" : "bg-gray-300 text-gray-600"
-                  }`}
-                >
-                  {s}
-                </div>
-                {s < 3 && <div className={`w-8 h-1 transition-colors ${step > s ? "bg-blue-900" : "bg-gray-300"}`} />}
-              </React.Fragment>
-            ))}
-          </div>
-        </div>
-
-        {step === 1 && renderStep1()}
-        {step === 2 && renderStep2()}
-        {step === 3 && renderStep3()}
       </div>
     </div>
   );

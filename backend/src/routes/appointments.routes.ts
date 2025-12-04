@@ -5,6 +5,7 @@ import { requirePrivileges } from "../middleware/rbac.middleware";
 import { Privilege } from "../types/rbac.types";
 import { exit } from "process";
 import * as appointmentsController from '../controller/appointment/appointments.controller';
+import getPatientAppointments from '../controller/appointment/getPatientAppointments.controller';
 
 const router = express.Router();
 
@@ -24,11 +25,36 @@ router.get(
   appointmentsController.getDoctorAppointments
 );
 
-router.get("/getAllAppointments", appointmentsController.getAllAppointments);
+router.get("/getAllAppointments",appointmentsController.getAllAppointments);
+
+router.post("/new-appointment", 
+  authenticate,
+  requirePrivileges([Privilege.CREATE_APPOINTMENTS]),
+  appointmentsController.createAppointment);
+
+router.put("/modify/:appointment_id",
+authenticate,
+requirePrivileges([Privilege.CREATE_APPOINTMENTS]),
+appointmentsController.updateAppointment);
+
+router.put("/delete/:appointment_id",
+authenticate,
+requirePrivileges([Privilege.CREATE_APPOINTMENTS]),
+appointmentsController.deleteAppointment);
+
+router.get("/patient/:patientId",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
+  getPatientAppointments
+);
 
 router.get("/user/:user_id",
   authenticate, 
   appointmentController.getUserAppointments);
 
+router.post("/schedule-appointment",
+  authenticate,
+  requirePrivileges([Privilege.CREATE_APPOINTMENTS]),
+  appointmentsController.scheduleAppointment);
 
 export default router;

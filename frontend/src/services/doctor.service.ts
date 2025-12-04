@@ -2,7 +2,7 @@ import { AuthResponse } from "../types/auth.types";
 import { DoctorInput } from "../types/doctor.types";
 
 
-const API_URL = import.meta.env.VITE_APP_API_URL || "https://www.snefrovidaac.com/api/";
+import { API_BASE_URL as API_URL } from "../config/api.config";
 
 export const registerDoctor = async (
   adminAccount: AuthResponse["user"],

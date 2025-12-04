@@ -14,8 +14,10 @@ import agendaRoutes from "./agenda.routes";
 import secretariaRoutes from "./secretaria.routes";
 import adminRoutes from "./admin.routes";
 import expedienteRoutes from "./expediente.routes";
+import profileRoutes from "./profile.routes";
 
 import ProtectedRoute from "../components/common/ProtectedRoute";
+import GenericDashboard from "@/components/organism/GenericDashboard";
 
 const router = createBrowserRouter([
   ...authRoutes,
@@ -29,6 +31,10 @@ const router = createBrowserRouter([
     ),
     errorElement: <NotFoundPage />,
     children: [
+      {
+        path: "",
+        element: <GenericDashboard />,
+      },
       ...analisisRoutes,
       ...forumsRoutes, // admin
       ...forumRoutes, // chat
@@ -37,6 +43,7 @@ const router = createBrowserRouter([
       ...agendaRoutes,
       ...secretariaRoutes,
       ...expedienteRoutes,
+      ...profileRoutes,
       ...adminRoutes,
       ...doctorsRoutes,
     ],

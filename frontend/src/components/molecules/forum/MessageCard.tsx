@@ -1,39 +1,110 @@
-import { BasicForumInfo } from "@/types/forum.types";
+import { Message } from "@/types/forum.types";
+import { FC, useState } from "react";
 import { Link } from "react-router-dom";
+import { authService } from "@/services/auth.service";
+import { ROLE_IDS } from "@/types/auth.types";
 import { HiDotsHorizontal } from "react-icons/hi";
-import { BiLike } from "react-icons/bi";
-import { FC } from "react";
+import { RiDeleteBin6Line } from "react-icons/ri";
+import { BiLike, BiSolidLike } from "react-icons/bi";
 import { MdChatBubbleOutline } from "react-icons/md";
 
 interface Props {
-  f: BasicForumInfo;
-  content: string;
-  likes: number;
-  comments: number;
+  message: Message;
+  onDelete: (messageId: number) => void;
 }
 
-const MessageCard: FC<Props> = ({ f, content, likes, comments }) => {
+const MessageCard: FC<Props> = ({ message, onDelete }) => {
+  const [showMenu, setShowMenu] = useState(false);
+  const [hasLiked, setHasLiked] = useState(message.liked === 1);
+  const [likeCount, setLikeCount] = useState(message.likes);
+  const currentUser = authService.getCurrentUser();
+  const isAdmin = currentUser?.role_id === ROLE_IDS.ADMIN;
+
+  const handleDeleteClick = () => {
+    setShowMenu(false);
+    onDelete(message.messageId);
+  };
+
+  const handleLike = () => {
+    setHasLiked((prev) => !prev);
+
+    setLikeCount((prev) => (hasLiked ? prev - 1 : prev + 1));
+    fetch(`/api/forums/like/${message.messageId}`, {
+      method: "POST",
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .catch((e) => console.error(e));
+  };
+
+  const authorName = message.userName ?? "Usuario";
+
   return (
-    <div className="w-8/12 rounded-md border-2 bg-white drop-shadow-sm p-2">
-      <section className="flex justify-between">
-        <Link
-          to={`${f.forumId}`}
-          className="text-gray-400 text-sm hover:underline"
-        >
-          {f.name}
-        </Link>
-        <HiDotsHorizontal className="hover:text-blue-600" />
+    <div className="w-8/12 rounded-md border-2 bg-white drop-shadow-sm p-2 break-words">
+      <section className="flex justify-between items-start">
+        <div className="flex flex-col">
+          {/* Author */}
+          <span className="text-sm font-semibold text-gray-800">
+            {authorName}
+          </span>
+
+          {message.forums.name && (
+            <Link
+              to={`/dashboard/foro/${message.forums.forumId}`}
+              className="text-gray-400 text-xs hover:underline"
+            >
+              {message.forums.name}
+            </Link>
+          )}
+        </div>
+
+        {isAdmin && (
+          <div className="relative">
+            <HiDotsHorizontal
+              className="hover:text-blue-600 cursor-pointer"
+              onClick={() => setShowMenu(!showMenu)}
+            />
+            {showMenu && (
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+                <button
+                  onClick={handleDeleteClick}
+                  className="flex items-center gap-2 w-full px-4 py-2 text-left text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                >
+                  <RiDeleteBin6Line className="text-lg" />
+                  <span className="text-sm font-medium">
+                    Eliminar mensaje
+                  </span>
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+        {!isAdmin && (
+          <HiDotsHorizontal className="text-gray-300 cursor-not-allowed" />
+        )}
       </section>
-      <section className="w-full text-lg my-2">{content}</section>
+
+      <section className="w-full text-base sm:text-lg my-2 break-words whitespace-pre-wrap">
+        {message.content}
+      </section>
+
       <section className="flex gap-4 items-center">
-        <div className="flex gap-2 items-center">
-          <BiLike className="hover:text-blue-600" />
-          {likes}
-        </div>
-        <div className="flex gap-2 items-center">
+        <button className="flex gap-2 items-center" onClick={handleLike}>
+          {hasLiked ? (
+            <BiSolidLike className="text-blue-600" />
+          ) : (
+            <BiLike className="hover:text-blue-600" />
+          )}
+          {likeCount}
+        </button>
+        <Link
+          className="flex gap-2 items-center"
+          to={`/dashboard/foro/${message.forums.forumId}/mensaje/${message.messageId}`}
+          state={{ authorName: message.userName }}
+        >
           <MdChatBubbleOutline className="hover:text-blue-600" />
-          {comments}
-        </div>
+          {message.replies}
+        </Link>
       </section>
     </div>
   );

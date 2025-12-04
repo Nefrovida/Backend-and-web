@@ -1,8 +1,8 @@
 // backend/src/model/user.model.ts
 import { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../util/prisma";
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
 
 export default class User {
     constructor() { }
@@ -44,3 +44,35 @@ export default class User {
         }
     }
 }
+
+// Check if username already exists
+export const checkUsernameExists = async (
+    username: string
+): Promise<boolean> => {
+    try {
+        const existingUser = await prisma.users.findFirst({
+            where: { username },
+        });
+        return !!existingUser;
+    } catch (error) {
+        return true;
+    }
+};
+
+export const reportUser = async (userId: string, messageId: number, cause: string) => {
+  try {
+    const report = await prisma.user_reports.create({
+      data: {
+        user_id: userId,              
+        reported_message: messageId,  
+        cause: cause,                 
+        date: new Date(),             
+        status: false,               
+      },
+    });
+    return { success: true, data: report };
+  } catch (error) {
+    console.error("Error al crear reporte de usuario en BD:", error);
+    return { success: false, error };
+  }
+};

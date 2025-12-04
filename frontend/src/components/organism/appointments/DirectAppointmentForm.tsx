@@ -7,7 +7,10 @@ interface Props {
   initialPatientId?: string;
 }
 
-const DirectAppointmentForm: React.FC<Props> = ({ onAppointmentCreated, initialPatientId }) => {
+const DirectAppointmentForm: React.FC<Props> = ({
+  onAppointmentCreated,
+  initialPatientId,
+}) => {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [selectedPatient, setSelectedPatient] = useState<string>("");
@@ -16,7 +19,9 @@ const DirectAppointmentForm: React.FC<Props> = ({ onAppointmentCreated, initialP
   const [availableSlots, setAvailableSlots] = useState<string[]>([]);
   const [allSlots, setAllSlots] = useState<string[]>([]);
   const [selectedTime, setSelectedTime] = useState<string>("");
-  const [appointmentType, setAppointmentType] = useState<'PRESENCIAL' | 'VIRTUAL'>('PRESENCIAL');
+  const [appointmentType, setAppointmentType] = useState<
+    "PRESENCIAL" | "VIRTUAL"
+  >("PRESENCIAL");
   const [duration, setDuration] = useState<number>(60);
   const [loading, setLoading] = useState(false);
   const [loadingSlots, setLoadingSlots] = useState(false);
@@ -25,7 +30,8 @@ const DirectAppointmentForm: React.FC<Props> = ({ onAppointmentCreated, initialP
   const [error, setError] = useState<string>("");
   const [patientSearchTerm, setPatientSearchTerm] = useState<string>("");
   const [doctorSearchTerm, setDoctorSearchTerm] = useState<string>("");
-  const [showPatientDropdown, setShowPatientDropdown] = useState<boolean>(false);
+  const [showPatientDropdown, setShowPatientDropdown] =
+    useState<boolean>(false);
   const [showDoctorDropdown, setShowDoctorDropdown] = useState<boolean>(false);
 
   useEffect(() => {
@@ -36,15 +42,18 @@ const DirectAppointmentForm: React.FC<Props> = ({ onAppointmentCreated, initialP
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Element;
-      if (!target.closest('.patient-dropdown') && !target.closest('.doctor-dropdown')) {
+      if (
+        !target.closest(".patient-dropdown") &&
+        !target.closest(".doctor-dropdown")
+      ) {
         setShowPatientDropdown(false);
         setShowDoctorDropdown(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -85,21 +94,26 @@ const DirectAppointmentForm: React.FC<Props> = ({ onAppointmentCreated, initialP
     setLoadingSlots(true);
     setError("");
     try {
-      const availableSlotsData = await agendaService.getDoctorAvailability(selectedDoctor, selectedDate);
-      console.log('Available slots received:', availableSlotsData); // Debug log
-      
-      // Generate all possible time slots (8 AM to 6 PM, every 30 minutes)
+      const availableSlotsData = await agendaService.getDoctorAvailability(
+        selectedDoctor,
+        selectedDate
+      );
+      console.log("Available slots received:", availableSlotsData); // Debug log
+
+      // Generate all possible time slots (7 AM to 6 PM, every 10 minutes)
       const allSlots: string[] = [];
-      const workStart = 8; // 8 AM
+      const workStart = 7; // 8 AM
       const workEnd = 18; // 6 PM
-      
+
       for (let hour = workStart; hour < workEnd; hour++) {
-        for (let minute = 0; minute < 60; minute += 30) {
-          const slotString = `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
+        for (let minute = 0; minute < 60; minute += 10) {
+          const slotString = `${hour.toString().padStart(2, "0")}:${minute
+            .toString()
+            .padStart(2, "0")}`;
           allSlots.push(slotString);
         }
       }
-      
+
       // Set available slots from API
       setAvailableSlots(availableSlotsData || []);
       setAllSlots(allSlots);
@@ -123,12 +137,18 @@ const DirectAppointmentForm: React.FC<Props> = ({ onAppointmentCreated, initialP
     setError("");
     try {
       const [hours, minutes] = selectedTime.split(":").map(Number);
-      const [year, month, day] = selectedDate.split('-').map(Number);
-      
+      const [year, month, day] = selectedDate.split("-").map(Number);
+
       // Create date string directly without Date object to avoid timezone issues
       // Format: YYYY-MM-DDTHH:MM:00 (no timezone suffix - server will interpret as local)
-      const dateHourString = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
-      
+      const dateHourString = `${year}-${String(month).padStart(
+        2,
+        "0"
+      )}-${String(day).padStart(2, "0")}T${String(hours).padStart(
+        2,
+        "0"
+      )}:${String(minutes).padStart(2, "0")}:00`;
+
       await agendaService.createAppointment({
         patientId: selectedPatient,
         doctorId: selectedDoctor,
@@ -153,24 +173,35 @@ const DirectAppointmentForm: React.FC<Props> = ({ onAppointmentCreated, initialP
         // Check for specific backend error messages and translate them
         const backendMessage = error.message;
         if (backendMessage.includes("Doctor has a conflicting appointment")) {
-          errorMessage = "El doctor ya tiene una cita programada en ese horario";
-        } else if (backendMessage.includes("Patient has a conflicting appointment")) {
-          errorMessage = "El paciente ya tiene una cita programada en ese horario";
+          errorMessage =
+            "El doctor ya tiene una cita programada en ese horario";
+        } else if (
+          backendMessage.includes("Patient has a conflicting appointment")
+        ) {
+          errorMessage =
+            "El paciente ya tiene una cita programada en ese horario";
         } else if (backendMessage.includes("must be in the future")) {
           errorMessage = "La fecha y hora de la cita deben ser en el futuro";
         } else if (backendMessage.includes("No appointment type found")) {
-          errorMessage = "No se pudo encontrar el tipo de cita para este doctor";
+          errorMessage =
+            "No se pudo encontrar el tipo de cita para este doctor";
         } else if (backendMessage.includes("Doctor not found")) {
           errorMessage = "Doctor no encontrado";
         } else if (backendMessage.includes("Patient not found")) {
           errorMessage = "Paciente no encontrado";
-        } else if (backendMessage.includes("Invalid date") || backendMessage.includes("Invalid time")) {
+        } else if (
+          backendMessage.includes("Invalid date") ||
+          backendMessage.includes("Invalid time")
+        ) {
           errorMessage = "Fecha u hora inválida";
         } else if (backendMessage.includes("Time slot is not available")) {
           errorMessage = "El horario seleccionado no está disponible";
         } else {
           // Use the backend message directly if it's user-friendly, otherwise keep generic
-          errorMessage = backendMessage.length > 10 && !backendMessage.includes("Error:") ? backendMessage : "Error al crear la cita";
+          errorMessage =
+            backendMessage.length > 10 && !backendMessage.includes("Error:")
+              ? backendMessage
+              : "Error al crear la cita";
         }
       }
       setError(errorMessage);
@@ -201,7 +232,7 @@ const DirectAppointmentForm: React.FC<Props> = ({ onAppointmentCreated, initialP
     }
 
     // Parse date components to avoid timezone issues
-    const [year, month, day] = selectedDate.split('-').map(Number);
+    const [year, month, day] = selectedDate.split("-").map(Number);
     const selectedDateObj = new Date(year, month - 1, day);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -233,29 +264,40 @@ const DirectAppointmentForm: React.FC<Props> = ({ onAppointmentCreated, initialP
   };
 
   const formatDate = (dateString: string) => {
-    const [year, month, day] = dateString.split('-');
+    const [year, month, day] = dateString.split("-");
     return `${day}/${month}/${year}`;
   };
 
-  const selectedPatientInfo = Array.isArray(patients) ? patients.find((p) => p.patient_id === selectedPatient) : undefined;
-  const selectedDoctorInfo = Array.isArray(doctors) ? doctors.find((d) => d.doctor_id === selectedDoctor) : undefined;
+  const selectedPatientInfo = Array.isArray(patients)
+    ? patients.find((p) => p.patient_id === selectedPatient)
+    : undefined;
+  const selectedDoctorInfo = Array.isArray(doctors)
+    ? doctors.find((d) => d.doctor_id === selectedDoctor)
+    : undefined;
 
-  const filteredPatients = Array.isArray(patients) ? (
-    patientSearchTerm
-      ? patients.filter(patient =>
-          patient.full_name.toLowerCase().includes(patientSearchTerm.toLowerCase())
+  const filteredPatients = Array.isArray(patients)
+    ? patientSearchTerm
+      ? patients.filter((patient) =>
+          patient.full_name
+            .toLowerCase()
+            .includes(patientSearchTerm.toLowerCase())
         )
       : patients.slice(0, 10)
-  ) : [];
+    : [];
 
-  const filteredDoctors = Array.isArray(doctors) ? (
-    doctorSearchTerm
-      ? doctors.filter(doctor =>
-          (doctor.name.toLowerCase().includes(doctorSearchTerm.toLowerCase()) ||
-           doctor.specialty.toLowerCase().includes(doctorSearchTerm.toLowerCase()))
+  const filteredDoctors = Array.isArray(doctors)
+    ? doctorSearchTerm
+      ? doctors.filter(
+          (doctor) =>
+            doctor.name
+              .toLowerCase()
+              .includes(doctorSearchTerm.toLowerCase()) ||
+            doctor.specialty
+              .toLowerCase()
+              .includes(doctorSearchTerm.toLowerCase())
         )
       : doctors.slice(0, 10)
-  ) : [];
+    : [];
 
   const handlePatientSelect = (patient: Patient) => {
     setSelectedPatient(patient.patient_id);
@@ -271,9 +313,7 @@ const DirectAppointmentForm: React.FC<Props> = ({ onAppointmentCreated, initialP
 
   return (
     <div className="flex-1 p-4 bg-white overflow-y-auto">
-      <h2 className="text-xl font-semibold text-primary mb-4">
-        Nueva Cita
-      </h2>
+      <h2 className="text-xl font-semibold text-primary mb-4">Nueva Cita</h2>
 
       {/* Error Message */}
       {error && (
@@ -309,19 +349,27 @@ const DirectAppointmentForm: React.FC<Props> = ({ onAppointmentCreated, initialP
                     onClick={() => handlePatientSelect(patient)}
                     className="p-3 hover:bg-blue-50 cursor-pointer border-b border-gray-200 last:border-b-0"
                   >
-                    <div className="font-medium text-gray-800">{patient.full_name}</div>
+                    <div className="font-medium text-gray-800">
+                      {patient.full_name}
+                    </div>
                     {patient.phone_number && (
-                      <div className="text-sm text-gray-600">{patient.phone_number}</div>
+                      <div className="text-sm text-gray-600">
+                        {patient.phone_number}
+                      </div>
                     )}
                   </div>
                 ))}
               </div>
             )}
-            {showPatientDropdown && patientSearchTerm && filteredPatients.length === 0 && (
-              <div className="absolute z-10 w-full mt-1 bg-white border-2 border-gray-300 rounded-lg shadow-lg p-3">
-                <p className="text-gray-500 text-center">No se encontraron pacientes</p>
-              </div>
-            )}
+            {showPatientDropdown &&
+              patientSearchTerm &&
+              filteredPatients.length === 0 && (
+                <div className="absolute z-10 w-full mt-1 bg-white border-2 border-gray-300 rounded-lg shadow-lg p-3">
+                  <p className="text-gray-500 text-center">
+                    No se encontraron pacientes
+                  </p>
+                </div>
+              )}
           </div>
 
           {/* Doctor Selection */}
@@ -349,17 +397,25 @@ const DirectAppointmentForm: React.FC<Props> = ({ onAppointmentCreated, initialP
                     onClick={() => handleDoctorSelect(doctor)}
                     className="p-3 hover:bg-blue-50 cursor-pointer border-b border-gray-200 last:border-b-0"
                   >
-                    <div className="font-medium text-gray-800">{doctor.name}</div>
-                    <div className="text-sm text-gray-600">{doctor.specialty}</div>
+                    <div className="font-medium text-gray-800">
+                      {doctor.name}
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      {doctor.specialty}
+                    </div>
                   </div>
                 ))}
               </div>
             )}
-            {showDoctorDropdown && doctorSearchTerm && filteredDoctors.length === 0 && (
-              <div className="absolute z-10 w-full mt-1 bg-white border-2 border-gray-300 rounded-lg shadow-lg p-3">
-                <p className="text-gray-500 text-center">No se encontraron doctores</p>
-              </div>
-            )}
+            {showDoctorDropdown &&
+              doctorSearchTerm &&
+              filteredDoctors.length === 0 && (
+                <div className="absolute z-10 w-full mt-1 bg-white border-2 border-gray-300 rounded-lg shadow-lg p-3">
+                  <p className="text-gray-500 text-center">
+                    No se encontraron doctores
+                  </p>
+                </div>
+              )}
           </div>
 
           {/* Appointment Type */}
@@ -372,8 +428,10 @@ const DirectAppointmentForm: React.FC<Props> = ({ onAppointmentCreated, initialP
                 <input
                   type="radio"
                   value="PRESENCIAL"
-                  checked={appointmentType === 'PRESENCIAL'}
-                  onChange={(e) => setAppointmentType(e.target.value as 'PRESENCIAL')}
+                  checked={appointmentType === "PRESENCIAL"}
+                  onChange={(e) =>
+                    setAppointmentType(e.target.value as "PRESENCIAL")
+                  }
                   className="mr-1"
                 />
                 <span className="text-sm">Presencial</span>
@@ -382,8 +440,10 @@ const DirectAppointmentForm: React.FC<Props> = ({ onAppointmentCreated, initialP
                 <input
                   type="radio"
                   value="VIRTUAL"
-                  checked={appointmentType === 'VIRTUAL'}
-                  onChange={(e) => setAppointmentType(e.target.value as 'VIRTUAL')}
+                  checked={appointmentType === "VIRTUAL"}
+                  onChange={(e) =>
+                    setAppointmentType(e.target.value as "VIRTUAL")
+                  }
                   className="mr-1"
                 />
                 <span className="text-sm">Virtual</span>
@@ -401,6 +461,7 @@ const DirectAppointmentForm: React.FC<Props> = ({ onAppointmentCreated, initialP
               onChange={(e) => setDuration(Number(e.target.value))}
               className="w-full p-2 border-2 border-gray-300 rounded-lg focus:border-primary focus:outline-none"
             >
+              <option value={10}>10 minutos</option>
               <option value={30}>30 minutos</option>
               <option value={60}>60 minutos</option>
               <option value={90}>90 minutos</option>
@@ -416,7 +477,7 @@ const DirectAppointmentForm: React.FC<Props> = ({ onAppointmentCreated, initialP
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              min={new Date().toISOString().split('T')[0]}
+              min={new Date().toISOString().split("T")[0]}
               className="w-full p-2 border-2 border-gray-300 rounded-lg focus:border-primary focus:outline-none"
             />
           </div>
@@ -430,7 +491,9 @@ const DirectAppointmentForm: React.FC<Props> = ({ onAppointmentCreated, initialP
               {loadingSlots ? (
                 <p className="text-gray-500 text-sm">Cargando horarios...</p>
               ) : allSlots.length === 0 ? (
-                <p className="text-gray-500 text-sm">No hay horarios disponibles para esta fecha</p>
+                <p className="text-gray-500 text-sm">
+                  No hay horarios disponibles para esta fecha
+                </p>
               ) : (
                 <div className="grid grid-cols-4 gap-2">
                   {allSlots.map((slot) => {
@@ -447,7 +510,9 @@ const DirectAppointmentForm: React.FC<Props> = ({ onAppointmentCreated, initialP
                             ? "bg-primary text-white border-primary"
                             : "bg-white text-gray-700 border-gray-300 hover:border-primary"
                         }`}
-                        title={isAvailable ? "Horario disponible" : "Horario ocupado"}
+                        title={
+                          isAvailable ? "Horario disponible" : "Horario ocupado"
+                        }
                       >
                         {slot}
                       </button>
@@ -473,7 +538,12 @@ const DirectAppointmentForm: React.FC<Props> = ({ onAppointmentCreated, initialP
             </button>
             <button
               onClick={handleConfirm}
-              disabled={!selectedPatient || !selectedDoctor || !selectedDate || !selectedTime}
+              disabled={
+                !selectedPatient ||
+                !selectedDoctor ||
+                !selectedDate ||
+                !selectedTime
+              }
               className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm disabled:bg-gray-300 disabled:cursor-not-allowed"
             >
               Crear Cita
@@ -489,7 +559,7 @@ const DirectAppointmentForm: React.FC<Props> = ({ onAppointmentCreated, initialP
             <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">
               ¿Confirmar nueva cita?
             </h3>
-            
+
             <div className="bg-gray-50 p-4 rounded-lg space-y-2 mb-4">
               <div className="flex justify-between text-sm">
                 <span className="font-medium text-gray-700">Paciente:</span>
@@ -547,8 +617,18 @@ const DirectAppointmentForm: React.FC<Props> = ({ onAppointmentCreated, initialP
           <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4 shadow-2xl text-center">
             <div className="mb-4">
               <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                <svg
+                  className="w-8 h-8 text-green-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M5 13l4 4L19 7"
+                  />
                 </svg>
               </div>
             </div>

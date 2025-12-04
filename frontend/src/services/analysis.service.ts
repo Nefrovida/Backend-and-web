@@ -5,9 +5,7 @@ import {
   AnalysisResponse,
   UpdateAnalysisData,
 } from "@/types/add.analysis.types";
-
-const API_BASE_URL =
-  (import.meta as any).env?.VITE_APP_API_URL || "https://www.snefrovidaac.com/api/";
+import { API_BASE_URL } from "../config/api.config";
 
 type ListResponse = {
   success: boolean;

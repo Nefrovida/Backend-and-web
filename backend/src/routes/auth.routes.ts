@@ -1,7 +1,9 @@
 import express from "express"
+import { Request, Response } from "express";
 import * as authController from "../controller/auth.controller";
 import { authenticate } from "../middleware/auth.middleware";
 const router = express.Router();
+
 
 
 // ============================================
@@ -9,7 +11,9 @@ const router = express.Router();
 // ============================================
 router.post("/register", authController.register);
 router.post("/login", authController.login);
+router.post("/login/mobile", authController.loginMobile);
 router.post("/refresh", authController.refreshToken); // Public - uses refresh token from cookie
+router.post("/forgot-password", authController.forgotPassword);
 
 // Protected auth routes
 router.post("/logout", authenticate, authController.logout);

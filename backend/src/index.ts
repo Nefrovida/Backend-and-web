@@ -5,7 +5,6 @@ import dotenv from "dotenv";
 import session from "express-session";
 import { errorHandler } from "./middleware/error.middleware";
 
-
 dotenv.config({ path: "../.env" });
 
 // Initialize server
@@ -21,6 +20,7 @@ app.use(
 );
 
 const port = process.env.SERVER_PORT || 3000;
+
 
 // CORS configuration
 // CORS: allow a configurable list of frontend origins. FRONTEND_URL may be a
@@ -61,7 +61,6 @@ fs.mkdir(uploadDir, { recursive: true }).catch(console.error);
 
 // Serve static files
 app.use("/uploads", express.static(uploadDir));
-
 
 // Endpoint to receibe new binary (presigned URL PUT)
 app.put(

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router";
 import { authService } from "../../services/auth.service";
+import nefrovidaLogo from "@/assets/logo.png";
 
 function Login() {
   const navigate = useNavigate();
@@ -9,6 +10,13 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Forgot Password State
+  const [showForgotModal, setShowForgotModal] = useState(false);
+  const [forgotUsername, setForgotUsername] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotMessage, setForgotMessage] = useState("");
+  const [forgotError, setForgotError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,7 +32,14 @@ function Login() {
       // Redirect to home
       navigate("/dashboard");
     } catch (err: any) {
-      setError(err.message || "Error en el inicio de sesión");
+      const errorMessage = err.message || "Error en el inicio de sesión";
+      
+      // Check if the error is about pending approval
+      if (errorMessage.includes("pending") || errorMessage.includes("approval") || errorMessage.includes("aprobación")) {
+        setError("Tu cuenta está pendiente de aprobación por un administrador. Por favor, espera a que tu cuenta sea activada.");
+      } else {
+        setError(errorMessage);
+      }
     } finally {
       setLoading(false);
     }
@@ -33,9 +48,26 @@ function Login() {
   const clearUsername = () => setUsername("");
   const clearPassword = () => setPassword("");
 
+  const handleForgotSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setForgotError("");
+    setForgotMessage("");
+    setForgotLoading(true);
+
+    try {
+      await authService.forgotPassword(forgotUsername);
+      setForgotMessage("Si el usuario existe, se ha enviado una solicitud a los administradores.");
+      setForgotUsername("");
+    } catch (err: any) {
+      setForgotError(err.message || "Error al solicitar restablecimiento");
+    } finally {
+      setForgotLoading(false);
+    }
+  };
+
   return (
-    <div 
-      className="min-h-screen flex items-center justify-center p-4" 
+    <div
+      className="min-h-screen flex items-center justify-center p-4"
       style={{
         background: "linear-gradient(180deg, #A8C5DD 0%, #1E3A8A 100%)"
       }}
@@ -44,12 +76,11 @@ function Login() {
         {/* Logo */}
         <div className="flex justify-center mb-6">
           <div className="text-center">
-            <h1 className="text-4xl font-bold">
-              <span style={{ color: "#1E3A8A" }}>NEFR</span>
-              <span style={{ color: "#DC2626" }}>O</span>
-              <span style={{ color: "#84CC16" }}>Vida</span>
-            </h1>
-            <p className="text-sm text-gray-600 mt-1">Asociación Civil</p>
+            <img
+              src={nefrovidaLogo}
+              alt="NefroVida A.C."
+              className="h-16 w-auto mx-auto select-none"
+            />
           </div>
         </div>
 
@@ -120,6 +151,7 @@ function Login() {
           <div className="text-center">
             <button
               type="button"
+              onClick={() => setShowForgotModal(true)}
               className="text-sm text-gray-600 hover:text-gray-800"
             >
               ¿Olvidaste tu contraseña?
@@ -153,6 +185,61 @@ function Login() {
           </p>
         </form>
       </div>
+
+      {/* Forgot Password Modal */}
+      {showForgotModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md relative">
+            <button
+              onClick={() => setShowForgotModal(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            <h3 className="text-2xl font-bold text-gray-800 mb-4 text-center">Recuperar Contraseña</h3>
+            <p className="text-gray-600 mb-6 text-center">
+              Ingresa tu nombre de usuario y notificaremos a un administrador para que te ayude a restablecer tu contraseña.
+            </p>
+
+            <form onSubmit={handleForgotSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm text-gray-600 mb-2 ml-1">Usuario</label>
+                <input
+                  type="text"
+                  value={forgotUsername}
+                  onChange={(e) => setForgotUsername(e.target.value)}
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-900 transition-colors"
+                  placeholder="Tu nombre de usuario"
+                  required
+                />
+              </div>
+
+              {forgotMessage && (
+                <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm">
+                  {forgotMessage}
+                </div>
+              )}
+
+              {forgotError && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                  {forgotError}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={forgotLoading}
+                className="w-full bg-blue-900 text-white py-3 rounded-full font-semibold hover:bg-blue-800 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors shadow-lg"
+              >
+                {forgotLoading ? "Enviando..." : "Enviar Solicitud"}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

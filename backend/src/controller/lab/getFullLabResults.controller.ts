@@ -1,11 +1,11 @@
 import { type Request, type Response } from "express";
 import Laboratory from "#/src/model/lab.model";
 import User from "#/src/model/user.model";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../../util/prisma";
 import path from "path";
 import fs from "fs";
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
 
 export const getFullLabResults = async (req: Request, res: Response) => {
     try {
@@ -15,19 +15,19 @@ export const getFullLabResults = async (req: Request, res: Response) => {
 
         // Validate that it's present
         if (!patient_analysis_id) {
-            return res.status(400).json({ 
-                success: false, 
-                message: "patient_analysis_id is required" 
+            return res.status(400).json({
+                success: false,
+                message: "patient_analysis_id is required"
             });
         }
 
         // console.log("id: ", patient_analysis_id);
         const id = Number(patient_analysis_id);
-        
+
         if (isNaN(id)) {
-            return res.status(400).json({ 
-                success: false, 
-                message: "patient_analysis_id must be a valid number" 
+            return res.status(400).json({
+                success: false,
+                message: "patient_analysis_id must be a valid number"
             });
         }
 
@@ -35,9 +35,9 @@ export const getFullLabResults = async (req: Request, res: Response) => {
         const fullLabResults = await Laboratory.getFullLabResults(id);
         // console.log("full results: ", fullLabResults);
         if (!fullLabResults.analysis?.patient_id || typeof fullLabResults.analysis?.patient_id !== "string") {
-            return res.status(400).json({ 
-                success: false, 
-                message: "patient_id is required" 
+            return res.status(400).json({
+                success: false,
+                message: "patient_id is required"
             });
         }
         const user = await User.getUserByPatientId(fullLabResults.analysis?.patient_id);
@@ -64,18 +64,18 @@ export const getResultsPDF = async (req: Request, res: Response) => {
 
         // Validate that it's present
         if (!results_id) {
-            return res.status(400).json({ 
-                success: false, 
-                message: "results_id is required" 
+            return res.status(400).json({
+                success: false,
+                message: "results_id is required"
             });
         }
 
         const id = Number(results_id);
-        
+
         if (isNaN(id)) {
-            return res.status(400).json({ 
-                success: false, 
-                message: "results_id must be a valid number" 
+            return res.status(400).json({
+                success: false,
+                message: "results_id must be a valid number"
             });
         }
 
@@ -85,16 +85,16 @@ export const getResultsPDF = async (req: Request, res: Response) => {
         });
 
         if (!results) {
-            return res.status(404).json({ 
-                success: false, 
-                message: "Results not found" 
+            return res.status(404).json({
+                success: false,
+                message: "Results not found"
             });
         }
 
         if (!results.path) {
-            return res.status(404).json({ 
-                success: false, 
-                message: "PDF file path not found for this result" 
+            return res.status(404).json({
+                success: false,
+                message: "PDF file path not found for this result"
             });
         }
 
@@ -106,31 +106,31 @@ export const getResultsPDF = async (req: Request, res: Response) => {
             relativePath = relativePath.substring(1);
         }
         const absolutePath = path.resolve(process.cwd(), relativePath);
-        
+
         // Extract just the filename for Content-Disposition header
         const filename = path.basename(relativePath);
 
         // Check if file exists
         if (!fs.existsSync(absolutePath)) {
             console.error(`PDF file not found at: ${absolutePath}`);
-            return res.status(404).json({ 
-                success: false, 
-                message: `PDF file not found on server. Expected path: ${absolutePath}` 
+            return res.status(404).json({
+                success: false,
+                message: `PDF file not found on server. Expected path: ${absolutePath}`
             });
         }
 
         // Set content type for PDF
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
-        
+
         // Send the file (sendFile requires absolute path)
         res.sendFile(absolutePath, (err) => {
             if (err) {
                 console.error("Error sending PDF file:", err);
                 if (!res.headersSent) {
-                    res.status(500).json({ 
-                        success: false, 
-                        message: "Error serving PDF file" 
+                    res.status(500).json({
+                        success: false,
+                        message: "Error serving PDF file"
                     });
                 }
             }
@@ -138,9 +138,9 @@ export const getResultsPDF = async (req: Request, res: Response) => {
     } catch (error) {
         console.error("Error in getResultsPDF controller: ", error);
         if (!res.headersSent) {
-            res.status(500).json({ 
-                success: false, 
-                message: "Unable to get results PDF" 
+            res.status(500).json({
+                success: false,
+                message: "Unable to get results PDF"
             });
         }
     }

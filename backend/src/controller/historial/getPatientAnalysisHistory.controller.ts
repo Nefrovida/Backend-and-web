@@ -19,11 +19,13 @@ async function getPatientAnalysisHistory(req: Request, res: Response) {
     const { prisma } = await import("../../util/prisma.js");
     const patient = await prisma.patients.findFirst({
       where: { user_id: userId },
-      select: { patient_id: true }
+      select: { patient_id: true },
     });
 
     if (!patient) {
-      return res.status(404).json({ error: "Patient profile not found for this user" });
+      return res
+        .status(404)
+        .json({ error: "Patient profile not found for this user" });
     }
 
     // Parse query parameters
@@ -48,7 +50,19 @@ async function getPatientAnalysisHistory(req: Request, res: Response) {
       { start, end, analysisType, status }
     );
 
-    res.json(patientAnalysisHistory);
+    const newResult = [];
+    for (const item of patientAnalysisHistory) {
+      newResult.push({
+        id: item.patient_analysis_id,
+        name: item.analysis.name,
+        date: item.analysis_date,
+        recommendations: item.results?.recommendation,
+        download_url: item.results?.path,
+      });
+    }
+
+    // res.json(patientAnalysisHistory);
+    res.json(newResult);
   } catch (error) {
     console.error("Error fetching patient analysis history:", error);
     res.status(500).json({ error: "Failed to fetch analysis history" });

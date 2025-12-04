@@ -7,11 +7,14 @@ import {
   BsFillPersonFill,
   BsDoorClosed,
   BsDoorOpenFill,
+  BsHouse,
+  BsHouseFill,
 } from "react-icons/bs";
 import { MdForum, MdOutlineForum } from "react-icons/md";
 import { LuNotebook, LuNotebookPen } from "react-icons/lu";
 import { IoFlaskSharp, IoFlaskOutline } from "react-icons/io5";
 import { RiChatSettingsLine, RiChatSettingsFill } from "react-icons/ri";
+import { FaCalendarPlus } from "react-icons/fa";
 import {
   FaUserMd,
   FaListAlt,
@@ -22,12 +25,15 @@ import {
   FaRegClipboard,
   FaRegClock,
   FaClock,
+  FaUserCheck,
 } from "react-icons/fa";
+import { HiOutlineUserGroup, HiUserGroup } from "react-icons/hi";
 import ConfirmModal from "../molecules/ConfirmModal";
 
 import { ROLE_IDS } from "../../types/auth.types";
 import { authService } from "../../services/auth.service";
 import { PiFlaskFill, PiFlaskLight } from "react-icons/pi";
+import { ImUserTie } from "react-icons/im";
 
 interface Props {
   children: React.ReactNode;
@@ -225,8 +231,15 @@ function Navbar({ children }: Props) {
         {/* Top Section */}
         <div className="flex flex-col gap-2 items-center w-full">
           <CustomLink
+            label="Inicio"
+            to="/dashboard"
+            icon={<BsHouse />}
+            activeIcon={<BsHouseFill />}
+            end
+          />
+          <CustomLink
             label="Mi Perfil"
-            to="/dashboard/"
+            to="/dashboard/profile/me"
             icon={<BsPerson />}
             activeIcon={<BsFillPersonFill />}
             end
@@ -249,13 +262,36 @@ function Navbar({ children }: Props) {
         <div className="flex flex-col gap-3 items-center w-full justify-center flex-1 py-4 overflow-y-auto scrollbar-hide px-2">
           {/* Only Admins can see this icons */}
           {isAdmin && (
-            <CustomLink
-              label="Registrar Doctor"
-              to="/dashboard/registrar-doctor"
-              icon={<FaUserMd />}
-              activeIcon={<FaUserMd />}
-              end
-            />
+            <>
+              <CustomLink
+                label="Usuarios Pendientes"
+                to="/dashboard/pending-users"
+                icon={<HiOutlineUserGroup />}
+                activeIcon={<HiUserGroup />}
+                end
+              />
+              <CustomLink
+                label="Usuarios Rechazados"
+                to="/dashboard/rejected-users"
+                icon={<FaUserCheck />}
+                activeIcon={<FaUserCheck />}
+                end
+              />
+              <CustomLink
+                label="Registrar Doctor"
+                to="/dashboard/registrar-doctor"
+                icon={<FaUserMd />}
+                activeIcon={<FaUserMd />}
+                end
+              />
+              <CustomLink
+                label="Registrar Admin"
+                to="/dashboard/registrar-admin"
+                icon={<ImUserTie />}
+                activeIcon={<ImUserTie />}
+                end
+              />
+            </>
           )}
 
           {/* Upload Results, only Laboratorist */}
@@ -312,13 +348,22 @@ function Navbar({ children }: Props) {
 
           {/* Laboratory results, Doctor */}
           {isDoctor && (
-            <CustomLink
-              label="Laboratorio"
-              to="/dashboard/laboratorio"
-              icon={<IoFlaskOutline />}
-              activeIcon={<IoFlaskSharp />}
-              end
-            />
+            <>
+              <CustomLink
+                label="Laboratorio"
+                to="/dashboard/laboratorio"
+                icon={<IoFlaskOutline />}
+                activeIcon={<IoFlaskSharp />}
+                end
+              />
+              <CustomLink
+                label="Usuarios Externos"
+                to="/dashboard/usuarios-externos"
+                icon={<FaUserMd />}
+                activeIcon={<FaUserMd />}
+                end
+              />
+            </>
           )}
 
           {/* Laboratorista analysis */}
@@ -347,6 +392,13 @@ function Navbar({ children }: Props) {
                 to="/dashboard/analisis"
                 icon={<FaRegListAlt />}
                 activeIcon={<FaListAlt />}
+                end
+              />
+              <CustomLink
+                label="Catálogo de citas"
+                to="/dashboard/citas"
+                icon={<FaCalendarPlus />}
+                activeIcon={<FaCalendarPlus />}
                 end
               />
             </>

@@ -22,7 +22,7 @@ export const login = async (loginData: LoginRequest): Promise<AuthResponse> => {
 
   // Find user with role and privileges
   const existingUser = await prisma.users.findFirst({
-    where: { username, active: true },
+    where: { username },
     include: {
       role: {
         include: {
@@ -37,7 +37,12 @@ export const login = async (loginData: LoginRequest): Promise<AuthResponse> => {
   });
 
   if (!existingUser) {
-    throw new UnauthorizedError("Invalid credentials");
+    throw new UnauthorizedError('Invalid credentials');
+  }
+
+  // Check if user is approved
+  if (existingUser.user_status !== 'APPROVED' || !existingUser.active) {
+    throw new UnauthorizedError('Your account is pending admin approval or has been deactivated');
   }
 
   // Verify password
@@ -129,7 +134,7 @@ export const register = async (
     ? new Date(userData.birthday)
     : new Date();
 
-  // Create user with default role (patient) if not specified
+  // Create user with PENDING status (awaiting admin approval)
   const newUser = await prisma.users.create({
     data: {
       ...userData,
@@ -138,6 +143,8 @@ export const register = async (
       password: hashedPassword,
       role_id: actualRoleId,
       first_login: true,
+      user_status: 'PENDING',
+      active: false,
     },
     include: {
       role: {
@@ -208,25 +215,10 @@ export const register = async (
       break;
   }
 
-  // Extract privileges
-  const privileges = newUser.role.role_privileges.map(
-    (rp) => rp.privilege.description
-  );
-
-  // Create JWT payload
-  const payload: JwtPayload = {
-    userId: newUser.user_id,
-    roleId: newUser.role_id,
-    privileges,
-  };
-
-  // Generate tokens
-  const accessToken = generateAccessToken(payload);
-  const refreshToken = generateRefreshToken(payload);
-
+  // Return user data without tokens - user must wait for admin approval
   return {
-    accessToken,
-    refreshToken,
+    accessToken: '',
+    refreshToken: '',
     user: {
       user_id: newUser.user_id,
       name: newUser.name,
@@ -255,7 +247,7 @@ export const refreshAccessToken = async (
 
   // Fetch user with updated role and privileges
   const user = await prisma.users.findUnique({
-    where: { user_id: decoded.userId, active: true },
+    where: { user_id: decoded.userId },
     include: {
       role: {
         include: {
@@ -269,8 +261,8 @@ export const refreshAccessToken = async (
     },
   });
 
-  if (!user) {
-    throw new UnauthorizedError("User not found or inactive");
+  if (!user || user.user_status !== 'APPROVED' || !user.active) {
+    throw new UnauthorizedError('User not found, inactive, or not approved');
   }
 
   // Extract privileges
@@ -294,4 +286,46 @@ export const refreshAccessToken = async (
       role_id: user.role_id,
     },
   };
+};
+
+/**
+ * Request password reset
+ */
+export const forgotPassword = async (username: string): Promise<void> => {
+  // Find user
+  const user = await prisma.users.findFirst({
+    where: { username, active: true },
+  });
+
+  if (!user) {
+    // We don't want to reveal if a user exists or not
+    return;
+  }
+
+  // Update user to set password_reset_requested to true
+  await prisma.users.update({
+    where: { user_id: user.user_id },
+    data: { password_reset_requested: true },
+  });
+
+  // Find all admins
+  const admins = await prisma.users.findMany({
+    where: { role_id: DEFAULT_ROLES.ADMIN, active: true },
+  });
+
+  // Create notification for each admin
+  const notifications = admins.map((admin) => ({
+    user_id: admin.user_id,
+    title: "Solicitud de Restablecimiento de Contraseña",
+    content: `El usuario ${user.name} (${user.username}) ha solicitado restablecer su contraseña.`,
+    date: new Date(),
+    answer: "Pendiente",
+    seen: false,
+  }));
+
+  if (notifications.length > 0) {
+    await prisma.notifications.createMany({
+      data: notifications,
+    });
+  }
 };
