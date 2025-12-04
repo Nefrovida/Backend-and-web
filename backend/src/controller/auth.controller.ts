@@ -94,34 +94,14 @@ export const register = async (req: Request, res: Response): Promise<void> => {
   try {
     const registerData: RegisterRequest = req.body;
     const result = await authService.register(registerData);
-
-    // Set tokens in httpOnly cookies
-    res.cookie('accessToken', result.accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    
+    // For pending users, don't set cookies or return tokens
+    // Return a message indicating they need admin approval
+    res.status(201).json({ 
+      message: 'Registro exitoso, tu cuenta está pendiente de aprobación por un administrador.',
+      user: result.user,
+      pending: true
     });
-
-    res.cookie('refreshToken', result.refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-    });
-
-    // Return only user data, not tokens by default
-    // Mobile/native clients can request tokens in the JSON response by
-    // sending the header 'x-return-tokens: true' or query param 'returnTokens=true'
-    const returnTokensHeader = String(req.headers['x-return-tokens'] || '').toLowerCase() === 'true';
-    const returnTokensQuery = String(req.query.returnTokens || '').toLowerCase() === 'true';
-
-    if (returnTokensHeader || returnTokensQuery) {
-      res.status(201).json({ user: result.user, accessToken: result.accessToken, refreshToken: result.refreshToken });
-      return;
-    }
-
-    res.status(201).json({ user: result.user });
   } catch (error: any) {
     res.status(error.statusCode || 500).json({ error: error.message });
   }
@@ -201,6 +181,7 @@ export const forgotPassword = async (req: Request, res: Response): Promise<void>
     // Always return success to prevent user enumeration
     res.status(200).json({ message: "If the user exists, a password reset request has been sent to the administrators." });
   } catch (error: any) {
+    console.error("Error in forgotPassword controller:", error);
     res.status(error.statusCode || 500).json({ error: error.message });
   }
 };

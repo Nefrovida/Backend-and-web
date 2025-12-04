@@ -12,9 +12,13 @@ async function getAppointmentsInRangeC(req: Request, res: Response) {
       });
     }
 
+        // Remove timezone suffix (e.g., "000Z" or "T00:00:00.000Z") to get just the date part
+        const cleanStart = start.toString().split('T')[0].split(' ')[0];
+        const cleanEnd = end.toString().split('T')[0].split(' ')[0];
+
         const appointments: AppointmentRecord[] = await getAppointmentsInRange(
-            start.toString().split("T")[0],
-            end.toString().split("T")[0]
+            cleanStart,
+            cleanEnd
         );
 
     res.status(200).json(appointments);

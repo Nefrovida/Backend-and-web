@@ -52,5 +52,9 @@ router.get("/user/:user_id",
   authenticate, 
   appointmentController.getUserAppointments);
 
+router.post("/schedule-appointment",
+  authenticate,
+  requirePrivileges([Privilege.CREATE_APPOINTMENTS]),
+  appointmentsController.scheduleAppointment);
 
 export default router;
