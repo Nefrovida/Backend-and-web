@@ -12,7 +12,7 @@ import { MdForum, MdOutlineForum } from "react-icons/md";
 import { LuNotebook, LuNotebookPen } from "react-icons/lu";
 import { IoFlaskSharp, IoFlaskOutline } from "react-icons/io5";
 import { RiChatSettingsLine, RiChatSettingsFill } from "react-icons/ri";
-import {  FaCalendarPlus } from "react-icons/fa";
+import { FaCalendarPlus } from "react-icons/fa";
 import {
   FaUserMd,
   FaListAlt,
@@ -23,7 +23,9 @@ import {
   FaRegClipboard,
   FaRegClock,
   FaClock,
+  FaUserCheck,
 } from "react-icons/fa";
+import { HiOutlineUserGroup, HiUserGroup } from "react-icons/hi";
 import ConfirmModal from "../molecules/ConfirmModal";
 
 import { ROLE_IDS } from "../../types/auth.types";
@@ -251,6 +253,20 @@ function Navbar({ children }: Props) {
           {isAdmin && (
             <>
               <CustomLink
+                label="Usuarios Pendientes"
+                to="/dashboard/pending-users"
+                icon={<HiOutlineUserGroup />}
+                activeIcon={<HiUserGroup />}
+                end
+              />
+              <CustomLink
+                label="Usuarios Rechazados"
+                to="/dashboard/rejected-users"
+                icon={<FaUserCheck />}
+                activeIcon={<FaUserCheck />}
+                end
+              />
+              <CustomLink
                 label="Registrar Doctor"
                 to="/dashboard/registrar-doctor"
                 icon={<FaUserMd />}
@@ -367,7 +383,7 @@ function Navbar({ children }: Props) {
                 activeIcon={<FaListAlt />}
                 end
               />
-                <CustomLink
+              <CustomLink
                 label="Catálogo de citas"
                 to="/dashboard/citas"
                 icon={<FaCalendarPlus />}
