@@ -91,10 +91,11 @@ const ReplyMessage = () => {
 
   return (
     <>
-      <div>
+      <div className="flex flex-col gap-4 pb-24">
         <Link to={"/dashboard/foro"}>
           <Title size="large">Foro</Title>
         </Link>
+        <SendReply replyInfo={{ messageId, forumId }} refresh={setRefresh} />
         {parentMessage ? (
           <ParentMessage message={parentMessage} />
         ) : (
@@ -107,7 +108,6 @@ const ReplyMessage = () => {
           onDeleteReply={handleDeleteReply}
           loading={loading}
         />
-        <SendReply replyInfo={{ messageId, forumId }} refresh={setRefresh} />
       </div>
 
       {/* Delete Reply Modal */}
