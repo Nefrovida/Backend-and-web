@@ -6,25 +6,10 @@ import {
   convertExternalToPatient,
   type User,
 } from "@/services/admin.service";
-import {
-  usersService,
-  type PendingUser,
-} from "../../services/users.service";
+import { usersService, type PendingUser } from "../../services/users.service";
+import { roleName } from "../../utils/roles.util";
 
 type ViewMode = "pending" | "all" | "external";
-
-// 👇 Mapeo de roles desde role_id
-const roleName = (id: number) => {
-  switch (id) {
-    case 1: return "Administrador";
-    case 2: return "Doctor";
-    case 3: return "Paciente";
-    case 4: return "Laboratorista";
-    case 5: return "Familiar";
-    case 6: return "Secretaria";
-    default: return "Desconocido";
-  }
-};
 
 function PendingUsersPage() {
   const [viewMode, setViewMode] = useState<ViewMode>("pending");
@@ -58,27 +43,33 @@ function PendingUsersPage() {
     try {
       const users = await usersService.getPendingUsers();
       setPendingUsers(users);
-    } catch (err: any) {
+    } catch (err) {
       setError(err?.message || "Error al cargar usuarios pendientes");
-    } finally { setLoading(false); }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const fetchAllUsers = async () => {
     try {
       const users = await getAllUsers();
       setAllUsers(users);
-    } catch (err: any) {
+    } catch (err) {
       setError(err?.message || "Error al cargar todos los usuarios");
-    } finally { setLoading(false); }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const fetchExternalUsers = async () => {
     try {
       const users = await getExternalUsers();
       setExternalUsers(users);
-    } catch (err: any) {
+    } catch (err) {
       setError(err?.message || "Error al cargar usuarios externos");
-    } finally { setLoading(false); }
+    } finally {
+      setLoading(false);
+    }
   };
 
 
@@ -88,7 +79,9 @@ function PendingUsersPage() {
       await usersService.approveUser(userId);
       setSuccessMessage(`Usuario ${userName} aprobado`);
       fetchPendingUsers();
-    } catch (err: any) { setError(err?.message || "Error al aprobar usuario"); }
+    } catch (err) {
+      setError(err?.message || "Error al aprobar usuario");
+    }
   };
 
   const handleReject = async (userId: string, userName: string) => {
@@ -97,7 +90,9 @@ function PendingUsersPage() {
       await usersService.rejectUser(userId);
       setSuccessMessage(`Usuario ${userName} rechazado`);
       fetchPendingUsers();
-    } catch (err: any) { setError(err?.message || "Error al rechazar usuario"); }
+    } catch (err) {
+      setError(err?.message || "Error al rechazar usuario");
+    }
   };
 
   const handleDeleteUser = async (userId: string, userName: string) => {
@@ -106,7 +101,9 @@ function PendingUsersPage() {
       await deleteUser(userId);
       setSuccessMessage(`Usuario ${userName} eliminado`);
       setAllUsers((prev) => prev.filter((u) => u.user_id !== userId));
-    } catch (err: any) { setError(err?.message || "Error al eliminar usuario"); }
+    } catch (err) {
+      setError(err?.message || "Error al eliminar usuario");
+    }
   };
 
   const handleConvertExternal = async (userId: string, userName: string) => {
@@ -115,13 +112,18 @@ function PendingUsersPage() {
       await convertExternalToPatient(userId);
       setSuccessMessage(`Usuario ${userName} ahora es paciente`);
       fetchExternalUsers();
-    } catch (err: any) { setError(err?.message || "Error al convertir usuario externo"); }
+    } catch (err) {
+      setError(err?.message || "Error al convertir usuario externo");
+    }
   };
 
   const formatDate = (dateString: string) =>
     new Date(dateString).toLocaleDateString("es-MX", {
-      year: "numeric", month: "long", day: "numeric",
-      hour: "2-digit", minute: "2-digit",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
 
   // ============================
@@ -132,9 +134,7 @@ function PendingUsersPage() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-900 mx-auto" />
-          <p className="mt-4 text-gray-600">
-            Cargando información...
-          </p>
+          <p className="mt-4 text-gray-600">Cargando información...</p>
         </div>
       </div>
     );
@@ -144,35 +144,58 @@ function PendingUsersPage() {
   // Render
   // ============================
   const filteredUsers =
-    selectedRole === "all" ? allUsers : allUsers.filter((u) => u.role_id === selectedRole);
+    selectedRole === "all"
+      ? allUsers
+      : allUsers.filter((u) => u.role_id === selectedRole);
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Gestión de Usuarios</h1>
-            <p className="mt-2 text-gray-600">Administra usuarios del sistema.</p>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Gestión de Usuarios
+            </h1>
+            <p className="mt-2 text-gray-600">
+              Administra usuarios del sistema.
+            </p>
           </div>
 
           {/* Tabs */}
           <div className="inline-flex rounded-md bg-gray-200 p-1">
             <button
-              className={`px-4 py-2 text-sm rounded-md ${viewMode === "pending" ? "bg-white shadow text-blue-700" : "text-gray-700 hover:text-gray-900"}`}
+              className={`px-4 py-2 text-sm rounded-md ${
+                viewMode === "pending"
+                  ? "bg-white shadow text-blue-700"
+                  : "text-gray-700 hover:text-gray-900"
+              }`}
               onClick={() => setViewMode("pending")}
-            >Pendientes</button>
+            >
+              Pendientes
+            </button>
 
             <button
-              className={`px-4 py-2 text-sm rounded-md ${viewMode === "all" ? "bg-white shadow text-blue-700" : "text-gray-700 hover:text-gray-900"}`}
+              className={`px-4 py-2 text-sm rounded-md ${
+                viewMode === "all"
+                  ? "bg-white shadow text-blue-700"
+                  : "text-gray-700 hover:text-gray-900"
+              }`}
               onClick={() => setViewMode("all")}
-            >Todos</button>
+            >
+              Todos
+            </button>
 
             <button
-              className={`px-4 py-2 text-sm rounded-md ${viewMode === "external" ? "bg-white shadow text-blue-700" : "text-gray-700 hover:text-gray-900"}`}
+              className={`px-4 py-2 text-sm rounded-md ${
+                viewMode === "external"
+                  ? "bg-white shadow text-blue-700"
+                  : "text-gray-700 hover:text-gray-900"
+              }`}
               onClick={() => setViewMode("external")}
-            >Externos</button>
+            >
+              Externos
+            </button>
           </div>
         </div>
 
@@ -189,8 +212,9 @@ function PendingUsersPage() {
         )}
 
         {/* Pendientes */}
-        {viewMode === "pending" && (
-          pendingUsers.length === 0 ? (
+        {/* ===================== */}
+        {viewMode === "pending" &&
+          (pendingUsers.length === 0 ? (
             <Empty message="No hay usuarios pendientes" />
           ) : (
             <UserListPending
@@ -199,8 +223,7 @@ function PendingUsersPage() {
               handleApprove={handleApprove}
               handleReject={handleReject}
             />
-          )
-        )}
+          ))}
 
         {/* TODOS */}
         {viewMode === "all" && (
@@ -209,7 +232,11 @@ function PendingUsersPage() {
             <div className="mb-4">
               <select
                 value={selectedRole}
-                onChange={(e) => setSelectedRole(e.target.value === "all" ? "all" : Number(e.target.value))}
+                onChange={(e) =>
+                  setSelectedRole(
+                    e.target.value === "all" ? "all" : Number(e.target.value)
+                  )
+                }
                 className="px-3 py-2 border rounded-md shadow-sm bg-white"
               >
                 <option value="all">Todos los roles</option>
@@ -234,17 +261,16 @@ function PendingUsersPage() {
         )}
 
         {/* EXTERNOS */}
-        {viewMode === "external" && (
-          externalUsers.length === 0 ? (
+        {/* ===================== */}
+        {viewMode === "external" &&
+          (externalUsers.length === 0 ? (
             <Empty message="No hay usuarios externos" />
           ) : (
             <UserListExternal
               users={externalUsers}
               handleConvert={handleConvertExternal}
             />
-          )
-        )}
-
+          ))}
       </div>
     </div>
   );

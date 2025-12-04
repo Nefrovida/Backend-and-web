@@ -51,7 +51,6 @@ export const getAllUsers = async () => {
     return data.users; 
 };
 
-//Desactivar usuario
 export const deleteUser = async (userId: string) => {
   const response = await fetch(`${API_URL}/admins/desactivate/${userId}`, {
     method: "PUT",
@@ -70,7 +69,6 @@ export const deleteUser = async (userId: string) => {
   }
 };
 
-// 🚨 Obtener usuarios externos
 export const getExternalUsers = async () => {
   const response = await fetch(`${API_URL}/users/getAllExternalUsers`, {
     method: "GET",
@@ -81,10 +79,9 @@ export const getExternalUsers = async () => {
   const data = await response.json();
   if (!response.ok) throw new Error(data?.message || "Error al cargar externos");
 
-  return data; // 👈 el backend ya manda array directo
+  return data; 
 };
 
-// 🔁 Convertir externo a paciente (solo cambia first_login)
 export const convertExternalToPatient = async (userId: string) => {
   const response = await fetch(`${API_URL}/users/external-to-patient/${userId}`, {
     method: "PUT",

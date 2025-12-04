@@ -1,22 +1,30 @@
-import express from "express"
+import express from "express";
 import * as usersController from "../controller/users.controller";
 import * as patientConversionController from "../controller/patient.conversion.controller";
 import { authenticate } from "../middleware/auth.middleware";
 import { requirePrivileges } from "../middleware/rbac.middleware";
 import { Privilege } from "../types/rbac.types";
 import { exit } from "process";
-import { checkAdminStatus, getAdminUsers } from "src/controller/forums.controller";
+import {
+  checkAdminStatus,
+  getAdminUsers,
+} from "src/controller/forums.controller";
 
+const router = express.Router();
 
-const router = express.Router()
+router.get("/health", (_req, res) => {
+  res.status(200).json({ status: "OK" });
+});
 
-router.get("/getAllExternalUsers",
-  //authenticate,
+router.get(
+  "/getAllExternalUsers",
+  authenticate,
   usersController.getAllExternalUsers
 );
 
-router.put("/external-to-patient/:userId",
-  //authenticate,
+router.put(
+  "/external-to-patient/:userId",
+  authenticate,
   usersController.convertExternalToPatient
 );
 
@@ -25,9 +33,7 @@ router.put("/external-to-patient/:userId",
 // ============================================
 router.get("/profile", authenticate, usersController.getProfile);
 
-router.get("/first-login/:user_id",
-  authenticate,
-  usersController.isFirstLogin);
+router.get("/first-login/:user_id", authenticate, usersController.isFirstLogin);
 
 // Get all external users (users without role-specific records)
 router.get(
@@ -60,8 +66,6 @@ router.get(
   usersController.getAllUsers
 );
 
-
-
 router.get(
   "/:id",
   authenticate,
@@ -69,16 +73,12 @@ router.get(
   usersController.getUserById
 );
 
-
-
 router.put(
   "/:id",
   authenticate,
   requirePrivileges([Privilege.UPDATE_USERS]),
   usersController.updateUser
 );
-
-
 
 router.delete(
   "/:id",

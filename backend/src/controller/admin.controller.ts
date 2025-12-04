@@ -1,7 +1,11 @@
 import { Request, Response } from "express";
-import { AdminRegistrationService, desactivateUser, getActiveUsersService } from "../service/admin.registration.service";
+import {
+  AdminRegistrationService,
+  desactivateUser,
+  getActiveUsersService,
+} from "../service/admin.registration.service";
 import { AdminSchema } from "../validators/admin.validator";
-import { ZodError } from "zod";
+import z, { ZodError } from "zod";
 import { JwtPayload } from "../types/auth.types";
 
 export const createAdmin = async (req: Request, res: Response) => {
@@ -16,7 +20,7 @@ export const createAdmin = async (req: Request, res: Response) => {
 
     let adminPayload = req.body.admin || req.body;
 
-    if (adminPayload && typeof adminPayload === 'object') {
+    if (adminPayload && typeof adminPayload === "object") {
       const { loggedUser, ...cleanPayload } = adminPayload;
       adminPayload = cleanPayload;
     }
@@ -49,17 +53,25 @@ export const createAdmin = async (req: Request, res: Response) => {
   }
 };
 
-export const desactivateUserController = async (req: Request, res: Response) => {
+export const desactivateUserController = async (
+  req: Request,
+  res: Response
+) => {
   try {
-    const sessionId = req.user!.userId; 
+    const sessionId = req.user?.userId;
+    if (!sessionId) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
 
-    const { id } = req.params;
+    const paramsSchema = z.object({
+      id: z.string().uuid(),
+    });
 
-    console.log("Desactivating user with ID:", id, "by session user ID:", sessionId);
+    const { id } = paramsSchema.parse(req.params);
+
     await desactivateUser(id, sessionId);
 
     res.status(200).json({ message: "Usuario desactivado" });
-
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
