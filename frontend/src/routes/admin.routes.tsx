@@ -21,7 +21,7 @@ const adminRoutes: RouteObject[] = [
   {
     path: "rejected-users",
     element: <RejectedUsersPage />,
-  }
+  },
   {
     path: "reestablecer-contraseña",
     element: <ResetPasswordPage />,
