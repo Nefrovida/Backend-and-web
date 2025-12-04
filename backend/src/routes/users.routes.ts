@@ -10,10 +10,15 @@ import { checkAdminStatus, getAdminUsers } from "src/controller/forums.controlle
 
 const router = express.Router()
 
-router.get("/health", (_req, res) => {
-  res.status(200).json({ status: "OK" });
-});
+router.get("/getAllExternalUsers",
+  //authenticate,
+  usersController.getAllExternalUsers
+);
 
+router.put("/external-to-patient/:userId",
+  //authenticate,
+  usersController.convertExternalToPatient
+);
 
 // ============================================
 // User Routes (Protected)

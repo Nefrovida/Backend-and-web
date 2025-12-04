@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { AdminRegistrationService } from "../service/admin.registration.service";
+import { AdminRegistrationService, desactivateUser, getActiveUsersService } from "../service/admin.registration.service";
 import { AdminSchema } from "../validators/admin.validator";
 import { ZodError } from "zod";
 import { JwtPayload } from "../types/auth.types";
@@ -46,5 +46,30 @@ export const createAdmin = async (req: Request, res: Response) => {
     res.status(status).json({
       message: error?.message ?? "Internal server error",
     });
+  }
+};
+
+export const desactivateUserController = async (req: Request, res: Response) => {
+  try {
+    const sessionId = req.user!.userId; 
+
+    const { id } = req.params;
+
+    console.log("Desactivating user with ID:", id, "by session user ID:", sessionId);
+    await desactivateUser(id, sessionId);
+
+    res.status(200).json({ message: "Usuario desactivado" });
+
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const getActiveUsers = async (req: Request, res: Response) => {
+  try {
+    const users = await getActiveUsersService();
+    res.status(200).json({ users });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
   }
 };

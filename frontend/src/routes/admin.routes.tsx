@@ -25,7 +25,8 @@ const adminRoutes: RouteObject[] = [
   {
     path: "reestablecer-contraseña",
     element: <ResetPasswordPage />,
-  }
+  },
+
 ];
 
 export default adminRoutes;
