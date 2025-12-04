@@ -185,7 +185,7 @@ export const scheduleAppointment = async (req: Request, res: Response) => {
       appointment_type: normalizedAppointmentType,
       link: null,
       place: null,
-      appointment_status: 'PROGRAMMED'
+      appointment_status: 'REQUESTED'
     });
 
     res.status(201).json({ success: true });

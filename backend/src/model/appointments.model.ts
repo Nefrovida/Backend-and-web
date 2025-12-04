@@ -278,7 +278,6 @@ export const createPatientAppointment = async (appointmentData: {
   appointment_status: 'REQUESTED' | 'PROGRAMMED' | 'FINISHED' | 'CANCELED' | 'MISSED';
 }) => {
   try {
-    console.log("appointmentData: ", appointmentData);
     const newPatientAppointment = await prisma.patient_appointment.create({
       data: appointmentData,
     });

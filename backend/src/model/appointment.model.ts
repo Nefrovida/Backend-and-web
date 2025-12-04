@@ -119,21 +119,20 @@ export default class AppointmentModel {
     date_hour: Date,
     reason: string
   ) {
-    const updated = await prisma.patient_appointment.update({
-      where: { patient_appointment_id: id },
-      data: {
-        date_hour,
-        appointment_status: "PROGRAMMED",
-      },
-      include: {
-        patient: {
-          include: {
-            user: {
-              select: {
-                name: true,
-                parent_last_name: true,
-                maternal_last_name: true,
-              },
+  const updated = await prisma.patient_appointment.update({
+    where: { patient_appointment_id: id },
+    data: {
+      date_hour, 
+      appointment_status: 'REQUESTED',
+    },
+    include: {
+      patient: {
+        include: {
+          user: {
+            select: {
+              name: true,
+              parent_last_name: true,
+              maternal_last_name: true,
             },
           },
         },
