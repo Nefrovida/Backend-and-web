@@ -24,6 +24,10 @@ import profileRoutes from "./profile.routes";
 const router = express.Router();
 
 // ============================================
+// Clinical History Routes (Protected)
+// ============================================
+router.use("/clinical-history", clinicalHistoryRoutes);
+// ============================================
 // User Routes (Protected)
 // ============================================
 router.use("/users", usersRoutes);
@@ -36,11 +40,6 @@ router.use("/auth", authRoutes);
 // Profile Routes (Protected)
 // ============================================
 router.use("/profile", profileRoutes);
-
-// ============================================
-// Clinical History Routes (Protected)
-// ============================================
-router.use("/clinical-history", clinicalHistoryRoutes);
 
 // ============================================
 // Role Routes (Protected)

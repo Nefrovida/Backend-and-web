@@ -143,7 +143,10 @@ WHERE description IN (
   'VIEW_NOTES',
   'VIEW_CLINICAL_HISTORY',
   'VIEW_MEDICAL_RECORD',
-  'VIEW_FORUM_USERS'
+  'VIEW_FORUM_USERS',
+  'CREATE_CLINICAL_HISTORY',
+  'UPDATE_CLINICAL_HISTORY',
+  'VIEW_HISTORY_QUESTIONS'
 );
 
 -- Secretaria (role_id = 6)
@@ -317,39 +320,135 @@ VALUES
 -- ❓ PREGUNTAS DE HISTORIAL CLÍNICO
 -- ========================
 
+-- ========================
+-- ❓ PREGUNTAS DE FACTOR DE RIESGO (questions_history)
+-- ========================
+
 INSERT INTO questions_history (description, type)
-VALUES 
-('¿Ha sido diagnosticado con diabetes?', 'boolean'),
-('¿Ha sido diagnosticado con hipertensión?', 'boolean'),
-('¿Tiene alergias a medicamentos?', 'text'),
-('¿Qué tipo de sangre tiene?', 'select'),
-('¿Fuma?', 'select'),
-('¿Con qué frecuencia realiza ejercicio?', 'select'),
-('¿Ha tenido cirugías previas?', 'text'),
-('¿Tiene antecedentes familiares de enfermedades cardiacas?', 'boolean');
+VALUES
+('¿Sus padres, hermanos o hermanas, padecen alguna enfermedad crónica como diabetes o hipertensión?', 'select'), -- 1
+('¿Padece diabetes mellitus?', 'select'), -- 2
+('¿Ha tenido cifras de glucosa mayor a 140 en ayunas?', 'select'), -- 3
+('¿Ha sido o actualmente está siendo tratado por presión arterial alta?', 'select'), -- 4
+('¿Ha tenido cifras de presión arterial mayores a 130/80?', 'select'), -- 5
+('¿Tiene algún familiar que padezca ERC (Enfermedad Renal Crónica)?', 'select'), -- 6
+('¿Regularmente se auto medica con analgésicos de venta libre como ibuprofeno, naproxeno, aspirinas, etc.?', 'select'), -- 7
+('¿Ha padecido de litiasis renal (piedras en los riñones)?', 'select'), -- 8
+('¿Padece sobrepeso u obesidad?', 'select'), -- 9
+('¿Consume refrescos?', 'select'), -- 10
+('¿Cuántos por semana (600 ml)?', 'select'), -- 11
+('¿Agrega sal a sus alimentos en la mesa?', 'select'), -- 12
+('¿Actualmente fuma o ha fumado en el pasado por más de diez años?', 'select'), -- 13
+('¿Ingieren frecuentemente bebidas alcohólicas (una vez a la semana)?', 'select'), -- 14
+('¿Ha padecido episodios de depresión?', 'select'); -- 15
 
 -- ========================
 -- 📋 OPCIONES DE PREGUNTAS
 -- ========================
 
+-- ========================
+-- 📌 OPCIONES DE RESPUESTA
+-- ========================
+
+-- Pregunta 1: Antecedentes familiares (Sí - ¿Cuál? - No - Lo desconoce)
 INSERT INTO options (question_id, description)
-VALUES 
-(4, 'O+'),
-(4, 'O-'),
-(4, 'A+'),
-(4, 'A-'),
-(4, 'B+'),
-(4, 'B-'),
-(4, 'AB+'),
-(4, 'AB-'),
-(5, 'Sí, diariamente'),
-(5, 'Ocasionalmente'),
-(5, 'No fumo'),
-(6, 'Diariamente'),
-(6, '3-4 veces por semana'),
-(6, '1-2 veces por semana'),
-(6, 'Raramente'),
-(6, 'Nunca');
+VALUES
+(1, 'Sí'),
+(1, 'No'),
+(1, 'Lo desconoce');
+
+-- Pregunta 2: Diabetes
+INSERT INTO options (question_id, description)
+VALUES
+(2, 'Sí'),
+(2, 'No'),
+(2, 'Lo desconoce');
+
+-- Pregunta 3: Glucosa > 140
+INSERT INTO options (question_id, description)
+VALUES
+(3, 'Sí'),
+(3, 'No'),
+(3, 'Lo desconoce');
+
+-- Pregunta 4: Tratamiento para presión alta
+INSERT INTO options (question_id, description)
+VALUES
+(4, 'Sí'),
+(4, 'No'),
+(4, 'Lo desconoce');
+
+-- Pregunta 5: Presión > 130/80
+INSERT INTO options (question_id, description)
+VALUES
+(5, 'Sí'),
+(5, 'No'),
+(5, 'Lo desconoce');
+
+-- Pregunta 6: Familiar con ERC
+INSERT INTO options (question_id, description)
+VALUES
+(6, 'Sí'),
+(6, 'No'),
+(6, 'Lo desconoce');
+
+-- Pregunta 7: Automedicación
+INSERT INTO options (question_id, description)
+VALUES
+(7, 'Sí'),
+(7, 'No'),
+(7, 'Lo desconoce');
+
+-- Pregunta 8: Litiasis renal
+INSERT INTO options (question_id, description)
+VALUES
+(8, 'Sí'),
+(8, 'No'),
+(8, 'Lo desconoce');
+
+-- Pregunta 9: Sobrepeso u obesidad
+INSERT INTO options (question_id, description)
+VALUES
+(9, 'Sí'),
+(9, 'No'),
+(9, 'Lo desconoce');
+
+-- Pregunta 10: ¿Consume refrescos?
+INSERT INTO options (question_id, description)
+VALUES
+(10, 'Sí'),
+(10, 'No');
+
+-- Pregunta 11: Cantidad de refrescos por semana
+INSERT INTO options (question_id, description)
+VALUES
+(11, '1 a 2'),
+(11, '3 a 5'),
+(11, 'Más de 5');
+
+-- Pregunta 12: Agrega sal a la comida
+INSERT INTO options (question_id, description)
+VALUES
+(12, 'Sí'),
+(12, 'No');
+
+-- Pregunta 13: ¿Fuma?
+INSERT INTO options (question_id, description)
+VALUES
+(13, 'Sí'),
+(13, 'No');
+
+-- Pregunta 14: Alcohol 1 vez por semana
+INSERT INTO options (question_id, description)
+VALUES
+(14, 'Sí'),
+(14, 'No');
+
+-- Pregunta 15: Depresión
+INSERT INTO options (question_id, description)
+VALUES
+(15, 'Sí'),
+(15, 'No');
 
 -- ========================
 -- 📝 HISTORIAL DE PACIENTES

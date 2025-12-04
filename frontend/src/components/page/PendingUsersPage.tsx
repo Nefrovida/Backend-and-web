@@ -81,9 +81,7 @@ function PendingUsersPage() {
     } finally { setLoading(false); }
   };
 
-  // ============================
-  // 🛠 Acciones
-  // ============================
+
   const handleApprove = async (userId: string, userName: string) => {
     if (!confirm(`¿Aprobar a ${userName}?`)) return;
     try {
@@ -190,9 +188,7 @@ function PendingUsersPage() {
           </div>
         )}
 
-        {/* ===================== */}
         {/* Pendientes */}
-        {/* ===================== */}
         {viewMode === "pending" && (
           pendingUsers.length === 0 ? (
             <Empty message="No hay usuarios pendientes" />
@@ -206,9 +202,7 @@ function PendingUsersPage() {
           )
         )}
 
-        {/* ===================== */}
         {/* TODOS */}
-        {/* ===================== */}
         {viewMode === "all" && (
           <>
             {/* Filtro */}
@@ -239,9 +233,7 @@ function PendingUsersPage() {
           </>
         )}
 
-        {/* ===================== */}
         {/* EXTERNOS */}
-        {/* ===================== */}
         {viewMode === "external" && (
           externalUsers.length === 0 ? (
             <Empty message="No hay usuarios externos" />
@@ -258,7 +250,6 @@ function PendingUsersPage() {
   );
 }
 
-/* ============ Componentes Reutilizables ================= */
 
 const Empty = ({ message }: { message: string }) => (
   <div className="bg-white rounded-lg shadow p-12 text-center">
