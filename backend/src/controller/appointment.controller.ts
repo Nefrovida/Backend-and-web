@@ -64,6 +64,9 @@ export default class AppointmentController {
 
       // Verificar que la fecha no sea en el pasado
       const newDate = new Date(date_hour);
+      // Subtract 6 hours to account for UTC conversion
+      newDate.setHours(newDate.getHours() - 6);
+      
       if (newDate < new Date()) {
         return res.status(400).json({
           error: "No se puede agendar en el pasado",
