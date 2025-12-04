@@ -1,8 +1,7 @@
 import { prisma } from "../util/prisma";
 
-
 export default class Agenda {
-  constructor() { }
+  constructor() {}
 
   /**
    * Secretaria (web) – Daily appointments, including patient name.
@@ -37,10 +36,10 @@ export default class Agenda {
           },
         },
       },
-            orderBy: {
-                date_hour: "asc",
-            },
-        });
+      orderBy: {
+        date_hour: "asc",
+      },
+    });
 
     // Unnest joins -> patient name
     const flattened = appointments.map((a) => {
@@ -67,7 +66,7 @@ export default class Agenda {
   /**
    * Mobile – Daily appointments, including doctor name.
    */
-  static async getAppointmentsPerDay(targetDate: string) {
+  static async getAppointmentsPerDay(targetDate: string, ) {
     const [year, month, day] = targetDate.split("-").map(Number);
 
     const start = new Date(year, month - 1, day, 0, 0, 0);
@@ -131,7 +130,7 @@ export default class Agenda {
       return {
         ...rest,
         appointment_id: appointment?.appointment_id ?? null,
-        // name: fullName || null,
+        name: fullName || null,
         doctor_name: fullName || null,
         appointment_name: appointmentName,
       };
@@ -147,6 +146,64 @@ export default class Agenda {
       data: { appointment_status: "CANCELED" },
     });
   }
+
+  /**
+   * Mobile – Cancel analysis by patient_analysis_id
+   */
+  static async cancelAnalysis(id: number) {
+    await prisma.patient_analysis.update({
+      where: { patient_analysis_id: id },
+      data: { analysis_status: "CANCELED" },
+    });
+  }
+  /**
+   * Mobile – Analysis details (card), by id.
+   */
+static async getAnalysisById(id: number) {
+  const analysis = await prisma.patient_analysis.findUnique({
+    where: {
+      patient_analysis_id: Number(id),
+    },
+    select: {
+      patient_analysis_id: true,
+      analysis_date: true,
+      place: true,
+      duration: true,
+      analysis_status: true,
+      analysis: {
+        select: {
+          analysis_id: true,
+          name: true,
+        },
+      },
+    },
+  });
+
+  if (!analysis) return null;
+
+  const {
+    analysis: nestedAnalysis,
+    analysis_date,
+    patient_analysis_id,
+    place,
+    duration,
+    analysis_status,
+  } = analysis;
+
+  const analysisName = nestedAnalysis?.name?.trim() ?? null;
+
+  return {
+    type: "ANALYSIS",
+    analysisId: nestedAnalysis?.analysis_id ?? null,
+    analysisName,
+    analysisDate: analysis_date,
+    patientAnalysisId: patient_analysis_id,
+    place,
+    duration,
+    analysisStatus: analysis_status,
+  };
+}
+
 
   /**
    * Mobile – Appointment details (card), by id.
@@ -204,8 +261,8 @@ export default class Agenda {
 
     return {
       ...rest,
+      type : "APPOINTMENT",
       appointment_id: nestedAppointment?.appointment_id ?? null,
-      name: fullName || null,
       doctor_name: fullName || null,
       appointment_name,
     };
@@ -216,8 +273,9 @@ export default class Agenda {
    */
   static async getAppointmentsInRange(startDate: string, endDate: string) {
     // Parse date components to avoid timezone issues
-    const [startYear, startMonth, startDay] = startDate.split('-').map(Number);
-    const [endYear, endMonth, endDay] = endDate.split('-').map(Number);
+    const [startYear, startMonth, startDay] = startDate.split("-").map(Number);
+    const [endYear, endMonth, endDay] = endDate.split("-").map(Number);
+
     const start = new Date(startYear, startMonth - 1, startDay);
     const end = new Date(endYear, endMonth - 1, endDay);
 
@@ -357,7 +415,7 @@ export default class Agenda {
 
   static async getDoctorAvailability(doctorId: string, date: string) {
     // Parse date components to avoid timezone issues
-    const [year, month, day] = date.split('-').map(Number);
+    const [year, month, day] = date.split("-").map(Number);
     const targetDate = new Date(year, month - 1, day); // month is 0-indexed in JS Date
     const startOfDay = new Date(year, month - 1, day, 0, 0, 0, 0);
     const endOfDay = new Date(year, month - 1, day, 23, 59, 59, 999);
@@ -397,7 +455,9 @@ export default class Agenda {
           const apptStart = new Date(appt.date_hour);
           // If duration is 45 minutes, treat it as occupying the full hour
           const effectiveDuration = appt.duration === 45 ? 60 : appt.duration;
-          const apptEnd = new Date(apptStart.getTime() + effectiveDuration * 60000);
+          const apptEnd = new Date(
+            apptStart.getTime() + effectiveDuration * 60000
+          );
           return slotTime >= apptStart && slotTime < apptEnd;
         });
 
@@ -422,13 +482,20 @@ export default class Agenda {
     appointmentType: "PRESENCIAL" | "VIRTUAL";
     place?: string;
   }) {
-    const { patientAppointmentId, doctorId, dateHour, duration, appointmentType, place } = data;
+    const {
+      patientAppointmentId,
+      doctorId,
+      dateHour,
+      duration,
+      appointmentType,
+      place,
+    } = data;
 
     const proposedStart = new Date(dateHour);
     const now = new Date();
 
     if (proposedStart <= now) {
-      throw new Error('Appointment date and time must be in the future');
+      throw new Error("Appointment date and time must be in the future");
     }
 
     const proposedEnd = new Date(proposedStart.getTime() + duration * 60000);
@@ -473,16 +540,21 @@ export default class Agenda {
     const doctorOverlaps = doctorConflicts.filter((appt) => {
       const apptStart = new Date(appt.date_hour);
       // If existing appointment is 45 min, treat it as occupying 60 min
-      const effectiveExistingDuration = appt.duration === 45 ? 60 : appt.duration;
-      const apptEnd = new Date(apptStart.getTime() + effectiveExistingDuration * 60000);
+      const effectiveExistingDuration =
+        appt.duration === 45 ? 60 : appt.duration;
+      const apptEnd = new Date(
+        apptStart.getTime() + effectiveExistingDuration * 60000
+      );
       // For checking conflicts, if the new appointment is 45 min, treat it as 60 min
       const effectiveNewDuration = duration === 45 ? 60 : duration;
-      const newEnd = new Date(proposedStart.getTime() + effectiveNewDuration * 60000);
+      const newEnd = new Date(
+        proposedStart.getTime() + effectiveNewDuration * 60000
+      );
       return proposedStart < apptEnd && newEnd > apptStart;
     });
 
     if (doctorOverlaps.length > 0) {
-      throw new Error('Doctor has a conflicting appointment at this time');
+      throw new Error("Doctor has a conflicting appointment at this time");
     }
 
     // Get the patient_appointment to check patient conflicts
@@ -491,7 +563,7 @@ export default class Agenda {
     });
 
     if (!patientAppt) {
-      throw new Error('Patient appointment not found');
+      throw new Error("Patient appointment not found");
     }
 
     // Check for conflicts with patient
@@ -510,16 +582,21 @@ export default class Agenda {
     const patientOverlaps = patientConflicts.filter((appt) => {
       const apptStart = new Date(appt.date_hour);
       // If existing appointment is 45 min, treat it as occupying 60 min
-      const effectiveExistingDuration = appt.duration === 45 ? 60 : appt.duration;
-      const apptEnd = new Date(apptStart.getTime() + effectiveExistingDuration * 60000);
+      const effectiveExistingDuration =
+        appt.duration === 45 ? 60 : appt.duration;
+      const apptEnd = new Date(
+        apptStart.getTime() + effectiveExistingDuration * 60000
+      );
       // For checking conflicts, if the new appointment is 45 min, treat it as 60 min
       const effectiveNewDuration = duration === 45 ? 60 : duration;
-      const newEnd = new Date(proposedStart.getTime() + effectiveNewDuration * 60000);
+      const newEnd = new Date(
+        proposedStart.getTime() + effectiveNewDuration * 60000
+      );
       return proposedStart < apptEnd && newEnd > apptStart;
     });
 
     if (patientOverlaps.length > 0) {
-      throw new Error('Patient has a conflicting appointment at this time');
+      throw new Error("Patient has a conflicting appointment at this time");
     }
 
     // First, get an appointment for this doctor (or create one if needed)
@@ -571,16 +648,17 @@ export default class Agenda {
     doctorId: string;
     dateHour: string;
     duration: number;
-    appointmentType: 'PRESENCIAL' | 'VIRTUAL';
+    appointmentType: "PRESENCIAL" | "VIRTUAL";
     place?: string;
   }) {
-    const { patientId, doctorId, dateHour, duration, appointmentType, place } = data;
+    const { patientId, doctorId, dateHour, duration, appointmentType, place } =
+      data;
 
     const proposedStart = new Date(dateHour);
     const now = new Date();
 
     if (proposedStart <= now) {
-      throw new Error('Appointment date and time must be in the future');
+      throw new Error("Appointment date and time must be in the future");
     }
 
     const proposedEnd = new Date(proposedStart.getTime() + duration * 60000);
@@ -602,12 +680,14 @@ export default class Agenda {
       const apptEnd = new Date(apptStart.getTime() + appt.duration * 60000);
       // For checking conflicts, if the new appointment is 45 min, treat it as 60 min
       const effectiveNewDuration = duration === 45 ? 60 : duration;
-      const newEnd = new Date(proposedStart.getTime() + effectiveNewDuration * 60000);
+      const newEnd = new Date(
+        proposedStart.getTime() + effectiveNewDuration * 60000
+      );
       return proposedStart < apptEnd && newEnd > apptStart;
     });
 
     if (doctorOverlaps.length > 0) {
-      throw new Error('Doctor has a conflicting appointment at this time');
+      throw new Error("Doctor has a conflicting appointment at this time");
     }
 
     // Check for conflicts with patient
@@ -623,16 +703,21 @@ export default class Agenda {
     const patientOverlaps = patientConflicts.filter((appt) => {
       const apptStart = new Date(appt.date_hour);
       // If existing appointment is 45 min, treat it as occupying 60 min
-      const effectiveExistingDuration = appt.duration === 45 ? 60 : appt.duration;
-      const apptEnd = new Date(apptStart.getTime() + effectiveExistingDuration * 60000);
+      const effectiveExistingDuration =
+        appt.duration === 45 ? 60 : appt.duration;
+      const apptEnd = new Date(
+        apptStart.getTime() + effectiveExistingDuration * 60000
+      );
       // For checking conflicts, if the new appointment is 45 min, treat it as 60 min
       const effectiveNewDuration = duration === 45 ? 60 : duration;
-      const newEnd = new Date(proposedStart.getTime() + effectiveNewDuration * 60000);
+      const newEnd = new Date(
+        proposedStart.getTime() + effectiveNewDuration * 60000
+      );
       return proposedStart < apptEnd && newEnd > apptStart;
     });
 
     if (patientOverlaps.length > 0) {
-      throw new Error('Patient has a conflicting appointment at this time');
+      throw new Error("Patient has a conflicting appointment at this time");
     }
 
     // Get an appointment for this doctor
@@ -643,7 +728,7 @@ export default class Agenda {
     });
 
     if (!doctorAppointment) {
-      throw new Error('No appointment type found for this doctor');
+      throw new Error("No appointment type found for this doctor");
     }
 
     // Create a new patient_appointment directly
@@ -654,8 +739,8 @@ export default class Agenda {
         date_hour: proposedStart,
         duration,
         appointment_type: appointmentType,
-        place: place || (appointmentType === 'PRESENCIAL' ? 'Consultorio' : undefined),
-        appointment_status: 'PROGRAMMED',
+        place: place || (appointmentType === "PRESENCIAL" ? "Consultorio" : undefined),
+        appointment_status: "PROGRAMMED",
       },
       include: {
         patient: {
@@ -726,4 +811,122 @@ export default class Agenda {
       };
     });
   }
+
+
+/**
+   * Mobile – Daily appointments per patient Id, including doctor name.
+   */
+static async getAppointmentsPerPatient(targetDate: string, userId: string ) {
+  const [year, month, day] = targetDate.split("-").map(Number);
+
+  const start = new Date(year, month - 1, day, 0, 0, 0);
+  const end = new Date(year, month - 1, day + 1, 0, 0, 0);
+
+  const patient = await prisma.patients.findFirst({
+    where: { user_id: userId },
+    select: { patient_id: true },
+  });
+
+  if (!patient) return [];
+
+  const patientId = patient.patient_id;
+
+  const [appointments, analysis] = await Promise.all([
+
+    prisma.patient_appointment.findMany({
+      where: {
+        patient_id: patientId,
+        date_hour: { gte: start, lt: end },
+        appointment_status: { in: ["PROGRAMMED", "REQUESTED"] },
+      },
+      select: {
+        patient_appointment_id: true,
+        patient_id: true,
+        date_hour: true,
+        duration: true,
+        link: true,
+        place: true,
+        appointment_type: true,
+        appointment_status: true,
+        appointment: {
+          select: {
+            appointment_id: true,
+            name: true,
+            doctor: {
+              select: {
+                doctor_id: true,
+                user: {
+                  select: {
+                    name: true,
+                    parent_last_name: true,
+                    maternal_last_name: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    }),
+
+    prisma.patient_analysis.findMany({
+      where: {
+        patient_id: patientId,
+        analysis_date: { gte: start, lt: end },
+        analysis_status: { in: ["PROGRAMMED", "REQUESTED"] },
+      },
+      select: {
+        patient_analysis_id: true,
+        patient_id: true,
+        analysis_date: true,
+        analysis_status: true,
+        place: true,
+        duration: true,
+        analysis: {
+          select: {
+            analysis_id: true,
+            name: true,
+          },
+        },
+      },
+    }),
+  ]);
+
+  const formattedAppointments = appointments.map(a => {
+    const doctorUser = a.appointment?.doctor?.user;
+    const fullName = [
+      doctorUser?.name,
+      doctorUser?.parent_last_name,
+      doctorUser?.maternal_last_name,
+    ].filter(Boolean).join(" ");
+
+    return {
+      type: "APPOINTMENT",
+      patient_appointment_id: a.patient_appointment_id,
+      appointment_name: a.appointment?.name,
+      doctor_name: fullName,
+      date_hour: a.date_hour,
+      place: a.place,
+      link: a.link,
+      appointment_type: a.appointment_type,
+      appointment_status: a.appointment_status,
+    };
+  });
+
+  const formattedAnalysis = analysis.map(an => ({
+    type: "ANALYSIS",
+    patientAnalysisId: an.patient_analysis_id,
+    analysisName: an.analysis?.name,
+    analysisDate: an.analysis_date,
+    place: an.place,
+    duration: an.duration,
+    analysisStatus: an.analysis_status,
+  }));
+
+  return {
+    appointments: formattedAppointments,
+    analysis: formattedAnalysis,
+  }
+}
+
 }

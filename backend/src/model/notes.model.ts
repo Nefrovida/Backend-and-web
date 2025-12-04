@@ -5,6 +5,7 @@ export default class Notes {
 
   static async createNote(data: {
     patient_id: string;
+    patient_appointment_id?: number;
     title: string;
     content: string;
     general_notes?: string;
@@ -15,6 +16,7 @@ export default class Notes {
     return await prisma.notes.create({
       data: {
         patient_id: data.patient_id,
+        patient_appointment_id: data.patient_appointment_id,
         title: data.title,
         content: data.content,
         general_notes: data.general_notes,
@@ -25,11 +27,19 @@ export default class Notes {
     });
   }
 
-  static async getNotesByPatient(page: number, patientId: string) {
+  static async getNotesByPatient(page: number, patientId: string, filterByVisibility: boolean = false) {
     const pagination = 10;
     const notes = await prisma.notes.findMany({
       where: {
         patient_id: patientId,
+        ...(filterByVisibility ? { visibility: true } : {}),
+      },
+      include: {
+        patient_appointment: {
+          include: {
+            appointment: true,
+          },
+        },
       },
       orderBy: {
         creation_date: "desc",
@@ -42,7 +52,7 @@ export default class Notes {
   }
 
   static async patientBelogsToDoctor(patientId: string, userId: string) {
-    await prisma.patient_appointment.findFirst({
+    const result = await prisma.patient_appointment.findFirst({
       where: {
         patient_id: patientId,
         appointment: {
@@ -52,5 +62,19 @@ export default class Notes {
         },
       },
     });
+    return result !== null;
+  }
+
+  static async appointmentBelongsToPatient(
+    appointmentId: number,
+    patientId: string
+  ) {
+    const result = await prisma.patient_appointment.findFirst({
+      where: {
+        patient_appointment_id: appointmentId,
+        patient_id: patientId,
+      },
+    });
+    return result !== null;
   }
 }

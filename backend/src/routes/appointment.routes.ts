@@ -1,14 +1,15 @@
-import express from 'express';
-import AppointmentController from '../controller/appointment.controller';
-import { authenticate } from '../middleware/auth.middleware';
-import { requirePrivileges } from '../middleware/rbac.middleware';
-import { Privilege } from '../types/rbac.types';
+import express from "express";
+import AppointmentController from "../controller/appointment.controller";
+import { authenticate } from "../middleware/auth.middleware";
+import { requirePrivileges } from "../middleware/rbac.middleware";
+import { Privilege } from "../types/rbac.types";
 
 const router = express.Router();
 
+
 // GET /api/appointments
 router.get(
-  '/',
+  "/",
   authenticate,
   requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
   AppointmentController.getAllAppointments
@@ -16,7 +17,7 @@ router.get(
 
 // GET /api/appointments/day/:date
 router.get(
-  '/day/:date',
+  "/day/:date",
   authenticate,
   requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
   AppointmentController.getAppointmentsByDay
@@ -24,10 +25,24 @@ router.get(
 
 // PUT /api/appointments/:id/reschedule
 router.put(
-  '/:id/reschedule',
+  "/:id/reschedule",
   authenticate,
-  requirePrivileges([Privilege.UPDATE_APPOINTMENTS]),
+  requirePrivileges([Privilege.CREATE_APPOINTMENTS]),
   AppointmentController.rescheduleAppointment
+);
+
+// GET /api/appointments/patient/get-notes
+router.get(
+  "/patient/get-notes",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_NOTES]),
+  AppointmentController.getPatientAppointment
+);
+router.delete(
+  "/:id/delete",
+  authenticate,
+  requirePrivileges([Privilege.DELETE_APPOINTMENTS]),
+  AppointmentController.deleteAppointment
 );
 
 export default router;

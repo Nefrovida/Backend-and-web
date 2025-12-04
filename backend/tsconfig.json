@@ -6,7 +6,8 @@
     "baseUrl": "./",
     "paths": {
       "@client": ["./prisma/database/prisma/client.ts"],
-      "#/*": ["*"]
+      "#/*": ["*"],
+      "src/*": ["src/*"]
     },
     "outDir": "./dist",
     "rootDir": "./",

@@ -36,21 +36,21 @@ export const DoctorSchema = z.object({
     .regex(/^\+?[1-9]\d{1,14}$/, "El teléfono debe estar en formato válido (ej: +5215511435634)")
     .optional()
     .or(z.literal("")), // Allow empty strings for optional fields
-  birthday: 
+  birthday:
     z.string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, "La fecha de nacimiento debe estar en formato YYYY-MM-DD")
-    .optional()
-    .or(z.literal("")) // Allow empty strings for optional fields
-    .refine((value) => {
-       if (!value) return true;
-       const year = parseInt(value.split("-")[0], 10);
-       return year >= 1910 && year < 2100;
+      .regex(/^\d{4}-\d{2}-\d{2}$/, "La fecha de nacimiento debe estar en formato YYYY-MM-DD")
+      .optional()
+      .or(z.literal("")) // Allow empty strings for optional fields
+      .refine((value) => {
+        if (!value) return true;
+        const year = parseInt(value.split("-")[0], 10);
+        return year >= 1910 && year < 2100;
       }, {
         message: "La fecha de nacimiento debe ser entre 1910 y 2099"
       }),
-  gender: 
+  gender:
     z.enum(["MALE", "FEMALE", "OTHER"])
-    .optional(),
+      .optional(),
   specialty: z.string()
     .min(3, "La especialidad debe tener al menos 3 caracteres")
     .max(50, "La especialidad debe tener máximo 50 caracteres")

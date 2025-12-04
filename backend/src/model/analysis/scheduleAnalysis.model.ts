@@ -79,6 +79,10 @@ class Analysis {
             };
         });
     }
+
+    static async getAnalysisCatalog(){
+        return await prisma.analysis.findMany({});
+    }
 }
 
 export default Analysis;

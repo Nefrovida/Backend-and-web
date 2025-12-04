@@ -1,18 +1,27 @@
+import { findById } from "./../model/history.model";
+import { messages } from "./../../prisma/database/prisma/client";
 // backend/src/service/forums.service.ts
-import { CreateForumInputValidated, UpdateForumInputValidated } from '../validators/forum.validator';
-import { ForumEntity } from '../types/forum.types';
-import { existsAndActive, isUserMember } from '../model/forum.model'
-import * as forumModel from '../model/forum.model';
-import { ConflictError, NotFoundError, BadRequestError } from '../util/errors.util';
+import {
+  CreateForumInputValidated,
+  UpdateForumInputValidated,
+} from "../validators/forum.validator";
+import { ForumEntity } from "../types/forum.types";
+import Forum, { existsAndActive, isUserMember } from "../model/forum.model";
+import * as forumModel from "../model/forum.model";
+import {
+  ConflictError,
+  NotFoundError,
+  BadRequestError,
+} from "../util/errors.util";
 
 /**
  * Create a new forum
- * 
+ *
  * Business logic:
  * 1. Check if a forum with the same name already exists (case-insensitive)
  * 2. Create the forum in the database
  * 3. Assign the creator (userId) to the created_by field
- * 
+ *
  * @param data - Validated forum data from the controller
  * @param userId - User ID from the JWT token (authenticated user)
  * @returns The created forum entity
@@ -28,7 +37,7 @@ export const createForum = async (
   const existingForum = await forumModel.findByName(name);
 
   if (existingForum) {
-    throw new ConflictError('A forum with this name already exists');
+    throw new ConflictError("A forum with this name already exists");
   }
 
   // Create the forum using the model layer
@@ -46,12 +55,12 @@ export const createForum = async (
 
 /**
  * Get all forums
- * 
+ *
  * Business logic:
  * 1. Retrieve all active forums from the database
  * 2. Apply pagination (default: page 1, limit 20)
  * 3. Apply filters if provided (search, public status)
- * 
+ *
  * @param page - Page number (1-indexed)
  * @param limit - Number of items per page
  * @param filters - Optional filters (search term, public status)
@@ -68,11 +77,16 @@ export const getAllForums = async (
 ): Promise<ForumEntity[]> => {
   const skip = (page - 1) * limit;
 
-  const forums = await forumModel.findAll(skip, limit, {
-    search: filters?.search,
-    isPublic: filters?.isPublic,
-    active: true,
-  }, userId);
+  const forums = await forumModel.findAll(
+    skip,
+    limit,
+    {
+      search: filters?.search,
+      isPublic: filters?.isPublic,
+      active: true,
+    },
+    userId
+  );
 
   return forums;
 };
@@ -80,7 +94,9 @@ export const getAllForums = async (
 /**
  * Get forum by id
  */
-export const getForumById = async (forumId: number): Promise<ForumEntity | null> => {
+export const getForumById = async (
+  forumId: number
+): Promise<ForumEntity | null> => {
   return await forumModel.findByIdWithCreator(forumId);
 };
 
@@ -104,14 +120,14 @@ export const updateForum = async (
   // Check if forum exists
   const existingForum = await forumModel.findById(forumId);
   if (!existingForum) {
-    throw new NotFoundError('Foro no encontrado');
+    throw new NotFoundError("Foro no encontrado");
   }
 
   // Check for duplicate name if name is being updated
   if (data.name && data.name !== existingForum.name) {
     const duplicateForum = await forumModel.findByName(data.name);
     if (duplicateForum) {
-      throw new ConflictError('Ya existe un foro con este nombre');
+      throw new ConflictError("Ya existe un foro con este nombre");
     }
   }
 
@@ -119,7 +135,6 @@ export const updateForum = async (
   const updatedForum = await forumModel.update(forumId, data);
   return updatedForum;
 };
-
 
 /**
  * Service: Reply to a message in a forum
@@ -133,42 +148,47 @@ export const replyToMessageService = async (
   // 1. Validate that the forum exists and is active
   const forumExists = await existsAndActive(forumId);
   if (!forumExists) {
-
-    throw new NotFoundError('El foro no existe o está inactivo');
+    throw new NotFoundError("El foro no existe o está inactivo");
   }
-
   // 2. Validate that the user is a member of the forum
   const isMember = await isUserMember(forumId, userId);
   if (!isMember) {
-
-    throw new BadRequestError('El usuario no es miembro del foro');
+    throw new BadRequestError("El usuario no es miembro del foro");
   }
 
   // 3. Validate that the parent message exists, is active, and belongs to the forum
   // 3. Validate that the parent message exists
   const parentMessage = await forumModel.findMessageById(parentMessageId);
   if (!parentMessage) {
-
-    throw new NotFoundError(`El mensaje padre con ID ${parentMessageId} no existe`);
+    throw new NotFoundError(
+      `El mensaje padre con ID ${parentMessageId} no existe`
+    );
   }
 
   if (!parentMessage.active) {
-
-    throw new NotFoundError('El mensaje padre ha sido eliminado o está inactivo');
+    throw new NotFoundError(
+      "El mensaje padre ha sido eliminado o está inactivo"
+    );
   }
 
   if (parentMessage.forum_id !== forumId) {
-
-    throw new BadRequestError(`El mensaje padre pertenece al foro ${parentMessage.forum_id}, no al foro actual ${forumId}`);
+    throw new BadRequestError(
+      `El mensaje padre pertenece al foro ${parentMessage.forum_id}, no al foro actual ${forumId}`
+    );
   }
 
   // 4. Create the reply
-  const reply = await forumModel.createReplyToMessage(forumId, userId, parentMessageId, content);
+  const reply = await forumModel.createReplyToMessage(
+    forumId,
+    userId,
+    parentMessageId,
+    content
+  );
 
   // 5. Transform the response to match the expected format
   return {
     success: true,
-    message: 'Respuesta creada exitosamente',
+    message: "Respuesta creada exitosamente",
     data: {
       id: reply.message_id,
       forumId: reply.forum_id,
@@ -184,13 +204,13 @@ export const replyToMessageService = async (
         name: reply.user.name,
         parentLastName: reply.user.parent_last_name,
         maternalLastName: reply.user.maternal_last_name,
-        username: reply.user.username
+        username: reply.user.username,
       },
       stats: {
         repliesCount: reply._count.messages,
-        likesCount: reply._count.likes
-      }
-    }
+        likesCount: reply._count.likes,
+      },
+    },
   };
 };
 
@@ -206,7 +226,7 @@ export const getForumMessages = async (
   // 1. Validate that the forum exists and is active
   const forum = await forumModel.findById(forumId);
   if (!forum || !forum.active) {
-    throw new NotFoundError('Foro no encontrado');
+    throw new NotFoundError("Foro no encontrado");
   }
 
   // 2. Check access rights
@@ -214,7 +234,9 @@ export const getForumMessages = async (
   if (!forum.public_status) {
     const isMember = await isUserMember(forumId, userId);
     if (!isMember) {
-      throw new BadRequestError('No tienes permiso para ver los mensajes de este foro privado');
+      throw new BadRequestError(
+        "No tienes permiso para ver los mensajes de este foro privado"
+      );
     }
   }
 
@@ -224,7 +246,7 @@ export const getForumMessages = async (
   // 4. Get messages and total count
   const [messages, totalCount] = await Promise.all([
     forumModel.findMessagesByForumId(forumId, skip, limit),
-    forumModel.countForumMessages(forumId)
+    forumModel.countForumMessages(forumId),
   ]);
 
   // 5. Calculate pagination metadata
@@ -233,7 +255,7 @@ export const getForumMessages = async (
   const hasPrevious = page > 1;
 
   // 6. Transform response
-  const formattedMessages = messages.map(msg => ({
+  const formattedMessages = messages.map((msg) => ({
     id: msg.message_id,
     forumId: msg.forum_id,
     createdBy: msg.user_id, // Map user_id to createdBy for frontend compatibility
@@ -246,12 +268,12 @@ export const getForumMessages = async (
       name: msg.user.name,
       parentLastName: msg.user.parent_last_name,
       maternalLastName: msg.user.maternal_last_name,
-      username: msg.user.username
+      username: msg.user.username,
     },
     stats: {
       repliesCount: msg._count.messages,
-      likesCount: msg._count.likes
-    }
+      likesCount: msg._count.likes,
+    },
   }));
 
   return formattedMessages;
@@ -270,25 +292,27 @@ export const getMessageReplies = async (
   // 1. Validate that the forum exists and is active
   const forum = await forumModel.findById(forumId);
   if (!forum || !forum.active) {
-    throw new NotFoundError('Foro no encontrado');
+    throw new NotFoundError("Foro no encontrado");
   }
 
   // 2. Check access rights
   if (!forum.public_status) {
     const isMember = await isUserMember(forumId, userId);
     if (!isMember) {
-      throw new BadRequestError('No tienes permiso para ver los mensajes de este foro privado');
+      throw new BadRequestError(
+        "No tienes permiso para ver los mensajes de este foro privado"
+      );
     }
   }
 
   // 3. Validate parent message
   const parentMessage = await forumModel.findMessageById(messageId);
   if (!parentMessage || !parentMessage.active) {
-    throw new NotFoundError('Mensaje no encontrado');
+    throw new NotFoundError("Mensaje no encontrado");
   }
 
   if (parentMessage.forum_id !== forumId) {
-    throw new BadRequestError('El mensaje no pertenece al foro especificado');
+    throw new BadRequestError("El mensaje no pertenece al foro especificado");
   }
 
   // 4. Calculate pagination
@@ -296,8 +320,8 @@ export const getMessageReplies = async (
 
   // 5. Get replies and total count
   const [replies, totalCount] = await Promise.all([
-    forumModel.findRepliesByMessageId(messageId, skip, limit),
-    forumModel.countReplies(messageId)
+    forumModel.findRepliesByMessageId(messageId, skip, limit, userId),
+    forumModel.countReplies(messageId),
   ]);
 
   // 6. Calculate pagination metadata
@@ -306,12 +330,13 @@ export const getMessageReplies = async (
   const hasPrevious = page > 1;
 
   // 7. Transform response
-  const formattedReplies = replies.map(reply => ({
+  const formattedReplies = replies.map((reply) => ({
     id: reply.message_id,
     forumId: reply.forum_id,
     createdBy: reply.user_id,
     userId: reply.user_id,
     content: reply.content,
+    liked: reply.likes.length > 0 ? 1 : 0,
     createdAt: reply.publication_timestamp,
     publicationTimestamp: reply.publication_timestamp,
     parentMessageId: reply.parent_message_id,
@@ -320,12 +345,12 @@ export const getMessageReplies = async (
       name: reply.user.name,
       parentLastName: reply.user.parent_last_name,
       maternalLastName: reply.user.maternal_last_name,
-      username: reply.user.username
+      username: reply.user.username,
     },
     stats: {
       repliesCount: reply._count.messages,
-      likesCount: reply._count.likes
-    }
+      likesCount: reply._count.likes,
+    },
   }));
 
   return {
@@ -336,7 +361,56 @@ export const getMessageReplies = async (
       totalRecords: totalCount,
       totalPages,
       hasNext,
-      hasPrevious
-    }
+      hasPrevious,
+    },
+  };
+};
+
+export const getMessage = async (messageId: number) => {
+  return await Forum.getMessage(messageId);
+};
+
+/**
+ * Delete a message from a forum (Admin only)
+ *
+ * Business logic:
+ * 1. Validate that the message exists and is active
+ * 2. Validate that the user is an admin (role_id = 1)
+ * 3. Soft delete the message (set active to false)
+ *
+ * @param messageId - ID of the message to delete
+ * @param userId - User ID from the JWT token
+ * @throws NotFoundError if message doesn't exist or is already inactive
+ * @throws BadRequestError if user is not an admin
+ */
+export const deleteMessage = async (messageId: number, userId: string) => {
+  // 1. Validate that the message exists and is active
+  const message = await forumModel.findMessageById(messageId);
+  if (!message) {
+    throw new NotFoundError("Mensaje no encontrado");
+  }
+
+  if (!message.active) {
+    throw new NotFoundError("El mensaje ya ha sido eliminado");
+  }
+
+  // 2. Validate that the user is an admin
+  const isAdmin = await forumModel.isUserAdmin(userId);
+  if (!isAdmin) {
+    throw new BadRequestError(
+      "Solo los administradores pueden eliminar mensajes"
+    );
+  }
+
+  // 3. Soft delete the message
+  await forumModel.softDeleteMessage(messageId);
+
+  return {
+    success: true,
+    message: "Mensaje eliminado exitosamente",
+    data: {
+      message_id: messageId,
+      deleted_at: new Date(),
+    },
   };
 };

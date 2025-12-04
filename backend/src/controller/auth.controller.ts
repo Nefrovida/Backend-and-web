@@ -9,7 +9,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   try {
     const loginData: LoginRequest = req.body;
     const result = await authService.login(loginData);
-    
+
     // Set tokens in httpOnly cookies
     res.cookie('accessToken', result.accessToken, {
       httpOnly: true,
@@ -17,14 +17,59 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       sameSite: 'strict',
       maxAge: 24 * 60 * 60 * 1000 // 24 hours
     });
-    
+
     res.cookie('refreshToken', result.refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
-    
+
+    // Return only user data, not tokens by default
+    // Mobile/native clients can request tokens in the JSON response by
+    // sending the header 'x-return-tokens: true' or query param 'returnTokens=true'
+    const returnTokensHeader = String(req.headers['x-return-tokens'] || '').toLowerCase() === 'true';
+    const returnTokensQuery = String(req.query.returnTokens || '').toLowerCase() === 'true';
+
+    if (returnTokensHeader || returnTokensQuery) {
+      res.status(200).json({ user: result.user, accessToken: result.accessToken, refreshToken: result.refreshToken });
+      return;
+    }
+
+    res.status(200).json({ user: result.user });
+  } catch (error: any) {
+    res.status(error.statusCode || 500).json({ error: error.message });
+  }
+};
+
+/**
+ * Login controller
+ */
+export const loginMobile = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const loginData: LoginRequest = req.body;
+    const result = await authService.login(loginData);
+
+    if (result.user.role_id !== 3) {
+      res.status(404).json({ error: "Usuario no válido" });
+      return;
+    }
+
+    // Set tokens in httpOnly cookies
+    res.cookie('accessToken', result.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    });
+
+    res.cookie('refreshToken', result.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
+
     // Return only user data, not tokens by default
     // Mobile/native clients can request tokens in the JSON response by
     // sending the header 'x-return-tokens: true' or query param 'returnTokens=true'
@@ -49,7 +94,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
   try {
     const registerData: RegisterRequest = req.body;
     const result = await authService.register(registerData);
-    
+
     // Set tokens in httpOnly cookies
     res.cookie('accessToken', result.accessToken, {
       httpOnly: true,
@@ -57,14 +102,14 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
       maxAge: 24 * 60 * 60 * 1000 // 24 hours
     });
-    
+
     res.cookie('refreshToken', result.refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
-    
+
     // Return only user data, not tokens by default
     // Mobile/native clients can request tokens in the JSON response by
     // sending the header 'x-return-tokens: true' or query param 'returnTokens=true'
@@ -97,14 +142,14 @@ export const refreshToken = async (req: Request, res: Response): Promise<void> =
         refreshTokenFromCookie = authHeader.substring(7);
       }
     }
-    
+
     if (!refreshTokenFromCookie) {
       res.status(401).json({ error: 'No refresh token provided' });
       return;
     }
 
     const result = await authService.refreshAccessToken(refreshTokenFromCookie);
-    
+
     // Update accessToken cookie
     res.cookie('accessToken', result.accessToken, {
       httpOnly: true,
@@ -112,7 +157,7 @@ export const refreshToken = async (req: Request, res: Response): Promise<void> =
       sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
       maxAge: 24 * 60 * 60 * 1000 // 24 hours
     });
-    
+
     res.status(200).json({ user: result.user });
   } catch (error: any) {
     res.status(error.statusCode || 500).json({ error: error.message });
@@ -129,12 +174,33 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
     secure: process.env.NODE_ENV === 'production',
     sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax'
   });
-  
+
   res.clearCookie('refreshToken', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax'
   });
-  
+
   res.status(200).json({ message: 'Logged out successfully' });
+};
+
+/**
+ * Forgot password controller
+ */
+export const forgotPassword = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { username } = req.body;
+
+    if (!username) {
+      res.status(400).json({ error: "Username is required" });
+      return;
+    }
+
+    await authService.forgotPassword(username);
+
+    // Always return success to prevent user enumeration
+    res.status(200).json({ message: "If the user exists, a password reset request has been sent to the administrators." });
+  } catch (error: any) {
+    res.status(error.statusCode || 500).json({ error: error.message });
+  }
 };

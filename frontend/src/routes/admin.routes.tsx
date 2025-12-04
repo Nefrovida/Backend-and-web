@@ -1,10 +1,15 @@
 import { RouteObject } from "react-router-dom";
-import RegisterDoctorPage from "../components/page/RegisterDoctorpage";
+import RegisterAdminPage from "../components/page/RegisterAdminPage";
+import ResetPasswordPage from "../components/page/ResetPasswordPage";
 
 const adminRoutes: RouteObject[] = [
   {
-    path: "register-doctor",
-    element: <RegisterDoctorPage />,
+    path: "registrar-admin",
+    element: <RegisterAdminPage />,
+  },
+  {
+    path: "reestablecer-contraseña",
+    element: <ResetPasswordPage />,
   },
 ];
 

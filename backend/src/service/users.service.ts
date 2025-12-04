@@ -1,12 +1,16 @@
 import { prisma } from '../util/prisma.js';
+import { hashPassword } from '../util/password.util';
 import { UserWithRoleAndPrivileges, UpdateUserRequest } from '../types/user.types';
 import { NotFoundError } from '../util/errors.util';
 
 /**
  * Get all users with their roles and privileges
  */
-export const getAllUsers = async (): Promise<UserWithRoleAndPrivileges[]> => {
+export const getAllUsers = async (onlyRequestedReset: boolean = false): Promise<UserWithRoleAndPrivileges[]> => {
+  const whereClause = onlyRequestedReset ? { password_reset_requested: true } : {};
+
   return await prisma.users.findMany({
+    where: whereClause,
     include: {
       role: {
         include: {
@@ -121,3 +125,41 @@ export const getUserByUsername = async (username: string): Promise<UserWithRoleA
   });
 };
 
+/**
+ * Get user first login status by user Id
+ */
+export const isFirstLogin = async (userId: string): Promise<boolean> => {
+  const user = await prisma.users.findUnique({
+    where: { user_id: userId },
+    select: { first_login: true },
+  });
+
+  if (!user) {
+    throw new NotFoundError('User not found');
+  }
+
+  return user.first_login;
+}
+
+/**
+ * Reset user password
+ */
+export const resetPassword = async (userId: string, newPassword: string): Promise<void> => {
+  const user = await prisma.users.findUnique({
+    where: { user_id: userId },
+  });
+
+  if (!user) {
+    throw new NotFoundError('User not found');
+  }
+
+  const hashedPassword = await hashPassword(newPassword);
+
+  await prisma.users.update({
+    where: { user_id: userId },
+    data: {
+      password: hashedPassword,
+      password_reset_requested: false
+    },
+  });
+};

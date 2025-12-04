@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import * as notesService from "../../service/notes.service";
 import z from "zod";
+import { prisma } from "../../util/prisma";
 
 async function getPatientNotes(req: Request, res: Response) {
   try {
@@ -41,7 +42,21 @@ async function getPatientNotes(req: Request, res: Response) {
       patientId as string
     );
 
-    return res.status(200).json(notes || []);
+    // Verificar si el usuario autenticado es el paciente consultando sus propias notas
+    const userPatient = await prisma.patients.findFirst({
+      where: {
+        user_id: req.user.userId,
+        patient_id: patientId,
+      },
+    });
+
+    // Si es un paciente consultando sus propias notas, filtrar por visibilidad
+    let filteredNotes = notes;
+    if (userPatient) {
+      filteredNotes = notes.filter(note => note.visibility === true);
+    }
+
+    return res.status(200).json(filteredNotes || []);
   } catch (error) {
     console.error("Error fetching notes:", error);
     return res.status(500).json({
