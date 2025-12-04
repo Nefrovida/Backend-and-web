@@ -11,12 +11,12 @@ import { checkAdminStatus, getAdminUsers } from "src/controller/forums.controlle
 const router = express.Router()
 
 router.get("/getAllExternalUsers",
-  //authenticate,
+  authenticate,
   usersController.getAllExternalUsers
 );
 
 router.put("/external-to-patient/:userId",
-  //authenticate,
+  authenticate,
   usersController.convertExternalToPatient
 );
 
