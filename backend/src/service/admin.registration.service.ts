@@ -1,4 +1,5 @@
 import { createUser, IUser } from "../model/doctor.model";
+import Admin from "../model/admin.model";
 
 type RegisterAdminInput = {
   name: string;
@@ -40,4 +41,18 @@ export const AdminRegistrationService = {
     const { password, ...safeUser } = user;
     return { account: safeUser };
   },
+};
+
+export const desactivateUser = async (id: string, sessionUserId: string) => {
+  const role = await Admin.AdminRole(sessionUserId);
+
+  if (!role) {
+    throw new Error("Only admins can deactivate users");
+  }
+
+  return await Admin.desactivateUser(id);
+};
+
+export const getActiveUsersService = async () => {
+  return await Admin.getActiveUsers();
 };

@@ -29,3 +29,78 @@ export const registerAdmin = async (
 
     return response.json();
 };
+
+export const getAllUsers = async () => {
+    const response = await fetch(`${API_URL}/admins/Allusers`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        const err = new Error(error.message || "Failed to fetch users");
+        (err as any).response = {
+            data: error,
+            status: response.status,
+        };
+        throw err;
+    }
+
+    const data = await response.json();
+    return data.users; 
+};
+
+export const deleteUser = async (userId: string) => {
+  const response = await fetch(`${API_URL}/admins/desactivate/${userId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    const err = new Error(error.message || "Failed to deactivate user");
+    (err as any).response = {
+      data: error,
+      status: response.status,
+    };
+    throw err;
+  }
+};
+
+export const getExternalUsers = async () => {
+  const response = await fetch(`${API_URL}/users/getAllExternalUsers`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include"
+  });
+
+  const data = await response.json();
+  if (!response.ok) throw new Error(data?.message || "Error al cargar externos");
+
+  return data; 
+};
+
+export const convertExternalToPatient = async (userId: string) => {
+  const response = await fetch(`${API_URL}/users/external-to-patient/${userId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include"
+  });
+
+  const data = await response.json().catch(() => null);
+  if (!response.ok) throw new Error(data?.message || "Error al convertir usuario externo");
+};
+
+export type User = {
+  user_id: string;
+  name: string;
+  parent_last_name: string;
+  maternal_last_name: string | null;
+  username: string;
+  phone_number: string;
+  active: boolean;  
+  user_status: string; 
+  role_id: number; 
+};

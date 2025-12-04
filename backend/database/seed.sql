@@ -67,7 +67,9 @@ VALUES
 ('VIEW_FORUM_USERS'),
 ('UPDATE_NOTES'),
 ('DELETE_NOTES'),
-('CREATE_ADMIN');
+('CREATE_ADMIN'),
+('APPROVE_USERS'),
+('PASS_PATTIENTS');
 
 -- ========================
 -- 🧩 ROLES - PRIVILEGIOS
@@ -142,7 +144,10 @@ WHERE description IN (
   'VIEW_NOTES',
   'VIEW_CLINICAL_HISTORY',
   'VIEW_MEDICAL_RECORD',
-  'VIEW_FORUM_USERS'
+  'VIEW_FORUM_USERS',
+  'CREATE_CLINICAL_HISTORY',
+  'UPDATE_CLINICAL_HISTORY',
+  'VIEW_HISTORY_QUESTIONS'
 );
 
 -- Secretaria (role_id = 6)
@@ -168,41 +173,41 @@ WHERE description IN (
 -- ========================
 
 -- Admin
-INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
+INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, user_status, first_login, role_id)
 VALUES 
-('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Carlos', 'Ramírez', 'González', true, '7711234567', 'testAdmin1', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1985-03-15', 'MALE', false, 1);
+('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Carlos', 'Ramírez', 'González', true, '7711234567', 'testAdmin1', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1985-03-15', 'MALE', 'APPROVED', false, 1);
 
 -- Doctores
-INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
+INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, user_status, first_login, role_id)
 VALUES 
-('b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22', 'María', 'López', 'Hernández', true, '7712345678', 'testDoctor1', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1980-06-20', 'FEMALE', false, 2),
-('b2eebc99-9c0b-4ef8-bb6d-6bb9bd380a33', 'José', 'García', 'Martínez', true, '7713456789', 'testDoctor2', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1975-11-10', 'MALE', false, 2),
-('b3eebc99-9c0b-4ef8-bb6d-6bb9bd380a44', 'Ana', 'Rodríguez', 'Sánchez', true, '7714567890', 'testDoctor3', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1988-02-28', 'FEMALE', false, 2);
+('b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22', 'María', 'López', 'Hernández', true, '7712345678', 'testDoctor1', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1980-06-20', 'FEMALE', 'APPROVED', false, 2),
+('b2eebc99-9c0b-4ef8-bb6d-6bb9bd380a33', 'José', 'García', 'Martínez', true, '7713456789', 'testDoctor2', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1975-11-10', 'MALE', 'APPROVED', false, 2),
+('b3eebc99-9c0b-4ef8-bb6d-6bb9bd380a44', 'Ana', 'Rodríguez', 'Sánchez', true, '7714567890', 'testDoctor3', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1988-02-28', 'FEMALE', 'APPROVED', false, 2);
 
 -- Pacientes
-INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
+INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, user_status, first_login, role_id)
 VALUES 
-('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'Pedro', 'Fernández', 'Morales', true, '7715678901', 'testPaciente1', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1990-05-12', 'MALE', false, 3),
-('c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', 'Laura', 'Martínez', 'Cruz', true, '7716789012', 'testPaciente2', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1995-08-25', 'FEMALE', false, 3),
-('c3eebc99-9c0b-4ef8-bb6d-6bb9bd380a77', 'Roberto', 'Sánchez', 'Flores', true, '7717890123', 'testPaciente3', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1982-12-05', 'MALE', false, 3),
-('c4eebc99-9c0b-4ef8-bb6d-6bb9bd380a88', 'Sofia', 'Torres', 'Ramírez', true, '7718901234', 'testPaciente4', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '2000-01-30', 'FEMALE', true, 3);
+('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'Pedro', 'Fernández', 'Morales', true, '7715678901', 'testPaciente1', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1990-05-12', 'MALE', 'APPROVED', false, 3),
+('c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', 'Laura', 'Martínez', 'Cruz', true, '7716789012', 'testPaciente2', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1995-08-25', 'FEMALE', 'APPROVED', false, 3),
+('c3eebc99-9c0b-4ef8-bb6d-6bb9bd380a77', 'Roberto', 'Sánchez', 'Flores', true, '7717890123', 'testPaciente3', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1982-12-05', 'MALE', 'APPROVED', false, 3),
+('c4eebc99-9c0b-4ef8-bb6d-6bb9bd380a88', 'Sofia', 'Torres', 'Ramírez', true, '7718901234', 'testPaciente4', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '2000-01-30', 'FEMALE', 'APPROVED', true, 3);
 
 -- Laboratoristas
-INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
+INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, user_status, first_login, role_id)
 VALUES 
-('d1eebc99-9c0b-4ef8-bb6d-6bb9bd380a99', 'Luis', 'Méndez', 'Castro', true, '7719012345', 'testLaboratorista1', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1987-07-18', 'MALE', false, 4),
-('d2eebc99-9c0b-4ef8-bb6d-6bb9bd380aaa', 'Carmen', 'Vargas', 'Ortiz', true, '7710123456', 'testLaboratorista2', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1992-04-22', 'FEMALE', false, 4);
+('d1eebc99-9c0b-4ef8-bb6d-6bb9bd380a99', 'Luis', 'Méndez', 'Castro', true, '7719012345', 'testLaboratorista1', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1987-07-18', 'MALE', 'APPROVED', false, 4),
+('d2eebc99-9c0b-4ef8-bb6d-6bb9bd380aaa', 'Carmen', 'Vargas', 'Ortiz', true, '7710123456', 'testLaboratorista2', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1992-04-22', 'FEMALE', 'APPROVED', false, 4);
 
 -- Familiares
-INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
+INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, user_status, first_login, role_id)
 VALUES 
-('e1eebc99-9c0b-4ef8-bb6d-6bb9bd380bbb', 'Juan', 'Fernández', 'López', true, '7721234567', 'testFamiliar1', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1988-09-15', 'MALE', false, 5),
-('e2eebc99-9c0b-4ef8-bb6d-6bb9bd380ccc', 'Patricia', 'Martínez', 'Díaz', true, '7722345678', 'testFamiliar2', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1993-11-20', 'FEMALE', false, 5);
+('e1eebc99-9c0b-4ef8-bb6d-6bb9bd380bbb', 'Juan', 'Fernández', 'López', true, '7721234567', 'testFamiliar1', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1988-09-15', 'MALE', 'APPROVED', false, 5),
+('e2eebc99-9c0b-4ef8-bb6d-6bb9bd380ccc', 'Patricia', 'Martínez', 'Díaz', true, '7722345678', 'testFamiliar2', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1993-11-20', 'FEMALE', 'APPROVED', false, 5);
 
 -- Secretaria
-INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
+INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, user_status, first_login, role_id)
 VALUES 
-('f1eebc99-9c0b-4ef8-bb6d-6bb9bd380ddd', 'Rosa', 'Jiménez', 'Ruiz', true, '7723456789', 'testSecretaria1', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1991-03-08', 'FEMALE', false, 6);
+('f1eebc99-9c0b-4ef8-bb6d-6bb9bd380ddd', 'Rosa', 'Jiménez', 'Ruiz', true, '7723456789', 'testSecretaria1', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1991-03-08', 'FEMALE', 'APPROVED', false, 6);
 
 -- ========================
 -- 🩺 DOCTORES
@@ -316,39 +321,135 @@ VALUES
 -- ❓ PREGUNTAS DE HISTORIAL CLÍNICO
 -- ========================
 
+-- ========================
+-- ❓ PREGUNTAS DE FACTOR DE RIESGO (questions_history)
+-- ========================
+
 INSERT INTO questions_history (description, type)
-VALUES 
-('¿Ha sido diagnosticado con diabetes?', 'boolean'),
-('¿Ha sido diagnosticado con hipertensión?', 'boolean'),
-('¿Tiene alergias a medicamentos?', 'text'),
-('¿Qué tipo de sangre tiene?', 'select'),
-('¿Fuma?', 'select'),
-('¿Con qué frecuencia realiza ejercicio?', 'select'),
-('¿Ha tenido cirugías previas?', 'text'),
-('¿Tiene antecedentes familiares de enfermedades cardiacas?', 'boolean');
+VALUES
+('¿Sus padres, hermanos o hermanas, padecen alguna enfermedad crónica como diabetes o hipertensión?', 'select'), -- 1
+('¿Padece diabetes mellitus?', 'select'), -- 2
+('¿Ha tenido cifras de glucosa mayor a 140 en ayunas?', 'select'), -- 3
+('¿Ha sido o actualmente está siendo tratado por presión arterial alta?', 'select'), -- 4
+('¿Ha tenido cifras de presión arterial mayores a 130/80?', 'select'), -- 5
+('¿Tiene algún familiar que padezca ERC (Enfermedad Renal Crónica)?', 'select'), -- 6
+('¿Regularmente se auto medica con analgésicos de venta libre como ibuprofeno, naproxeno, aspirinas, etc.?', 'select'), -- 7
+('¿Ha padecido de litiasis renal (piedras en los riñones)?', 'select'), -- 8
+('¿Padece sobrepeso u obesidad?', 'select'), -- 9
+('¿Consume refrescos?', 'select'), -- 10
+('¿Cuántos por semana (600 ml)?', 'select'), -- 11
+('¿Agrega sal a sus alimentos en la mesa?', 'select'), -- 12
+('¿Actualmente fuma o ha fumado en el pasado por más de diez años?', 'select'), -- 13
+('¿Ingieren frecuentemente bebidas alcohólicas (una vez a la semana)?', 'select'), -- 14
+('¿Ha padecido episodios de depresión?', 'select'); -- 15
 
 -- ========================
 -- 📋 OPCIONES DE PREGUNTAS
 -- ========================
 
+-- ========================
+-- 📌 OPCIONES DE RESPUESTA
+-- ========================
+
+-- Pregunta 1: Antecedentes familiares (Sí - ¿Cuál? - No - Lo desconoce)
 INSERT INTO options (question_id, description)
-VALUES 
-(4, 'O+'),
-(4, 'O-'),
-(4, 'A+'),
-(4, 'A-'),
-(4, 'B+'),
-(4, 'B-'),
-(4, 'AB+'),
-(4, 'AB-'),
-(5, 'Sí, diariamente'),
-(5, 'Ocasionalmente'),
-(5, 'No fumo'),
-(6, 'Diariamente'),
-(6, '3-4 veces por semana'),
-(6, '1-2 veces por semana'),
-(6, 'Raramente'),
-(6, 'Nunca');
+VALUES
+(1, 'Sí'),
+(1, 'No'),
+(1, 'Lo desconoce');
+
+-- Pregunta 2: Diabetes
+INSERT INTO options (question_id, description)
+VALUES
+(2, 'Sí'),
+(2, 'No'),
+(2, 'Lo desconoce');
+
+-- Pregunta 3: Glucosa > 140
+INSERT INTO options (question_id, description)
+VALUES
+(3, 'Sí'),
+(3, 'No'),
+(3, 'Lo desconoce');
+
+-- Pregunta 4: Tratamiento para presión alta
+INSERT INTO options (question_id, description)
+VALUES
+(4, 'Sí'),
+(4, 'No'),
+(4, 'Lo desconoce');
+
+-- Pregunta 5: Presión > 130/80
+INSERT INTO options (question_id, description)
+VALUES
+(5, 'Sí'),
+(5, 'No'),
+(5, 'Lo desconoce');
+
+-- Pregunta 6: Familiar con ERC
+INSERT INTO options (question_id, description)
+VALUES
+(6, 'Sí'),
+(6, 'No'),
+(6, 'Lo desconoce');
+
+-- Pregunta 7: Automedicación
+INSERT INTO options (question_id, description)
+VALUES
+(7, 'Sí'),
+(7, 'No'),
+(7, 'Lo desconoce');
+
+-- Pregunta 8: Litiasis renal
+INSERT INTO options (question_id, description)
+VALUES
+(8, 'Sí'),
+(8, 'No'),
+(8, 'Lo desconoce');
+
+-- Pregunta 9: Sobrepeso u obesidad
+INSERT INTO options (question_id, description)
+VALUES
+(9, 'Sí'),
+(9, 'No'),
+(9, 'Lo desconoce');
+
+-- Pregunta 10: ¿Consume refrescos?
+INSERT INTO options (question_id, description)
+VALUES
+(10, 'Sí'),
+(10, 'No');
+
+-- Pregunta 11: Cantidad de refrescos por semana
+INSERT INTO options (question_id, description)
+VALUES
+(11, '1 a 2'),
+(11, '3 a 5'),
+(11, 'Más de 5');
+
+-- Pregunta 12: Agrega sal a la comida
+INSERT INTO options (question_id, description)
+VALUES
+(12, 'Sí'),
+(12, 'No');
+
+-- Pregunta 13: ¿Fuma?
+INSERT INTO options (question_id, description)
+VALUES
+(13, 'Sí'),
+(13, 'No');
+
+-- Pregunta 14: Alcohol 1 vez por semana
+INSERT INTO options (question_id, description)
+VALUES
+(14, 'Sí'),
+(14, 'No');
+
+-- Pregunta 15: Depresión
+INSERT INTO options (question_id, description)
+VALUES
+(15, 'Sí'),
+(15, 'No');
 
 -- ========================
 -- 📝 HISTORIAL DE PACIENTES

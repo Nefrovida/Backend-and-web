@@ -29,3 +29,11 @@ export const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*\d)(?=.*[#?!@$%^&*\-]).{8,}$/;
 
 // Bcrypt salt rounds: can be overridden by env var BCRYPT_ROUNDS
 export const BCRYPT_SALT_ROUNDS = Number(process.env.BCRYPT_ROUNDS) || 10;
+
+/**
+ * Re-export the UserStatus enum for tracking user approval state.
+ * PENDING - User registered but awaiting admin approval
+ * APPROVED - User has been approved by an admin and can access the platform
+ * REJECTED - User registration was rejected by an admin
+ */
+export { UserStatus } from '@prisma/client';

@@ -74,6 +74,67 @@ export const getProfile = async (req: Request, res: Response): Promise<void> => 
 };
 
 /**
+ * Get all pending users (awaiting approval)
+ */
+export const getPendingUsers = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const pendingUsers = await usersService.getPendingUsers();
+    res.status(200).json(pendingUsers);
+  } catch (error: any) {
+    res.status(error.statusCode || 500).json({ error: error.message });
+  }
+};
+
+/**
+ * Get all rejected users
+ */
+export const getRejectedUsers = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const rejectedUsers = await usersService.getRejectedUsers();
+    res.status(200).json(rejectedUsers);
+  } catch (error: any) {
+    res.status(error.statusCode || 500).json({ error: error.message });
+  }
+};
+
+/**
+ * Approve a user
+ */
+export const approveUser = async (req: Request, res: Response): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    const { id } = req.params;
+    const approvedUser = await usersService.approveUser(id, req.user.userId);
+    res.status(200).json({
+      message: 'User approved successfully',
+      user: approvedUser
+    });
+  } catch (error: any) {
+    res.status(error.statusCode || 500).json({ error: error.message });
+  }
+};
+
+/**
+ * Reject a user
+ */
+export const rejectUser = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const rejectedUser = await usersService.rejectUser(id);
+    res.status(200).json({
+      message: 'User rejected successfully',
+      user: rejectedUser
+    });
+  } catch (error: any) {
+    res.status(error.statusCode || 500).json({ error: error.message });
+  }
+};
+
+/**
  * Get first login status
  */
 export const isFirstLogin = async (req: Request, res: Response): Promise<void> => {
@@ -135,5 +196,39 @@ export const reportUser = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error reporting user:", error);
     return res.status(500).json({ message: "Error interno del servidor" });
+  }
+};
+/**
+ * Get all external users
+ */
+export const getAllExternalUsers = async (req: Request, res: Response) => {
+  try {
+    const externalUsers = await usersService.getAllExternalUsers();
+    res.status(200).json(externalUsers);
+  } catch (error: any) {
+    res.status(error.statusCode || 500).json({ error: error.message });
+  }
+};
+
+/**
+ * Convert external user to patient
+ * @param userId
+ */
+export const convertExternalToPatient = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+
+    if (!userId) {
+      res.status(400).json({ error: 'User ID is required' });
+      return;
+    }
+
+    const patient = await usersService.convertExternalToPatient(userId);
+    res.status(200).json({
+      message: 'User converted to patient successfully',
+      patient
+    });
+  } catch (error: any) {
+    res.status(error.statusCode || 500).json({ error: error.message });
   }
 };

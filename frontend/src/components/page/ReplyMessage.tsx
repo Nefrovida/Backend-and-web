@@ -1,6 +1,6 @@
-import { Reply, SimpleMessage } from "@/types/forum.types";
+import { Reply, Message } from "@/types/forum.types";
 import React, { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import Title from "../atoms/Title";
 import ParentMessage from "../molecules/forum/ParentMessage";
 import useInfiniteScroll from "@/hooks/useInfiniteScroll";
@@ -13,9 +13,10 @@ import Loading from "../molecules/Loading";
 
 const ReplyMessage = () => {
   const { messageId, forumId } = useParams();
-  const [parentMessage, setParentMessage] = useState<SimpleMessage | null>(
-    null
-  );
+  const location = useLocation();
+  const locationState = location.state as { authorName?: string } | null;
+
+  const [parentMessage, setParentMessage] = useState<Message | null>(null);
   const [refresh, setRefresh] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedReplyId, setSelectedReplyId] = useState<number | null>(null);
@@ -31,27 +32,36 @@ const ReplyMessage = () => {
     (page: number) => {
       const params = new URLSearchParams();
       params.append("page", page.toString());
-
       return params.toString();
     }
   );
 
   useEffect(() => {
+    if (!messageId) return;
+
     fetch(`/api/forums/message/${messageId}`)
       .then((res) => res.json())
       .then((data) => {
-        setParentMessage({
+        const authorName =
+          locationState?.authorName || data.user.username || "Usuario";
+
+        const parent: Message = {
           messageId: data.message_id,
-          forumId: data.forum_id,
           content: data.content,
-          user: {
-            userId: data.user.user_id,
-            userName: data.user.username,
+          likes: 0,
+          liked: 0,
+          replies: 0,
+          forums: {
+            forumId: data.forum_id,
+            name: "",
           },
-        } as SimpleMessage);
+          userName: authorName,
+        };
+
+        setParentMessage(parent);
       })
       .catch((e) => console.log("error", e));
-  }, [forumId, messageId]);
+  }, [forumId, messageId, locationState]);
 
   const handleDeleteReply = (replyId: number) => {
     setSelectedReplyId(replyId);
@@ -64,20 +74,18 @@ const ReplyMessage = () => {
       setDeleteError("");
       await forumsService.deleteReply(replyId);
 
-      // Remove reply from list
-      results.splice(
-        results.findIndex((r) => r.id === replyId),
-        1
-      );
+      const idx = results.findIndex((r) => r.id === replyId);
+      if (idx !== -1) {
+        results.splice(idx, 1);
+      }
 
-      // Close modal and show success
       setIsDeleteModalOpen(false);
       setSelectedReplyId(null);
       setToast({
         message: "Respuesta eliminada exitosamente",
         type: "success",
       });
-    } catch (err) {
+    } catch (err: any) {
       setDeleteError(err.message || "Error al eliminar la respuesta");
       console.error("Error deleting reply:", err);
     }
@@ -91,15 +99,19 @@ const ReplyMessage = () => {
 
   return (
     <>
-      <div>
+      <div className="flex flex-col gap-4 pb-24">
         <Link to={"/dashboard/foro"}>
           <Title size="large">Foro</Title>
         </Link>
+
+        <SendReply replyInfo={{ messageId, forumId }} refresh={setRefresh} />
+
         {parentMessage ? (
           <ParentMessage message={parentMessage} />
         ) : (
           <Loading />
         )}
+
         <RepliesList
           results={results}
           scrollRef={scrollRef}
@@ -107,10 +119,8 @@ const ReplyMessage = () => {
           onDeleteReply={handleDeleteReply}
           loading={loading}
         />
-        <SendReply replyInfo={{ messageId, forumId }} refresh={setRefresh} />
       </div>
 
-      {/* Delete Reply Modal */}
       <DeleteMessageModal
         isOpen={isDeleteModalOpen}
         onClose={handleCloseDeleteModal}
@@ -119,7 +129,6 @@ const ReplyMessage = () => {
         externalError={deleteError}
       />
 
-      {/* Toast Notification */}
       {toast && (
         <Toast
           message={toast.message}

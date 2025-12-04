@@ -7,14 +7,14 @@ import { requirePrivileges, requireAnyPrivilege } from "../middleware/rbac.middl
 import { Privilege } from "../types/rbac.types";
 
 router.get("/risk-questions",
-    authenticate,
+   // authenticate,
     CHC.getRiskQuestions
 );
 
 router.get("/risk-options",
-    authenticate,
+    //authenticate,
     CHC.getRiskOptions
-)
+);
 
 router.post("/risk-form/submit/:id",
     authenticate,

@@ -1,16 +1,21 @@
-import { Request, Response } from 'express';
-import * as agendaService from '../../service/agenda.service';
+import { Request, Response } from "express";
+import * as agendaService from "../../service/agenda.service";
 
 /**
  * Get all pending appointment requests (patient_appointments waiting to be scheduled)
  */
-export const getPendingAppointmentRequests = async (req: Request, res: Response) => {
+export const getPendingAppointmentRequests = async (
+  req: Request,
+  res: Response
+) => {
   try {
     const requests = await agendaService.getPendingAppointmentRequests();
     res.json(requests);
   } catch (error) {
-    console.error('Error fetching pending appointment requests:', error);
-    res.status(500).json({ error: 'Failed to fetch pending appointment requests' });
+    console.error("Error fetching pending appointment requests:", error);
+    res
+      .status(500)
+      .json({ error: "Failed to fetch pending appointment requests" });
   }
 };
 
@@ -22,8 +27,8 @@ export const getDoctors = async (req: Request, res: Response) => {
     const doctors = await agendaService.getDoctors();
     res.json(doctors);
   } catch (error) {
-    console.error('Error fetching doctors:', error);
-    res.status(500).json({ error: 'Failed to fetch doctors' });
+    console.error("Error fetching doctors:", error);
+    res.status(500).json({ error: "Failed to fetch doctors" });
   }
 };
 
@@ -35,7 +40,7 @@ export const getDoctorAvailability = async (req: Request, res: Response) => {
     const { doctorId, date } = req.query;
 
     if (!doctorId || !date) {
-      return res.status(400).json({ error: 'doctorId and date are required' });
+      return res.status(400).json({ error: "doctorId and date are required" });
     }
 
     const availability = await agendaService.getDoctorAvailability(
@@ -45,8 +50,8 @@ export const getDoctorAvailability = async (req: Request, res: Response) => {
 
     res.json(availability);
   } catch (error) {
-    console.error('Error fetching doctor availability:', error);
-    res.status(500).json({ error: 'Failed to fetch doctor availability' });
+    console.error("Error fetching doctor availability:", error);
+    res.status(500).json({ error: "Failed to fetch doctor availability" });
   }
 };
 
@@ -55,11 +60,18 @@ export const getDoctorAvailability = async (req: Request, res: Response) => {
  */
 export const scheduleAppointment = async (req: Request, res: Response) => {
   try {
-    const { patientAppointmentId, doctorId, dateHour, duration, appointmentType, place } = req.body;
+    const {
+      patientAppointmentId,
+      doctorId,
+      dateHour,
+      duration,
+      appointmentType,
+      place,
+    } = req.body;
 
     if (!patientAppointmentId || !doctorId || !dateHour) {
-      return res.status(400).json({ 
-        error: 'patientAppointmentId, doctorId, and dateHour are required' 
+      return res.status(400).json({
+        error: "patientAppointmentId, doctorId, and dateHour are required",
       });
     }
 
@@ -68,14 +80,14 @@ export const scheduleAppointment = async (req: Request, res: Response) => {
       doctorId,
       dateHour,
       duration: duration || 45,
-      appointmentType: appointmentType || 'PRESENCIAL',
-      place: place || 'Consultorio'
+      appointmentType: appointmentType || "PRESENCIAL",
+      place: place || "Consultorio",
     });
 
     res.json(scheduledAppointment);
   } catch (error) {
-    console.error('Error scheduling appointment:', error);
-    res.status(500).json({ error: 'Failed to schedule appointment' });
+    console.error("Error scheduling appointment:", error);
+    res.status(500).json({ error: "Failed to schedule appointment" });
   }
 };
 
@@ -84,11 +96,12 @@ export const scheduleAppointment = async (req: Request, res: Response) => {
  */
 export const createAppointment = async (req: Request, res: Response) => {
   try {
-    const { patientId, doctorId, dateHour, duration, appointmentType, place } = req.body;
+    const { patientId, doctorId, dateHour, duration, appointmentType, place } =
+      req.body;
 
     if (!patientId || !doctorId || !dateHour) {
-      return res.status(400).json({ 
-        error: 'patientId, doctorId, and dateHour are required' 
+      return res.status(400).json({
+        error: "patientId, doctorId, and dateHour are required",
       });
     }
 
@@ -97,13 +110,13 @@ export const createAppointment = async (req: Request, res: Response) => {
       doctorId,
       dateHour,
       duration: duration || 45,
-      appointmentType: appointmentType || 'PRESENCIAL',
-      place: place || (appointmentType === 'PRESENCIAL' ? 'Consultorio' : undefined)
+      appointmentType: appointmentType || "PRESENCIAL",
+      place:
+        place || (appointmentType === "PRESENCIAL" ? "Consultorio" : undefined),
     });
-
     res.json(newAppointment);
   } catch (error) {
-    console.error('Error creating appointment:', error);
-    res.status(500).json({ error: 'Failed to create appointment' });
+    console.error("Error creating appointment:", error);
+    res.status(500).json({ error: "Failed to create appointment" });
   }
 };

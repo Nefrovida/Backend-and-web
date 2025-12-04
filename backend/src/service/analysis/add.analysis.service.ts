@@ -1,5 +1,16 @@
 // backend/src/service/analysis/add.analysis.service.ts
 import * as analysisModel from '../../model/analysis/add.analysis.model';
+
+/**
+ * Get analysis by name
+ */
+export const getAnalysisByName = async (analysisName: string) => {
+  const analysis = await analysisModel.findByName(analysisName);
+  if (!analysis) {
+    throw new NotFoundError('Analysis not found');
+  }
+  return analysis;
+};
 import {
   CreateAnalysisRequest,
   AnalysisResponse,

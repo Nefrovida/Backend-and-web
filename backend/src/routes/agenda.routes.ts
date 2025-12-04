@@ -7,6 +7,7 @@ import getAppointmentsInRangeC from "../controller/agenda/getAppointmentsInRange
 import getAppointmentsPerPatient from "../controller/agenda/getAppointmentsPerPatient.controller";
 
 import getAppointmentDateAvailability from "../controller/agenda/getAppointmentDateAvailability.controller";
+import getAnalysisDateAvailability from "../controller/analysis/getAnalysisDateAvailability.controller";
 
 import cancelAppointment from "src/controller/agenda/cancelAppointment.controller";
 import cancelAnalysis from "src/controller/agenda/cancelAnalysis.controller";
@@ -97,6 +98,13 @@ router.get(
   authenticate,
   requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
   getAppointmentDateAvailability
+);
+
+router.get(
+  "/analyses/date-availability",
+  authenticate,
+  requirePrivileges([Privilege.VIEW_APPOINTMENTS]),
+  getAnalysisDateAvailability
 );
 
 router.get(

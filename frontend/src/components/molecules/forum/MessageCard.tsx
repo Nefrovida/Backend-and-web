@@ -37,15 +37,27 @@ const MessageCard: FC<Props> = ({ message, onDelete }) => {
       .catch((e) => console.error(e));
   };
 
+  const authorName = message.userName ?? "Usuario";
+
   return (
-    <div className="w-8/12 rounded-md border-2 bg-white drop-shadow-sm p-2">
-      <section className="flex justify-between">
-        <Link
-          to={`/dashboard/foro/${message.forums.forumId}`}
-          className="text-gray-400 text-sm hover:underline"
-        >
-          {message.forums.name}
-        </Link>
+    <div className="w-8/12 rounded-md border-2 bg-white drop-shadow-sm p-2 break-words">
+      <section className="flex justify-between items-start">
+        <div className="flex flex-col">
+          {/* Author */}
+          <span className="text-sm font-semibold text-gray-800">
+            {authorName}
+          </span>
+
+          {message.forums.name && (
+            <Link
+              to={`/dashboard/foro/${message.forums.forumId}`}
+              className="text-gray-400 text-xs hover:underline"
+            >
+              {message.forums.name}
+            </Link>
+          )}
+        </div>
+
         {isAdmin && (
           <div className="relative">
             <HiDotsHorizontal
@@ -59,7 +71,9 @@ const MessageCard: FC<Props> = ({ message, onDelete }) => {
                   className="flex items-center gap-2 w-full px-4 py-2 text-left text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                 >
                   <RiDeleteBin6Line className="text-lg" />
-                  <span className="text-sm font-medium">Eliminar mensaje</span>
+                  <span className="text-sm font-medium">
+                    Eliminar mensaje
+                  </span>
                 </button>
               </div>
             )}
@@ -69,7 +83,11 @@ const MessageCard: FC<Props> = ({ message, onDelete }) => {
           <HiDotsHorizontal className="text-gray-300 cursor-not-allowed" />
         )}
       </section>
-      <section className="w-full text-lg my-2">{message.content}</section>
+
+      <section className="w-full text-base sm:text-lg my-2 break-words whitespace-pre-wrap">
+        {message.content}
+      </section>
+
       <section className="flex gap-4 items-center">
         <button className="flex gap-2 items-center" onClick={handleLike}>
           {hasLiked ? (
@@ -82,6 +100,7 @@ const MessageCard: FC<Props> = ({ message, onDelete }) => {
         <Link
           className="flex gap-2 items-center"
           to={`/dashboard/foro/${message.forums.forumId}/mensaje/${message.messageId}`}
+          state={{ authorName: message.userName }}
         >
           <MdChatBubbleOutline className="hover:text-blue-600" />
           {message.replies}
