@@ -67,7 +67,8 @@ VALUES
 ('VIEW_FORUM_USERS'),
 ('UPDATE_NOTES'),
 ('DELETE_NOTES'),
-('CREATE_ADMIN');
+('CREATE_ADMIN'),
+('APPROVE_USERS');
 
 -- ========================
 -- 🧩 ROLES - PRIVILEGIOS
@@ -168,36 +169,36 @@ WHERE description IN (
 -- ========================
 
 -- Admin
-INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
+INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, user_status, first_login, role_id)
 VALUES 
-('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Carlos', 'Ramírez', 'González', true, '7711234567', 'testAdmin1', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1985-03-15', 'MALE', false, 1);
+('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Carlos', 'Ramírez', 'González', true, '7711234567', 'testAdmin1', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1985-03-15', 'MALE', 'APPROVED', false, 1);
 
 -- Doctores
-INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
+INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, user_status, first_login, role_id)
 VALUES 
-('b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22', 'María', 'López', 'Hernández', true, '7712345678', 'testDoctor1', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1980-06-20', 'FEMALE', false, 2),
-('b2eebc99-9c0b-4ef8-bb6d-6bb9bd380a33', 'José', 'García', 'Martínez', true, '7713456789', 'testDoctor2', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1975-11-10', 'MALE', false, 2),
-('b3eebc99-9c0b-4ef8-bb6d-6bb9bd380a44', 'Ana', 'Rodríguez', 'Sánchez', true, '7714567890', 'testDoctor3', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1988-02-28', 'FEMALE', false, 2);
+('b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22', 'María', 'López', 'Hernández', true, '7712345678', 'testDoctor1', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1980-06-20', 'FEMALE', 'APPROVED', false, 2),
+('b2eebc99-9c0b-4ef8-bb6d-6bb9bd380a33', 'José', 'García', 'Martínez', true, '7713456789', 'testDoctor2', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1975-11-10', 'MALE', 'APPROVED', false, 2),
+('b3eebc99-9c0b-4ef8-bb6d-6bb9bd380a44', 'Ana', 'Rodríguez', 'Sánchez', true, '7714567890', 'testDoctor3', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1988-02-28', 'FEMALE', 'APPROVED', false, 2);
 
 -- Pacientes
-INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
+INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, user_status, first_login, role_id)
 VALUES 
-('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'Pedro', 'Fernández', 'Morales', true, '7715678901', 'testPaciente1', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1990-05-12', 'MALE', false, 3),
-('c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', 'Laura', 'Martínez', 'Cruz', true, '7716789012', 'testPaciente2', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1995-08-25', 'FEMALE', false, 3),
-('c3eebc99-9c0b-4ef8-bb6d-6bb9bd380a77', 'Roberto', 'Sánchez', 'Flores', true, '7717890123', 'testPaciente3', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1982-12-05', 'MALE', false, 3),
-('c4eebc99-9c0b-4ef8-bb6d-6bb9bd380a88', 'Sofia', 'Torres', 'Ramírez', true, '7718901234', 'testPaciente4', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '2000-01-30', 'FEMALE', true, 3);
+('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'Pedro', 'Fernández', 'Morales', true, '7715678901', 'testPaciente1', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1990-05-12', 'MALE', 'APPROVED', false, 3),
+('c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', 'Laura', 'Martínez', 'Cruz', true, '7716789012', 'testPaciente2', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1995-08-25', 'FEMALE', 'APPROVED', false, 3),
+('c3eebc99-9c0b-4ef8-bb6d-6bb9bd380a77', 'Roberto', 'Sánchez', 'Flores', true, '7717890123', 'testPaciente3', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1982-12-05', 'MALE', 'APPROVED', false, 3),
+('c4eebc99-9c0b-4ef8-bb6d-6bb9bd380a88', 'Sofia', 'Torres', 'Ramírez', true, '7718901234', 'testPaciente4', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '2000-01-30', 'FEMALE', 'APPROVED', true, 3);
 
 -- Laboratoristas
-INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
+INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, user_status, first_login, role_id)
 VALUES 
-('d1eebc99-9c0b-4ef8-bb6d-6bb9bd380a99', 'Luis', 'Méndez', 'Castro', true, '7719012345', 'testLaboratorista1', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1987-07-18', 'MALE', false, 4),
-('d2eebc99-9c0b-4ef8-bb6d-6bb9bd380aaa', 'Carmen', 'Vargas', 'Ortiz', true, '7710123456', 'testLaboratorista2', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1992-04-22', 'FEMALE', false, 4);
+('d1eebc99-9c0b-4ef8-bb6d-6bb9bd380a99', 'Luis', 'Méndez', 'Castro', true, '7719012345', 'testLaboratorista1', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1987-07-18', 'MALE', 'APPROVED', false, 4),
+('d2eebc99-9c0b-4ef8-bb6d-6bb9bd380aaa', 'Carmen', 'Vargas', 'Ortiz', true, '7710123456', 'testLaboratorista2', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1992-04-22', 'FEMALE', 'APPROVED', false, 4);
 
 -- Familiares
-INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)
+INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, user_status, first_login, role_id)
 VALUES 
-('e1eebc99-9c0b-4ef8-bb6d-6bb9bd380bbb', 'Juan', 'Fernández', 'López', true, '7721234567', 'testFamiliar1', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1988-09-15', 'MALE', false, 5),
-('e2eebc99-9c0b-4ef8-bb6d-6bb9bd380ccc', 'Patricia', 'Martínez', 'Díaz', true, '7722345678', 'testFamiliar2', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1993-11-20', 'FEMALE', false, 5);
+('e1eebc99-9c0b-4ef8-bb6d-6bb9bd380bbb', 'Juan', 'Fernández', 'López', true, '7721234567', 'testFamiliar1', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1988-09-15', 'MALE', 'APPROVED', false, 5),
+('e2eebc99-9c0b-4ef8-bb6d-6bb9bd380ccc', 'Patricia', 'Martínez', 'Díaz', true, '7722345678', 'testFamiliar2', '$2b$10$f9x27.PRkO.oCMQVkRBXSOWgIARKlXdeIq2fuYIL.HJcs3gIsFFBG', '1993-11-20', 'FEMALE', 'APPROVED', false, 5);
 
 -- Secretaria
 INSERT INTO users (user_id, name, parent_last_name, maternal_last_name, active, phone_number, username, password, birthday, gender, first_login, role_id)

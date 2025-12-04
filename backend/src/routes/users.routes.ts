@@ -82,6 +82,37 @@ router.delete(
   usersController.deleteUser
 );
 
+// ============================================
+// User Approval Routes (Admin Only)
+// ============================================
+router.get(
+  "/pending/all",
+  authenticate,
+  requirePrivileges([Privilege.APPROVE_USERS]),
+  usersController.getPendingUsers
+);
+
+router.get(
+  "/rejected/all",
+  authenticate,
+  requirePrivileges([Privilege.APPROVE_USERS]),
+  usersController.getRejectedUsers
+);
+
+router.put(
+  "/:id/approve",
+  authenticate,
+  requirePrivileges([Privilege.APPROVE_USERS]),
+  usersController.approveUser
+);
+
+router.put(
+  "/:id/reject",
+  authenticate,
+  requirePrivileges([Privilege.APPROVE_USERS]),
+  usersController.rejectUser
+);
+
 router.post(
   "/:id/reset-password",
   authenticate,

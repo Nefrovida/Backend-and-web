@@ -31,7 +31,14 @@ function Login() {
       // Redirect to home
       navigate("/dashboard");
     } catch (err: any) {
-      setError(err.message || "Error en el inicio de sesión");
+      const errorMessage = err.message || "Error en el inicio de sesión";
+      
+      // Check if the error is about pending approval
+      if (errorMessage.includes("pending") || errorMessage.includes("approval") || errorMessage.includes("aprobación")) {
+        setError("Tu cuenta está pendiente de aprobación por un administrador. Por favor, espera a que tu cuenta sea activada.");
+      } else {
+        setError(errorMessage);
+      }
     } finally {
       setLoading(false);
     }

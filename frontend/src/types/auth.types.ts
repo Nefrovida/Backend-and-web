@@ -36,6 +36,8 @@ export interface AuthResponse {
     username: string;
     role_id: number;
   };
+  pending?: boolean;
+  message?: string;
 }
 
 export interface LoginData {
