@@ -43,12 +43,11 @@ const MessageCard: FC<Props> = ({ message, onDelete }) => {
     <div className="w-8/12 rounded-md border-2 bg-white drop-shadow-sm p-2 break-words">
       <section className="flex justify-between items-start">
         <div className="flex flex-col">
-          {/* Autor */}
+          {/* Author */}
           <span className="text-sm font-semibold text-gray-800">
             {authorName}
           </span>
 
-          {/* Nombre del foro solo si existe */}
           {message.forums.name && (
             <Link
               to={`/dashboard/foro/${message.forums.forumId}`}

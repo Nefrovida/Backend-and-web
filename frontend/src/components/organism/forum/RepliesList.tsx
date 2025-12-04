@@ -51,7 +51,7 @@ const RepliesList: FC<Props> = ({
                   forumId: Number(forumId),
                   name: "",
                 },
-                userName: displayName, // nombre completo
+                userName: displayName,
               }}
               onDelete={onDeleteReply}
             />

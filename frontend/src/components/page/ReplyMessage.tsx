@@ -42,21 +42,18 @@ const ReplyMessage = () => {
     fetch(`/api/forums/message/${messageId}`)
       .then((res) => res.json())
       .then((data) => {
-        // Nombre que se mostrará:
-        // 1) el nombre completo que viene del feed (state.authorName)
-        // 2) si no hay, se cae al username del backend
         const authorName =
           locationState?.authorName || data.user.username || "Usuario";
 
         const parent: Message = {
           messageId: data.message_id,
           content: data.content,
-          likes: 0, // no los necesitamos aquí
+          likes: 0,
           liked: 0,
           replies: 0,
           forums: {
             forumId: data.forum_id,
-            name: "", // si quieres, luego puedes cargar el nombre del foro
+            name: "",
           },
           userName: authorName,
         };
