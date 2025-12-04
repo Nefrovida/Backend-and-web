@@ -101,6 +101,7 @@ const MessageCard: FC<Props> = ({ message, onDelete }) => {
         <Link
           className="flex gap-2 items-center"
           to={`/dashboard/foro/${message.forums.forumId}/mensaje/${message.messageId}`}
+          state={{ authorName: message.userName }}
         >
           <MdChatBubbleOutline className="hover:text-blue-600" />
           {message.replies}

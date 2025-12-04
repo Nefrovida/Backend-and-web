@@ -30,8 +30,13 @@ const RepliesList: FC<Props> = ({
       {results.length > 0 &&
         results.map((m) => {
           const displayName =
-            [m.author?.name, m.author?.lastName].filter(Boolean).join(" ") ||
-            "Usuario";
+            [
+              m.author?.name,
+              m.author?.parentLastName,
+              m.author?.maternalLastName,
+            ]
+              .filter(Boolean)
+              .join(" ") || m.author?.username || "Usuario";
 
           return (
             <MessageCard
@@ -44,10 +49,9 @@ const RepliesList: FC<Props> = ({
                 replies: m.stats.repliesCount,
                 forums: {
                   forumId: Number(forumId),
-                  // en replies no necesitas mostrar el nombre del foro
                   name: "",
                 },
-                userName: displayName,
+                userName: displayName, // nombre completo
               }}
               onDelete={onDeleteReply}
             />
