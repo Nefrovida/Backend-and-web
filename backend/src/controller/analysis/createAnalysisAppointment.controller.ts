@@ -5,7 +5,7 @@ import { Status } from "@prisma/client";
 
 export default async function createAnalysisAppointment(req: Request, res: Response) {
     try {
-        const { user_id, analysis_id, analysis_date, place } = req.body;
+        const { user_id, analysis_id, analysis_date } = req.body;
 
         if (!user_id || !analysis_id || !analysis_date) {
             return res.status(400).json({
@@ -23,9 +23,29 @@ export default async function createAnalysisAppointment(req: Request, res: Respo
             });
         }
 
-        const parsedDate = new Date(analysis_date);
+        // const parsedDate = new Date(analysis_date);
+        let appointmentDate: Date;
+    
+        if (analysis_date.includes('T')) {
+        // Parse as "YYYY-MM-DDTHH:mm:ss" format
+        const [datePart, timePart] = analysis_date.split('T');
+        const [year, month, day] = datePart.split('-').map(Number);
+        const [hours, minutes, seconds = 0] = timePart.replace('Z', '').split(':').map(Number);
+        
+        // Create date using local timezone (not UTC)
+        appointmentDate = new Date(year, month - 1, day, hours - 6, minutes, seconds);
+        } else {
+        // Fallback to direct parsing
+        appointmentDate = new Date(analysis_date);
+        }
+        
+        const now = new Date();
+        if (appointmentDate <= now) {
+        res.status(400).json({ success: false });
+        return;
+        }
 
-        if (isNaN(parsedDate.getTime())) {
+        if (isNaN(appointmentDate.getTime())) {
             return res.status(400).json({
                 error: "Formato de fecha invalido",
                 received: analysis_date
@@ -36,9 +56,9 @@ export default async function createAnalysisAppointment(req: Request, res: Respo
             data: {
                 patient_id: patient.patient_id,
                 analysis_id,
-                analysis_date: parsedDate,
+                analysis_date: appointmentDate,
                 results_date: null,
-                place: place || "Laboratorio",
+                place: "Laboratorio Central",
                 duration: 30,
                 analysis_status: Status.REQUESTED,
                 laboratorist_id: null,

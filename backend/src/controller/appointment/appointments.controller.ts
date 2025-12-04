@@ -124,3 +124,73 @@ export const getUserAppointmentsByUserId = async (
     res.status(error.statusCode || 500).json({ error: error.message });
   }
 };
+
+/**
+ * Schedule an appointment (patient schedules it)
+ */
+export const scheduleAppointment = async (req: Request, res: Response) => {
+  try {
+    const { appointmentId, patientId, dateHour, appointmentType } = req.body;
+
+    // 1. Validate required fields
+    if (!appointmentId || !patientId || !dateHour || !appointmentType) {
+      res.status(400).json({ success: false });
+      return;
+    }
+
+    // 2. Validate user is authenticated
+    if (!req.user) {
+      res.status(401).json({ success: false });
+      return;
+    }
+
+    // 3. Validate appointmentId exists and get appointment details
+    const appointment = await appointmentsService.validateAppointment(appointmentId);
+    if (!appointment) {
+      res.status(404).json({ success: false });
+      return;
+    }
+
+    // 4. Parse dateHour as local time (treat the incoming string as local time, not UTC)
+    // If dateHour is "2025-12-04T11:50:00", parse it as local time components
+    let appointmentDate: Date;
+    
+    if (dateHour.includes('T')) {
+      // Parse as "YYYY-MM-DDTHH:mm:ss" format
+      const [datePart, timePart] = dateHour.split('T');
+      const [year, month, day] = datePart.split('-').map(Number);
+      const [hours, minutes, seconds = 0] = timePart.replace('Z', '').split(':').map(Number);
+      
+      // Create date using local timezone (not UTC)
+      appointmentDate = new Date(year, month - 1, day, hours - 6, minutes, seconds);
+    } else {
+      // Fallback to direct parsing
+      appointmentDate = new Date(dateHour);
+    }
+    
+    const now = new Date();
+    if (appointmentDate <= now) {
+      res.status(400).json({ success: false });
+      return;
+    }
+
+    const normalizedAppointmentType = appointmentType.toUpperCase() as 'PRESENCIAL' | 'VIRTUAL';
+
+    // 6. Create the patient appointment
+    await appointmentsService.schedulePatientAppointment({
+      patient_id: patientId,
+      appointment_id: appointmentId,
+      date_hour: appointmentDate,
+      duration: 10,
+      appointment_type: normalizedAppointmentType,
+      link: null,
+      place: null,
+      appointment_status: 'REQUESTED'
+    });
+
+    res.status(201).json({ success: true });
+  } catch (error: any) {
+    console.error('Error scheduling appointment:', error);
+    res.status(error.statusCode || 500).json({ success: false });
+  }
+};
