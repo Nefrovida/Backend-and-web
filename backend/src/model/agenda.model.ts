@@ -66,7 +66,7 @@ export default class Agenda {
   /**
    * Mobile – Daily appointments, including doctor name.
    */
-  static async getAppointmentsPerDay(targetDate: string, ) {
+  static async getAppointmentsPerDay(targetDate: string) {
     const [year, month, day] = targetDate.split("-").map(Number);
 
     const start = new Date(year, month - 1, day, 0, 0, 0);
@@ -159,51 +159,50 @@ export default class Agenda {
   /**
    * Mobile – Analysis details (card), by id.
    */
-static async getAnalysisById(id: number) {
-  const analysis = await prisma.patient_analysis.findUnique({
-    where: {
-      patient_analysis_id: Number(id),
-    },
-    select: {
-      patient_analysis_id: true,
-      analysis_date: true,
-      place: true,
-      duration: true,
-      analysis_status: true,
-      analysis: {
-        select: {
-          analysis_id: true,
-          name: true,
+  static async getAnalysisById(id: number) {
+    const analysis = await prisma.patient_analysis.findUnique({
+      where: {
+        patient_analysis_id: Number(id),
+      },
+      select: {
+        patient_analysis_id: true,
+        analysis_date: true,
+        place: true,
+        duration: true,
+        analysis_status: true,
+        analysis: {
+          select: {
+            analysis_id: true,
+            name: true,
+          },
         },
       },
-    },
-  });
+    });
 
-  if (!analysis) return null;
+    if (!analysis) return null;
 
-  const {
-    analysis: nestedAnalysis,
-    analysis_date,
-    patient_analysis_id,
-    place,
-    duration,
-    analysis_status,
-  } = analysis;
+    const {
+      analysis: nestedAnalysis,
+      analysis_date,
+      patient_analysis_id,
+      place,
+      duration,
+      analysis_status,
+    } = analysis;
 
-  const analysisName = nestedAnalysis?.name?.trim() ?? null;
+    const analysisName = nestedAnalysis?.name?.trim() ?? null;
 
-  return {
-    type: "ANALYSIS",
-    analysisId: nestedAnalysis?.analysis_id ?? null,
-    analysisName,
-    analysisDate: analysis_date,
-    patientAnalysisId: patient_analysis_id,
-    place,
-    duration,
-    analysisStatus: analysis_status,
-  };
-}
-
+    return {
+      type: "ANALYSIS",
+      analysisId: nestedAnalysis?.analysis_id ?? null,
+      analysisName,
+      analysisDate: analysis_date,
+      patientAnalysisId: patient_analysis_id,
+      place,
+      duration,
+      analysisStatus: analysis_status,
+    };
+  }
 
   /**
    * Mobile – Appointment details (card), by id.
@@ -261,7 +260,7 @@ static async getAnalysisById(id: number) {
 
     return {
       ...rest,
-      type : "APPOINTMENT",
+      type: "APPOINTMENT",
       appointment_id: nestedAppointment?.appointment_id ?? null,
       doctor_name: fullName || null,
       appointment_name,
@@ -476,7 +475,7 @@ static async getAnalysisById(id: number) {
 
   static async getLaboratoryAvailability(date: string) {
     // Parse date components to avoid timezone issues
-    const [year, month, day] = date.split('-').map(Number);
+    const [year, month, day] = date.split("-").map(Number);
     const targetDate = new Date(year, month - 1, day); // month is 0-indexed in JS Date
     const startOfDay = new Date(year, month - 1, day, 0, 0, 0, 0);
     const endOfDay = new Date(year, month - 1, day, 23, 59, 59, 999);
@@ -511,7 +510,9 @@ static async getAnalysisById(id: number) {
         const isBooked = bookedAnalyses.some((analysis) => {
           if (!analysis.analysis_date) return false;
           const analysisStart = new Date(analysis.analysis_date);
-          const analysisEnd = new Date(analysisStart.getTime() + analysis.duration * 60000);
+          const analysisEnd = new Date(
+            analysisStart.getTime() + analysis.duration * 60000
+          );
           return slotTime >= analysisStart && slotTime < analysisEnd;
         });
 
@@ -708,7 +709,13 @@ static async getAnalysisById(id: number) {
     const { patientId, doctorId, dateHour, duration, appointmentType, place } =
       data;
 
-    const proposedStart = new Date(dateHour);
+    const [datePart, timePart] = dateHour.split("T");
+    const [year, month, day] = datePart.split("-").map(Number);
+    const [hours, minutes] = timePart.split(":").map(Number);
+
+    const proposedStart = new Date(
+      Date.UTC(year, month - 1, day, hours, minutes)
+    );
     const now = new Date();
 
     if (proposedStart <= now) {
@@ -790,10 +797,12 @@ static async getAnalysisById(id: number) {
       data: {
         patient_id: patientId,
         appointment_id: doctorAppointment.appointment_id,
-        date_hour: proposedStart,
+        date_hour: proposedStart.toISOString(),
         duration,
         appointment_type: appointmentType,
-        place: place || (appointmentType === "PRESENCIAL" ? "Consultorio" : undefined),
+        place:
+          place ||
+          (appointmentType === "PRESENCIAL" ? "Consultorio" : undefined),
         appointment_status: "PROGRAMMED",
       },
       include: {
@@ -866,121 +875,120 @@ static async getAnalysisById(id: number) {
     });
   }
 
-
-/**
+  /**
    * Mobile – Daily appointments per patient Id, including doctor name.
    */
-static async getAppointmentsPerPatient(targetDate: string, userId: string ) {
-  const [year, month, day] = targetDate.split("-").map(Number);
+  static async getAppointmentsPerPatient(targetDate: string, userId: string) {
+    const [year, month, day] = targetDate.split("-").map(Number);
 
-  const start = new Date(year, month - 1, day, 0, 0, 0);
-  const end = new Date(year, month - 1, day + 1, 0, 0, 0);
+    const start = new Date(year, month - 1, day, 0, 0, 0);
+    const end = new Date(year, month - 1, day + 1, 0, 0, 0);
 
-  const patient = await prisma.patients.findFirst({
-    where: { user_id: userId },
-    select: { patient_id: true },
-  });
+    const patient = await prisma.patients.findFirst({
+      where: { user_id: userId },
+      select: { patient_id: true },
+    });
 
-  if (!patient) return [];
+    if (!patient) return [];
 
-  const patientId = patient.patient_id;
+    const patientId = patient.patient_id;
 
-  const [appointments, analysis] = await Promise.all([
-
-    prisma.patient_appointment.findMany({
-      where: {
-        patient_id: patientId,
-        date_hour: { gte: start, lt: end },
-        appointment_status: { in: ["PROGRAMMED", "REQUESTED"] },
-      },
-      select: {
-        patient_appointment_id: true,
-        patient_id: true,
-        date_hour: true,
-        duration: true,
-        link: true,
-        place: true,
-        appointment_type: true,
-        appointment_status: true,
-        appointment: {
-          select: {
-            appointment_id: true,
-            name: true,
-            doctor: {
-              select: {
-                doctor_id: true,
-                user: {
-                  select: {
-                    name: true,
-                    parent_last_name: true,
-                    maternal_last_name: true,
+    const [appointments, analysis] = await Promise.all([
+      prisma.patient_appointment.findMany({
+        where: {
+          patient_id: patientId,
+          date_hour: { gte: start, lt: end },
+          appointment_status: { in: ["PROGRAMMED", "REQUESTED"] },
+        },
+        select: {
+          patient_appointment_id: true,
+          patient_id: true,
+          date_hour: true,
+          duration: true,
+          link: true,
+          place: true,
+          appointment_type: true,
+          appointment_status: true,
+          appointment: {
+            select: {
+              appointment_id: true,
+              name: true,
+              doctor: {
+                select: {
+                  doctor_id: true,
+                  user: {
+                    select: {
+                      name: true,
+                      parent_last_name: true,
+                      maternal_last_name: true,
+                    },
                   },
                 },
               },
             },
           },
         },
-      },
-    }),
+      }),
 
-    prisma.patient_analysis.findMany({
-      where: {
-        patient_id: patientId,
-        analysis_date: { gte: start, lt: end },
-        analysis_status: { in: ["PROGRAMMED", "REQUESTED"] },
-      },
-      select: {
-        patient_analysis_id: true,
-        patient_id: true,
-        analysis_date: true,
-        analysis_status: true,
-        place: true,
-        duration: true,
-        analysis: {
-          select: {
-            analysis_id: true,
-            name: true,
+      prisma.patient_analysis.findMany({
+        where: {
+          patient_id: patientId,
+          analysis_date: { gte: start, lt: end },
+          analysis_status: { in: ["PROGRAMMED", "REQUESTED"] },
+        },
+        select: {
+          patient_analysis_id: true,
+          patient_id: true,
+          analysis_date: true,
+          analysis_status: true,
+          place: true,
+          duration: true,
+          analysis: {
+            select: {
+              analysis_id: true,
+              name: true,
+            },
           },
         },
-      },
-    }),
-  ]);
+      }),
+    ]);
 
-  const formattedAppointments = appointments.map(a => {
-    const doctorUser = a.appointment?.doctor?.user;
-    const fullName = [
-      doctorUser?.name,
-      doctorUser?.parent_last_name,
-      doctorUser?.maternal_last_name,
-    ].filter(Boolean).join(" ");
+    const formattedAppointments = appointments.map((a) => {
+      const doctorUser = a.appointment?.doctor?.user;
+      const fullName = [
+        doctorUser?.name,
+        doctorUser?.parent_last_name,
+        doctorUser?.maternal_last_name,
+      ]
+        .filter(Boolean)
+        .join(" ");
+
+      return {
+        type: "APPOINTMENT",
+        patient_appointment_id: a.patient_appointment_id,
+        appointment_name: a.appointment?.name,
+        doctor_name: fullName,
+        date_hour: a.date_hour,
+        place: a.place,
+        link: a.link,
+        appointment_type: a.appointment_type,
+        appointment_status: a.appointment_status,
+      };
+    });
+
+    const formattedAnalysis = analysis.map((an) => ({
+      type: "ANALYSIS",
+      patientAnalysisId: an.patient_analysis_id,
+      analysisName: an.analysis?.name,
+      analysisDate: an.analysis_date,
+      place: an.place,
+      duration: an.duration,
+      analysisStatus: an.analysis_status,
+    }));
 
     return {
-      type: "APPOINTMENT",
-      patient_appointment_id: a.patient_appointment_id,
-      appointment_name: a.appointment?.name,
-      doctor_name: fullName,
-      date_hour: a.date_hour,
-      place: a.place,
-      link: a.link,
-      appointment_type: a.appointment_type,
-      appointment_status: a.appointment_status,
+      appointments: formattedAppointments,
+      analysis: formattedAnalysis,
     };
-  });
-
-  const formattedAnalysis = analysis.map(an => ({
-    type: "ANALYSIS",
-    patientAnalysisId: an.patient_analysis_id,
-    analysisName: an.analysis?.name,
-    analysisDate: an.analysis_date,
-    place: an.place,
-    duration: an.duration,
-    analysisStatus: an.analysis_status,
-  }));
-
-  return {
-    appointments: formattedAppointments,
-    analysis: formattedAnalysis,
   }
-}
-
 }
