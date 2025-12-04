@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 import session from "express-session";
 import { errorHandler } from "./middleware/error.middleware";
 
-dotenv.config({ path: "../.env" });
+dotenv.config({ path: "../../.env" });
 
 // Initialize server
 const app = express();
@@ -20,7 +20,6 @@ app.use(
 );
 
 const port = process.env.SERVER_PORT || 3000;
-
 
 // CORS configuration
 // CORS: allow a configurable list of frontend origins. FRONTEND_URL may be a

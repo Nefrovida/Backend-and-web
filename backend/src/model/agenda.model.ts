@@ -512,16 +512,18 @@ export default class Agenda {
     // Remove booked slots from available slots
     for (const analysis of bookedAnalyses) {
       if (!analysis.analysis_date) continue;
-      
+
       const analysisDate = new Date(analysis.analysis_date);
-      
+
       // Get local time components from the UTC analysis date
       const analysisHour = analysisDate.getHours() + 6;
       const analysisMinute = analysisDate.getMinutes();
-      
+
       // Format the booked slot time as "HH:MM"
-      const bookedSlot = `${analysisHour.toString().padStart(2, "0")}:${analysisMinute.toString().padStart(2, "0")}`;
-      
+      const bookedSlot = `${analysisHour
+        .toString()
+        .padStart(2, "0")}:${analysisMinute.toString().padStart(2, "0")}`;
+
       // Remove the booked slot from available slots
       const index = availableSlots.indexOf(bookedSlot);
       if (index > -1) {
@@ -752,6 +754,8 @@ export default class Agenda {
     const proposedStart = new Date(
       Date.UTC(year, month - 1, day, hours, minutes)
     );
+
+    console.log(dateHour);
     const now = new Date();
 
     if (proposedStart <= now) {

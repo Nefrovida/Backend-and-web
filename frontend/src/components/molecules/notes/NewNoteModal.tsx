@@ -1,5 +1,5 @@
 import TextArea from "@/components/atoms/TextArea";
-import React, { FC } from "react";
+import React, { FC, useEffect } from "react";
 
 const MAX_TITLE_LENGHT = 200;
 const MAX_GENERAL_NOTES_LENGTH = 3000;
@@ -23,10 +23,12 @@ const NewNoteModal: FC<Props> = ({ modalState, title }) => {
     type: "general_notes" | "ailments" | "prescription" | "title",
     v: string
   ) {
-    modalState((prev) => ({
-      ...prev,
-      [type]: v,
-    }));
+    modalState((prev) => {
+      return {
+        ...prev,
+        [type]: v,
+      };
+    });
   }
 
   return (
@@ -38,7 +40,6 @@ const NewNoteModal: FC<Props> = ({ modalState, title }) => {
           onChange={(v) => {
             handleChange("title", v.target.value);
           }}
-          value={title}
           maxLength={MAX_TITLE_LENGHT}
         />
       </div>
