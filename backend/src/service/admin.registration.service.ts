@@ -44,10 +44,8 @@ export const AdminRegistrationService = {
 };
 
 export const desactivateUser = async (id: string, sessionUserId: string) => {
-  console.log("dentro de la app");
   const role = await Admin.AdminRole(sessionUserId);
-  console.log("entro al primer model");
-  console.log("Role of session user:", role);
+
   if (!role) {
     throw new Error("Only admins can deactivate users");
   }

@@ -15,11 +15,13 @@ router.post(
 
 router.get("/Allusers",
     authenticate,
+    requirePrivileges([Privilege.VIEW_USERS]),
     getActiveUsers
 )
 
 router.put("/desactivate/:id",
     authenticate,
+    requirePrivileges([Privilege.DELETE_USERS]),
     desactivateUserController
 );
 

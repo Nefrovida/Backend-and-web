@@ -68,7 +68,8 @@ VALUES
 ('UPDATE_NOTES'),
 ('DELETE_NOTES'),
 ('CREATE_ADMIN'),
-('APPROVE_USERS');
+('APPROVE_USERS'),
+('PASS_PATTIENTS');
 
 -- ========================
 -- 🧩 ROLES - PRIVILEGIOS

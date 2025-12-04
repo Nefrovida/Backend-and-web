@@ -177,7 +177,6 @@ export const resetPassword = async (req: Request, res: Response): Promise<void> 
  */
 export const getAllExternalUsers = async (req: Request, res: Response) => {
   try {
-    console.log("Inside getAllExternalUsers controller");
     const externalUsers = await usersService.getAllExternalUsers();
     res.status(200).json(externalUsers);
   } catch (error: any) {

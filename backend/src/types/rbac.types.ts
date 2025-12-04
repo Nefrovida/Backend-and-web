@@ -7,6 +7,8 @@ export enum Privilege {
   CREATE_USERS = "CREATE_USERS",
   UPDATE_USERS = "UPDATE_USERS",
   DELETE_USERS = "DELETE_USERS",
+  DEACTIVATE_USERS = "DEACTIVATE_USERS",
+  
 
   // Role management
   VIEW_ROLES = "VIEW_ROLES",

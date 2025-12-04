@@ -7,7 +7,6 @@ import {
   type User,
 } from "@/services/admin.service";
 import { usersService, type PendingUser } from "../../services/users.service";
-import { roleName } from "../../utils/roles.util";
 
 type ViewMode = "pending" | "all" | "external";
 
