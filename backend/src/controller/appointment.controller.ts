@@ -136,4 +136,28 @@ export default class AppointmentController {
       res.status(500).json({ error: "Error al eliminar cita" });
     }
   }
+
+  static async changeAppointmentStatus(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+
+      if (!id) {
+        return res.status(400).json({ error: "ID inválido" });
+      }
+
+      const appointmentId = parseInt(id);
+      const existing = await AppointmentModel.getAppointmentById(appointmentId);
+      if (!existing) {
+        return res.status(404).json({ error: "Cita no encontrada" });
+      }
+
+      const updatedAppointment =
+        await AppointmentModel.changeAppointmentStatus(appointmentId);
+
+      return res.status(200).json("Aprroved successfully");
+    } catch (error) {
+      console.error("Error changing appointment status:", error);
+      res.status(500).json({ error: "Error al cambiar el estado de la cita" });
+    }
+  } 
 }
