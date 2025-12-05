@@ -49,6 +49,9 @@ export default async function createAnalysisAppointment(
             where: {
                 patient_id: patient.patient_id,
                 analysis_date: appointmentDate,
+                analysis_status: {
+                    not: Status.CANCELED,
+                },
             },
         });
 
@@ -60,27 +63,23 @@ export default async function createAnalysisAppointment(
             });
         }
 
-        // 2) (OPTIONAL) Avoid same ANALYSIS TYPE using the same slot
-        //    for any patient (laboratory capacity).
-        //    Uncomment and adjust the logic:
-        /*
+        // 2) Avoid same ANALYSIS TYPE using the same slot
         const duplicatedForSlot = await prisma.patient_analysis.findFirst({
-          where: {
-            analysis_id,
-            analysis_date: appointmentDate,
-            analysis_status: {
-              not: Status.CANCELED, // si existe este status en tu enum
+            where: {
+                analysis_id,
+                analysis_date: appointmentDate,
+                analysis_status: {
+                    not: Status.CANCELED,
+                },
             },
-          },
         });
-    
+
         if (duplicatedForSlot) {
-          return res.status(409).json({
-            success: false,
-            error: "Ese horario ya está ocupado para este análisis en laboratorio.",
-          });
+            return res.status(409).json({
+                success: false,
+                error: "Ese horario ya está ocupado para este análisis en laboratorio.",
+            });
         }
-        */
 
         const newAnalysis = await prisma.patient_analysis.create({
             data: {
