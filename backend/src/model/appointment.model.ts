@@ -200,4 +200,14 @@ export default class AppointmentModel {
     });
     return;
   }
+  static async changeAppointmentStatus(appointmentId: number) {
+    const updated = await prisma.patient_appointment.update({
+      where: { patient_appointment_id: appointmentId },
+      data: {
+        appointment_status: "PROGRAMMED",
+      },
+    });
+    return updated;
+  }
+
 }
