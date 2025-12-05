@@ -26,7 +26,6 @@ const AgendarCitaPage: React.FC = () => {
   }, [directFromQuery]);
 
   const handleSelectRequest = (request: AppointmentRequest) => {
-    console.log("📌 REQUEST SELECCIONADA:", request); // 👈 Mira el ID en la consola
     setSelectedRequest(request);
     setIsDirectMode(false);
     setIsRescheduleMode(false);
@@ -49,25 +48,19 @@ const AgendarCitaPage: React.FC = () => {
     setIsRescheduleMode(false);
   };
 
-  // 👇 Aprobar la solicitud tal cual está
   const handleApproveSelected = async () => {
     if (!selectedRequest) return;
 
-    // 🔥 EDITA SOLO ESTA LÍNEA (usa el nombre correcto del ID, mira la consola)
     const appointmentId =
-      selectedRequest.patient_appointment_id || // 👈 Opción 1
-      selectedRequest.patient_appointment_id || // 👈 Opción 2
-      selectedRequest.patient_appointment_id;                       // 👈 Opción 3
+      selectedRequest.patient_appointment_id                 
 
     if (!appointmentId) {
-      console.error("❌ No se pudo obtener el ID de la solicitud:", selectedRequest);
       alert("No se reconoce el ID de la cita");
       return;
     }
 
     try {
       setIsApproving(true);
-      console.log("🆔 Enviando al backend:", appointmentId);
 
       const res = await fetch(
         `${API_BASE_URL}/appointments/${appointmentId}/change-status`,
