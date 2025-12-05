@@ -747,15 +747,8 @@ export default class Agenda {
     const { patientId, doctorId, dateHour, duration, appointmentType, place } =
       data;
 
-    const [datePart, timePart] = dateHour.split("T");
-    const [year, month, day] = datePart.split("-").map(Number);
-    const [hours, minutes] = timePart.split(":").map(Number);
+    const proposedStart = new Date(dateHour);
 
-    const proposedStart = new Date(
-      Date.UTC(year, month - 1, day, hours, minutes)
-    );
-
-    console.log(dateHour);
     const now = new Date();
 
     if (proposedStart <= now) {
