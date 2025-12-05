@@ -562,7 +562,8 @@ export default class Agenda {
       doctorId,
       proposedStart,
       proposedEnd,
-      duration
+      duration,
+      patientAppointmentId
     );
 
     // Get the patient_appointment to check patient conflicts
@@ -630,7 +631,8 @@ export default class Agenda {
     doctorId: string,
     proposedStart: Date,
     proposedEnd: Date,
-    duration: number
+    duration: number,
+    excludePatientAppointmentId?: number
   ) {
     // Check for conflicts with doctor
     const doctorConflicts = await prisma.patient_appointment.findMany({
@@ -641,6 +643,13 @@ export default class Agenda {
         appointment_status: {
           not: "CANCELED",
         },
+        ...(excludePatientAppointmentId
+          ? {
+            patient_appointment_id: {
+              not: excludePatientAppointmentId,
+            },
+          }
+          : {}),
         OR: [
           {
             date_hour: {
@@ -659,7 +668,9 @@ export default class Agenda {
             AND: [
               {
                 date_hour: {
-                  gte: new Date(proposedStart.getTime() - 24 * 60 * 60 * 1000), // rough, but better to calculate
+                  gte: new Date(
+                    proposedStart.getTime() - 24 * 60 * 60 * 1000
+                  ),
                 },
               },
             ],
