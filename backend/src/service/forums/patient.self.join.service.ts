@@ -3,26 +3,24 @@ import {
   findPatientByUserId,
   findUserInForum,
   addUserToForum
-} from '../../model/forums/add_patient_to_forum.model';
+} from '../../model/forums/patient.self.join.model';
 import {
   NotFoundError,
   BadRequestError,
   ConflictError
 } from '../../util/errors.util.js';
 import type {
-  AddPatientToForumResponse,
-  ForumRole
-} from '../../types/forums/add_patient_to_forum.types';
-import { FORUM_ROLES } from '../../types/forums/add_patient_to_forum.types';
+  PatientSelfJoinResponse
+} from '../../types/forums/patient.self.join.types';
+import { ForumRole } from '@prisma/client';
 
 /**
- * Service to add patient to forum
+ * Service for patient to self-join a public forum
  */
-export async function addPatientToForumService(
+export async function patientSelfJoinService(
   forumId: number,
-  userId: string,
-  forumRole: ForumRole
-): Promise<AddPatientToForumResponse> {
+  userId: string
+): Promise<PatientSelfJoinResponse> {
 
   // 1. Verify that forum exists
   const forum = await findForumById(forumId);
@@ -30,9 +28,9 @@ export async function addPatientToForumService(
     throw new NotFoundError('Forum not found');
   }
 
-  // 2. Verify that forum is private
-  if (forum.public_status) {
-    throw new BadRequestError('Only private forums can have users added manually');
+  // 2. Verify that forum is public
+  if (!forum.public_status) {
+    throw new BadRequestError('Only public forums can be joined directly');
   }
 
   // 3. Verify that forum is active
@@ -52,13 +50,13 @@ export async function addPatientToForumService(
     throw new ConflictError('User is already a member of this forum');
   }
 
-  // 6. Add user to forum
-  const userForum = await addUserToForum(userId, forumId, forumRole);
+  // 6. Add user to forum with MEMBER role
+  const userForum = await addUserToForum(userId, forumId, ForumRole.MEMBER);
 
   // 7. Return success response
   return {
     success: true,
-    message: 'Patient added to forum successfully',
+    message: 'Successfully joined the forum',
     data: {
       userId: userForum.user_id,
       forumId: userForum.forum_id,
