@@ -514,7 +514,7 @@ VALUES
 (1, 'c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', '¡Hola a todos! Acabo de crear este foro para compartir experiencias sobre el manejo de la diabetes. ¿Qué tips de alimentación les han funcionado?', '2025-11-01 10:00:00', NULL, true),
 (1, 'c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', 'Hola Pedro! A mí me ha ayudado mucho reducir los carbohidratos refinados y aumentar el consumo de verduras. También medir la glucosa regularmente.', '2025-11-01 14:30:00', 1, true),
 (1, 'c3eebc99-9c0b-4ef8-bb6d-6bb9bd380a77', 'Excelente iniciativa! Yo recomiendo llevar un diario de alimentos para identificar qué comidas afectan más los niveles de glucosa.', '2025-11-02 09:15:00', 1, true),
-(1, 'c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'Gracias Laura! Eso de medir regularmente es clave. ¿Cada cuánto lo haces?', '2025-11-02 11:00:00', 2, true)
+(1, 'c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'Gracias Laura! Eso de medir regularmente es clave. ¿Cada cuánto lo haces?', '2025-11-02 11:00:00', 2, true);
 
 INSERT INTO messages (forum_id, user_id, content, publication_timestamp, parent_message_id, active)
 VALUES 
