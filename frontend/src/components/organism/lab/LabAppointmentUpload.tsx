@@ -88,12 +88,14 @@ function LabAppointmentUpload() {
     async function handleUpload() {
         if (!appointment || !file || !id) return;
 
-        // Only allow uploading results when the study is already in the laboratory (LAB)
-        if (appointment.status !== ANALYSIS_STATUS.LAB) {
+        if (
+            appointment.status !== ANALYSIS_STATUS.LAB &&
+            appointment.status !== ANALYSIS_STATUS.REQUESTED
+        ) {
             setFeedback({
                 type: "error",
                 message:
-                    "Solo puedes subir resultados para estudios que ya están en laboratorio.",
+                    "Solo puedes subir resultados para estudios pendientes de laboratorio.",
             });
             return;
         }
@@ -228,7 +230,9 @@ function LabAppointmentUpload() {
         );
     }
 
-    const canUpload = appointment?.status === ANALYSIS_STATUS.LAB;
+    const canUpload =
+        appointment?.status === ANALYSIS_STATUS.LAB ||
+        appointment?.status === ANALYSIS_STATUS.REQUESTED;
     const uploadDisabled = !file || uploading || success || !canUpload;
     const inputDisabled = uploading || success || !canUpload;
 
@@ -239,7 +243,9 @@ function LabAppointmentUpload() {
                     <p className="text-lg font-semibold text-slate-900">
                         {appointment.patientName}
                     </p>
-                    <p className="text-sm text-slate-700">{appointment.analysisName}</p>
+                    <p className="text-sm text-slate-700">
+                        {appointment.analysisName}
+                    </p>
                     <p className="text-xs text-slate-500 mt-1">
                         {new Date(appointment.date).toLocaleString("es-MX")}
                     </p>
@@ -276,7 +282,9 @@ function LabAppointmentUpload() {
                     {file && (
                         <p className="text-xs text-slate-700 mt-1">
                             Archivo seleccionado:{" "}
-                            <span className="font-mono break-all">{file.name}</span>
+                            <span className="font-mono break-all">
+                                {file.name}
+                            </span>
                         </p>
                     )}
 
@@ -301,7 +309,8 @@ function LabAppointmentUpload() {
                             Resultados ya enviados
                         </p>
                         <p className="text-xs text-slate-600 mt-1">
-                            Este estudio ya cuenta con un archivo de resultados registrado.
+                            Este estudio ya cuenta con un archivo de resultados
+                            registrado.
                         </p>
                     </div>
                 ) : (
@@ -311,8 +320,9 @@ function LabAppointmentUpload() {
                             Resultados aún no disponibles
                         </p>
                         <p className="text-xs text-slate-600 mt-1">
-                            Este estudio todavía no está listo para subir resultados desde el
-                            laboratorio.
+                            Este estudio no está habilitado para subir resultados
+                            desde esta pantalla. Verifica el estado en el módulo
+                            correspondiente.
                         </p>
                     </div>
                 )

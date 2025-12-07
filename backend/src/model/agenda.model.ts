@@ -512,17 +512,15 @@ export default class Agenda {
     // Remove booked slots from available slots
     for (const analysis of bookedAnalyses) {
       if (!analysis.analysis_date) continue;
-      
+
       const analysisDate = new Date(analysis.analysis_date);
-      
-      // Get local time components from the UTC analysis date
-      const analysisHour = analysisDate.getHours() + 6;
+      const analysisHour = analysisDate.getHours();
       const analysisMinute = analysisDate.getMinutes();
-      
-      // Format the booked slot time as "HH:MM"
-      const bookedSlot = `${analysisHour.toString().padStart(2, "0")}:${analysisMinute.toString().padStart(2, "0")}`;
-      
-      // Remove the booked slot from available slots
+
+      const bookedSlot = `${analysisHour.toString().padStart(2, "0")}:${analysisMinute
+        .toString()
+        .padStart(2, "0")}`;
+
       const index = availableSlots.indexOf(bookedSlot);
       if (index > -1) {
         availableSlots.splice(index, 1);
@@ -549,7 +547,11 @@ export default class Agenda {
       place,
     } = data;
 
-    const proposedStart = new Date(dateHour);
+    const [datePart, timePart] = dateHour.split("T");
+    const [year, month, day] = datePart.split("-").map(Number);
+    const [hours, minutes] = timePart.split(":").map(Number);
+
+    const proposedStart = new Date(year, month - 1, day, hours, minutes, 0, 0);
     const now = new Date();
 
     if (proposedStart <= now) {
@@ -562,10 +564,10 @@ export default class Agenda {
       doctorId,
       proposedStart,
       proposedEnd,
-      duration
+      duration,
+      patientAppointmentId
     );
 
-    // Get the patient_appointment to check patient conflicts
     const patientAppt = await prisma.patient_appointment.findUnique({
       where: { patient_appointment_id: patientAppointmentId },
     });
@@ -581,7 +583,6 @@ export default class Agenda {
       duration
     );
 
-    // First, get an appointment for this doctor (or create one if needed)
     const doctorAppointment = await prisma.appointments.findFirst({
       where: {
         doctor_id: doctorId,
@@ -592,14 +593,13 @@ export default class Agenda {
       throw new Error("No appointment type found for this doctor");
     }
 
-    // Update the patient_appointment with the scheduled details
     const scheduledAppointment = await prisma.patient_appointment.update({
       where: {
         patient_appointment_id: patientAppointmentId,
       },
       data: {
         appointment_id: doctorAppointment.appointment_id,
-        date_hour: proposedStart,
+        date_hour: proposedStart,   // ✅ local, igual que createAppointment
         duration,
         appointment_type: appointmentType,
         place,
@@ -630,7 +630,8 @@ export default class Agenda {
     doctorId: string,
     proposedStart: Date,
     proposedEnd: Date,
-    duration: number
+    duration: number,
+    excludePatientAppointmentId?: number
   ) {
     // Check for conflicts with doctor
     const doctorConflicts = await prisma.patient_appointment.findMany({
@@ -641,6 +642,13 @@ export default class Agenda {
         appointment_status: {
           not: "CANCELED",
         },
+        ...(excludePatientAppointmentId
+          ? {
+            patient_appointment_id: {
+              not: excludePatientAppointmentId,
+            },
+          }
+          : {}),
         OR: [
           {
             date_hour: {
@@ -659,7 +667,9 @@ export default class Agenda {
             AND: [
               {
                 date_hour: {
-                  gte: new Date(proposedStart.getTime() - 24 * 60 * 60 * 1000), // rough, but better to calculate
+                  gte: new Date(
+                    proposedStart.getTime() - 24 * 60 * 60 * 1000
+                  ),
                 },
               },
             ],
@@ -749,9 +759,7 @@ export default class Agenda {
     const [year, month, day] = datePart.split("-").map(Number);
     const [hours, minutes] = timePart.split(":").map(Number);
 
-    const proposedStart = new Date(
-      Date.UTC(year, month - 1, day, hours, minutes)
-    );
+    const proposedStart = new Date(year, month - 1, day, hours, minutes, 0, 0);
     const now = new Date();
 
     if (proposedStart <= now) {
@@ -829,7 +837,7 @@ export default class Agenda {
       data: {
         patient_id: patientId,
         appointment_id: doctorAppointment.appointment_id,
-        date_hour: proposedStart.toISOString(),
+        date_hour: proposedStart,
         duration,
         appointment_type: appointmentType,
         place:
