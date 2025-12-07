@@ -1,6 +1,7 @@
 // frontend/src/hooks/lab/useFullLabResults.ts
 import { useEffect, useState, useCallback } from "react";
 import { patientFullResultsApi } from "@/services/lab/results.service";
+import { API_BASE_URL } from "@/config/api.config";
 
 export default function useFullLabResults(patient_analysis_id: string) {
   // variables for full results and user
@@ -32,9 +33,20 @@ export default function useFullLabResults(patient_analysis_id: string) {
         setAnalysis(res.data.analysis);
         setError("");
 
-        // aquí usamos directamente la ruta del PDF que viene del backend
+        // aquí usamos la ruta del PDF que viene del backend
+        // y la convertimos en una URL absoluta para que el iframe pueda cargarla
         const pdfPath = res.data.results?.path || null;
-        setPdf(pdfPath);
+
+        function getFullPath(path: string | null | undefined) {
+          if (!path) return null;
+          if (/^https?:\/\//i.test(path)) return path; // full URL already
+          // derive origin from API_BASE_URL, fallback to window.location.origin
+          const backendOrigin = API_BASE_URL.replace(/\/api\/?$/, "") || window.location.origin;
+          if (path.startsWith("/")) return `${backendOrigin}${path}`;
+          return `${backendOrigin}/${path}`;
+        }
+
+        setPdf(getFullPath(pdfPath));
       } else {
         setError("Request for patient results failed");
       }

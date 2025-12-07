@@ -27,8 +27,10 @@ const LabResultsSection: React.FC<Props> = ({
 }) => {
   const [analysisItems, setAnalysisItems] = useState<AnalysisWithUpload[]>(existingAnalysis);
 
-  // Derive backend origin from API_BASE_URL
-  const BACKEND_ORIGIN = API_BASE_URL.replace(/\/api$/, "");
+  // Derive backend origin from API_BASE_URL. If API_BASE_URL is a relative path (e.g. '/api')
+  // `replace` strips a trailing '/api' or '/api/' and we fall back to `window.location.origin`
+  // so links become absolute and won't be intercepted by React Router.
+  const BACKEND_ORIGIN = API_BASE_URL.replace(/\/api\/?$/, "") || window.location.origin;
 
   function getFullPath(path: string | null | undefined) {
     if (!path) return null;
