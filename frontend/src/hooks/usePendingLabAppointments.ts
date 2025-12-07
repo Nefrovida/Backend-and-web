@@ -26,13 +26,15 @@ export default function usePendingLabAppointments() {
             setError(null);
             const data = await fetchPendingAppointments();
 
-            const onlyUpload = data.filter(
-                (appt) => appt.status === ANALYSIS_STATUS.LAB
+            const onlyUpload = data.filter((appt) =>
+                (appt.status === ANALYSIS_STATUS.REQUESTED ||
+                    appt.status === ANALYSIS_STATUS.LAB) &&
+                (appt as any).resultURI == null
             );
 
             const sorted = [...onlyUpload].sort((a, b) => {
                 const weight = (s: LabAppointment["status"]) =>
-                    s === "REQUESTED" ? 0 : 1;
+                    s === ANALYSIS_STATUS.REQUESTED ? 0 : 1;
 
                 const wA = weight(a.status);
                 const wB = weight(b.status);

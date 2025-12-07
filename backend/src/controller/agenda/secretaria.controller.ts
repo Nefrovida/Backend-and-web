@@ -85,9 +85,16 @@ export const scheduleAppointment = async (req: Request, res: Response) => {
     });
 
     res.json(scheduledAppointment);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error scheduling appointment:", error);
-    res.status(500).json({ error: "Failed to schedule appointment" });
+    const message =
+      error instanceof Error && error.message
+        ? error.message
+        : "Failed to schedule appointment";
+
+    // si quieres distinguir errores de validación vs 500,
+    // podrías usar 400 aquí:
+    res.status(400).json({ error: message });
   }
 };
 

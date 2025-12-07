@@ -144,9 +144,12 @@ export default class Laboratory {
       }
 
       // Only allow uploading results when the study is already in the laboratory (LAB)
-      if (existing.analysis_status !== ANALYSIS_STATUS.LAB) {
+      if (
+        existing.analysis_status !== ANALYSIS_STATUS.LAB &&
+        existing.analysis_status !== ANALYSIS_STATUS.REQUESTED
+      ) {
         throw new Error(
-          "Solo se pueden subir resultados para estudios que ya están en laboratorio (estado LAB)."
+          "Solo se pueden subir resultados para estudios pendientes (REQUESTED o LAB)."
         );
       }
 

@@ -1,15 +1,19 @@
+// backend/src/controller/analysis/createAnalysisAppointment.controller.ts
 import { Request, Response } from "express";
 import { prisma } from "#/src/util/prisma";
 import { Status } from "@prisma/client";
 
-
-export default async function createAnalysisAppointment(req: Request, res: Response) {
+export default async function createAnalysisAppointment(
+    req: Request,
+    res: Response
+) {
     try {
         const { user_id, analysis_id, analysis_date } = req.body;
 
         if (!user_id || !analysis_id || !analysis_date) {
             return res.status(400).json({
-                error: "Revisa que no falta en enviar el user_id, analysis_id o analysis_date",
+                error:
+                    "Revisa que no falte enviar el user_id, analysis_id o analysis_date",
             });
         }
 
@@ -19,36 +23,61 @@ export default async function createAnalysisAppointment(req: Request, res: Respo
 
         if (!patient) {
             return res.status(404).json({
-                error: "No se encontro ningun paciente con ese usuario :p",
+                error: "No se encontró ningún paciente con ese usuario",
             });
         }
 
-        // const parsedDate = new Date(analysis_date);
-        let appointmentDate: Date;
-    
-        if (analysis_date.includes('T')) {
-        // Parse as "YYYY-MM-DDTHH:mm:ss" format
-        const [datePart, timePart] = analysis_date.split('T');
-        const [year, month, day] = datePart.split('-').map(Number);
-        const [hours, minutes, seconds = 0] = timePart.replace('Z', '').split(':').map(Number);
-        
-        // Create date using local timezone (not UTC)
-        appointmentDate = new Date(year, month - 1, day, hours - 6, minutes, seconds);
-        } else {
-        // Fallback to direct parsing
-        appointmentDate = new Date(analysis_date);
-        }
-        
-        const now = new Date();
-        if (appointmentDate <= now) {
-        res.status(400).json({ success: false });
-        return;
-        }
+        const appointmentDate = new Date(analysis_date);
 
         if (isNaN(appointmentDate.getTime())) {
             return res.status(400).json({
-                error: "Formato de fecha invalido",
-                received: analysis_date
+                error: "Formato de fecha inválido",
+                received: analysis_date,
+            });
+        }
+
+        const now = new Date();
+        if (appointmentDate <= now) {
+            return res.status(400).json({
+                success: false,
+                error: "No puedes agendar análisis en el pasado",
+            });
+        }
+
+        // 1) Avoid same PATIENT reserving the SAME ANALYSIS TIME SLOT
+        const duplicatedForPatient = await prisma.patient_analysis.findFirst({
+            where: {
+                patient_id: patient.patient_id,
+                analysis_date: appointmentDate,
+                analysis_status: {
+                    not: Status.CANCELED,
+                },
+            },
+        });
+
+        if (duplicatedForPatient) {
+            return res.status(409).json({
+                success: false,
+                error:
+                    "Ya tienes un análisis reservado en ese horario. Elige otro horario, por favor.",
+            });
+        }
+
+        // 2) Avoid same ANALYSIS TYPE using the same slot
+        const duplicatedForSlot = await prisma.patient_analysis.findFirst({
+            where: {
+                analysis_id,
+                analysis_date: appointmentDate,
+                analysis_status: {
+                    not: Status.CANCELED,
+                },
+            },
+        });
+
+        if (duplicatedForSlot) {
+            return res.status(409).json({
+                success: false,
+                error: "Ese horario ya está ocupado para este análisis en laboratorio.",
             });
         }
 
@@ -65,12 +94,14 @@ export default async function createAnalysisAppointment(req: Request, res: Respo
             },
         });
 
-        res.status(201).json({
+        return res.status(201).json({
             success: true,
             analysis: newAnalysis,
         });
     } catch (error) {
-        console.error("Error al crear la cita de analisis UnU", error);
-        res.status(500).json({ error: "Error al crear la cita de analisis" });
+        console.error("Error al crear la cita de análisis", error);
+        return res
+            .status(500)
+            .json({ error: "Error al crear la cita de análisis" });
     }
 }
