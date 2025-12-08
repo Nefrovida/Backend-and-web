@@ -37,11 +37,7 @@ function Agenda() {
       const res = await fetch(
         `/api/agenda/appointments/range?start=${startStr}&end=${endStr}`
       );
-      let data = await res.json();
-      data = data.map((appt: any) => ({
-        ...appt,
-        date_hour: appt.date_hour.replace("Z", ""),
-      }));
+      const data = await res.json();
       const mappedEvents = mapAppointmentsToEvents(data);
 
       setEvents(mappedEvents);

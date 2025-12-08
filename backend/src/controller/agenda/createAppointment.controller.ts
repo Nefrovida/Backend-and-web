@@ -1,8 +1,7 @@
+// backend/src/controller/agenda/createAppointment.controller.ts
 import { Request, Response } from "express";
 import { prisma } from "../../util/prisma";
 import { Type, Status } from "@prisma/client";
-
-// const prisma = new PrismaClient();
 
 async function createAppointment(req: Request, res: Response) {
     try {
@@ -10,7 +9,8 @@ async function createAppointment(req: Request, res: Response) {
 
         if (!user_id || !appointment_id || !date_hour) {
             return res.status(400).json({
-                error: "Missing user_id, appointment_id or date_hour",
+                error:
+                    "Revisa que no falte enviar el user_id, appointment_id o date_hour",
             });
         }
 
@@ -20,23 +20,72 @@ async function createAppointment(req: Request, res: Response) {
 
         if (!patient) {
             return res.status(404).json({
-                error: "No patient was found for this user",
+                error: "No se encontró ningún paciente con ese usuario :p",
             });
         }
-        const parsedDate = new Date(date_hour);
 
-        if (isNaN(parsedDate.getTime())) {
+        const appointmentDate = new Date(date_hour);
+
+        if (isNaN(appointmentDate.getTime())) {
             return res.status(400).json({
-                error: "Invalid date format",
-                received: date_hour
+                error: "Formato de fecha inválido",
+                received: date_hour,
             });
         }
+
+        const now = new Date();
+        if (appointmentDate <= now) {
+            return res.status(400).json({
+                success: false,
+                error: "No puedes agendar citas en el pasado",
+            });
+        }
+
+        // 1) Evitar que el MISMO PACIENTE reserve dos veces el mismo horario
+        const duplicatedForPatient = await prisma.patient_appointment.findFirst({
+            where: {
+                patient_id: patient.patient_id,
+                date_hour: appointmentDate,
+                appointment_status: {
+                    not: Status.CANCELED, // si la cita está cancelada, se podría volver a reservar
+                },
+            },
+        });
+
+        if (duplicatedForPatient) {
+            return res.status(409).json({
+                success: false,
+                error:
+                    "Ya tienes una cita reservada en ese horario. Elige otro horario, por favor.",
+            });
+        }
+
+        // 2) (Opcional) Evitar doble reserva para el MISMO appointment_id en ese horario
+        //    Descomenta si quieres que, en general, ese slot no se pueda repetir para nadie:
+        /*
+        const duplicatedForSlot = await prisma.patient_appointment.findFirst({
+          where: {
+            appointment_id,
+            date_hour: appointmentDate,
+            appointment_status: {
+              notIn: [Status.CANCELED, Status.FINISHED], // ignorar citas que ya terminaron o canceladas
+            },
+          },
+        });
+    
+        if (duplicatedForSlot) {
+          return res.status(409).json({
+            success: false,
+            error: "Ese horario ya está ocupado para esta consulta.",
+          });
+        }
+        */
 
         const newAppointment = await prisma.patient_appointment.create({
             data: {
                 patient_id: patient.patient_id,
                 appointment_id,
-                date_hour: parsedDate,
+                date_hour: appointmentDate,
                 duration: 30,
                 link: null,
                 place: null,
@@ -45,13 +94,13 @@ async function createAppointment(req: Request, res: Response) {
             },
         });
 
-        res.status(201).json({
+        return res.status(201).json({
             success: true,
             appointment: newAppointment,
         });
     } catch (error) {
-        console.error("Error creating appointment:", error);
-        res.status(500).json({ error: "Failed to create appointment" });
+        console.error("Error al crear la cita UnU", error);
+        return res.status(500).json({ error: "Error al crear la cita" });
     }
 }
 

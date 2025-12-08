@@ -246,7 +246,7 @@ const DirectAppointmentForm: React.FC<Props> = ({
     if (selectedDateObj.toDateString() === today.toDateString()) {
       const [hours, minutes] = selectedTime.split(":");
       const selectedTimeObj = new Date();
-      selectedTimeObj.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+      selectedTimeObj.setHours(parseInt(hours) - 6, parseInt(minutes), 0, 0);
 
       if (selectedTimeObj <= new Date()) {
         setError("La hora seleccionada debe ser en el futuro");

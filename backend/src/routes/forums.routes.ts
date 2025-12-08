@@ -1,4 +1,5 @@
 import express from "express";
+import * as patientSelfJoinController from "../controller/forums/patient.self.join.controller";
 import * as forumsController from "../controller/forums.controller";
 import * as addPatientToForumController from "../controller/forums/add_patient_to_forum.controller";
 import { authenticate } from "../middleware/auth.middleware";
@@ -67,8 +68,6 @@ router.delete(
 );
 
 router.get("/", authenticate, forumsController.getAll);
-
-router.get("/:forumId", authenticate, forumsController.getById);
 
 router.get("/me", authenticate, forumsController.getMyForums);
 
@@ -205,6 +204,17 @@ router.post(
   "/:forumId/join",
   authenticate,
   addPatientToForumController.joinForum
+);
+
+/**
+ * @route   POST /api/forums/:forumId/android/join
+ * @desc    Patient self-join to a public forum (Android frontend)
+ * @access  Private (requires authentication only)
+ */
+router.post(
+  "/:forumId/android/join",
+  authenticate,
+  patientSelfJoinController.patientSelfJoin
 );
 
 router.post("/like/:messageId", authenticate, likeMessage);
