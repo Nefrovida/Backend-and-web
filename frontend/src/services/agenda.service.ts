@@ -1,6 +1,5 @@
 import { AppointmentRequest, Doctor, ScheduleAppointmentData, Patient, CreateAppointmentData } from "../types/appointment";
-
-const API_BASE_URL = (import.meta as any).env.VITE_APP_API_URL || "http://localhost:3001/api";
+import { API_BASE_URL } from "../config/api.config";
 
 export const agendaService = {
   async getPendingRequests(): Promise<AppointmentRequest[]> {

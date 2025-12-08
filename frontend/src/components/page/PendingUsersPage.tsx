@@ -8,6 +8,25 @@ import {
 } from "@/services/admin.service";
 import { usersService, type PendingUser } from "../../services/users.service";
 
+const roleName = (id: number) => {
+  switch (id) {
+    case 1:
+      return "Administrador";
+    case 2:
+      return "Doctor";
+    case 3:
+      return "Paciente";
+    case 4:
+      return "Laboratorista";
+    case 5:
+      return "Familiar";
+    case 6:
+      return "Secretaria";
+    default:
+      return "Desconocido";
+  }
+};
+
 type ViewMode = "pending" | "all" | "external";
 
 function PendingUsersPage() {

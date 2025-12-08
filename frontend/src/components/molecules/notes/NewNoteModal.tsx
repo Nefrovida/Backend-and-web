@@ -38,7 +38,6 @@ const NewNoteModal: FC<Props> = ({ modalState, title }) => {
           onChange={(v) => {
             handleChange("title", v.target.value);
           }}
-          value={title}
           maxLength={MAX_TITLE_LENGHT}
         />
       </div>

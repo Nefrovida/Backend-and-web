@@ -1,6 +1,6 @@
 import { MedicalRecordData } from "../types/expediente.types";
 
-const API_BASE_URL = import.meta.env.VITE_APP_API_URL || "http://localhost:3001/api";
+import { API_BASE_URL } from "../config/api.config";
 const BACKEND_ORIGIN = API_BASE_URL.replace(/\/api$/, "");
 
 export interface UploadPDFRequest {

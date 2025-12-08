@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_APP_API_URL || "http://localhost:3001/api";
+import { API_BASE_URL } from "../config/api.config";
 
 export interface PendingUser {
   user_id: string;
