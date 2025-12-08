@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { LabResultFormData } from "../../../types/expediente.types";
 import { MedicalRecordAnalysis } from "../../../types/expediente.types";
 import { expedienteService } from "../../../services/expediente.service";
+import { API_BASE_URL } from "../../../config/api.config";
 
 interface Props {
   data: LabResultFormData;
@@ -26,9 +27,8 @@ const LabResultsSection: React.FC<Props> = ({
 }) => {
   const [analysisItems, setAnalysisItems] = useState<AnalysisWithUpload[]>(existingAnalysis);
 
-  // Derive backend origin from Vite env or default to http://localhost:3001
-  const API_BASE = (import.meta as any).env?.VITE_APP_API_URL || "http://localhost:3001/api";
-  const BACKEND_ORIGIN = API_BASE.replace(/\/api$/, "");
+  // Derive backend origin from API_BASE_URL
+  const BACKEND_ORIGIN = API_BASE_URL.replace(/\/api$/, "");
 
   function getFullPath(path: string | null | undefined) {
     if (!path) return null;

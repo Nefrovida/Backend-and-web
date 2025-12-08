@@ -4,6 +4,31 @@ import Laboratory from "../../model/lab.model";
 
 const MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024; // 20 MB
 
+/**
+ * Get the server origin from environment variables
+ * Priority:
+ * 1. VITE_APP_API_URL (if set, remove /api suffix)
+ * 2. SERVER_ORIGIN 
+ * 3. Fallback to http://localhost:{SERVER_PORT}
+ */
+function getServerOrigin(): string {
+  // Try VITE_APP_API_URL first (remove /api suffix if present)
+  if (process.env.VITE_APP_API_URL) {
+    return process.env.VITE_APP_API_URL.replace(/\/api\/?$/i, '').replace(/\/$/, '');
+  }
+  
+  // Fall back to SERVER_ORIGIN if set
+  if (process.env.SERVER_ORIGIN) {
+    return process.env.SERVER_ORIGIN.replace(/\/$/, '');
+  }
+  
+  // Final fallback to localhost
+  const port = process.env.SERVER_PORT ?? 3001;
+  return `http://localhost:${port}`;
+}
+
+const SERVER_ORIGIN = getServerOrigin();
+
 export async function getLabAppointments(req: Request, res: Response) {
   try {
     const page = Number(req.query.page ?? 0);
@@ -61,7 +86,7 @@ export async function requestPresign(req: Request, res: Response) {
     }
 
     const safeName = `${id}-${Date.now()}.pdf`;
-    const url = `http://localhost:3001/uploads/${safeName}`;
+    const url = `${SERVER_ORIGIN}/uploads/${safeName}`;
 
     res.status(200).json({ url });
   } catch (error: any) {
@@ -91,26 +116,37 @@ export async function confirmUpload(req: Request, res: Response) {
       });
     }
 
-    // Validate that the URI points to our uploads server and has the expected format
-    const uploadsBase = "http://localhost:3001/uploads/";
-    if (!uri.startsWith(uploadsBase)) {
+    // Accept absolute or relative upload URIs, and normalize to the filename
+    const uploadsBase = `${SERVER_ORIGIN}/uploads/`;
+    let fileName: string | null = null;
+
+    if (uri.startsWith(uploadsBase)) {
+      // Absolute URL (e.g. https://example.com/uploads/5-123.pdf)
+      fileName = uri.substring(uploadsBase.length);
+    } else if (uri.startsWith("/uploads/")) {
+      // Relative path with leading slash
+      fileName = uri.substring("/uploads/".length);
+    } else if (uri.startsWith("uploads/")) {
+      // Relative path without leading slash
+      fileName = uri.substring("uploads/".length);
+    } else {
       return res.status(400).json({
         success: false,
         message: "La URL de resultados no es válida.",
       });
     }
-
-    const fileName = uri.substring(uploadsBase.length); // ex: "5-1234567890.pdf"
     const fileNameRegex = /^[0-9]+-[0-9]+\.pdf$/;
 
-    if (!fileNameRegex.test(fileName)) {
+    if (!fileName || !fileNameRegex.test(fileName)) {
       return res.status(400).json({
         success: false,
         message: "La URL de resultados no tiene un formato permitido.",
       });
     }
 
-    await Laboratory.confirmLabAppointmentResult(id, uri);
+    // Normalize to relative path before storing in DB
+    const relativePath = `/uploads/${fileName}`;
+    await Laboratory.confirmLabAppointmentResult(id, relativePath);
 
     res
       .status(200)

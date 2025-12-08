@@ -106,11 +106,7 @@ WHERE description IN (
   'VIEW_LAB_RESULTS',
   'EDIT_LAB_RESULTS',
   'CREATE_NOTES',
-  'VIEW_NOTES',
-  'UPDATE_NOTES',
-  'DELETE_NOTES',
-  'REMOVE_USER_FROM_FORUM',
-  'VIEW_FORUM_USERS'
+  'VIEW_NOTES'
 );
 
 -- Admin (role_id = 1): full privileges
@@ -268,9 +264,9 @@ INSERT INTO patient_appointment (patient_id, appointment_id, date_hour, duration
 VALUES 
 ('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 1, '2025-11-25 10:00:00', 60, 'PRESENCIAL', NULL, 'Consultorio 101, Hospital Central', 'PROGRAMMED'),
 ('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 2, '2025-10-15 14:00:00', 30, 'PRESENCIAL', NULL, 'Consultorio 101, Hospital Central', 'FINISHED'),
-('c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', 3, '2025-11-23 09:00:00', 60, 'VIRTUAL', 'https://meet.google.com/abc-defg-hij', NULL, 'PROGRAMMED'),
-('c3eebc99-9c0b-4ef8-bb6d-6bb9bd380a77', 3, '2025-10-20 16:00:00', 60, 'PRESENCIAL', NULL, 'Consultorio 205, Clínica del Sur', 'FINISHED'),
-('c4eebc99-9c0b-4ef8-bb6d-6bb9bd380a88', 4, '2025-11-28 11:00:00', 60, 'PRESENCIAL', NULL, 'Consultorio 302, Hospital Infantil', 'PROGRAMMED'),
+('c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', 3, '2025-11-23 09:00:00', 45, 'VIRTUAL', 'https://meet.google.com/abc-defg-hij', NULL, 'PROGRAMMED'),
+('c3eebc99-9c0b-4ef8-bb6d-6bb9bd380a77', 3, '2025-10-20 16:00:00', 45, 'PRESENCIAL', NULL, 'Consultorio 205, Clínica del Sur', 'FINISHED'),
+('c4eebc99-9c0b-4ef8-bb6d-6bb9bd380a88', 4, '2025-11-28 11:00:00', 45, 'PRESENCIAL', NULL, 'Consultorio 302, Hospital Infantil', 'PROGRAMMED'),
 ('c4eebc99-9c0b-4ef8-bb6d-6bb9bd380a88', 5, '2025-10-10 10:00:00', 30, 'PRESENCIAL', NULL, 'Consultorio 302, Hospital Infantil', 'FINISHED');
 
 -- ========================
@@ -518,19 +514,25 @@ VALUES
 (1, 'c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', '¡Hola a todos! Acabo de crear este foro para compartir experiencias sobre el manejo de la diabetes. ¿Qué tips de alimentación les han funcionado?', '2025-11-01 10:00:00', NULL, true),
 (1, 'c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', 'Hola Pedro! A mí me ha ayudado mucho reducir los carbohidratos refinados y aumentar el consumo de verduras. También medir la glucosa regularmente.', '2025-11-01 14:30:00', 1, true),
 (1, 'c3eebc99-9c0b-4ef8-bb6d-6bb9bd380a77', 'Excelente iniciativa! Yo recomiendo llevar un diario de alimentos para identificar qué comidas afectan más los niveles de glucosa.', '2025-11-02 09:15:00', 1, true),
-(1, 'c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'Gracias Laura! Eso de medir regularmente es clave. ¿Cada cuánto lo haces?', '2025-11-02 11:00:00', 2, true),
+(1, 'c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'Gracias Laura! Eso de medir regularmente es clave. ¿Cada cuánto lo haces?', '2025-11-02 11:00:00', 2, true)
 
+INSERT INTO messages (forum_id, user_id, content, publication_timestamp, parent_message_id, active)
+VALUES 
 -- Foro 2: Ejercicio y Salud Cardiovascular
 (2, 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22', 'Bienvenidos al foro de salud cardiovascular. Recuerden que el ejercicio moderado es fundamental. ¿Qué rutinas siguen ustedes?', '2025-10-28 08:00:00', NULL, true),
 (2, 'c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'Buenos días doctora! Yo hago caminata rápida 30 minutos al día, 5 días a la semana. ¿Es suficiente?', '2025-10-28 10:30:00', 5, true),
 (2, 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22', 'Excelente Pedro! Esa es una rutina muy adecuada. Lo importante es la constancia y que tu frecuencia cardíaca llegue a la zona objetivo.', '2025-10-28 12:00:00', 6, true),
-(2, 'b2eebc99-9c0b-4ef8-bb6d-6bb9bd380a33', 'Yo también recomiendo agregar ejercicios de fuerza 2-3 veces por semana. No necesariamente pesas, pueden ser ejercicios con peso corporal.', '2025-10-29 09:00:00', 5, true),
+(2, 'b2eebc99-9c0b-4ef8-bb6d-6bb9bd380a33', 'Yo también recomiendo agregar ejercicios de fuerza 2-3 veces por semana. No necesariamente pesas, pueden ser ejercicios con peso corporal.', '2025-10-29 09:00:00', 5, true);
 
+INSERT INTO messages (forum_id, user_id, content, publication_timestamp, parent_message_id, active)
+VALUES 
 -- Foro 3: Apoyo para Padres
 (3, 'c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', '¡Hola papás y mamás! Este es un espacio para compartir nuestras experiencias. ¿Cómo manejan las visitas al doctor con sus hijos?', '2025-11-05 16:00:00', NULL, true),
 (3, 'e2eebc99-9c0b-4ef8-bb6d-6bb9bd380ccc', 'Hola Laura! Yo trato de hacerlo divertido, le explico a mi hija que vamos a ver cómo está creciendo fuerte y sana.', '2025-11-06 10:00:00', 9, true),
-(3, 'b3eebc99-9c0b-4ef8-bb6d-6bb9bd380a44', 'Excelente estrategia Patricia! Como pediatra, recomiendo siempre ser honestos pero positivos. Nunca usar la visita al doctor como amenaza.', '2025-11-06 14:30:00', 10, true),
+(3, 'b3eebc99-9c0b-4ef8-bb6d-6bb9bd380a44', 'Excelente estrategia Patricia! Como pediatra, recomiendo siempre ser honestos pero positivos. Nunca usar la visita al doctor como amenaza.', '2025-11-06 14:30:00', 10, true);
 
+INSERT INTO messages (forum_id, user_id, content, publication_timestamp, parent_message_id, active)
+VALUES 
 -- Foro 4: Foro Privado Cardiología
 (4, 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22', 'Colegas, quiero compartir un caso interesante de arritmia que atendí esta semana.', '2025-11-10 11:00:00', NULL, true),
 (4, 'b2eebc99-9c0b-4ef8-bb6d-6bb9bd380a33', 'Adelante María, nos interesa conocer el caso.', '2025-11-10 13:00:00', 12, true),

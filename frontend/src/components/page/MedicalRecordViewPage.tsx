@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useMedicalRecord } from "../../hooks/useMedicalRecord";
+import { API_BASE_URL } from "../../config/api.config";
 import Title from "../atoms/Title";
 import {
   FaUserCircle,
@@ -21,14 +22,14 @@ type TabType = "info" | "appointments" | "notes" | "analysis" | "history" | "rep
 const MedicalRecordViewPage = () => {
   const { patientId } = useParams<{ patientId: string }>();
   const navigate = useNavigate();
-  const { data, loading, error } = useMedicalRecord(patientId);
   const [pdfOpen, setPdfOpen] = useState(false);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>("info");
 
-  // Derive backend origin from Vite env or default to http://localhost:3001
-  const API_BASE = (import.meta as any).env?.VITE_APP_API_URL || "http://localhost:3001/api";
-  const BACKEND_ORIGIN = API_BASE.replace(/\/api$/, "");
+  const { data, loading, error, refetch } = useMedicalRecord(patientId);
+
+  // Derive backend origin from API_BASE_URL
+  const BACKEND_ORIGIN = API_BASE_URL.replace(/\/api$/, "");
 
   if (loading) {
     return (

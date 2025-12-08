@@ -8,8 +8,7 @@ import { AdministratorsModal } from '../../components/forums/AdministratorsModal
 import { MembersModal } from '../../components/forums/MembersModal';
 import { DeleteForumModal } from '../../components/forums/DeleteForumModal';
 import { Toast } from '../../components/forums/Toast';
-
-const API_BASE = (import.meta as any).env?.VITE_APP_API_URL || 'http://localhost:3001/api';
+import { API_BASE_URL } from '../../config/api.config';
 
 
 /**
@@ -54,7 +53,7 @@ export const ForumsPage = () => {
   const fetchForums = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(`${API_BASE}/forums`, {
+      const response = await fetch(`${API_BASE_URL}/forums`, {
         credentials: 'include',
       });
 
@@ -77,7 +76,7 @@ export const ForumsPage = () => {
     try {
       setModalError(''); // Clear previous modal errors
 
-      const response = await fetch(`${API_BASE}/forums`, {
+      const response = await fetch(`${API_BASE_URL}/forums`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -116,7 +115,7 @@ export const ForumsPage = () => {
     try {
       setModalError(''); // Clear previous modal errors
 
-      const response = await fetch(`${API_BASE}/forums/${forumId}`, {
+      const response = await fetch(`${API_BASE_URL}/forums/${forumId}`, {
         method: 'PUT',
         credentials: 'include',
         headers: {
@@ -192,7 +191,7 @@ export const ForumsPage = () => {
     try {
       setModalError(''); // Clear previous modal errors
 
-      const response = await fetch(`${API_BASE}/forums/${forumId}`, {
+      const response = await fetch(`${API_BASE_URL}/forums/${forumId}`, {
         method: 'DELETE',
         credentials: 'include',
       });

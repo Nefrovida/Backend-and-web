@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Forum } from '../../types/forum.types';
+import { API_BASE_URL } from '../../config/api.config';
 
 interface User {
   user_id: string;
@@ -59,9 +60,8 @@ export const MembersModal: React.FC<MembersModalProps> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0);
-  // Prefer using a configured API base URL; fallback to the backend default
-  const API_BASE = (import.meta as any).env?.VITE_APP_API_URL || 'http://localhost:3001/api';
-
+  // Prefer using a configured API base URL
+  
   // Update local error when external error changes
   useEffect(() => {
     if (externalError) {
@@ -84,7 +84,7 @@ export const MembersModal: React.FC<MembersModalProps> = ({
       setIsLoading(true);
       setError('');
 
-      const response = await fetch(`${API_BASE}/forums/regular-users?page=${currentPage}&limit=10`, {
+      const response = await fetch(`${API_BASE_URL}/forums/regular-users?page=${currentPage}&limit=10`, {
         credentials: 'include',
       });
 
@@ -111,7 +111,7 @@ export const MembersModal: React.FC<MembersModalProps> = ({
       setIsLoadingForum(true);
       setError('');
 
-      const response = await fetch(`${API_BASE}/forums/${forum.forum_id}/members`, {
+      const response = await fetch(`${API_BASE_URL}/forums/${forum.forum_id}/members`, {
         credentials: 'include',
       });
 
@@ -138,7 +138,7 @@ export const MembersModal: React.FC<MembersModalProps> = ({
     try {
       setError('');
 
-      const response = await fetch(`${API_BASE}/forums/${forum.forum_id}/members`, {
+      const response = await fetch(`${API_BASE_URL}/forums/${forum.forum_id}/members`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -171,7 +171,7 @@ export const MembersModal: React.FC<MembersModalProps> = ({
     try {
       setError('');
 
-      const response = await fetch(`${API_BASE}/forums/${forum.forum_id}/members/${userId}`, {
+      const response = await fetch(`${API_BASE_URL}/forums/${forum.forum_id}/members/${userId}`, {
         method: 'DELETE',
         credentials: 'include',
       });
