@@ -480,6 +480,12 @@ export default class Agenda {
     const startOfDay = new Date(year, month - 1, day, 0, 0, 0, 0);
     const endOfDay = new Date(year, month - 1, day, 23, 59, 59, 999);
 
+    console.log(startOfDay);
+    const weekDay = startOfDay.getDay();
+    if (weekDay == 6 || weekDay == 3) {
+      return;
+    }
+
     // Get all scheduled analyses for this date
     const bookedAnalyses = await prisma.patient_analysis.findMany({
       where: {
