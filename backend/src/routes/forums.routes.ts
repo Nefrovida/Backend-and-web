@@ -69,8 +69,6 @@ router.delete(
 
 router.get("/", authenticate, forumsController.getAll);
 
-router.get("/:forumId", authenticate, forumsController.getById);
-
 router.get("/me", authenticate, forumsController.getMyForums);
 
 /**
