@@ -500,7 +500,7 @@ export default class Agenda {
 
     // Create full agenda - all slots are initially available
     for (let hour = workStart; hour < workEnd; hour++) {
-      for (let minute = 0; minute < 60; minute += 30) {
+      for (let minute = 0; minute < 60; minute += 10) {
         availableSlots.push(
           `${hour.toString().padStart(2, "0")}:${minute
             .toString()
@@ -517,9 +517,9 @@ export default class Agenda {
       const analysisHour = analysisDate.getHours();
       const analysisMinute = analysisDate.getMinutes();
 
-      const bookedSlot = `${analysisHour.toString().padStart(2, "0")}:${analysisMinute
+      const bookedSlot = `${analysisHour
         .toString()
-        .padStart(2, "0")}`;
+        .padStart(2, "0")}:${analysisMinute.toString().padStart(2, "0")}`;
 
       const index = availableSlots.indexOf(bookedSlot);
       if (index > -1) {
@@ -599,7 +599,7 @@ export default class Agenda {
       },
       data: {
         appointment_id: doctorAppointment.appointment_id,
-        date_hour: proposedStart,   // ✅ local, igual que createAppointment
+        date_hour: proposedStart, // ✅ local, igual que createAppointment
         duration,
         appointment_type: appointmentType,
         place,
@@ -644,10 +644,10 @@ export default class Agenda {
         },
         ...(excludePatientAppointmentId
           ? {
-            patient_appointment_id: {
-              not: excludePatientAppointmentId,
-            },
-          }
+              patient_appointment_id: {
+                not: excludePatientAppointmentId,
+              },
+            }
           : {}),
         OR: [
           {
@@ -667,9 +667,7 @@ export default class Agenda {
             AND: [
               {
                 date_hour: {
-                  gte: new Date(
-                    proposedStart.getTime() - 24 * 60 * 60 * 1000
-                  ),
+                  gte: new Date(proposedStart.getTime() - 24 * 60 * 60 * 1000),
                 },
               },
             ],
