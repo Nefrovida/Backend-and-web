@@ -45,4 +45,11 @@ router.delete(
   AppointmentController.deleteAppointment
 );
 
+router.put(
+  "/:id/change-status",
+  authenticate,
+  requirePrivileges([Privilege.UPDATE_APPOINTMENTS]),
+  AppointmentController.changeAppointmentStatus
+)
+
 export default router;
