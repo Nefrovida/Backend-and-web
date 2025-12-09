@@ -2,6 +2,7 @@
 import { Request, Response } from "express";
 import { prisma } from "#/src/util/prisma";
 import { Status } from "@prisma/client";
+import { parseClientDateToUTC } from "#/src/util/date.util";
 
 export default async function createAnalysisAppointment(
     req: Request,
@@ -27,7 +28,15 @@ export default async function createAnalysisAppointment(
             });
         }
 
-        const appointmentDate = new Date(analysis_date);
+        let appointmentDate: Date;
+        try {
+            appointmentDate = parseClientDateToUTC(analysis_date);
+        } catch (e) {
+            return res.status(400).json({
+                error: "Formato de fecha inválido",
+                received: analysis_date,
+            });
+        }
 
         if (isNaN(appointmentDate.getTime())) {
             return res.status(400).json({

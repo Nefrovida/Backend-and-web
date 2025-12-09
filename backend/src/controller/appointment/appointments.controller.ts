@@ -1,6 +1,12 @@
+// backend/src/controller/appointments/appointments.controllers.ts
 import { Request, Response } from "express";
 import * as appointmentsService from "../../service/appointments.service";
-import {createAppointmentTypeSchema, updateAppointmentTypeSchema } from "../../validators/appointment.validator";
+import {
+  createAppointmentTypeSchema,
+  updateAppointmentTypeSchema,
+} from "../../validators/appointment.validator";
+import { parseClientDateToUTC } from "../../util/date.util";
+
 /**
  * Get all appointments for the authenticated doctor
  * @param req - Express request with authenticated user
@@ -35,10 +41,13 @@ export const getAllAppointments = async (
   }
 };
 
-export const createAppointment = async (req: Request, res: Response): Promise<void> => {
+export const createAppointment = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const appointmentData = req.body;
-    
+
     if (!appointmentData) {
       res.status(400).json({ error: "Appointment data is required" });
       return;
@@ -46,7 +55,8 @@ export const createAppointment = async (req: Request, res: Response): Promise<vo
 
     const validatedData = createAppointmentTypeSchema.parse(appointmentData);
 
-    const existingAppointment = await appointmentsService.getAppointmentByData(validatedData);
+    const existingAppointment =
+      await appointmentsService.getAppointmentByData(validatedData);
 
     if (existingAppointment) {
       res.status(409).json({ error: "Appointment already exists" });
@@ -56,13 +66,15 @@ export const createAppointment = async (req: Request, res: Response): Promise<vo
     await appointmentsService.createAppointment(validatedData);
 
     res.status(201).json("Appointment created successfully");
-    
   } catch (error: any) {
     res.status(error.statusCode || 500).json({ error: error.message });
   }
 };
 
-export const updateAppointment = async (req: Request, res: Response): Promise<void> => {
+export const updateAppointment = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const appointmentId = req.params.appointment_id;
     const appointmentIdNumber = parseInt(appointmentId);
@@ -80,16 +92,21 @@ export const updateAppointment = async (req: Request, res: Response): Promise<vo
 
     const validatedData = updateAppointmentTypeSchema.parse(appointmentData);
 
-    await appointmentsService.updateAppointment(appointmentIdNumber, validatedData);
+    await appointmentsService.updateAppointment(
+      appointmentIdNumber,
+      validatedData
+    );
 
     res.status(200).json("Appointment updated successfully");
-    
   } catch (error: any) {
     res.status(error.statusCode || 500).json({ error: error.message });
   }
 };
 
-export const deleteAppointment = async (req: Request, res: Response): Promise<void> => {
+export const deleteAppointment = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const appointmentId = req.params.appointment_id;
     const appointmentIdNumber = parseInt(appointmentId);
@@ -102,7 +119,6 @@ export const deleteAppointment = async (req: Request, res: Response): Promise<vo
     await appointmentsService.deleteAppointment(appointmentIdNumber);
 
     res.status(200).json("Appointment deleted successfully");
-    
   } catch (error: any) {
     res.status(error.statusCode || 500).json({ error: error.message });
   }
@@ -145,36 +161,34 @@ export const scheduleAppointment = async (req: Request, res: Response) => {
     }
 
     // 3. Validate appointmentId exists and get appointment details
-    const appointment = await appointmentsService.validateAppointment(appointmentId);
+    const appointment =
+      await appointmentsService.validateAppointment(appointmentId);
     if (!appointment) {
       res.status(404).json({ success: false });
       return;
     }
 
-    // 4. Parse dateHour as local time (treat the incoming string as local time, not UTC)
-    // If dateHour is "2025-12-04T11:50:00", parse it as local time components
+    // 4. Parse dateHour usando la misma lógica centralizada
     let appointmentDate: Date;
-    
-    if (dateHour.includes('T')) {
-      // Parse as "YYYY-MM-DDTHH:mm:ss" format
-      const [datePart, timePart] = dateHour.split('T');
-      const [year, month, day] = datePart.split('-').map(Number);
-      const [hours, minutes, seconds = 0] = timePart.replace('Z', '').split(':').map(Number);
-      
-      // Create date using local timezone (not UTC)
-      appointmentDate = new Date(year, month - 1, day, hours - 6, minutes, seconds);
-    } else {
-      // Fallback to direct parsing
-      appointmentDate = new Date(dateHour);
+    try {
+      appointmentDate = parseClientDateToUTC(dateHour);
+    } catch (e) {
+      res.status(400).json({
+        success: false,
+        error: "Formato de fecha inválido",
+      });
+      return;
     }
-    
+
     const now = new Date();
     if (appointmentDate <= now) {
       res.status(400).json({ success: false });
       return;
     }
 
-    const normalizedAppointmentType = appointmentType.toUpperCase() as 'PRESENCIAL' | 'VIRTUAL';
+    const normalizedAppointmentType = appointmentType.toUpperCase() as
+      | "PRESENCIAL"
+      | "VIRTUAL";
 
     // 6. Create the patient appointment
     await appointmentsService.schedulePatientAppointment({
@@ -185,12 +199,12 @@ export const scheduleAppointment = async (req: Request, res: Response) => {
       appointment_type: normalizedAppointmentType,
       link: null,
       place: null,
-      appointment_status: 'REQUESTED'
+      appointment_status: "REQUESTED",
     });
 
     res.status(201).json({ success: true });
   } catch (error: any) {
-    console.error('Error scheduling appointment:', error);
+    console.error("Error scheduling appointment:", error);
     res.status(error.statusCode || 500).json({ success: false });
   }
 };
