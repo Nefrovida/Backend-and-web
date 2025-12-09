@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from 'express';
-import { addPatientToForumService, joinForumService } from '../../service/forums/add_patient_to_forum.service';
+import { addPatientToForumService } from '../../service/forums/add_patient_to_forum.service';
 import {
   addPatientToForumBodySchema,
   addPatientToForumParamsSchema
