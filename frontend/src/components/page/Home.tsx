@@ -33,7 +33,7 @@ const Home: React.FC = () => {
             <span className="border-l h-4 border-slate-300" />
             <span>
               Contáctanos:{" "}
-              <span className="font-medium text-slate-900">(01 427) 101-34-35</span>
+              <span className="font-medium text-slate-900">427 101 34 35</span>
             </span>
           </div>
 
@@ -71,7 +71,7 @@ const Home: React.FC = () => {
               </span>
               <span>
                 Contáctanos:{" "}
-                <span className="font-semibold">(01 427) 101-34-35</span>
+                <span className="font-semibold">427 101 34 35</span>
               </span>
             </div>
 
@@ -113,10 +113,21 @@ const Home: React.FC = () => {
                 </h1>
 
                 <p className="mt-4 text-base md:text-lg text-slate-700 max-w-xl">
-                  En NefroVida A.C. estamos comprometidos con la salud de nuestros pacientes.
-                  Ofrecemos servicios especializados en la detección, prevención y tratamiento
-                  de la Enfermedad Renal Crónica, diseñados para proteger tu salud renal y mejorar
-                  tu calidad de vida.
+                  NefroVida A.C. es una asociación sin fines de lucro cuyo principal objetivo 
+                  es apoyar a pacientes y familiares con Enfermedad Renal Crónica, en situación 
+                  de vulnerabilidad, y residentes de San Juan del Río y municipios aledaños.
+                </p>
+
+                <p className="mt-3 text-base md:text-lg text-slate-700 max-w-xl">
+                  Estamos comprometidos con la salud de nuestros pacientes. Ofrecemos servicios 
+                  especializados en la detección, prevención y tratamiento de la Enfermedad Renal 
+                  Crónica, diseñados para proteger tu salud renal y mejorar tu calidad de vida.
+                </p>
+
+                <p className="mt-3 text-base md:text-lg text-slate-700 max-w-xl">
+                  Además, con tu donativo ayudas a pacientes en tratamiento sustitutivo con el 
+                  pago de sesiones de hemodiálisis y a continuar realizando prevención de 
+                  Enfermedad Renal a personas en situación vulnerable.
                 </p>
 
               </div>
@@ -135,27 +146,42 @@ const Home: React.FC = () => {
                   <div className="mt-4 grid gap-3 text-xs text-slate-700">
                     <div className="border border-slate-100 rounded-2xl p-3">
                       <p className="font-medium text-slate-900">
-                        Tamizaje de detección y prevención de ERC
+                        Nuestros Tamizajes
                       </p>
-                      <p className="mt-1">
-                        Niños (donativo $180), adultos (donativo $200), embarazadas
-                        (donativo $395).
+                      <p className="mt-1 font-semibold text-slate-800">
+                        OBJETIVO: Detectar de manera temprana alteraciones en la función renal 
+                        para prevenir o retrasar la progresión de enfermedades renales crónicas.
                       </p>
-                      <p className="mt-1 text-slate-500 text-[11px]">
-                        Incluye estudios de laboratorio, cuestionario de riesgo,
-                        toma de presión arterial, peso, talla, circunferencia de
-                        cintura, entrega de estudios impresos, interpretación,
-                        recomendación y derivación con especialidades.
+                      <p className="mt-2 text-slate-600">
+                        INCLUYE: Aplicación de cuestionario de factor de riesgo, toma de presión arterial, 
+                        peso, talla, circunferencia de cintura, estudios de laboratorio de sangre y orina, 
+                        entrega de estudios impresos, interpretación, recomendaciones y derivación con especialidades.
+                      </p>
+                      <div className="mt-2 space-y-1">
+                        <p>• <span className="font-medium">NIÑOS:</span> Química Sanguínea de 6 elementos + examen general de orina</p>
+                        <p>• <span className="font-medium">ADULTOS:</span> Química Sanguínea de 6 elementos + microalbuminuria</p>
+                        <p>• <span className="font-medium">EMBARAZADAS:</span> Química Sanguínea de 6 elementos + PFH + BH + examen general de orina</p>
+                      </div>
+                      <p className="mt-2 text-slate-500 text-[11px]">
+                        Llama, pregunta por nuestras cuotas de recuperación y agenda.
                       </p>
                     </div>
 
                     <div className="border border-slate-100 rounded-2xl p-3">
                       <p className="font-medium text-slate-900">Consultas</p>
-                      <p className="mt-1">
-                        Nefrología, nefro pediatría, urología, diabetólogo,
-                        médico general, nutrición y psicología.
+                      <p className="mt-1 text-slate-600">
+                        Atención médica especializada:
                       </p>
-                      <p className="mt-1 text-slate-500 text-[11px]">
+                      <div className="mt-1 space-y-0.5">
+                        <p>• Nefrología</p>
+                        <p>• Nefro pediatra</p>
+                        <p>• Urología</p>
+                        <p>• Diabetólogo</p>
+                        <p>• Médico General</p>
+                        <p>• Nutrición</p>
+                        <p>• Psicología</p>
+                      </div>
+                      <p className="mt-2 text-slate-500 text-[11px]">
                         Llama, pregunta por nuestras cuotas de recuperación y agenda.
                       </p>
                     </div>
@@ -163,77 +189,23 @@ const Home: React.FC = () => {
                     <div className="border border-slate-100 rounded-2xl p-3">
                       <p className="font-medium text-slate-900">Ultrasonidos</p>
                       <p className="mt-1">
-                        Renal, abdomen, próstata, tiroides, obstétrico, tejidos
-                        blandos, hernias, testicular, mama y más.
+                        Realizados por un médico certificado, con previa cita:
                       </p>
-                      <p className="mt-1 text-slate-500 text-[11px]">
-                        Realizados por un médico certificado.
+                      <div className="mt-1 space-y-0.5">
+                        <p>• Renal</p>
+                        <p>• Abdomen</p>
+                        <p>• Entre otros más</p>
+                      </div>
+                      <p className="mt-2 text-slate-500 text-[11px]">
+                        Llama, pregunta por nuestras cuotas de recuperación y agenda.
                       </p>
                     </div>
                   </div>
                 </div>
-{/* 
-                <div className="rounded-3xl bg-blue-900 text-white p-5 md:p-6 text-sm">
-                  <p className="font-semibold">Tu donativo transforma vidas</p>
-                  <p className="mt-2 text-xs md:text-sm text-blue-50">
-                    Además con tu donativo ayudas a pacientes en tratamiento
-                    sustitutivo con el pago de sesiones de hemodiálisis y a
-                    continuar realizando prevención de Enfermedad Renal a
-                    personas en situación vulnerable.
-                  </p>
-                </div> */}
               </div>
             </div>
           </div>
         </section>
-
-        {/* About NefroVida
-        <section className="border-t border-slate-200 bg-white">
-          <div className="max-w-6xl mx-auto px-4 py-10 md:py-14 grid gap-8 md:grid-cols-2">
-            <div>
-              <h2 className="text-xl md:text-2xl font-semibold text-slate-900">
-                NefroVida A.C.
-              </h2>
-              <p className="mt-3 text-base text-slate-600">
-                Desde el año 2007, médicos, psicólogos, tanatólogos, nutriólogos
-                y especialistas en el cuidado de la salud física y emocional
-                conforman un equipo interdisciplinario para apoyar a pacientes
-                con Insuficiencia Renal Crónica en situación de pobreza y
-                vulnerabilidad en el estado de Querétaro y comunidades aledañas.
-              </p>
-              <p className="mt-3 text-base text-slate-600">
-                Atendemos principalmente a personas sin seguridad social que se
-                encuentran en diálisis peritoneal, hemodiálisis o en protocolo
-                de trasplante, con un enfoque integral en su bienestar.
-              </p>
-            </div>
-
-            <div className="space-y-3 text-sm text-slate-600">
-              <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                <p className="font-medium text-slate-900">
-                  Estudios de laboratorio
-                </p>
-                <p className="mt-2 text-xs">
-                  Realizamos cualquier tipo de estudio de laboratorio con cuotas
-                  bajas de recuperación. Los exámenes son una herramienta
-                  primordial para diagnosticar diferentes patologías, definir
-                  tratamientos y dar seguimiento a la evolución de cada paciente.
-                </p>
-              </div>
-
-              <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                <p className="font-medium text-slate-900">
-                  Acompañamiento integral
-                </p>
-                <p className="mt-2 text-xs">
-                  Nuestro equipo interdisciplinario brinda apoyo médico,
-                  nutricional, psicológico y tanatológico, poniendo en el centro
-                  la calidad de vida de las personas y sus familias.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section> */}
 
         {/* Mission, Vision and Values */}
         <section className="border-t border-slate-200 bg-slate-50">
@@ -245,11 +217,6 @@ const Home: React.FC = () => {
                 <h2 className="text-lg md:text-xl font-semibold text-slate-900">
                   Conoce más sobre NefroVida A.C.
                 </h2>
-                {/* <p className="mt-2 text-sm text-slate-600 max-w-xl">
-                  Nuestra labor está guiada por principios humanos, atención interdisciplinaria
-                  y un compromiso con la prevención, detección y tratamiento de la Enfermedad Renal Crónica
-                  en personas en situación vulnerable.
-                </p> */}
               </div>
 
               <a
@@ -269,10 +236,10 @@ const Home: React.FC = () => {
               <div className="rounded-3xl bg-white border border-slate-100 shadow-sm p-6 flex flex-col">
                 <h3 className="text-sm font-semibold text-slate-900">Misión</h3>
                 <p className="mt-2 text-xs text-slate-600 leading-relaxed">
-                  Brindar atención y apoyo multidisciplinario para la prevención, detección, control
-                  y tratamiento de la Enfermedad Renal Crónica. Acompañamos a personas con o sin tratamiento
-                  sustitutivo (hemodiálisis, diálisis) y en protocolos de trasplante mediante programas
-                  que mejoren su calidad de vida.
+                  Brindar atención y apoyo multidisciplinario en la prevención, detección, control 
+                  y tratamiento de personas con Enfermedad Renal Crónica, con o sin tratamiento 
+                  sustitutivo de función renal (hemodiálisis, diálisis) y acompañamiento de protocolo 
+                  de trasplante por medio de programas y acciones que contribuyan a mejorar su calidad de vida.
                 </p>
               </div>
 
@@ -280,9 +247,10 @@ const Home: React.FC = () => {
               <div className="rounded-3xl bg-white border border-slate-100 shadow-sm p-6 flex flex-col">
                 <h3 className="text-sm font-semibold text-slate-900">Visión</h3>
                 <p className="mt-2 text-xs text-slate-600 leading-relaxed">
-                  Ser una organización autosustentable que promueve la detección oportuna y la prevención
-                  en personas en situación vulnerable con factores de riesgo para ERC, contribuyendo
-                  a disminuir su progresión y su letalidad.
+                  Ser una organización autosustentable que promueve la prevención y detección oportuna 
+                  en personas con factores de riesgo de la Enfermedad Renal Crónica (ERC), que se encuentran 
+                  en situación vulnerable; con el fin de modificar positivamente la evolución natural y así 
+                  disminuir la letalidad de la ERC.
                 </p>
               </div>
             </div>
@@ -299,18 +267,34 @@ const Home: React.FC = () => {
         <div className="max-w-6xl mx-auto px-4 py-6 grid gap-4 md:grid-cols-3">
           <div>
             <p className="font-semibold text-slate-900">Contacto</p>
-            <p className="mt-1">San Juan del Río, Querétaro, México.</p>
             <p className="mt-1">
-              Teléfono: <span className="font-medium">(01 427) 101-34-35</span>
+              <span className="font-medium">Dirección:</span><br />
+              Sierra Vertientes #167 Lomas de San Juan<br />
+              San Juan del Río, Querétaro, México
+            </p>
+            <p className="mt-2">
+              <span className="font-medium">Teléfono:</span> 427 101 34 35
             </p>
             <p className="mt-1">
-              Beneficiarios: lunes a viernes, 09:00 a 17:00 h
+              <span className="font-medium">WhatsApp:</span> 427 219 1068
             </p>
-            <p className="mt-1">Laboratorio: lunes a viernes, 07:30 a 17:00 h</p>
+            <p className="mt-1">
+              <span className="font-medium">Correo:</span> nefrovida.a.c@hotmail.com
+            </p>
           </div>
 
           <div>
-            <p className="font-semibold text-slate-900">Redes sociales</p>
+            <p className="font-semibold text-slate-900">Horario</p>
+            <p className="mt-1">
+              <span className="font-medium">Beneficiarios:</span><br />
+              Lunes - Viernes: 7:30am – 3:30pm
+            </p>
+            <p className="mt-2">
+              <span className="font-medium">Laboratorio:</span><br />
+              Lunes - Viernes: 7:30am – 9:00am
+            </p>
+            
+            <p className="font-semibold text-slate-900 mt-4">Redes sociales</p>
             <ul className="mt-1 space-y-1">
               <li>
                 <a
@@ -349,8 +333,8 @@ const Home: React.FC = () => {
             <p className="text-slate-500">
               © {new Date().getFullYear()} NefroVida A.C. Todos los derechos reservados.
             </p>
-            <p className="text-slate-400">
-              Creado porVitalsoft.
+            <p className="text-slate-400 mt-1">
+              Creado por Vitalsoft.
             </p>
           </div>
         </div>

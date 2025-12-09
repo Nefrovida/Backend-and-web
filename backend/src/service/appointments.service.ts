@@ -132,5 +132,37 @@ export const schedulePatientAppointment = async (appointmentData: {
   place?: string | null;
   appointment_status: 'REQUESTED' | 'PROGRAMMED' | 'FINISHED' | 'CANCELED' | 'MISSED';
 }) => {
-  return await appointmentsModel.createPatientAppointment(appointmentData);
+  // Normalize and validate patient_id: the frontend may send a `user_id` instead
+  // of the `patients.patient_id`. Try to resolve it to an existing patient.
+  try {
+    // 1) Check appointment exists
+    const appointment = await appointmentsModel.getAppointmentById(appointmentData.appointment_id);
+    if (!appointment) {
+      throw new NotFoundError(`Appointment with ID ${appointmentData.appointment_id} not found`);
+    }
+
+    // 2) Ensure patient_id refers to an existing patients.patient_id; if not,
+    //    try to resolve it as a users.user_id -> find the corresponding patient
+    let patient = await prisma.patients.findUnique({ where: { patient_id: appointmentData.patient_id } });
+    if (!patient) {
+      // maybe frontend sent the user_id instead of patient_id
+      patient = await prisma.patients.findFirst({ where: { user_id: appointmentData.patient_id } });
+      if (patient) {
+        appointmentData.patient_id = patient.patient_id; // replace with real patient_id
+      }
+    }
+
+    if (!patient) {
+      throw new NotFoundError(`Patient not found for id provided`);
+    }
+
+    // 3) Create patient appointment
+    return await appointmentsModel.createPatientAppointment(appointmentData);
+  } catch (error: any) {
+    // Surface Prisma FK errors as NotFound for clarity, otherwise rethrow
+    if (error?.code === 'P2003') {
+      throw new NotFoundError('Referenced record not found (patient or appointment)');
+    }
+    throw error;
+  }
 };

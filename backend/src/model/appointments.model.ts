@@ -284,6 +284,7 @@ export const createPatientAppointment = async (appointmentData: {
     return newPatientAppointment;
   } catch (error) {
     console.error('Error creating patient appointment:', error);
-    throw new Error('Failed to create patient appointment');
+    // Rethrow original error so callers can inspect Prisma error codes (e.g. P2003 FK violation)
+    throw error;
   }
 };

@@ -1,18 +1,18 @@
-import { timeStamp } from "console";
-
-export function mapAnalysisToEvents(data){
-    const events = [];
+// frontend/src/model/laboratoristCalendar.model.ts
+export function mapAnalysisToEvents(data: any) {
+    const events: any[] = [];
 
     Object.keys(data).forEach((timestamp) => {
-        data[timestamp].forEach((item) => {
-            const fullName = 
-                `${item.patient.user.name} ` +
-                `${item.patient.user.parent_last_name} ` +
-                `${item.patient.user.maternal_last_name ?? ""}`.trim();
+        data[timestamp].forEach((item: any) => {
+            const fullName = [
+                item.patient.user.name,
+                item.patient.user.parent_last_name,
+                item.patient.user.maternal_last_name,
+            ]
+                .filter(Boolean)
+                .join(" ");
 
-            // Delete UTC to retrieve date in Mexico's zone
-            const raw = item.analysis_date.replace("Z", "");
-            const startDate = new Date(raw);
+            const startDate = new Date(item.analysis_date);
             const endDate = new Date(startDate.getTime() + 30 * 60 * 1000);
 
             events.push({
@@ -23,7 +23,7 @@ export function mapAnalysisToEvents(data){
                 start: startDate,
                 end: endDate,
             });
-        })
-    })
-    return events
+        });
+    });
+    return events;
 }
