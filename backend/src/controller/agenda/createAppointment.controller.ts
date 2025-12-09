@@ -2,6 +2,7 @@
 import { Request, Response } from "express";
 import { prisma } from "../../util/prisma";
 import { Type, Status } from "@prisma/client";
+import { parseClientDateToUTC } from "../../util/date.util";
 
 async function createAppointment(req: Request, res: Response) {
     try {
@@ -24,7 +25,15 @@ async function createAppointment(req: Request, res: Response) {
             });
         }
 
-        const appointmentDate = new Date(date_hour);
+        let appointmentDate: Date;
+        try {
+            appointmentDate = parseClientDateToUTC(date_hour);
+        } catch (e) {
+            return res.status(400).json({
+                error: "Formato de fecha inválido",
+                received: date_hour,
+            });
+        }
 
         if (isNaN(appointmentDate.getTime())) {
             return res.status(400).json({
@@ -61,14 +70,13 @@ async function createAppointment(req: Request, res: Response) {
         }
 
         // 2) (Opcional) Evitar doble reserva para el MISMO appointment_id en ese horario
-        //    Descomenta si quieres que, en general, ese slot no se pueda repetir para nadie:
         /*
         const duplicatedForSlot = await prisma.patient_appointment.findFirst({
           where: {
             appointment_id,
             date_hour: appointmentDate,
             appointment_status: {
-              notIn: [Status.CANCELED, Status.FINISHED], // ignorar citas que ya terminaron o canceladas
+              notIn: [Status.CANCELED, Status.FINISHED],
             },
           },
         });

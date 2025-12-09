@@ -1,6 +1,8 @@
+// backend/src/controller/appointment.controller.ts
 import { Request, Response } from "express";
 import AppointmentModel from "../model/appointment.model";
 import { getAppointmentByPatient } from "../service/appointments.service";
+import { parseClientDateToUTC } from "../util/date.util";
 
 export default class AppointmentController {
   /**
@@ -62,10 +64,15 @@ export default class AppointmentController {
         return res.status(404).json({ error: "Cita no encontrada" });
       }
 
-      // Verificar que la fecha no sea en el pasado
-      const newDate = new Date(date_hour);
-      // Subtract 6 hours to account for UTC conversion
-      newDate.setHours(newDate.getHours() - 6);
+      let newDate: Date;
+      try {
+        newDate = parseClientDateToUTC(date_hour);
+      } catch (e) {
+        return res.status(400).json({
+          error: "Formato de fecha inválido",
+          received: date_hour,
+        });
+      }
 
       if (newDate < new Date()) {
         return res.status(400).json({
@@ -116,8 +123,6 @@ export default class AppointmentController {
     try {
       const { id } = req.params;
 
-      // Validaciones
-
       const appointmentId = parseInt(id);
       if (isNaN(appointmentId)) {
         return res.status(400).json({ error: "ID inválido" });
@@ -126,10 +131,8 @@ export default class AppointmentController {
       if (!existing) {
         return res.status(404).json({ error: "Cita no encontrada" });
       }
-      //Eliminar
-      const deleteAppointment = await AppointmentModel.deleteAppointment(
-        appointmentId
-      );
+
+      await AppointmentModel.deleteAppointment(appointmentId);
       return res.status(200).json({ message: "Success" });
     } catch (error) {
       console.error("Error deleting appointment:", error);
@@ -151,13 +154,12 @@ export default class AppointmentController {
         return res.status(404).json({ error: "Cita no encontrada" });
       }
 
-      const updatedAppointment =
-        await AppointmentModel.changeAppointmentStatus(appointmentId);
+      await AppointmentModel.changeAppointmentStatus(appointmentId);
 
       return res.status(200).json("Aprroved successfully");
     } catch (error) {
       console.error("Error changing appointment status:", error);
       res.status(500).json({ error: "Error al cambiar el estado de la cita" });
     }
-  } 
+  }
 }
